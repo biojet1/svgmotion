@@ -1,0 +1,41 @@
+{
+  "name": "svgmotion",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "license": "AGPL-version-3.0",
+  "private": false,
+  "engines": {
+    "node": ">= 14.0.0",
+    "npm": ">= 6.0.0"
+  },
+  "homepage": "",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "bugs": "",
+  "keywords": [],
+  "author": {
+    "name": "",
+    "email": "",
+    "url": ""
+  },
+  "contributors": [],
+  "scripts": {
+    "c8rephtml": "c8 report -r html",
+    "compile": "npx tsc -d --sourcemap",
+    "clean": "rm dist/*.*",
+    "test": "c8 npx tap -t600 --disable-coverage --reporter=terse 'test/**/*.tap.*js'",
+    "try": "npm run compile && npx tap -t600 --disable-coverage --reporter=terse 'test/**/*.tap.*js'"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.3"
+  },
+  "dependencies": {
+    "puppeteer": "^22.6.0",
+    "tap": "^18.7.1",
+    "yargs": "^17.7.2"
+  }
+}
