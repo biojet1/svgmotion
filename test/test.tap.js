@@ -1,7 +1,7 @@
 "uses strict";
 import test from "tap";
 
-import { Handle, KeyframeEntry, Keyframes } from "../dist/model/keyframes.js";
+import { Handle, KeyframeEntry, Keyframes, NumberValue } from "../dist/model/keyframes.js";
 
 test.test("handle", (t) => {
     let h = new Handle();
@@ -30,4 +30,12 @@ test.test("Keyframes", (t) => {
 
 });
 
+test.test("NumberValue", (t) => {
+    let v = new NumberValue();
+    v.set_value(0, 9);
+    v.set_value(60, 10);
+    console.log(v);
 
+    t.end();
+
+});

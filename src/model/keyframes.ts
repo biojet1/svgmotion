@@ -32,15 +32,10 @@ export class Keyframes<V> extends Array<KeyframeEntry<V>> {
     }
 }
 
-// time: int = field(rename="t")
-// in_value: Handle = field(rename="i", default=Handle(1, 1))
-// out_value: Handle = field(rename="o", default=Handle(0, 0))
-// hold: bool = field(rename="h", default=False)
-// value: T = field(rename="s")
 
 export abstract class Animatable<V> {
     value!: Keyframes<V> | V;
-    abstract interpolated_value(ratio: number, a: V, b: V): V;
+    abstract lerp_value(ratio: number, a: V, b: V): V;
     abstract add_value(a: V, b: V): V;
     get_value(time: number) {
         const { value } = this;
@@ -58,7 +53,7 @@ export abstract class Animatable<V> {
                         } else if (r == 1) {
                             return k.value;
                         }
-                        return this.interpolated_value(
+                        return this.lerp_value(
                             cubic_bezier_y_of_x(
                                 [0, 0],
                                 [p.out_value.x, p.out_value.y],
@@ -82,7 +77,6 @@ export abstract class Animatable<V> {
             return value;
         }
     }
-
 
     set_value(
         time: number,
@@ -125,4 +119,13 @@ export abstract class Animatable<V> {
         return kfs.set_value(time, value);
     }
 
+}
+
+export class NumberValue extends Animatable<number> {
+    lerp_value(r: number, a: number, b: number): number {
+        return a * (1 - r) + b * r;
+    }
+    add_value(a: number, b: number): number {
+        return a + b;
+    }
 }

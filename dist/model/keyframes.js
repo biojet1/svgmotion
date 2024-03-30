@@ -29,11 +29,6 @@ export class Keyframes extends Array {
         return kf;
     }
 }
-// time: int = field(rename="t")
-// in_value: Handle = field(rename="i", default=Handle(1, 1))
-// out_value: Handle = field(rename="o", default=Handle(0, 0))
-// hold: bool = field(rename="h", default=False)
-// value: T = field(rename="s")
 export class Animatable {
     value;
     get_value(time) {
@@ -53,7 +48,7 @@ export class Animatable {
                         else if (r == 1) {
                             return k.value;
                         }
-                        return this.interpolated_value(cubic_bezier_y_of_x([0, 0], [p.out_value.x, p.out_value.y], [p.in_value.x, p.in_value.y], [1, 1])(r), p.value, k.value);
+                        return this.lerp_value(cubic_bezier_y_of_x([0, 0], [p.out_value.x, p.out_value.y], [p.in_value.x, p.in_value.y], [1, 1])(r), p.value, k.value);
                     }
                     else {
                         return k.value;
@@ -106,6 +101,14 @@ export class Animatable {
             }
         }
         return kfs.set_value(time, value);
+    }
+}
+export class NumberValue extends Animatable {
+    lerp_value(r, a, b) {
+        return a * (1 - r) + b * r;
+    }
+    add_value(a, b) {
+        return a + b;
     }
 }
 //# sourceMappingURL=keyframes.js.map
