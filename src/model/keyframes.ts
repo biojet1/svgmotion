@@ -118,7 +118,9 @@ export abstract class Animatable<V> {
         }
         return kfs.set_value(time, value);
     }
-
+    constructor(v: V) {
+        this.value = v;
+    }
 }
 
 export class NumberValue extends Animatable<number> {
@@ -128,4 +130,88 @@ export class NumberValue extends Animatable<number> {
     add_value(a: number, b: number): number {
         return a + b;
     }
+    constructor(v: number) {
+        super(v);
+    }
 }
+
+export class NVector extends Float64Array {
+    add(that: NVector) {
+        return new NVector(this.map((v, i) => v + that[i]));
+    }
+    mul(that: NVector) {
+        return new NVector(this.map((v, i) => v * that[i]));
+    }
+    lerp(that: NVector, t: number) {
+        const u = (1 - t);
+        const a = this.map((v, i) => v * u);
+        const b = that.map((v, i) => v * t);
+        return new NVector(a.map((v, i) => v + b[i]));
+    }
+}
+
+export class NVectorValue extends Animatable<NVector> {
+    lerp_value(r: number, a: NVector, b: NVector): NVector {
+        return a.lerp(b, r);
+    }
+    add_value(a: NVector, b: NVector): NVector {
+        return a.add(b);
+    }
+    constructor(v: Iterable<number>) {
+        super(new NVector(v));
+    }
+}
+// def Point(x, y):
+//     return NVector(x, y)
+
+
+// def Size(x, y):
+//     return NVector(x, y)
+export class Point extends NVector {
+    constructor(x: number = 0, y: number = 0) {
+        super([x, y]);
+    }
+}
+
+// def Point3D(x, y, z):
+//     return NVector(x, y, z)
+export class PositionValue extends NVectorValue {
+    // constructor(x: number = 0, y: number = 0) {
+    //     super([x, y]);
+    // }
+}
+
+export class Transform {
+    anchor?: PositionValue;
+    position?: PositionValue;
+    scale?: NVectorValue;
+    rotation?: NumberValue;
+    skew?: NumberValue;
+    skew_axis?: NumberValue;
+    // constructor(x: number = 0, y: number = 0) {
+    //     super([x, y]);
+    // }
+}
+export class Box {
+    size: PositionValue;
+    position: PositionValue;
+    constructor(position: Iterable<number>, size: Iterable<number>) {
+        this.size = new NVectorValue(size);
+        this.position = new NVectorValue(position);
+    }
+}
+
+// class Transform(LottieObject):
+//     """!
+//     Layer transform
+//     """
+//     _props = [
+//         LottieProp("anchor_point", "a", PositionValue, False),
+//         LottieProp("position", "p", PositionValue, False),
+//         LottieProp("scale", "s", MultiDimensional, False),
+//         LottieProp("rotation", "r", Value, False),
+//         LottieProp("opacity", "o", Value, False),
+//         LottieProp("skew", "sk", Value, False),
+//         LottieProp("skew_axis", "sa", Value, False),
+
+// TODO: VectorValue, RGBAValue

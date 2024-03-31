@@ -27,11 +27,13 @@
     "c8rephtml": "c8 report -r html",
     "compile": "npx tsc -d --sourcemap",
     "clean": "rm dist/*.*",
-    "test": "c8 npx tap -t600 --disable-coverage --reporter=terse 'test/**/*.tap.*js'",
-    "try": "npm run compile && npx tap -t600 --disable-coverage --reporter=terse 'test/**/*.tap.*js'"
+    "c8test": "c8 npx tap -t600 --disable-coverage --reporter=terse 'test/**/*.tap.*js'",
+    "try": "npm run compile && npm run compile",
+    "test": "npx tap -t600 --disable-coverage 'test/**/*.tap.*js'"
   },
   "devDependencies": {
-    "typescript": "^5.4.3"
+    "typescript": "^5.4.3",
+    "webpack": "^5.91.0"
   },
   "dependencies": {
     "puppeteer": "^22.6.0",

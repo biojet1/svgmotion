@@ -1,7 +1,13 @@
 "uses strict";
 import test from "tap";
 
-import { Handle, KeyframeEntry, Keyframes, NumberValue } from "../dist/model/keyframes.js";
+import {
+    Handle, KeyframeEntry, Keyframes, NumberValue,
+    NVectorValue, Point, NVector
+} from "../dist/model/keyframes.js";
+import {
+    ViewPort, Rect, Ellipse
+} from "../dist/model/node.js";
 
 test.test("handle", (t) => {
     let h = new Handle();
@@ -39,3 +45,38 @@ test.test("NumberValue", (t) => {
     t.end();
 
 });
+test.test("Point", (t) => {
+    let v = new Point(4, 5, 6, 7);
+
+    console.log(v);
+    t.end();
+
+});
+test.test("NVectorValue", (t) => {
+    let v = new NVectorValue();
+    v.set_value(0, new NVector([3, 4]));
+    v.set_value(60, new NVector([4, 5]));
+
+    console.log(v.get_value(60));
+    t.end();
+
+});
+
+test.test("ViewPort", (t) => {
+    let v = new ViewPort();
+    v.push(new Rect());
+    v.push(new Ellipse());
+
+    // v.set_value(0, new NVector([3, 4]));
+    // v.set_value(60, new NVector([4, 5]));
+    v[0].fun();
+
+    console.log(v);
+    t.end();
+
+});
+
+
+
+
+

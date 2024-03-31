@@ -102,6 +102,9 @@ export class Animatable {
         }
         return kfs.set_value(time, value);
     }
+    constructor(v) {
+        this.value = v;
+    }
 }
 export class NumberValue extends Animatable {
     lerp_value(r, a, b) {
@@ -110,5 +113,75 @@ export class NumberValue extends Animatable {
     add_value(a, b) {
         return a + b;
     }
+    constructor(v) {
+        super(v);
+    }
 }
+export class NVector extends Float64Array {
+    add(that) {
+        return new NVector(this.map((v, i) => v + that[i]));
+    }
+    mul(that) {
+        return new NVector(this.map((v, i) => v * that[i]));
+    }
+    lerp(that, t) {
+        const u = (1 - t);
+        const a = this.map((v, i) => v * u);
+        const b = that.map((v, i) => v * t);
+        return new NVector(a.map((v, i) => v + b[i]));
+    }
+}
+export class NVectorValue extends Animatable {
+    lerp_value(r, a, b) {
+        return a.lerp(b, r);
+    }
+    add_value(a, b) {
+        return a.add(b);
+    }
+    constructor(v) {
+        super(new NVector(v));
+    }
+}
+// def Point(x, y):
+//     return NVector(x, y)
+// def Size(x, y):
+//     return NVector(x, y)
+export class Point extends NVector {
+    constructor(x = 0, y = 0) {
+        super([x, y]);
+    }
+}
+// def Point3D(x, y, z):
+//     return NVector(x, y, z)
+export class PositionValue extends NVectorValue {
+}
+export class Transform {
+    anchor;
+    position;
+    scale;
+    rotation;
+    skew;
+    skew_axis;
+}
+export class Box {
+    size;
+    position;
+    constructor(position, size) {
+        this.size = new NVectorValue(size);
+        this.position = new NVectorValue(position);
+    }
+}
+// class Transform(LottieObject):
+//     """!
+//     Layer transform
+//     """
+//     _props = [
+//         LottieProp("anchor_point", "a", PositionValue, False),
+//         LottieProp("position", "p", PositionValue, False),
+//         LottieProp("scale", "s", MultiDimensional, False),
+//         LottieProp("rotation", "r", Value, False),
+//         LottieProp("opacity", "o", Value, False),
+//         LottieProp("skew", "sk", Value, False),
+//         LottieProp("skew_axis", "sa", Value, False),
+// TODO: VectorValue, RGBAValue
 //# sourceMappingURL=keyframes.js.map
