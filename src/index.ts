@@ -1,16 +1,43 @@
-import  puppeteer from "puppeteer";
-(async () => {
-	const browser = await puppeteer.launch({
-    args: ['--no-sandbox'],
-    timeout: 10000,
-  });
-    console.log(browser);
-	
-	const page = await browser.newPage();
-	await page.goto('https://www.freecodecamp.org/news/how-to-use-puppeteer-with-nodejs/');
-    console.log(page);
-   // # await page.waitForNavigation({waitUntil: 'networkidle', networkIdleTimeout: 1000});
-  console.log("title", await page.title());
-	
-	await browser.close();
-})();
+import { Root, ViewPort, Rect, Size } from "./model/index.js";
+
+export { Root, ViewPort, Rect };
+
+export function animate(root: Root, fps: number) {
+  const [start, end] = root.calc_time_range();
+  if (end >= start) {
+
+    const spf = 1000 / fps;
+    let frame = start;
+    const frames = end - start + 1;
+
+    function render(currentTime: DOMHighResTimeStamp) {
+      const t = performance.now();
+      {
+        // console.info(`${frame} t=${t} frames=${frames} ${start}-${end}`);
+        root.update_node(frame);
+      }
+      frame = (frame + 1) % frames;
+      const delta = performance.now() - t;
+      if (delta >= spf) {
+        requestAnimationFrame(render);
+      }
+      else {
+        setTimeout(function () { requestAnimationFrame(render); }, spf - delta);
+      }
+    }
+    requestAnimationFrame(render);
+  } else {
+    root.update_node(0);
+  }
+}
+
+// globalThis.requestAnimationFrame()
+
+(globalThis as unknown as any).svgmotion = {
+  root: function () {
+    return new Root();
+  }, Size, animate
+
+};
+
+(globalThis as unknown as any).animate = animate;

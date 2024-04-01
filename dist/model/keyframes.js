@@ -33,7 +33,7 @@ export class Animatable {
     value;
     get_value(time) {
         const { value } = this;
-        if (value instanceof Array) {
+        if (value instanceof Keyframes) {
             let p = undefined; // previous KeyframeEntry<V>
             for (const k of value) {
                 if (time <= k.time) {
@@ -151,37 +151,13 @@ export class Point extends NVector {
         super([x, y]);
     }
 }
+export class Size extends NVector {
+    constructor(w = 0, h = 0) {
+        super([w, h]);
+    }
+}
 // def Point3D(x, y, z):
 //     return NVector(x, y, z)
 export class PositionValue extends NVectorValue {
 }
-export class Transform {
-    anchor;
-    position;
-    scale;
-    rotation;
-    skew;
-    skew_axis;
-}
-export class Box {
-    size;
-    position;
-    constructor(position, size) {
-        this.size = new NVectorValue(size);
-        this.position = new NVectorValue(position);
-    }
-}
-// class Transform(LottieObject):
-//     """!
-//     Layer transform
-//     """
-//     _props = [
-//         LottieProp("anchor_point", "a", PositionValue, False),
-//         LottieProp("position", "p", PositionValue, False),
-//         LottieProp("scale", "s", MultiDimensional, False),
-//         LottieProp("rotation", "r", Value, False),
-//         LottieProp("opacity", "o", Value, False),
-//         LottieProp("skew", "sk", Value, False),
-//         LottieProp("skew_axis", "sa", Value, False),
-// TODO: VectorValue, RGBAValue
 //# sourceMappingURL=keyframes.js.map

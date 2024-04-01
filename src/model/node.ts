@@ -1,66 +1,125 @@
-
-import { NVectorValue, Transform, NumberValue, Box } from "./keyframes.js"
+import { Animatable, Keyframes, NVectorValue, NumberValue } from "./keyframes.js";
+import { Box, Transform, ValueSet } from "./properties.js";
 
 interface INode {
     id?: string;
     transform?: Transform;
     opacity?: NumberValue;
+    _node?: SVGElement;
     // fill
     // stroke
     // clip
-    _update(frame: number, node: SVGElement): boolean;
+    // _update(frame: number, node: SVGElement): boolean;
+
 }
+
 function update(frame: number, target: INode, el: SVGElement) {
     const { opacity } = target;
     if (opacity) {
         const v = opacity.get_value(frame);
         el.style.opacity = v + '';
+        // el.style.stroke
     }
-
-
-
 }
 
-function deco(target: any, context: any) {
-
-
-    target.prototype.fun = function () {
-        console.log("FUN")
-    }
-    return target;
-}
-
-@deco
 export abstract class Node implements INode {
     id?: string;
     transform?: Transform;
     opacity?: NumberValue;
-    abstract _update(frame: number, node: SVGElement): boolean;
+    _node?: SVGElement;
+
     abstract as_svg(doc: Document): SVGElement;
+
+    update_self(frame: number, node: SVGElement): void {
+        update(frame, this, node);
+    }
+
+    update_node(frame: number): void {
+        const node = this._node;
+        if (node) {
+            this.update_self(frame, node);
+        }
+    }
+    * enum_values(): Generator<Animatable<any>, void, unknown> {
+        for (let v of Object.values(this)) {
+            if (v instanceof Animatable) {
+                yield v;
+            } else if (v instanceof ValueSet) {
+                yield* v.enum_values();
+            }
+        }
+    }
 }
 
 export abstract class Shape extends Node {
     // strok fill
 }
 
-
-
-
 export abstract class Container extends Array<Node | Container> implements INode {
     id?: string;
     transform?: Transform;
     opacity?: NumberValue;
+    _node?: SVGElement;
 
-    _update(frame: number, node: SVGElement): boolean {
-
-        for (const e of this) {
-            //  e._update(frame, )
-
+    abstract as_svg(doc: Document): SVGElement;
+    update_self(frame: number, node: SVGElement): boolean {
+        update(frame, this, node);
+        return true; // should we call update_node to children
+    }
+    update_node(frame: number) {
+        const node = this._node;
+        if (node) {
+            if (this.update_self(frame, node)) {
+                for (const sub of this) {
+                    sub.update_node(frame);
+                }
+            }
         }
-        return true;
+    }
+    * enum_values(): Generator<Animatable<any>, void, unknown> {
+        for (let v of Object.values(this)) {
+            if (v instanceof Animatable) {
+                yield v;
+            } else if (v instanceof ValueSet) {
+                yield* v.enum_values();
+            }
+        }
+        for (const sub of this) {
+            yield* sub.enum_values();
+        }
+    }
+
+    * enum_keyframes(): Generator<Keyframes<any>, void, unknown> {
+        for (let { value } of this.enum_values()) {
+            if (value instanceof Keyframes) {
+                yield value;
+            }
+        }
+    }
+    add_rect(size: Iterable<number> = [100, 100]) {
+        const x = new Rect();
+        // x.size = new NVectorValue(size);
+        this.push(x);
+        return x;
 
     }
-    abstract as_svg(doc: Document): SVGElement;
+    calc_time_range() {
+        let max = 0;
+        let min = 0;
+        for (let kfs of this.enum_keyframes()) {
+            for (const { time } of kfs) {
+                if (time > max) {
+                    max = time;
+                }
+                if (time < min) {
+                    min = time;
+                }
+            }
+        }
+        return [min, max];
+    }
+
+
 }
 
 export class Group extends Container {
@@ -72,16 +131,15 @@ export class Group extends Container {
         return con;
     }
 }
-// 
+
 export class ViewPort extends Container {
     view_port: Box = new Box([0, 0], [100, 100]);
     as_svg(doc: Document) {
-        const con = doc.createElementNS(NS_SVG, "svg");
+        const con = this._node = doc.createElementNS(NS_SVG, "svg");
         // e.preserveAspectRatio
         // this.view_port.size
         // e.width.baseVal.value = this.size
         // e.addEventListener
-        (con as any)._aux = this;
         for (const sub of this) {
             con.appendChild(sub.as_svg(doc));
         }
@@ -93,20 +151,18 @@ const NS_SVG = "http://www.w3.org/2000/svg"
 export class Rect extends Shape {
     size: NVectorValue = new NVectorValue([100, 100]);
     as_svg(doc: Document) {
-        const e = doc.createElementNS(NS_SVG, "rect");
+        const e = this._node = doc.createElementNS(NS_SVG, "rect");
         // e.width.baseVal.value = this.size
         // e.addEventListener
-        (e as any)._aux = this;
         return e;
     }
-    _update(frame: number, node: SVGElement): boolean {
+    update_self(frame: number, node: SVGElement) {
         let x = this.size.get_value(frame);
         let e = node as unknown as SVGRectElement;
         e.width.baseVal.value = x[0];
-        e.height.baseVal.value = x[0];
-        // super.
-        update(frame, this, node);
-        return false;
+        e.height.baseVal.value = x[1];
+        // console.log(`Rect:update_self ${frame} ${x}`);
+        super.update_self(frame, node);
     }
 }
 
@@ -118,22 +174,8 @@ export class Rect extends Shape {
 //     href: string = "";
 //     size: NVectorValue = new NVectorValue([100, 100]);
 // }
-
-const w = new WeakMap<SVGElement, INode>();
-
-function _update_walk(frame: number, node: SVGElement) {
-    // w.get(node);
-    const aux = (node as any)._aux as INode;
-    if (aux) {
-        if (aux._update(frame, node)) {
-            for (let cur = node.firstElementChild; cur; cur = cur.nextElementSibling) {
-                _update_walk(frame, cur as SVGElement);
-            }
-        }
-    }
-}
-
 export class Root extends ViewPort {
     defs: Array<Node | Container> = [];
+
 
 }

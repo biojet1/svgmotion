@@ -38,18 +38,8 @@ export declare class NVectorValue extends Animatable<NVector> {
 export declare class Point extends NVector {
     constructor(x?: number, y?: number);
 }
+export declare class Size extends NVector {
+    constructor(w?: number, h?: number);
+}
 export declare class PositionValue extends NVectorValue {
-}
-export declare class Transform {
-    anchor?: PositionValue;
-    position?: PositionValue;
-    scale?: NVectorValue;
-    rotation?: NumberValue;
-    skew?: NumberValue;
-    skew_axis?: NumberValue;
-}
-export declare class Box {
-    size: PositionValue;
-    position: PositionValue;
-    constructor(position: Iterable<number>, size: Iterable<number>);
 }
