@@ -1,10 +1,11 @@
 import { Animatable, Keyframes, NVectorValue, NumberValue } from "./keyframes.js";
-import { Box, Transform } from "./properties.js";
+import { Box, Stroke, Transform } from "./properties.js";
 interface INode {
     id?: string;
     transform?: Transform;
     opacity?: NumberValue;
     _node?: SVGElement;
+    stroke?: Stroke;
 }
 export declare abstract class Node implements INode {
     id?: string;
@@ -22,6 +23,7 @@ export declare abstract class Container extends Array<Node | Container> implemen
     id?: string;
     transform?: Transform;
     opacity?: NumberValue;
+    stroke?: Stroke;
     _node?: SVGElement;
     abstract as_svg(doc: Document): SVGElement;
     update_self(frame: number, node: SVGElement): boolean;

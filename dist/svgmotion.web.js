@@ -1,8 +1,81 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	"use strict";
+/******/ 	// The require scope
+/******/ 	var __webpack_require__ = {};
+/******/ 	
+/************************************************************************/
+/******/ 	/* webpack/runtime/define property getters */
+/******/ 	(() => {
+/******/ 		// define getter functions for harmony exports
+/******/ 		__webpack_require__.d = (exports, definition) => {
+/******/ 			for(var key in definition) {
+/******/ 				if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
+/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+/******/ 				}
+/******/ 			}
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
+/******/ 	(() => {
+/******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__webpack_require__.r = (exports) => {
+/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/************************************************************************/
 var __webpack_exports__ = {};
 
 // UNUSED EXPORTS: Rect, Root, ViewPort, animate
+
+// NAMESPACE OBJECT: ./dist/model/index.js
+var model_namespaceObject = {};
+__webpack_require__.r(model_namespaceObject);
+__webpack_require__.d(model_namespaceObject, {
+  Animatable: () => (Animatable),
+  Box: () => (Box),
+  Container: () => (Container),
+  Fill: () => (Fill),
+  Group: () => (Group),
+  Handle: () => (Handle),
+  KeyframeEntry: () => (KeyframeEntry),
+  Keyframes: () => (Keyframes),
+  NVector: () => (NVector),
+  NVectorValue: () => (NVectorValue),
+  Node: () => (Node),
+  NumberValue: () => (NumberValue),
+  Point: () => (Point),
+  PositionValue: () => (PositionValue),
+  RGB: () => (RGB),
+  RGBValue: () => (RGBValue),
+  Rect: () => (Rect),
+  Root: () => (Root),
+  Shape: () => (Shape),
+  Size: () => (Size),
+  Stroke: () => (Stroke),
+  Transform: () => (Transform),
+  ValueSet: () => (ValueSet),
+  ViewPort: () => (ViewPort)
+});
+
+// NAMESPACE OBJECT: ./dist/track/index.js
+var track_namespaceObject = {};
+__webpack_require__.r(track_namespaceObject);
+__webpack_require__.d(track_namespaceObject, {
+  Action: () => (Action),
+  To: () => (To),
+  ToA: () => (ToA),
+  Track: () => (Track)
+});
 
 ;// CONCATENATED MODULE: ./dist/model/bezier.js
 function cubic_bezier_y_of_x(p1, p2, p3, p4) {
@@ -85,6 +158,10 @@ class KeyframeEntry {
     out_value = new Handle();
     hold = false;
     value;
+    calc_ratio(r) {
+        const { out_value: ov, in_value: iv } = this;
+        return cubic_bezier_y_of_x([0, 0], [ov.x, ov.y], [iv.x, iv.y], [1, 1])(r);
+    }
 }
 class Keyframes extends Array {
     set_value(time, value) {
@@ -124,7 +201,7 @@ class Animatable {
                         else if (r == 1) {
                             return k.value;
                         }
-                        return this.lerp_value(cubic_bezier_y_of_x([0, 0], [p.out_value.x, p.out_value.y], [p.in_value.x, p.in_value.y], [1, 1])(r), p.value, k.value);
+                        return this.lerp_value(p.calc_ratio(r), p.value, k.value);
                     }
                     else {
                         return k.value;
@@ -232,19 +309,25 @@ class Size extends NVector {
         super([w, h]);
     }
 }
+class RGB extends NVector {
+    constructor(r = 0, g = 0, b = 0) {
+        super([r, g, b]);
+    }
+}
 // def Point3D(x, y, z):
 //     return NVector(x, y, z)
-class PositionValue extends (/* unused pure expression or super */ null && (NVectorValue)) {
+class PositionValue extends NVectorValue {
+}
+class RGBValue extends NVectorValue {
 }
 //# sourceMappingURL=keyframes.js.map
 ;// CONCATENATED MODULE: ./dist/model/properties.js
-
 
 class ValueSet {
     *enum_values() {
         for (const sub of Object.values(this)) {
             if (sub instanceof Animatable) {
-                let { value } = sub;
+                // let { value } = sub;
                 // if (value instanceof Keyframes) {
                 //     yield value;
                 // }
@@ -262,10 +345,14 @@ class Box extends ValueSet {
         this.position = new NVectorValue(position);
     }
 }
-class Stroke extends (/* unused pure expression or super */ null && (ValueSet)) {
+class Stroke extends ValueSet {
     width;
 }
-class Transform extends (/* unused pure expression or super */ null && (ValueSet)) {
+class Fill extends ValueSet {
+    color;
+    opacity;
+}
+class Transform extends ValueSet {
     anchor;
     position;
     scale;
@@ -316,6 +403,8 @@ class Container extends Array {
     id;
     transform;
     opacity;
+    // fill?: Fill;
+    stroke;
     _node;
     update_self(frame, node) {
         update(frame, this, node);
@@ -373,9 +462,9 @@ class Container extends Array {
         return [min, max];
     }
 }
-class Group extends (/* unused pure expression or super */ null && (Container)) {
+class Group extends Container {
     as_svg(doc) {
-        const con = doc.createElementNS(NS_SVG, "group");
+        const con = this._node = doc.createElementNS(NS_SVG, "group");
         for (const sub of this) {
             con.appendChild(sub.as_svg(doc));
         }
@@ -430,15 +519,79 @@ class Root extends ViewPort {
 
 
 //# sourceMappingURL=index.js.map
+;// CONCATENATED MODULE: ./dist/track/index.js
+class Action {
+    _start = -Infinity;
+    _end = -Infinity;
+    _dur = -Infinity;
+    ready(track) {
+        throw new Error("Not implemented");
+    }
+    run() {
+        throw new Error("Not implemented");
+    }
+    resolve(frame, base_frame) {
+        const dur = this._dur;
+        this._start = frame;
+        this._end = frame + dur;
+    }
+    get_active_dur() {
+        return this._end - this._start;
+    }
+}
+class ToA extends Action {
+    constructor(props, value, dur = 1) {
+        super();
+        this.ready = function (track) {
+            this._dur = track.to_frame(dur);
+        };
+        this.run = function () {
+            const { _start, _end } = this;
+            for (const prop of props) {
+                // const 
+                prop.set_value(_end, value, _start);
+            }
+        };
+    }
+}
+function To(props, value, dur = 1) {
+    return new ToA(props, value, dur);
+}
+class Track {
+    frame = 0;
+    frame_rate = 60;
+    sec(n) {
+        return this.frame_rate * n;
+    }
+    to_frame(sec) {
+        return Math.round(this.frame_rate * sec);
+    }
+    feed(cur) {
+        cur.ready(this);
+        cur.resolve(this.frame, this.frame);
+        const d = cur.get_active_dur();
+        if (d >= 0) {
+            cur.run();
+            this.frame += d;
+        }
+        else {
+            throw new Error(`Unexpected`);
+        }
+        return this;
+    }
+}
+//# sourceMappingURL=index.js.map
 ;// CONCATENATED MODULE: ./dist/index.js
+
+
 
 
 function animate(root, fps) {
     const [start, end] = root.calc_time_range();
     if (end >= start) {
-        const spf = 1000 / fps;
-        let frame = start;
+        const mspf = 1000 / fps; // miliseconds per frame
         const frames = end - start + 1;
+        let frame = start;
         function render(currentTime) {
             const t = performance.now();
             {
@@ -446,12 +599,12 @@ function animate(root, fps) {
                 root.update_node(frame);
             }
             frame = (frame + 1) % frames;
-            const delta = performance.now() - t;
-            if (delta >= spf) {
-                requestAnimationFrame(render);
+            const excess = mspf - (performance.now() - t);
+            if (excess > 0) {
+                setTimeout(() => requestAnimationFrame(render), excess);
             }
             else {
-                setTimeout(function () { requestAnimationFrame(render); }, spf - delta);
+                requestAnimationFrame(render);
             }
         }
         requestAnimationFrame(render);
@@ -464,7 +617,7 @@ function animate(root, fps) {
 globalThis.svgmotion = {
     root: function () {
         return new Root();
-    }, Size: Size, animate
+    }, animate, ...model_namespaceObject, ...track_namespaceObject
 };
 globalThis.animate = animate;
 //# sourceMappingURL=index.js.map

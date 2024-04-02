@@ -1,12 +1,10 @@
-import { Animatable } from "./keyframes.js";
-import { NumberValue } from "./keyframes.js";
-import { PositionValue, NVectorValue } from "./keyframes.js";
+import { Animatable, NVectorValue, NumberValue, PositionValue, RGBValue } from "./keyframes.js";
 
 export class ValueSet {
     *enum_values(): Generator<Animatable<any>, void, unknown> {
         for (const sub of Object.values(this)) {
             if (sub instanceof Animatable) {
-                let { value } = sub;
+                // let { value } = sub;
                 // if (value instanceof Keyframes) {
                 //     yield value;
                 // }
@@ -15,6 +13,7 @@ export class ValueSet {
         }
     }
 }
+
 export class Box extends ValueSet {
     size: PositionValue;
     position: PositionValue;
@@ -28,6 +27,12 @@ export class Box extends ValueSet {
 export class Stroke extends ValueSet {
     width?: NumberValue;
 }
+
+export class Fill extends ValueSet {
+    color?: RGBValue;
+    opacity?: NumberValue;
+}
+
 
 export class Transform extends ValueSet {
     anchor?: PositionValue;

@@ -8,6 +8,7 @@ export declare class KeyframeEntry<V> {
     out_value: Handle;
     hold: boolean;
     value: V;
+    calc_ratio(r: number): number;
 }
 export declare class Keyframes<V> extends Array<KeyframeEntry<V>> {
     set_value(time: number, value: V): KeyframeEntry<V>;
@@ -41,5 +42,10 @@ export declare class Point extends NVector {
 export declare class Size extends NVector {
     constructor(w?: number, h?: number);
 }
+export declare class RGB extends NVector {
+    constructor(r?: number, g?: number, b?: number);
+}
 export declare class PositionValue extends NVectorValue {
+}
+export declare class RGBValue extends NVectorValue {
 }

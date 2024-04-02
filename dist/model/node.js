@@ -39,6 +39,8 @@ export class Container extends Array {
     id;
     transform;
     opacity;
+    // fill?: Fill;
+    stroke;
     _node;
     update_self(frame, node) {
         update(frame, this, node);
@@ -98,7 +100,7 @@ export class Container extends Array {
 }
 export class Group extends Container {
     as_svg(doc) {
-        const con = doc.createElementNS(NS_SVG, "group");
+        const con = this._node = doc.createElementNS(NS_SVG, "group");
         for (const sub of this) {
             con.appendChild(sub.as_svg(doc));
         }

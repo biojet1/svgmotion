@@ -1,14 +1,15 @@
-import { Root, ViewPort, Rect, Size } from "./model/index.js";
-
+import { Root, ViewPort, Rect, Size, NumberValue } from "./model/index.js";
+import * as all from "./model/index.js";
+import * as track from "./track/index.js";
 export { Root, ViewPort, Rect };
 
 export function animate(root: Root, fps: number) {
   const [start, end] = root.calc_time_range();
   if (end >= start) {
 
-    const spf = 1000 / fps;
-    let frame = start;
+    const mspf = 1000 / fps; // miliseconds per frame
     const frames = end - start + 1;
+    let frame = start;
 
     function render(currentTime: DOMHighResTimeStamp) {
       const t = performance.now();
@@ -17,12 +18,12 @@ export function animate(root: Root, fps: number) {
         root.update_node(frame);
       }
       frame = (frame + 1) % frames;
-      const delta = performance.now() - t;
-      if (delta >= spf) {
-        requestAnimationFrame(render);
+      const excess = mspf - (performance.now() - t);
+      if (excess > 0) {
+        setTimeout(() => requestAnimationFrame(render), excess);
       }
       else {
-        setTimeout(function () { requestAnimationFrame(render); }, spf - delta);
+        requestAnimationFrame(render);
       }
     }
     requestAnimationFrame(render);
@@ -36,7 +37,7 @@ export function animate(root: Root, fps: number) {
 (globalThis as unknown as any).svgmotion = {
   root: function () {
     return new Root();
-  }, Size, animate
+  }, animate, ...all, ...track
 
 };
 

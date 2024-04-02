@@ -1,6 +1,4 @@
-import { Animatable } from "./keyframes.js";
-import { NumberValue } from "./keyframes.js";
-import { PositionValue, NVectorValue } from "./keyframes.js";
+import { Animatable, NVectorValue, NumberValue, PositionValue, RGBValue } from "./keyframes.js";
 export declare class ValueSet {
     enum_values(): Generator<Animatable<any>, void, unknown>;
 }
@@ -11,6 +9,10 @@ export declare class Box extends ValueSet {
 }
 export declare class Stroke extends ValueSet {
     width?: NumberValue;
+}
+export declare class Fill extends ValueSet {
+    color?: RGBValue;
+    opacity?: NumberValue;
 }
 export declare class Transform extends ValueSet {
     anchor?: PositionValue;

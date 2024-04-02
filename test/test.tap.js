@@ -71,6 +71,7 @@ test.test("ViewPort", (t) => {
     // v.set_value(0, new NVector([3, 4]));
     // v.set_value(60, new NVector([4, 5]));
     // v[0].fun();
+    // r.opacity = 
 
     console.log(root.calc_time_range());
 

@@ -9,6 +9,10 @@ export class KeyframeEntry {
     out_value = new Handle();
     hold = false;
     value;
+    calc_ratio(r) {
+        const { out_value: ov, in_value: iv } = this;
+        return cubic_bezier_y_of_x([0, 0], [ov.x, ov.y], [iv.x, iv.y], [1, 1])(r);
+    }
 }
 export class Keyframes extends Array {
     set_value(time, value) {
@@ -48,7 +52,7 @@ export class Animatable {
                         else if (r == 1) {
                             return k.value;
                         }
-                        return this.lerp_value(cubic_bezier_y_of_x([0, 0], [p.out_value.x, p.out_value.y], [p.in_value.x, p.in_value.y], [1, 1])(r), p.value, k.value);
+                        return this.lerp_value(p.calc_ratio(r), p.value, k.value);
                     }
                     else {
                         return k.value;
@@ -156,8 +160,15 @@ export class Size extends NVector {
         super([w, h]);
     }
 }
+export class RGB extends NVector {
+    constructor(r = 0, g = 0, b = 0) {
+        super([r, g, b]);
+    }
+}
 // def Point3D(x, y, z):
 //     return NVector(x, y, z)
 export class PositionValue extends NVectorValue {
+}
+export class RGBValue extends NVectorValue {
 }
 //# sourceMappingURL=keyframes.js.map

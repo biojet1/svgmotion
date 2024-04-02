@@ -1,13 +1,13 @@
 import { Animatable, Keyframes, NVectorValue, NumberValue } from "./keyframes.js";
-import { Box, Transform, ValueSet } from "./properties.js";
+import { Box, Fill, Stroke, Transform, ValueSet } from "./properties.js";
 
 interface INode {
     id?: string;
     transform?: Transform;
     opacity?: NumberValue;
     _node?: SVGElement;
-    // fill
-    // stroke
+    // fill?: Fill;
+    stroke?: Stroke;
     // clip
     // _update(frame: number, node: SVGElement): boolean;
 
@@ -59,6 +59,9 @@ export abstract class Container extends Array<Node | Container> implements INode
     id?: string;
     transform?: Transform;
     opacity?: NumberValue;
+    // fill?: Fill;
+    stroke?: Stroke;
+
     _node?: SVGElement;
 
     abstract as_svg(doc: Document): SVGElement;
@@ -124,7 +127,7 @@ export abstract class Container extends Array<Node | Container> implements INode
 
 export class Group extends Container {
     as_svg(doc: Document) {
-        const con = doc.createElementNS(NS_SVG, "group");
+        const con = this._node = doc.createElementNS(NS_SVG, "group");
         for (const sub of this) {
             con.appendChild(sub.as_svg(doc));
         }
