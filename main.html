@@ -21,7 +21,7 @@
       // console.log(Object.entries(rect));
       // document.body.appendChild(svg);
       // root.update_node(0);
-      const { Size, animate, NumberValue, Track, To } = svgmotion;
+      const { Size, animate, NumberValue, Track, To, Seq } = svgmotion;
 
       let root = svgmotion.root();
       let r = root.add_rect();
@@ -35,9 +35,10 @@
       // r.opacity.set_value(30, 0.25);
       // r.opacity.set_value(50, 0.5);
       let tr = new Track();
-      tr.feed(To([r.opacity], 0.75));
-      tr.feed(To([r.opacity], 0));
-      tr.feed(To([r.opacity], 1));
+
+      tr.feed(
+        Seq(To([r.opacity], 0.75), To([r.opacity], 0), To([r.opacity], 1))
+      );
 
       console.log(`opacity [${r.opacity.get_value(0)}]`);
       let svg = root.as_svg(document);
