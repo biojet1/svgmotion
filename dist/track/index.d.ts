@@ -6,17 +6,17 @@ export interface IAction {
     _start?: number;
     _end?: number;
     ready(track: Track): void;
-    resolve(frame: number, base_frame: number): void;
+    resolve(frame: number, base_frame: number, hint_dur: number): void;
     get_active_dur(): number;
     run(): void;
 }
 export declare class Action implements IAction {
     _start: number;
     _end: number;
-    _dur: number;
+    _dur?: number;
     ready(track: Track): void;
     run(): void;
-    resolve(frame: number, base_frame: number): void;
+    resolve(frame: number, base_frame: number, hint_dur: number): void;
     get_active_dur(): number;
 }
 export declare abstract class Actions extends Array<Action | Actions> implements IAction {
@@ -24,20 +24,29 @@ export declare abstract class Actions extends Array<Action | Actions> implements
     _end: number;
     ready(track: Track): void;
     run(): void;
-    abstract resolve(frame: number, base_frame: number): void;
     get_active_dur(): number;
+    abstract resolve(frame: number, base_frame: number, hint_dur: number): void;
 }
 export declare class SeqA extends Actions {
     _delay?: number;
     _stagger?: number;
-    _dur?: number;
+    _hint_dur?: number;
     _easing?: (a: any) => void;
     ready(track: Track): void;
-    resolve(frame: number, base_frame: number): void;
+    resolve(frame: number, base_frame: number, hint_dur: number): void;
     delay(sec: number): this;
     stagger(sec: number): this;
 }
 export declare function Seq(...items: Array<Action | Actions>): SeqA;
+export declare class ParA extends Actions {
+    _hint_dur?: number;
+    _easing?: (a: any) => void;
+    _tail?: boolean;
+    ready(track: Track): void;
+    resolve(frame: number, base_frame: number, hint_dur: number): void;
+}
+export declare function Par(...items: Array<Action | Actions>): ParA;
+export declare function ParE(...items: Array<Action | Actions>): ParA;
 export declare class ToA extends Action {
     constructor(props: IProperty<any>[], value: any, dur?: number);
 }
@@ -45,6 +54,8 @@ export declare function To(props: IProperty<any>[], value: any, dur?: number): T
 export declare class Track {
     frame: number;
     frame_rate: number;
+    easing?: (a: any) => void;
+    hint_dur: number;
     sec(n: number): number;
     to_frame(sec: number): number;
     feed(cur: IAction): this;
