@@ -19,6 +19,7 @@ export declare abstract class Animatable<V> {
     abstract add_value(a: V, b: V): V;
     get_value(time: number): V;
     set_value(time: number, value: V, start?: number, easing?: (a: KeyframeEntry<V>) => void, add?: boolean): KeyframeEntry<V>;
+    parse_value(x: any): V;
     constructor(v: V);
 }
 export declare class NumberValue extends Animatable<number> {

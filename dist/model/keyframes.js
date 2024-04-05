@@ -84,7 +84,7 @@ export class Animatable {
                 }
                 else {
                     if (start != last.time) {
-                        throw new Error(`unexpected`);
+                        throw new Error(`unexpected start=${start} last.time=${last.time} time=${time}`);
                     }
                 }
             }
@@ -105,6 +105,9 @@ export class Animatable {
             }
         }
         return kfs.set_value(time, value);
+    }
+    parse_value(x) {
+        return x;
     }
     constructor(v) {
         this.value = v;

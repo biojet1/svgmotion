@@ -92,7 +92,7 @@ export abstract class Animatable<V> {
                     last = kfs.set_value(start, this.get_value(last.time));
                 } else {
                     if (start != last.time) {
-                        throw new Error(`unexpected`);
+                        throw new Error(`unexpected start=${start} last.time=${last.time} time=${time}`);
                     }
                 }
             }
@@ -113,6 +113,9 @@ export abstract class Animatable<V> {
         }
         return kfs.set_value(time, value);
     }
+    parse_value(x: any): V {
+        return x as V;
+    }
     constructor(v: V) {
         this.value = v;
     }
@@ -125,6 +128,7 @@ export class NumberValue extends Animatable<number> {
     add_value(a: number, b: number): number {
         return a + b;
     }
+
     constructor(v: number) {
         super(v);
     }

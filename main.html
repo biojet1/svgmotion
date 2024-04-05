@@ -21,7 +21,8 @@
       // console.log(Object.entries(rect));
       // document.body.appendChild(svg);
       // root.update_node(0);
-      const { Size, animate, NumberValue, Track, To, Seq, Par } = svgmotion;
+      const { Size, animate, NumberValue, Track, To, Seq, Par, Step } =
+        svgmotion;
 
       let root = svgmotion.root();
       let r = root.add_rect();
@@ -43,10 +44,18 @@
             To([r.size], new Size(100, 100)),
             To([r.size], new Size(10, 10))
           ),
-          Seq(
-            To([r.opacity], 0.25),
-            To([r.opacity], 0.9),
-            To([r.opacity], 0.25)
+          Step(
+            [
+              { A: 0.25, t: 0 },
+              { A: 0.9, dur: 1 },
+              { A: 0.25, dur: 1 },
+              { A: 0.9, dur: 1 },
+            ],
+
+            // To([r.opacity], 0.25),
+            // To([r.opacity], 0.9),
+            // To([r.opacity], 0.25)
+            { A: r.opacity }
           )
         )
       );
