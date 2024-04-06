@@ -98,7 +98,12 @@ export class Animatable {
         }
         if (last) {
             if (easing) {
-                easing(last);
+                if (easing === true) {
+                    last.hold = true;
+                }
+                else {
+                    easing(last);
+                }
             }
             if (add) {
                 value = this.add_value(last.value, value);

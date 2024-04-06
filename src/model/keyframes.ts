@@ -77,7 +77,7 @@ export abstract class Animatable<V> {
         time: number,
         value: V,
         start?: number,
-        easing?: (a: KeyframeEntry<V>) => void,
+        easing?: ((a: KeyframeEntry<V>) => void) | boolean,
         add?: boolean
     ) {
         let { value: kfs } = this;
@@ -105,7 +105,11 @@ export abstract class Animatable<V> {
         }
         if (last) {
             if (easing) {
-                easing(last);
+                if (easing === true) {
+                    last.hold = true;
+                } else {
+                    easing(last);
+                }
             }
             if (add) {
                 value = this.add_value(last.value, value);

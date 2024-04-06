@@ -1,4 +1,3 @@
-import { Track } from "./track.js";
 
 export interface IProperty<V> {
     get_value(time: number): V;
@@ -6,7 +5,7 @@ export interface IProperty<V> {
         time: number,
         value: V,
         start?: number,
-        easing?: (a: any) => void,
+        easing?: ((a: any) => void) | boolean,
         add?: boolean
     ): any;
     parse_value(x: any): V;
@@ -15,17 +14,24 @@ export interface IProperty<V> {
 export interface IAction {
     _start?: number;
     _end?: number;
-    ready(track: Track): void;
+    ready(parent: IParent): void;
     resolve(frame: number, base_frame: number, hint_dur: number): void;
     get_active_dur(): number;
     run(): void;
+}
+
+export interface IParent {
+    _easing?: ((a: any) => void) | boolean;
+    _hint_dur?: number;
+    frame_rate: number;
+    to_frame(sec: number): number;
 }
 
 export class Action implements IAction {
     _start: number = -Infinity;
     _end: number = -Infinity;
     _dur?: number;
-    ready(track: Track): void {
+    ready(parent: IParent): void {
         throw new Error("Not implemented");
     }
     run(): void {
@@ -41,13 +47,18 @@ export class Action implements IAction {
     }
 }
 
-export abstract class Actions
-    extends Array<Action | Actions>
-    implements IAction {
+export abstract class Actions extends Array<Action | Actions> implements IAction {
     _start: number = -Infinity;
     _end: number = -Infinity;
-    ready(track: Track): void {
-        throw new Error("Not implemented");
+    frame_rate = -Infinity;
+    _hint_dur?: number;
+    _easing?: ((a: any) => void) | boolean;
+    ready(parent: IParent): void {
+        this._easing = this._easing ?? parent._easing;
+        this.frame_rate = parent.frame_rate;
+        if (this._hint_dur != undefined) {
+            this._hint_dur = this.to_frame(this._hint_dur);
+        }
     }
     run() {
         for (const act of this) {
@@ -60,48 +71,47 @@ export abstract class Actions
     get_active_dur() {
         return this._end - this._start;
     }
+    to_frame(sec: number) {
+        return Math.round(this.frame_rate * sec);
+    }
     abstract resolve(frame: number, base_frame: number, hint_dur: number): void;
 }
 
 export class SeqA extends Actions {
     _delay?: number;
     _stagger?: number;
-    _hint_dur?: number = -Infinity;
-    _easing?: (a: any) => void;
 
-    ready(track: Track): void {
-        const { _delay, _stagger, _hint_dur } = this;
-        _delay && (this._delay = track.to_frame(_delay));
-        _stagger && (this._stagger = track.to_frame(_stagger));
-        _hint_dur && (this._hint_dur = track.to_frame(_hint_dur));
+    ready(parent: IParent): void {
+        super.ready(parent);
+        const { _delay, _stagger } = this;
+        _delay && (this._delay = parent.to_frame(_delay));
+        _stagger && (this._stagger = parent.to_frame(_stagger));
         for (const act of this) {
-            act.ready(track);
+            act.ready(this);
         }
     }
 
     resolve(frame: number, base_frame: number, hint_dur: number) {
-        const { _delay, _stagger, _hint_dur } = this;
-        if (_hint_dur != undefined) {
-            hint_dur = _hint_dur;
-        }
+        const { _delay, _stagger } = this;
+        const _hint_dur = this._hint_dur ?? hint_dur;
         let e = frame;
         if (_stagger) {
             let s = frame; // starting time
             for (const act of this) {
-                act.resolve(s, base_frame, hint_dur);
+                act.resolve(s, base_frame, _hint_dur);
                 e = act._end;
                 s = Math.max(s + _stagger, base_frame); // next start time
             }
         } else if (_delay) {
             let s = frame; // starting time
             for (const act of this) {
-                act.resolve(s, base_frame, hint_dur);
+                act.resolve(s, base_frame, _hint_dur);
                 e = act._end;
                 s = Math.max(e + _delay, base_frame); // next start time
             }
         } else {
             for (const act of this) {
-                act.resolve(e, base_frame, hint_dur);
+                act.resolve(e, base_frame, _hint_dur);
                 e = act._end;
             }
         }
@@ -117,41 +127,38 @@ export class SeqA extends Actions {
         return this;
     }
 }
+
 export function Seq(...items: Array<Action | Actions>) {
     const x = new SeqA(...items);
     return x;
 }
+
 export class ParA extends Actions {
-    _hint_dur?: number;
-    _easing?: (a: any) => void;
+
     _tail?: boolean;
 
-    ready(track: Track): void {
-        const { _hint_dur } = this;
-        _hint_dur && (this._hint_dur = track.to_frame(_hint_dur));
+    ready(parent: IParent): void {
+        super.ready(parent);
         for (const act of this) {
-            act.ready(track);
+            act.ready(this);
         }
     }
     resolve(frame: number, base_frame: number, hint_dur: number): void {
         let end = frame;
-        const { _hint_dur } = this;
-        if (_hint_dur != undefined) {
-            hint_dur = _hint_dur;
-        }
+        let _hint_dur = this._hint_dur ?? hint_dur;
         for (const act of this) {
             act.resolve(frame, base_frame, hint_dur);
-            if (hint_dur == undefined) {
-                hint_dur = act.get_active_dur();
+            if (_hint_dur == undefined) {
+                _hint_dur = act.get_active_dur();
             } else {
-                hint_dur = Math.max(hint_dur, act.get_active_dur());
+                _hint_dur = Math.max(_hint_dur, act.get_active_dur());
             }
             end = Math.max(end, act._end);
         }
         if (this._tail) {
             for (const act of this) {
                 if (act._end != end) {
-                    act.resolve(end - act.get_active_dur(), base_frame, hint_dur);
+                    act.resolve(end - act.get_active_dur(), base_frame, _hint_dur);
                 }
                 if (act._end != end) {
                     throw new Error(`Unexpected act._end=${act._end} end=${end}`);
@@ -172,17 +179,19 @@ export function ParE(...items: Array<Action | Actions>) {
     return x;
 }
 export class ToA extends Action {
+    _easing?: ((a: any) => void) | boolean;
     constructor(props: IProperty<any>[], value: any, dur?: number) {
         super();
-        this.ready = function (track: Track): void {
-            if (dur) {
-                this._dur = track.to_frame(dur);
+        this.ready = function (parent: IParent): void {
+            const { _easing } = this;
+            this._dur = (dur == undefined) ? parent._hint_dur : parent.to_frame(dur);
+            if (!_easing) {
+                this._easing = parent._easing;
             }
         };
         this.run = function (): void {
             const { _start, _end } = this;
             for (const prop of props) {
-                // const
                 prop.set_value(_end, value, _start);
             }
         };

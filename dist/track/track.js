@@ -1,8 +1,8 @@
 export class Track {
     frame = 0;
     frame_rate = 60;
-    #easing;
-    hint_dur = 60; // 1s * frame_rate
+    _hint_dur = 60; // 1s * frame_rate
+    _easing;
     sec(n) {
         return this.frame_rate * n;
     }
@@ -14,7 +14,7 @@ export class Track {
         // } else {
         //     return x;
         // }
-        return x ?? this.#easing;
+        return x ?? this._easing;
     }
     feed(cur) {
         const d = feed(this, cur, this.frame, this.frame);
@@ -42,7 +42,7 @@ export class Track {
 }
 function feed(track, cur, frame, base_frame) {
     cur.ready(track);
-    cur.resolve(frame, base_frame, track.hint_dur);
+    cur.resolve(frame, base_frame, track._hint_dur);
     const d = cur.get_active_dur();
     if (d >= 0) {
         cur.run();

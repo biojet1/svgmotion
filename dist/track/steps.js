@@ -13,22 +13,16 @@ export class StepA extends Action {
         this._steps = steps;
         this._vars = vars;
         this._base_frame = Infinity;
-        this.ready = function (track) {
-            if (dur) {
-                this._dur = track.to_frame(dur);
-            }
-            if (max_dur) {
-                this._max_dur = track.to_frame(max_dur);
-            }
+        this.ready = function (parent) {
+            this._dur = (dur == undefined) ? parent._hint_dur : parent.to_frame(dur);
+            this._max_dur = (max_dur == undefined) ? parent._hint_dur : parent.to_frame(max_dur);
             if (repeat) {
                 this._repeat = repeat;
             }
             if (bounce) {
                 this._bounce = bounce;
             }
-            if (easing) {
-                // this._max_dur = track.to_frame(max_dur);
-            }
+            easing = this._easing ?? easing;
             // collect names, parse inputs
             const names = [];
             this._steps.map((e, i, a) => {
@@ -36,10 +30,10 @@ export class StepA extends Action {
                     switch (k) {
                         case "dur":
                         case "t":
-                            e[k] = track.to_frame(v);
+                            e[k] = parent.to_frame(v);
                             continue;
                         case "ease":
-                            e[k] = track.to_easing(v);
+                            e[k] = e[k] ?? easing;
                             continue;
                     }
                     names.push(k);

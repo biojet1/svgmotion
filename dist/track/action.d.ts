@@ -1,22 +1,27 @@
-import { Track } from "./track.js";
 export interface IProperty<V> {
     get_value(time: number): V;
-    set_value(time: number, value: V, start?: number, easing?: (a: any) => void, add?: boolean): any;
+    set_value(time: number, value: V, start?: number, easing?: ((a: any) => void) | boolean, add?: boolean): any;
     parse_value(x: any): V;
 }
 export interface IAction {
     _start?: number;
     _end?: number;
-    ready(track: Track): void;
+    ready(parent: IParent): void;
     resolve(frame: number, base_frame: number, hint_dur: number): void;
     get_active_dur(): number;
     run(): void;
+}
+export interface IParent {
+    _easing?: ((a: any) => void) | boolean;
+    _hint_dur?: number;
+    frame_rate: number;
+    to_frame(sec: number): number;
 }
 export declare class Action implements IAction {
     _start: number;
     _end: number;
     _dur?: number;
-    ready(track: Track): void;
+    ready(parent: IParent): void;
     run(): void;
     resolve(frame: number, base_frame: number, hint_dur: number): void;
     get_active_dur(): number;
@@ -24,32 +29,33 @@ export declare class Action implements IAction {
 export declare abstract class Actions extends Array<Action | Actions> implements IAction {
     _start: number;
     _end: number;
-    ready(track: Track): void;
+    frame_rate: number;
+    _hint_dur?: number;
+    _easing?: ((a: any) => void) | boolean;
+    ready(parent: IParent): void;
     run(): void;
     get_active_dur(): number;
+    to_frame(sec: number): number;
     abstract resolve(frame: number, base_frame: number, hint_dur: number): void;
 }
 export declare class SeqA extends Actions {
     _delay?: number;
     _stagger?: number;
-    _hint_dur?: number;
-    _easing?: (a: any) => void;
-    ready(track: Track): void;
+    ready(parent: IParent): void;
     resolve(frame: number, base_frame: number, hint_dur: number): void;
     delay(sec: number): this;
     stagger(sec: number): this;
 }
 export declare function Seq(...items: Array<Action | Actions>): SeqA;
 export declare class ParA extends Actions {
-    _hint_dur?: number;
-    _easing?: (a: any) => void;
     _tail?: boolean;
-    ready(track: Track): void;
+    ready(parent: IParent): void;
     resolve(frame: number, base_frame: number, hint_dur: number): void;
 }
 export declare function Par(...items: Array<Action | Actions>): ParA;
 export declare function ParE(...items: Array<Action | Actions>): ParA;
 export declare class ToA extends Action {
+    _easing?: ((a: any) => void) | boolean;
     constructor(props: IProperty<any>[], value: any, dur?: number);
 }
 export declare function To(props: IProperty<any>[], value: any, dur?: number): ToA;

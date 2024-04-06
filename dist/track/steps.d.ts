@@ -23,7 +23,7 @@ interface Params {
 export declare class StepA extends Action {
     _steps: Array<UserEntry>;
     _max_dur?: number;
-    _easing?: any;
+    _easing?: ((a: any) => void) | true;
     _bounce?: boolean;
     _repeat?: number;
     _base_frame: number;
