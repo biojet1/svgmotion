@@ -1,7 +1,3 @@
-export declare class Handle {
-    x: number;
-    y: number;
-}
 export interface IEasing {
     ratio_at(t: number): number;
     reverse(): IEasing;
@@ -9,11 +5,7 @@ export interface IEasing {
 export declare class KeyframeEntry<V> {
     time: number;
     value: V;
-    in_value: Handle;
-    out_value: Handle;
-    hold: boolean;
     easing?: IEasing | boolean;
-    calc_ratio(r: number): number;
 }
 export declare class Keyframes<V> extends Array<KeyframeEntry<V>> {
     set_value(time: number, value: V): KeyframeEntry<V>;
@@ -23,7 +15,7 @@ export declare abstract class Animatable<V> {
     abstract lerp_value(ratio: number, a: V, b: V): V;
     abstract add_value(a: V, b: V): V;
     get_value(time: number): V;
-    set_value(time: number, value: V, start?: number, easing?: ((a: KeyframeEntry<V>) => void) | boolean, add?: boolean): KeyframeEntry<V>;
+    set_value(time: number, value: V, start?: number, easing?: IEasing | boolean, add?: boolean): KeyframeEntry<V>;
     parse_value(x: any): V;
     constructor(v: V);
 }

@@ -193,15 +193,29 @@ function resolve_bounce(steps) {
     for (const e of steps) {
         t_max = Math.max(t_max, e.t);
     }
+    let extra = [];
     for (const e of steps) {
         if (e.t < t_max) {
+            const { t, ease, ...vars } = e;
             const t2 = t_max + (t_max - e.t);
-            const e2 = { ...e, t: t2 };
+            const e2 = { ...vars, t: t2 };
+            if (ease != undefined) {
+                if (ease && ease !== true) {
+                    e2.ease = ease.reverse();
+                }
+                else {
+                    e2.ease = ease;
+                }
+            }
+            extra.push(e2);
         }
         else {
+            if (e.t != t_max) {
+                throw new Error(`e.t=${e.t}, t_max=${t_max}`);
+            }
         }
     }
-    return [];
+    return steps.concat(extra);
 }
 function map_keyframes(steps) {
     const entry_map = {};

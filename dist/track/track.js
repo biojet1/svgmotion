@@ -9,13 +9,6 @@ export class Track {
     to_frame(sec) {
         return Math.round(this.frame_rate * sec);
     }
-    to_easing(x) {
-        // if (typeof x === 'string' || x instanceof String) {
-        // } else {
-        //     return x;
-        // }
-        return x ?? this._easing;
-    }
     feed(cur) {
         const d = feed(this, cur, this.frame, this.frame);
         this.frame += d;

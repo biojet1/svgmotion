@@ -1,10 +1,5 @@
 import { cubic_bezier_y_of_x } from "./bezier.js";
 
-export class Handle {
-    x: number = 0;
-    y: number = 0;
-}
-
 export interface IEasing {
     ratio_at(t: number): number;
     reverse(): IEasing;
@@ -13,15 +8,7 @@ export interface IEasing {
 export class KeyframeEntry<V> {
     time: number = 0;
     value!: V;
-    in_value: Handle = new Handle();
-    out_value: Handle = new Handle();
-    hold: boolean = false;
     easing?: IEasing | boolean;
-
-    calc_ratio(r: number) {
-        const { out_value: ov, in_value: iv } = this;
-        return cubic_bezier_y_of_x([0, 0], [ov.x, ov.y], [iv.x, iv.y], [1, 1])(r);
-    }
 }
 
 export class Keyframes<V> extends Array<KeyframeEntry<V>> {
@@ -54,23 +41,17 @@ export abstract class Animatable<V> {
             for (const k of value) {
                 if (time <= k.time) {
                     if (p) {
-                        if (k.hold) {
+                        if (k.easing === true) {
                             return p.value;
                         }
-                        // if (k.easing == true) {
-                        //     return p.value;
-                        // }
                         let r = (time - p.time) / (k.time - p.time);
                         if (r == 0) {
                             return p.value;
                         } else if (r == 1) {
                             return k.value;
-                        } else {
-                            r = p.calc_ratio(r);
+                        } else if (p.easing && p.easing !== true) {
+                            r = p.easing.ratio_at(r);
                         }
-                        // if (p.easing && p.easing != true) {
-                        //     r = p.easing.ratio_at(r);
-                        // }
                         return this.lerp_value(r, p.value, k.value);
                     } else {
                         return k.value;
@@ -91,7 +72,7 @@ export abstract class Animatable<V> {
         time: number,
         value: V,
         start?: number,
-        easing?: ((a: KeyframeEntry<V>) => void) | boolean,
+        easing?: IEasing | boolean,
         add?: boolean
     ) {
         let { value: kfs } = this;
@@ -102,7 +83,7 @@ export abstract class Animatable<V> {
                 if (start == undefined) {
                     // pass
                 } else if (start > last.time) {
-                    last.hold = true;
+                    last.easing = true;
                     last = kfs.set_value(start, this.get_value(last.time));
                 } else {
                     if (start != last.time) {
@@ -120,12 +101,8 @@ export abstract class Animatable<V> {
             }
         }
         if (last) {
-            if (easing) {
-                if (easing === true) {
-                    last.hold = true;
-                } else {
-                    easing(last);
-                }
+            if (easing != undefined) {
+                last.easing = easing;
             }
             if (add) {
                 value = this.add_value(last.value, value);

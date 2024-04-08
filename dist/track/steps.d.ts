@@ -1,13 +1,13 @@
-import { Action, IProperty } from "./action.js";
+import { Action, IProperty, IEasing } from "./action.js";
 export interface Entry {
     t: number;
-    ease?: any;
+    ease?: IEasing | boolean;
     [key: string]: any;
 }
 export interface UserEntry {
     dur?: number;
     t?: number;
-    ease?: any;
+    ease?: IEasing | boolean;
     [key: string]: any;
 }
 export interface PropMap {
@@ -15,7 +15,7 @@ export interface PropMap {
 }
 interface Params {
     dur?: number;
-    easing?: any;
+    easing?: IEasing | boolean;
     bounce?: boolean;
     repeat?: number;
     max_dur?: number;
@@ -23,7 +23,7 @@ interface Params {
 export declare class StepA extends Action {
     _steps: Array<UserEntry>;
     _max_dur?: number;
-    _easing?: ((a: any) => void) | true;
+    _easing?: IEasing | boolean;
     _bounce?: boolean;
     _repeat?: number;
     _base_frame: number;

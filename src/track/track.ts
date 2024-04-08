@@ -1,23 +1,16 @@
-import { IAction, Action } from "./action.js";
+import { IAction, Action, IEasing } from "./action.js";
 
 
 export class Track {
     frame: number = 0;
     frame_rate: number = 60;
     _hint_dur: number = 60; // 1s * frame_rate
-    _easing?: ((a: any) => void) | true;
+    _easing?: IEasing | boolean;
     sec(n: number) {
         return this.frame_rate * n;
     }
     to_frame(sec: number) {
         return Math.round(this.frame_rate * sec);
-    }
-    to_easing(x?: (a: any) => void) {
-        // if (typeof x === 'string' || x instanceof String) {
-        // } else {
-        //     return x;
-        // }
-        return x ?? this._easing;
     }
     feed(cur: IAction) {
         const d = feed(this, cur, this.frame, this.frame);
