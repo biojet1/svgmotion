@@ -1,9 +1,29 @@
+import { cubic_bezier_y_of_x } from "../model/bezier";
 
 export interface IEasable {
     in_value: { x: number, y: number };
     out_value: { x: number, y: number };
     hold: boolean;
 }
+
+class Ease extends Float64Array {
+
+    calc_ratio(r: number) {
+        const [ox, oy, ix, iy] = this;
+        return cubic_bezier_y_of_x([0, 0], [ox, oy], [ix, iy], [1, 1])(r);
+    }
+
+    reverse() {
+        const [ox, oy, ix, iy] = this;
+        return new Ease([1 - ix, 1 - iy], [1 - ox, 1 - oy]);
+    }
+    constructor(o: Iterable<number>, i: Iterable<number>) {
+        const [ox, oy] = o;
+        const [ix, iy] = i;
+        super([ox, oy, ix, iy]);
+    }
+}
+
 
 function Hold(kf: IEasable) {
     kf.hold = true;

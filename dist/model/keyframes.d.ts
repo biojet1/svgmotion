@@ -2,12 +2,17 @@ export declare class Handle {
     x: number;
     y: number;
 }
+export interface IEasing {
+    ratio_at(t: number): number;
+    reverse(): IEasing;
+}
 export declare class KeyframeEntry<V> {
     time: number;
+    value: V;
     in_value: Handle;
     out_value: Handle;
     hold: boolean;
-    value: V;
+    easing?: IEasing | boolean;
     calc_ratio(r: number): number;
 }
 export declare class Keyframes<V> extends Array<KeyframeEntry<V>> {

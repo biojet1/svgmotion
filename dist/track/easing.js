@@ -1,3 +1,19 @@
+import { cubic_bezier_y_of_x } from "../model/bezier";
+class Ease extends Float64Array {
+    calc_ratio(r) {
+        const [ox, oy, ix, iy] = this;
+        return cubic_bezier_y_of_x([0, 0], [ox, oy], [ix, iy], [1, 1])(r);
+    }
+    reverse() {
+        const [ox, oy, ix, iy] = this;
+        return new Ease([1 - ix, 1 - iy], [1 - ox, 1 - oy]);
+    }
+    constructor(o, i) {
+        const [ox, oy] = o;
+        const [ix, iy] = i;
+        super([ox, oy, ix, iy]);
+    }
+}
 function Hold(kf) {
     kf.hold = true;
 }
@@ -23,5 +39,4 @@ function Bezier(out_point, in_point) {
         kf.in_value.y = in_point[1];
     };
 }
-export {};
 //# sourceMappingURL=easing.js.map

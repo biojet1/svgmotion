@@ -5,10 +5,11 @@ export class Handle {
 }
 export class KeyframeEntry {
     time = 0;
+    value;
     in_value = new Handle();
     out_value = new Handle();
     hold = false;
-    value;
+    easing;
     calc_ratio(r) {
         const { out_value: ov, in_value: iv } = this;
         return cubic_bezier_y_of_x([0, 0], [ov.x, ov.y], [iv.x, iv.y], [1, 1])(r);
@@ -45,14 +46,23 @@ export class Animatable {
                         if (k.hold) {
                             return p.value;
                         }
-                        const r = (time - p.time) / (k.time - p.time);
+                        // if (k.easing == true) {
+                        //     return p.value;
+                        // }
+                        let r = (time - p.time) / (k.time - p.time);
                         if (r == 0) {
                             return p.value;
                         }
                         else if (r == 1) {
                             return k.value;
                         }
-                        return this.lerp_value(p.calc_ratio(r), p.value, k.value);
+                        else {
+                            r = p.calc_ratio(r);
+                        }
+                        // if (p.easing && p.easing != true) {
+                        //     r = p.easing.ratio_at(r);
+                        // }
+                        return this.lerp_value(r, p.value, k.value);
                     }
                     else {
                         return k.value;
@@ -137,7 +147,7 @@ export class NVector extends Float64Array {
         return new NVector(this.map((v, i) => v * that[i]));
     }
     lerp(that, t) {
-        const u = (1 - t);
+        const u = 1 - t;
         const a = this.map((v, i) => v * u);
         const b = that.map((v, i) => v * t);
         return new NVector(a.map((v, i) => v + b[i]));

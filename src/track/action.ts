@@ -92,8 +92,7 @@ export class SeqA extends Actions {
     }
 
     resolve(frame: number, base_frame: number, hint_dur: number) {
-        const { _delay, _stagger } = this;
-        const _hint_dur = this._hint_dur ?? hint_dur;
+        const { _delay, _stagger, _hint_dur = hint_dur } = this;
         let e = frame;
         if (_stagger) {
             let s = frame; // starting time
@@ -143,11 +142,12 @@ export class ParA extends Actions {
             act.ready(this);
         }
     }
-    resolve(frame: number, base_frame: number, hint_dur: number): void {
+    resolve(frame: number, base_frame: number, hint_dur_: number): void {
+        let { _hint_dur = hint_dur_ } = this;
         let end = frame;
-        let _hint_dur = this._hint_dur ?? hint_dur;
+
         for (const act of this) {
-            act.resolve(frame, base_frame, hint_dur);
+            act.resolve(frame, base_frame, _hint_dur);
             if (_hint_dur == undefined) {
                 _hint_dur = act.get_active_dur();
             } else {
@@ -184,7 +184,7 @@ export class ToA extends Action {
         super();
         this.ready = function (parent: IParent): void {
             const { _easing } = this;
-            this._dur = (dur == undefined) ? parent._hint_dur : parent.to_frame(dur);
+            this._dur = (dur == undefined) ? undefined : parent.to_frame(dur);
             if (!_easing) {
                 this._easing = parent._easing;
             }

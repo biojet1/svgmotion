@@ -50,7 +50,7 @@ export declare function Seq(...items: Array<Action | Actions>): SeqA;
 export declare class ParA extends Actions {
     _tail?: boolean;
     ready(parent: IParent): void;
-    resolve(frame: number, base_frame: number, hint_dur: number): void;
+    resolve(frame: number, base_frame: number, hint_dur_: number): void;
 }
 export declare function Par(...items: Array<Action | Actions>): ParA;
 export declare function ParE(...items: Array<Action | Actions>): ParA;

@@ -14,8 +14,8 @@ export class StepA extends Action {
         this._vars = vars;
         this._base_frame = Infinity;
         this.ready = function (parent) {
-            this._dur = (dur == undefined) ? parent._hint_dur : parent.to_frame(dur);
-            this._max_dur = (max_dur == undefined) ? parent._hint_dur : parent.to_frame(max_dur);
+            this._dur = (dur == undefined) ? undefined : parent.to_frame(dur);
+            this._max_dur = (max_dur == undefined) ? undefined : parent.to_frame(max_dur);
             if (repeat) {
                 this._repeat = repeat;
             }
@@ -48,7 +48,7 @@ export class StepA extends Action {
         };
     }
     resolve(frame, base_frame, hint_dur) {
-        let { _steps: steps, _kf_map, _dur, _max_dur, _vars } = this;
+        const { _steps: steps, _kf_map, _dur = hint_dur, _max_dur = hint_dur, _vars } = this;
         if (_kf_map != undefined) {
             if (this._start != frame) {
                 const d = this._end - this._start;
@@ -57,13 +57,7 @@ export class StepA extends Action {
             }
             return;
         }
-        if (_dur != undefined) {
-            hint_dur = _dur;
-        }
-        if (_max_dur == undefined) {
-            _max_dur = hint_dur;
-        }
-        const entries = resolve_t(steps, _vars, hint_dur, _max_dur);
+        const entries = resolve_t(steps, _vars, _dur, _max_dur);
         if (this._bounce) {
             // TODO
         }
@@ -178,6 +172,36 @@ function resolve_t(steps, vars, hint_dur, max_dur) {
         entries.push(e);
     });
     return entries;
+}
+// def resolve_bounce(steps: list[Entry]):
+//     t_max = 0
+//     for e in steps:
+//         t_max = max(t_max, e["t"])
+//     extra = []
+//     for e in steps:
+//         if e["t"] < t_max:
+//             t2 = t_max + (t_max - e["t"])
+//             e2 = {**e, "t": t2}
+//             if e.get("ease"):
+//                 e2["ease"] = e["ease"].reverse()
+//             extra.append(e2)
+//         else:
+//             assert e["t"] == t_max, f't:{e["t"]} t_max:{t_max}'
+//     return steps + extra
+function resolve_bounce(steps) {
+    let t_max = 0;
+    for (const e of steps) {
+        t_max = Math.max(t_max, e.t);
+    }
+    for (const e of steps) {
+        if (e.t < t_max) {
+            const t2 = t_max + (t_max - e.t);
+            const e2 = { ...e, t: t2 };
+        }
+        else {
+        }
+    }
+    return [];
 }
 function map_keyframes(steps) {
     const entry_map = {};

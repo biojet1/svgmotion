@@ -5,15 +5,22 @@ export class Handle {
     y: number = 0;
 }
 
+export interface IEasing {
+    ratio_at(t: number): number;
+    reverse(): IEasing;
+}
+
 export class KeyframeEntry<V> {
     time: number = 0;
+    value!: V;
     in_value: Handle = new Handle();
     out_value: Handle = new Handle();
     hold: boolean = false;
-    value!: V;
+    easing?: IEasing | boolean;
+
     calc_ratio(r: number) {
         const { out_value: ov, in_value: iv } = this;
-        return cubic_bezier_y_of_x([0, 0], [ov.x, ov.y], [iv.x, iv.y], [1, 1])(r)
+        return cubic_bezier_y_of_x([0, 0], [ov.x, ov.y], [iv.x, iv.y], [1, 1])(r);
     }
 }
 
@@ -36,7 +43,6 @@ export class Keyframes<V> extends Array<KeyframeEntry<V>> {
     }
 }
 
-
 export abstract class Animatable<V> {
     value!: Keyframes<V> | V;
     abstract lerp_value(ratio: number, a: V, b: V): V;
@@ -51,13 +57,21 @@ export abstract class Animatable<V> {
                         if (k.hold) {
                             return p.value;
                         }
-                        const r = (time - p.time) / (k.time - p.time);
+                        // if (k.easing == true) {
+                        //     return p.value;
+                        // }
+                        let r = (time - p.time) / (k.time - p.time);
                         if (r == 0) {
                             return p.value;
                         } else if (r == 1) {
                             return k.value;
+                        } else {
+                            r = p.calc_ratio(r);
                         }
-                        return this.lerp_value(p.calc_ratio(r), p.value, k.value);
+                        // if (p.easing && p.easing != true) {
+                        //     r = p.easing.ratio_at(r);
+                        // }
+                        return this.lerp_value(r, p.value, k.value);
                     } else {
                         return k.value;
                     }
@@ -92,7 +106,9 @@ export abstract class Animatable<V> {
                     last = kfs.set_value(start, this.get_value(last.time));
                 } else {
                     if (start != last.time) {
-                        throw new Error(`unexpected start=${start} last.time=${last.time} time=${time}`);
+                        throw new Error(
+                            `unexpected start=${start} last.time=${last.time} time=${time}`
+                        );
                     }
                 }
             }
@@ -146,7 +162,7 @@ export class NVector extends Float64Array {
         return new NVector(this.map((v, i) => v * that[i]));
     }
     lerp(that: NVector, t: number) {
-        const u = (1 - t);
+        const u = 1 - t;
         const a = this.map((v, i) => v * u);
         const b = that.map((v, i) => v * t);
         return new NVector(a.map((v, i) => v + b[i]));
@@ -166,7 +182,6 @@ export class NVectorValue extends Animatable<NVector> {
 }
 // def Point(x, y):
 //     return NVector(x, y)
-
 
 // def Size(x, y):
 //     return NVector(x, y)
@@ -195,11 +210,8 @@ export class PositionValue extends NVectorValue {
     // }
 }
 
-
 export class RGBValue extends NVectorValue {
     // constructor(x: number = 0, y: number = 0) {
     //     super([x, y]);
     // }
 }
-
-
