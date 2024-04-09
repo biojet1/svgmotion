@@ -41,7 +41,13 @@ export class Transform extends ValueSet {
     rotation?: NumberValue;
     skew?: NumberValue;
     skew_axis?: NumberValue;
-}
 
+}
+export class OpacityProp extends NumberValue {
+    update_prop(frame: number, node: SVGElement) {
+        const v = this.get_value(frame);
+        node.style.opacity = v + '';
+    }
+}
 
 

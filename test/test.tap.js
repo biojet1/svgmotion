@@ -2,18 +2,10 @@
 import test from "tap";
 
 import {
-    Handle, KeyframeEntry, Keyframes, NumberValue,
+    KeyframeEntry, Keyframes, NumberValue,
     NVectorValue, Point, NVector,
     ViewPort, Rect, Size, Root
 } from "../dist/model/index.js";
-
-test.test("handle", (t) => {
-    let h = new Handle();
-    t.equal(h.x, 0);
-    t.equal(h.y, 0);
-    t.end();
-
-});
 
 test.test("KeyframeEntry", (t) => {
     let kfe = new KeyframeEntry();

@@ -4,7 +4,7 @@ class Easing extends Float64Array {
         const [ox, oy, ix, iy] = this;
         return cubic_bezier_y_of_x([0, 0], [ox, oy], [ix, iy], [1, 1])(t);
     }
-    reverse() {
+    reversed() {
         const [ox, oy, ix, iy] = this;
         return new Easing(1 - ix, 1 - iy, 1 - ox, 1 - oy);
     }

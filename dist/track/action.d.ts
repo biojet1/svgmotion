@@ -1,6 +1,6 @@
 export interface IEasing {
     ratio_at(t: number): number;
-    reverse(): IEasing;
+    reversed(): IEasing;
 }
 export interface IProperty<V> {
     get_value(time: number): V;

@@ -104,12 +104,12 @@ export class StepA extends Action {
             }
             return;
         }
-        const entries = resolve_t(steps, _vars, _dur, _max_dur);
+        let entries = resolve_t(steps, _vars, _dur, _max_dur);
         if (this._bounce) {
-            // TODO
+            entries = resolve_bounce(entries);
         }
         if (this._repeat) {
-            // TODO
+            entries = resolve_repeat(entries, this._repeat);
         }
 
         let t_max = 0;
@@ -245,27 +245,69 @@ function resolve_bounce(steps: Array<Entry>): Array<Entry> {
         t_max = Math.max(t_max, e.t);
     }
     let extra: Array<Entry> = [];
-    for (const e of steps) {
-        if (e.t < t_max) {
-            const { t, ease, ...vars } = e;
-            const t2 = t_max + (t_max - e.t)
-            const e2: Entry = { ...vars, t: t2 };
+    for (const { t, ease, ...vars } of steps) {
+        if (t < t_max) {
+            const e: Entry = { ...vars, t: t_max + (t_max - t) };
             if (ease != undefined) {
                 if (ease && ease !== true) {
-                    e2.ease = ease.reverse()
+                    e.ease = ease.reversed()
                 } else {
-                    e2.ease = ease;
+                    e.ease = ease;
                 }
             }
-            extra.push(e2);
+            extra.push(e);
         } else {
-            if (e.t != t_max) {
-                throw new Error(`e.t=${e.t}, t_max=${t_max}`);
+            if (t != t_max) {
+                throw new Error(`e.t=${t}, t_max=${t_max}`);
             }
         }
     }
     return steps.concat(extra);
 }
+
+// def resolve_repeat(steps, repeat: int):
+//     t_max = 0
+//     for e in steps:
+//         t_max = max(t_max, e["t"])
+//     n = repeat
+//     t_dur = t_max + 1
+//     t = t_dur
+//     extra = []
+//     while n > 0:
+//         n -= 1
+//         for i, e in enumerate(steps):
+//             e2 = {**e, "t": e["t"] + t}
+//             if i == 0:
+//                 e2["ease"] = True
+//                 pass
+//             # else:
+//             #     e2["t"] = e["t"] - steps[i - 1]["t"]
+//             extra.append(e2)
+//         t += t_dur
+//     return steps + extra
+
+function resolve_repeat(steps: Array<Entry>, repeat: number): Array<Entry> {
+    let t_max = 0;
+    for (const { t } of steps) {
+        t_max = Math.max(t_max, t);
+    }
+    let extra: Array<Entry> = [];
+    let n = repeat;
+    const t_dur = t_max + 1;
+    let u = t_dur;
+    while (n-- > 0) {
+        steps.forEach(({ t, ...etc }, i, a) => {
+            const e = { ...etc, t: t + u };
+            if (i == 0) {
+                e.ease = true;
+            }
+            extra.push(e);
+        });
+        u += t_dur;
+    }
+    return steps.concat(extra);
+}
+
 function map_keyframes(steps: Array<Entry>): KFMap {
     const entry_map: { [key: string]: Array<Entry> } = {};
     for (const e of steps) {
