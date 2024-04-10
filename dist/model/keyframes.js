@@ -24,17 +24,17 @@ export class Keyframes extends Array {
 }
 export class Animatable {
     value;
-    get_value(time) {
+    get_value(frame) {
         const { value } = this;
         if (value instanceof Keyframes) {
             let p = undefined; // previous KeyframeEntry<V>
             for (const k of value) {
-                if (time <= k.time) {
+                if (frame <= k.time) {
                     if (p) {
                         if (k.easing === true) {
                             return p.value;
                         }
-                        let r = (time - p.time) / (k.time - p.time);
+                        let r = (frame - p.time) / (k.time - p.time);
                         if (r == 0) {
                             return p.value;
                         }
@@ -61,7 +61,7 @@ export class Animatable {
             return value;
         }
     }
-    set_value(time, value, start, easing, add) {
+    set_value(frame, value, start, easing, add) {
         let { value: kfs } = this;
         let last;
         if (kfs instanceof Keyframes) {
@@ -76,7 +76,7 @@ export class Animatable {
                 }
                 else {
                     if (start != last.time) {
-                        throw new Error(`unexpected start=${start} last.time=${last.time} time=${time}`);
+                        throw new Error(`unexpected start=${start} last.time=${last.time} time=${frame}`);
                     }
                 }
             }
@@ -96,7 +96,7 @@ export class Animatable {
                 value = this.add_value(last.value, value);
             }
         }
-        return kfs.set_value(time, value);
+        return kfs.set_value(frame, value);
     }
     parse_value(x) {
         return x;
@@ -112,7 +112,7 @@ export class NumberValue extends Animatable {
     add_value(a, b) {
         return a + b;
     }
-    constructor(v) {
+    constructor(v = 0) {
         super(v);
     }
 }
@@ -137,8 +137,16 @@ export class NVectorValue extends Animatable {
     add_value(a, b) {
         return a.add(b);
     }
+    parse_value(x) {
+        if (x instanceof NVector) {
+            return x;
+        }
+        else {
+            return new NVector(x);
+        }
+    }
     constructor(v) {
-        super(new NVector(v));
+        super(NVector.from(v));
     }
 }
 // def Point(x, y):

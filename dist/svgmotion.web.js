@@ -35,7 +35,7 @@
 /************************************************************************/
 var __webpack_exports__ = {};
 
-// UNUSED EXPORTS: Rect, Root, ViewPort, animate
+// UNUSED EXPORTS: Action, Actions, Par, ParA, ParE, Rect, Root, Seq, SeqA, Step, StepA, To, ToA, Track, ViewPort, animate
 
 // NAMESPACE OBJECT: ./dist/model/index.js
 var model_namespaceObject = {};
@@ -64,6 +64,7 @@ __webpack_require__.d(model_namespaceObject, {
   Size: () => (Size),
   Stroke: () => (Stroke),
   Transform: () => (Transform),
+  UPDATE: () => (UPDATE),
   ValueSet: () => (ValueSet),
   ViewPort: () => (ViewPort)
 });
@@ -113,17 +114,17 @@ class Keyframes extends Array {
 }
 class Animatable {
     value;
-    get_value(time) {
+    get_value(frame) {
         const { value } = this;
         if (value instanceof Keyframes) {
             let p = undefined; // previous KeyframeEntry<V>
             for (const k of value) {
-                if (time <= k.time) {
+                if (frame <= k.time) {
                     if (p) {
                         if (k.easing === true) {
                             return p.value;
                         }
-                        let r = (time - p.time) / (k.time - p.time);
+                        let r = (frame - p.time) / (k.time - p.time);
                         if (r == 0) {
                             return p.value;
                         }
@@ -150,7 +151,7 @@ class Animatable {
             return value;
         }
     }
-    set_value(time, value, start, easing, add) {
+    set_value(frame, value, start, easing, add) {
         let { value: kfs } = this;
         let last;
         if (kfs instanceof Keyframes) {
@@ -165,7 +166,7 @@ class Animatable {
                 }
                 else {
                     if (start != last.time) {
-                        throw new Error(`unexpected start=${start} last.time=${last.time} time=${time}`);
+                        throw new Error(`unexpected start=${start} last.time=${last.time} time=${frame}`);
                     }
                 }
             }
@@ -185,7 +186,7 @@ class Animatable {
                 value = this.add_value(last.value, value);
             }
         }
-        return kfs.set_value(time, value);
+        return kfs.set_value(frame, value);
     }
     parse_value(x) {
         return x;
@@ -201,7 +202,7 @@ class NumberValue extends Animatable {
     add_value(a, b) {
         return a + b;
     }
-    constructor(v) {
+    constructor(v = 0) {
         super(v);
     }
 }
@@ -226,8 +227,16 @@ class NVectorValue extends Animatable {
     add_value(a, b) {
         return a.add(b);
     }
+    parse_value(x) {
+        if (x instanceof NVector) {
+            return x;
+        }
+        else {
+            return new NVector(x);
+        }
+    }
     constructor(v) {
-        super(new NVector(v));
+        super(NVector.from(v));
     }
 }
 // def Point(x, y):
@@ -307,18 +316,32 @@ class Transform extends ValueSet {
     skew_axis;
 }
 class OpacityProp extends NumberValue {
-    update_prop(frame, node) {
-        const v = this.get_value(frame);
-        node.style.opacity = v + '';
-    }
 }
 class RectSizeProp extends NVectorValue {
-    update_prop(frame, node) {
-        let x = this.get_value(frame);
+}
+const UPDATE = {
+    opacity: function (frame, node, prop) {
+        const v = prop.get_value(frame);
+        node.style.opacity = v + '';
+    },
+    size: function (frame, node, prop) {
+        let x = prop.get_value(frame);
         node.width.baseVal.value = x[0];
         node.height.baseVal.value = x[1];
+    },
+    position: function (frame, node, prop) {
+        let x = prop.get_value(frame);
+        node.x.baseVal.value = x[0];
+        node.y.baseVal.value = x[1];
+    },
+    transform: function (frame, node, prop) {
+        const { anchor, position, scale, rotation } = prop;
+        // node.transform.baseVal.
+        // let x = prop.get_value(frame);
+        // node.width.baseVal.value = x[0];
+        // node.height.baseVal.value = x[1];
     }
-}
+};
 //# sourceMappingURL=properties.js.map
 ;// CONCATENATED MODULE: ./dist/model/node.js
 
@@ -420,8 +443,11 @@ function update(frame, target, el) {
     //     el.style.opacity = v + '';
     //     // el.style.stroke
     // }
-    for (let v of Object.values(target)) {
-        v?.update_prop?.(frame, el);
+    // for (let v of Object.values(target)) {
+    //     v?.update_prop?.(frame, el);
+    // }
+    for (let [n, v] of Object.entries(target)) {
+        v && UPDATE[n]?.(frame, el, v);
     }
 }
 class Group extends Container {
@@ -726,7 +752,7 @@ class StepA extends Action {
                             e[k] = parent.to_frame(v);
                             continue;
                         case "ease":
-                            e[k] = e[k] ?? easing;
+                            v == undefined || (e[k] = easing);
                             continue;
                     }
                     names.push(k);
@@ -761,26 +787,48 @@ class StepA extends Action {
         for (const e of entries) {
             t_max = Math.max(t_max, e.t);
         }
+        this._entries = Array.from(entries);
         this._kf_map = map_keyframes(entries);
         this._start = frame;
         this._end = frame + t_max;
         this._base_frame = base_frame;
     }
     run() {
-        const start = this._start;
-        const B = this._base_frame;
-        for (const { prop, entries } of separate_keyframes(this._vars, this._kf_map)) {
-            let prev_t = 0;
-            for (let { t, value, ease } of entries) {
-                const frame = start + t;
-                if (value == undefined) {
-                    value = prop.get_value(start);
+        // const start = this._start;
+        // const B = this._base_frame;
+        // for (const { prop, entries } of separate_keyframes(
+        //     this._vars,
+        //     this._kf_map!
+        // )) {
+        //     let prev_t = 0;
+        //     for (const { t, value, ease } of entries) {
+        //         const frame = start + t;
+        //         let v;
+        //         if (value == null) {
+        //             v = prop.get_value(start);
+        //         } else {
+        //             v = prop.parse_value(value);
+        //         }
+        //         prop.set_value(frame, v, prev_t, ease);
+        //         prev_t = t;
+        //     }
+        // }
+        const { _start, _vars, _kf_map } = this;
+        for (const [name, entries] of Object.entries(_kf_map)) {
+            for (const prop of enum_props(_vars, name)) {
+                let prev_t = 0;
+                for (const { t, value, ease } of entries) {
+                    const frame = _start + t;
+                    let v;
+                    if (value == null) {
+                        v = prop.get_value(_start);
+                    }
+                    else {
+                        v = prop.parse_value(value);
+                    }
+                    prop.set_value(frame, v, prev_t, ease);
+                    prev_t = t;
                 }
-                else {
-                    // TODO
-                }
-                prop.set_value(frame, value, prev_t, ease);
-                prev_t = t;
             }
         }
     }
@@ -994,17 +1042,13 @@ function* enum_props(vars, name) {
         }
     }
 }
-function* separate_keyframes(vars, kf_map) {
-    for (const [name, entries] of Object.entries(kf_map)) {
-        for (const prop of enum_props(vars, name)) {
-            for (const a of entries) {
-                a.value = prop.parse_value(a.value);
-            }
-            // a._name = name;
-            yield { prop, entries };
-        }
-    }
-}
+// function* separate_keyframes(vars: PropMap, kf_map: KFMap) {
+//     for (const [name, entries] of Object.entries(kf_map)) {
+//         for (const prop of enum_props(vars, name)) {
+//             yield { prop, entries };
+//         }
+//     }
+// }
 function Step(steps, vars, params = {}) {
     return new StepA(steps, vars, params);
 }
@@ -1018,6 +1062,8 @@ function Step(steps, vars, params = {}) {
 
 
 
+
+// export * from "./track/steps.js";
 
 function animate(root, fps) {
     const [start, end] = root.calc_time_range();
@@ -1050,7 +1096,7 @@ function animate(root, fps) {
 globalThis.svgmotion = {
     root: function () {
         return new Root();
-    }, animate, ...model_namespaceObject, ...dist_track_namespaceObject
+    }, animate, ...model_namespaceObject, ...dist_track_namespaceObject,
 };
 globalThis.animate = animate;
 //# sourceMappingURL=index.js.map

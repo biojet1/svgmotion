@@ -1,5 +1,5 @@
 import { Animatable, Keyframes } from "./keyframes.js";
-import { Box, RectSizeProp, ValueSet } from "./properties.js";
+import { Box, RectSizeProp, UPDATE, ValueSet } from "./properties.js";
 export class Node {
     id;
     transform;
@@ -97,8 +97,11 @@ function update(frame, target, el) {
     //     el.style.opacity = v + '';
     //     // el.style.stroke
     // }
-    for (let v of Object.values(target)) {
-        v?.update_prop?.(frame, el);
+    // for (let v of Object.values(target)) {
+    //     v?.update_prop?.(frame, el);
+    // }
+    for (let [n, v] of Object.entries(target)) {
+        v && UPDATE[n]?.(frame, el, v);
     }
 }
 export class Group extends Container {

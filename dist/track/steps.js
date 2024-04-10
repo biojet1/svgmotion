@@ -33,7 +33,7 @@ export class StepA extends Action {
                             e[k] = parent.to_frame(v);
                             continue;
                         case "ease":
-                            e[k] = e[k] ?? easing;
+                            v == undefined || (e[k] = easing);
                             continue;
                     }
                     names.push(k);
@@ -68,26 +68,48 @@ export class StepA extends Action {
         for (const e of entries) {
             t_max = Math.max(t_max, e.t);
         }
+        this._entries = Array.from(entries);
         this._kf_map = map_keyframes(entries);
         this._start = frame;
         this._end = frame + t_max;
         this._base_frame = base_frame;
     }
     run() {
-        const start = this._start;
-        const B = this._base_frame;
-        for (const { prop, entries } of separate_keyframes(this._vars, this._kf_map)) {
-            let prev_t = 0;
-            for (let { t, value, ease } of entries) {
-                const frame = start + t;
-                if (value == undefined) {
-                    value = prop.get_value(start);
+        // const start = this._start;
+        // const B = this._base_frame;
+        // for (const { prop, entries } of separate_keyframes(
+        //     this._vars,
+        //     this._kf_map!
+        // )) {
+        //     let prev_t = 0;
+        //     for (const { t, value, ease } of entries) {
+        //         const frame = start + t;
+        //         let v;
+        //         if (value == null) {
+        //             v = prop.get_value(start);
+        //         } else {
+        //             v = prop.parse_value(value);
+        //         }
+        //         prop.set_value(frame, v, prev_t, ease);
+        //         prev_t = t;
+        //     }
+        // }
+        const { _start, _vars, _kf_map } = this;
+        for (const [name, entries] of Object.entries(_kf_map)) {
+            for (const prop of enum_props(_vars, name)) {
+                let prev_t = 0;
+                for (const { t, value, ease } of entries) {
+                    const frame = _start + t;
+                    let v;
+                    if (value == null) {
+                        v = prop.get_value(_start);
+                    }
+                    else {
+                        v = prop.parse_value(value);
+                    }
+                    prop.set_value(frame, v, prev_t, ease);
+                    prev_t = t;
                 }
-                else {
-                    // TODO
-                }
-                prop.set_value(frame, value, prev_t, ease);
-                prev_t = t;
             }
         }
     }
@@ -301,17 +323,13 @@ function* enum_props(vars, name) {
         }
     }
 }
-function* separate_keyframes(vars, kf_map) {
-    for (const [name, entries] of Object.entries(kf_map)) {
-        for (const prop of enum_props(vars, name)) {
-            for (const a of entries) {
-                a.value = prop.parse_value(a.value);
-            }
-            // a._name = name;
-            yield { prop, entries };
-        }
-    }
-}
+// function* separate_keyframes(vars: PropMap, kf_map: KFMap) {
+//     for (const [name, entries] of Object.entries(kf_map)) {
+//         for (const prop of enum_props(vars, name)) {
+//             yield { prop, entries };
+//         }
+//     }
+// }
 export function Step(steps, vars, params = {}) {
     return new StepA(steps, vars, params);
 }

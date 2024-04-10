@@ -119,23 +119,9 @@ export abstract class Container extends Array<Node | Container> implements INode
 
 }
 function update(frame: number, target: Node | Container, el: SVGElement) {
-    // const { opacity } = target;
-    // if (opacity) {
-    //     const v = opacity.get_value(frame);
-    //     el.style.opacity = v + '';
-    //     // el.style.stroke
-    // }
-    for (let v of Object.values(target)) {
-
-        v?.update_prop?.(frame, el);
-
+    for (let [n, v] of Object.entries(target)) {
+        v && UPDATE[n]?.(frame, el, v);
     }
-    // for (let [n, v] of Object.entries(target)) {
-    //     let x = UPDATE[n];
-    //     if (x && vv) {
-    //         x?.(frame, el, v);
-    //     }
-    // }
 
 }
 

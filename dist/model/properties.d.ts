@@ -25,8 +25,9 @@ export declare class Transform extends ValueSet {
     skew_axis?: NumberValue;
 }
 export declare class OpacityProp extends NumberValue {
-    update_prop(frame: number, node: SVGElement): void;
 }
 export declare class RectSizeProp extends NVectorValue {
-    update_prop(frame: number, node: SVGRectElement): void;
 }
+export declare const UPDATE: {
+    [key: string]: any;
+};

@@ -34,17 +34,17 @@ export abstract class Animatable<V> {
     value!: Keyframes<V> | V;
     abstract lerp_value(ratio: number, a: V, b: V): V;
     abstract add_value(a: V, b: V): V;
-    get_value(time: number) {
+    get_value(frame: number) {
         const { value } = this;
         if (value instanceof Keyframes) {
             let p = undefined; // previous KeyframeEntry<V>
             for (const k of value) {
-                if (time <= k.time) {
+                if (frame <= k.time) {
                     if (p) {
                         if (k.easing === true) {
                             return p.value;
                         }
-                        let r = (time - p.time) / (k.time - p.time);
+                        let r = (frame - p.time) / (k.time - p.time);
                         if (r == 0) {
                             return p.value;
                         } else if (r == 1) {
@@ -69,7 +69,7 @@ export abstract class Animatable<V> {
     }
 
     set_value(
-        time: number,
+        frame: number,
         value: V,
         start?: number,
         easing?: IEasing | boolean,
@@ -88,7 +88,7 @@ export abstract class Animatable<V> {
                 } else {
                     if (start != last.time) {
                         throw new Error(
-                            `unexpected start=${start} last.time=${last.time} time=${time}`
+                            `unexpected start=${start} last.time=${last.time} time=${frame}`
                         );
                     }
                 }
@@ -108,7 +108,7 @@ export abstract class Animatable<V> {
                 value = this.add_value(last.value, value);
             }
         }
-        return kfs.set_value(time, value);
+        return kfs.set_value(frame, value);
     }
     parse_value(x: any): V {
         return x as V;
@@ -126,7 +126,7 @@ export class NumberValue extends Animatable<number> {
         return a + b;
     }
 
-    constructor(v: number) {
+    constructor(v: number = 0) {
         super(v);
     }
 }
@@ -153,8 +153,15 @@ export class NVectorValue extends Animatable<NVector> {
     add_value(a: NVector, b: NVector): NVector {
         return a.add(b);
     }
+    parse_value(x: any): NVector {
+        if (x instanceof NVector) {
+            return x;
+        } else {
+            return new NVector(x);
+        }
+    }
     constructor(v: Iterable<number>) {
-        super(new NVector(v));
+        super(NVector.from(v) as NVector);
     }
 }
 // def Point(x, y):

@@ -2,6 +2,8 @@ import { Root, ViewPort, Rect } from "./model/index.js";
 import * as all from "./model/index.js";
 import * as track from "./track/index.js";
 export { Root, ViewPort, Rect };
+// export * from "./track/steps.js";
+export * from "./track/index.js";
 export function animate(root, fps) {
     const [start, end] = root.calc_time_range();
     if (end >= start) {
@@ -33,7 +35,7 @@ export function animate(root, fps) {
 globalThis.svgmotion = {
     root: function () {
         return new Root();
-    }, animate, ...all, ...track
+    }, animate, ...all, ...track,
 };
 globalThis.animate = animate;
 //# sourceMappingURL=index.js.map

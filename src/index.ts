@@ -1,7 +1,10 @@
 import { Root, ViewPort, Rect, Size, NumberValue } from "./model/index.js";
 import * as all from "./model/index.js";
 import * as track from "./track/index.js";
+
 export { Root, ViewPort, Rect };
+// export * from "./track/steps.js";
+export * from "./track/index.js";
 
 export function animate(root: Root, fps: number) {
   const [start, end] = root.calc_time_range();
@@ -37,7 +40,7 @@ export function animate(root: Root, fps: number) {
 (globalThis as unknown as any).svgmotion = {
   root: function () {
     return new Root();
-  }, animate, ...all, ...track
+  }, animate, ...all, ...track,
 
 };
 

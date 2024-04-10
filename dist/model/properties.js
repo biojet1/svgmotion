@@ -48,16 +48,30 @@ export class Transform extends ValueSet {
     skew_axis;
 }
 export class OpacityProp extends NumberValue {
-    update_prop(frame, node) {
-        const v = this.get_value(frame);
-        node.style.opacity = v + '';
-    }
 }
 export class RectSizeProp extends NVectorValue {
-    update_prop(frame, node) {
-        let x = this.get_value(frame);
+}
+export const UPDATE = {
+    opacity: function (frame, node, prop) {
+        const v = prop.get_value(frame);
+        node.style.opacity = v + '';
+    },
+    size: function (frame, node, prop) {
+        let x = prop.get_value(frame);
         node.width.baseVal.value = x[0];
         node.height.baseVal.value = x[1];
+    },
+    position: function (frame, node, prop) {
+        let x = prop.get_value(frame);
+        node.x.baseVal.value = x[0];
+        node.y.baseVal.value = x[1];
+    },
+    transform: function (frame, node, prop) {
+        const { anchor, position, scale, rotation } = prop;
+        // node.transform.baseVal.
+        // let x = prop.get_value(frame);
+        // node.width.baseVal.value = x[0];
+        // node.height.baseVal.value = x[1];
     }
-}
+};
 //# sourceMappingURL=properties.js.map

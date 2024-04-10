@@ -21,8 +21,17 @@
       // console.log(Object.entries(rect));
       // document.body.appendChild(svg);
       // root.update_node(0);
-      const { Size, animate, OpacityProp, Track, To, Seq, Par, Step } =
-        svgmotion;
+      const {
+        Size,
+        animate,
+        OpacityProp,
+        NVectorValue,
+        Track,
+        To,
+        Seq,
+        Par,
+        Step,
+      } = svgmotion;
 
       let root = svgmotion.root();
       let r = root.add_rect();
@@ -30,6 +39,7 @@
       // r.size.set_value(0, new Size(50, 50));
       // r.size.set_value(50, new Size(50, 100));
       r.opacity = new OpacityProp(0.9);
+      r.position = new NVectorValue([10, 10]);
       // r.opacity.set_value(0, 0);
       // r.opacity.set_value(10, 1);
       // r.opacity.set_value(20, 0.75);
@@ -46,17 +56,18 @@
           ),
           Step(
             [
-              { A: 0.25, t: 0 },
-              { A: 0.9, dur: 1 },
-              { A: 0.25, dur: 1 },
-              { A: 0.9, dur: 1 },
+              { A: 0.25, t: 0, B: [50, 50] },
+              { A: 0.9, dur: 1, B: [0, 50] },
+              { A: 0.25, dur: 1, B: [50, 0] },
+              { A: 0.9, dur: 1, B: [0, 0] },
+              { A: 0.25, dur: 1, B: null },
             ],
-            { A: r.opacity }
+            { A: r.opacity, B: r.position }
           )
         )
       );
 
-      console.log(`opacity [${r.opacity.get_value(0)}]`);
+      // console.log(`opacity [${r.opacity.get_value(0)}]`);
       let svg = root.as_svg(document);
       document.body.appendChild(svg);
 
