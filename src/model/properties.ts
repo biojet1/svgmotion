@@ -40,8 +40,18 @@ export class Stroke extends ValueSet {
 }
 
 export class Fill extends ValueSet {
-    color?: RGBValue;
-    opacity?: NumberValue;
+    get opacity() {
+        const v = new NumberValue(1);
+        const o = { value: v, writable: true, enumerable: true };
+        Object.defineProperty(this, "opacity", o)
+        return v;
+    }
+    get color() {
+        const v = new RGBValue([0, 0, 0]);
+        const o = { value: v, writable: true, enumerable: true };
+        Object.defineProperty(this, "color", o)
+        return v;
+    }
 }
 
 
@@ -97,5 +107,19 @@ export const UPDATE: {
         // let x = prop.get_value(frame);
         // node.width.baseVal.value = x[0];
         // node.height.baseVal.value = x[1];
+    },
+    fill: function (frame: number, node: SVGSVGElement, prop: Fill) {
+        for (let [n, v] of Object.entries(prop)) {
+            if (v) {
+                switch (n) {
+                    case "opacity":
+                        node.style.fillOpacity = (v as NumberValue).get_value(frame) + '';
+                        break;
+                    case "color":
+                        node.style.fill = RGBValue.to_css_rgb((v as RGBValue).get_value(frame));
+                        break;
+                }
+            }
+        }
     }
 }

@@ -4,7 +4,7 @@ import { Box, Fill, OpacityProp, RectSizeProp, Stroke, Transform, UPDATE, ValueS
 interface INode {
     id?: string;
     transform?: Transform;
-    opacity?: OpacityProp;
+    opacity?: NumberValue;
     _node?: SVGElement;
     // fill?: Fill;
     stroke?: Stroke;
@@ -17,8 +17,8 @@ interface INode {
 
 export abstract class Node implements INode {
     id?: string;
-    transform?: Transform;
-    opacity?: OpacityProp;
+    // transform?: Transform;
+    // opacity?: OpacityProp;
     _node?: SVGElement;
 
     abstract as_svg(doc: Document): SVGElement;
@@ -42,11 +42,36 @@ export abstract class Node implements INode {
             }
         }
     }
+    get opacity() {
+        const v = new NumberValue(1);
+        const o = { value: v, writable: true, enumerable: true };
+        console.log("opacity prop_x", o)
+        Object.defineProperty(this, "opacity", o)
+        return v;
+    }
+    get fill() {
+        const v = new Fill();
+        const o = { value: v, writable: true, enumerable: true };
+        Object.defineProperty(this, "fill", o)
+        return v;
+    }
+    // get transform() {
+    //     const v = new Transform();
+    //     Object.defineProperty(this, "transform", { value: v })
+    //     return v;
+    // }
 
 }
 
 export abstract class Shape extends Node {
     // strok fill
+    get prop_x() {
+        const p = { value: { value: 4 } };
+        console.log("prop_x", p)
+        Object.defineProperty(this, "prop_x", p)
+        return p;
+    }
+
 }
 
 export abstract class Container extends Array<Node | Container> implements INode {
@@ -55,6 +80,7 @@ export abstract class Container extends Array<Node | Container> implements INode
     opacity?: OpacityProp;
     // // fill?: Fill;
     // stroke?: Stroke;
+
 
     _node?: SVGElement;
 

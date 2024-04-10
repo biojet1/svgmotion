@@ -4,7 +4,7 @@ import test from "tap";
 import {
     KeyframeEntry, Keyframes, NumberValue,
     NVectorValue, Point, NVector,
-    ViewPort, Rect, Size, Root
+    ViewPort, RGBValue, Size, Root
 } from "../dist/model/index.js";
 import {
     Step, Track
@@ -99,10 +99,28 @@ test.test("Step", (t) => {
     let tr = new Track();
     let root = new Root();
     let r = root.add_rect();
-    r.opacity = new NumberValue(0.9);
+    // r.opacity = new NumberValue(0.9);
     r.position = new NVectorValue([10, 30]);
     t.equal(r.position.value[0], 10);
     t.equal(r.position.value[1], 30);
+
+
+    {
+        t.equal(Object.getOwnPropertyDescriptor(r, 'opacity'), undefined);
+        t.equal(r.opacity.value, 1);
+        // console.log(Object.entries(r));
+        r.opacity.value = 0.5;
+        t.equal(r.opacity.value, 0.5);
+        r.opacity.value = 0.75;
+        t.equal(Object.getOwnPropertyDescriptor(r, 'opacity').value.value, 0.75);
+        r.opacity = new NumberValue(0.9);
+        t.equal(r.opacity.value, 0.9);
+    }
+
+    {r.fill.color = 
+
+        console.log('r.fill', r.fill);
+    }
 
     let s = Step(
         [
@@ -123,21 +141,10 @@ test.test("Step", (t) => {
         // console.log(q[3]);
         t.same(Array.from(q[3].value), [50, 50]);
     }
-    // console.log(r.position.get_value(0));
-    // console.log("LOG", s._kf_map, s._entries, r.position.value);
 
-    // tr.feed(
-    //     Step(
-    //         [
-    //             { A: 0.25, t: 0, B: [50, 50] },
-    //             { A: 0.9, dur: 1, B: [0, 50] },
-    //             { A: 0.25, dur: 1, B: [0, 0] },
-    //             { A: 0.9, dur: 1, B: null },
-    //         ],
-    //         { A: r.opacity, B: r.position }
-    //     )
-    // );
-
+    console.log(r.prop_x);
+    r.prop_x.value += 20;
+    console.log(r.prop_x);
     t.end();
 
 });

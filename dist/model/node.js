@@ -1,9 +1,9 @@
-import { Animatable, Keyframes } from "./keyframes.js";
-import { Box, RectSizeProp, UPDATE, ValueSet } from "./properties.js";
+import { Animatable, Keyframes, NumberValue } from "./keyframes.js";
+import { Box, Fill, RectSizeProp, UPDATE, ValueSet } from "./properties.js";
 export class Node {
     id;
-    transform;
-    opacity;
+    // transform?: Transform;
+    // opacity?: OpacityProp;
     _node;
     update_self(frame, node) {
         update(frame, this, node);
@@ -24,8 +24,28 @@ export class Node {
             }
         }
     }
+    get opacity() {
+        const v = new NumberValue(1);
+        const o = { value: v, writable: true, enumerable: true };
+        console.log("opacity prop_x", o);
+        Object.defineProperty(this, "opacity", o);
+        return v;
+    }
+    get fill() {
+        const v = new Fill();
+        const o = { value: v, writable: true, enumerable: true };
+        Object.defineProperty(this, "fill", o);
+        return v;
+    }
 }
 export class Shape extends Node {
+    // strok fill
+    get prop_x() {
+        const p = { value: { value: 4 } };
+        console.log("prop_x", p);
+        Object.defineProperty(this, "prop_x", p);
+        return p;
+    }
 }
 export class Container extends Array {
     id;
@@ -91,15 +111,6 @@ export class Container extends Array {
     }
 }
 function update(frame, target, el) {
-    // const { opacity } = target;
-    // if (opacity) {
-    //     const v = opacity.get_value(frame);
-    //     el.style.opacity = v + '';
-    //     // el.style.stroke
-    // }
-    // for (let v of Object.values(target)) {
-    //     v?.update_prop?.(frame, el);
-    // }
     for (let [n, v] of Object.entries(target)) {
         v && UPDATE[n]?.(frame, el, v);
     }

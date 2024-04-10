@@ -13,8 +13,8 @@ export declare class Stroke extends ValueSet {
     width?: NumberValue;
 }
 export declare class Fill extends ValueSet {
-    color?: RGBValue;
-    opacity?: NumberValue;
+    get opacity(): NumberValue;
+    get color(): RGBValue;
 }
 export declare class Transform extends ValueSet {
     anchor?: PositionValue;

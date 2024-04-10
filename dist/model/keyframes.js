@@ -173,5 +173,11 @@ export class RGB extends NVector {
 export class PositionValue extends NVectorValue {
 }
 export class RGBValue extends NVectorValue {
+    // constructor(x: number = 0, y: number = 0) {
+    //     super([x, y]);
+    // }
+    static to_css_rgb([r, g, b]) {
+        return `rgb(${Math.round(r * 255)}, ${Math.round(g * 255)}, ${Math.round(b * 255)})`;
+    }
 }
 //# sourceMappingURL=keyframes.js.map

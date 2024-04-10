@@ -75,25 +75,6 @@ export class StepA extends Action {
         this._base_frame = base_frame;
     }
     run() {
-        // const start = this._start;
-        // const B = this._base_frame;
-        // for (const { prop, entries } of separate_keyframes(
-        //     this._vars,
-        //     this._kf_map!
-        // )) {
-        //     let prev_t = 0;
-        //     for (const { t, value, ease } of entries) {
-        //         const frame = start + t;
-        //         let v;
-        //         if (value == null) {
-        //             v = prop.get_value(start);
-        //         } else {
-        //             v = prop.parse_value(value);
-        //         }
-        //         prop.set_value(frame, v, prev_t, ease);
-        //         prev_t = t;
-        //     }
-        // }
         const { _start, _vars, _kf_map } = this;
         for (const [name, entries] of Object.entries(_kf_map)) {
             for (const prop of enum_props(_vars, name)) {
@@ -323,13 +304,6 @@ function* enum_props(vars, name) {
         }
     }
 }
-// function* separate_keyframes(vars: PropMap, kf_map: KFMap) {
-//     for (const [name, entries] of Object.entries(kf_map)) {
-//         for (const prop of enum_props(vars, name)) {
-//             yield { prop, entries };
-//         }
-//     }
-// }
 export function Step(steps, vars, params = {}) {
     return new StepA(steps, vars, params);
 }

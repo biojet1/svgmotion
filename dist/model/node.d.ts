@@ -1,23 +1,28 @@
-import { Animatable, Keyframes } from "./keyframes.js";
-import { Box, OpacityProp, RectSizeProp, Stroke, Transform } from "./properties.js";
+import { Animatable, Keyframes, NumberValue } from "./keyframes.js";
+import { Box, Fill, OpacityProp, RectSizeProp, Stroke, Transform } from "./properties.js";
 interface INode {
     id?: string;
     transform?: Transform;
-    opacity?: OpacityProp;
+    opacity?: NumberValue;
     _node?: SVGElement;
     stroke?: Stroke;
 }
 export declare abstract class Node implements INode {
     id?: string;
-    transform?: Transform;
-    opacity?: OpacityProp;
     _node?: SVGElement;
     abstract as_svg(doc: Document): SVGElement;
     update_self(frame: number, node: SVGElement): void;
     update_node(frame: number): void;
     enum_values(): Generator<Animatable<any>, void, unknown>;
+    get opacity(): NumberValue;
+    get fill(): Fill;
 }
 export declare abstract class Shape extends Node {
+    get prop_x(): {
+        value: {
+            value: number;
+        };
+    };
 }
 export declare abstract class Container extends Array<Node | Container> implements INode {
     id?: string;

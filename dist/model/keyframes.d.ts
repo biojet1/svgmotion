@@ -47,4 +47,5 @@ export declare class RGB extends NVector {
 export declare class PositionValue extends NVectorValue {
 }
 export declare class RGBValue extends NVectorValue {
+    static to_css_rgb([r, g, b]: Iterable<number>): string;
 }

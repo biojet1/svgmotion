@@ -1,4 +1,4 @@
-import { Animatable, NVectorValue, NumberValue } from "./keyframes.js";
+import { Animatable, NVectorValue, NumberValue, RGBValue } from "./keyframes.js";
 export class ValueSet {
     *enum_values() {
         for (const sub of Object.values(this)) {
@@ -36,8 +36,18 @@ export class Stroke extends ValueSet {
     width;
 }
 export class Fill extends ValueSet {
-    color;
-    opacity;
+    get opacity() {
+        const v = new NumberValue(1);
+        const o = { value: v, writable: true, enumerable: true };
+        Object.defineProperty(this, "opacity", o);
+        return v;
+    }
+    get color() {
+        const v = new RGBValue([0, 0, 0]);
+        const o = { value: v, writable: true, enumerable: true };
+        Object.defineProperty(this, "color", o);
+        return v;
+    }
 }
 export class Transform extends ValueSet {
     anchor;
@@ -57,9 +67,9 @@ export const UPDATE = {
         node.style.opacity = v + '';
     },
     size: function (frame, node, prop) {
-        let x = prop.get_value(frame);
-        node.width.baseVal.value = x[0];
-        node.height.baseVal.value = x[1];
+        let [x, y] = prop.get_value(frame);
+        node.width.baseVal.value = x;
+        node.height.baseVal.value = y;
     },
     position: function (frame, node, prop) {
         let x = prop.get_value(frame);
@@ -72,6 +82,20 @@ export const UPDATE = {
         // let x = prop.get_value(frame);
         // node.width.baseVal.value = x[0];
         // node.height.baseVal.value = x[1];
+    },
+    fill: function (frame, node, prop) {
+        for (let [n, v] of Object.entries(prop)) {
+            if (v) {
+                switch (n) {
+                    case "opacity":
+                        node.style.fillOpacity = v.get_value(frame) + '';
+                        break;
+                    case "color":
+                        node.style.fill = RGBValue.to_css_rgb(v.get_value(frame));
+                        break;
+                }
+            }
+        }
     }
 };
 //# sourceMappingURL=properties.js.map

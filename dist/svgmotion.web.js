@@ -263,6 +263,12 @@ class RGB extends NVector {
 class PositionValue extends NVectorValue {
 }
 class RGBValue extends NVectorValue {
+    // constructor(x: number = 0, y: number = 0) {
+    //     super([x, y]);
+    // }
+    static to_css_rgb([r, g, b]) {
+        return `rgb(${Math.round(r * 255)}, ${Math.round(g * 255)}, ${Math.round(b * 255)})`;
+    }
 }
 //# sourceMappingURL=keyframes.js.map
 ;// CONCATENATED MODULE: ./dist/model/properties.js
@@ -304,8 +310,18 @@ class Stroke extends ValueSet {
     width;
 }
 class Fill extends ValueSet {
-    color;
-    opacity;
+    get opacity() {
+        const v = new NumberValue(1);
+        const o = { value: v, writable: true, enumerable: true };
+        Object.defineProperty(this, "opacity", o);
+        return v;
+    }
+    get color() {
+        const v = new RGBValue([0, 0, 0]);
+        const o = { value: v, writable: true, enumerable: true };
+        Object.defineProperty(this, "color", o);
+        return v;
+    }
 }
 class Transform extends ValueSet {
     anchor;
@@ -325,9 +341,9 @@ const UPDATE = {
         node.style.opacity = v + '';
     },
     size: function (frame, node, prop) {
-        let x = prop.get_value(frame);
-        node.width.baseVal.value = x[0];
-        node.height.baseVal.value = x[1];
+        let [x, y] = prop.get_value(frame);
+        node.width.baseVal.value = x;
+        node.height.baseVal.value = y;
     },
     position: function (frame, node, prop) {
         let x = prop.get_value(frame);
@@ -340,6 +356,20 @@ const UPDATE = {
         // let x = prop.get_value(frame);
         // node.width.baseVal.value = x[0];
         // node.height.baseVal.value = x[1];
+    },
+    fill: function (frame, node, prop) {
+        for (let [n, v] of Object.entries(prop)) {
+            if (v) {
+                switch (n) {
+                    case "opacity":
+                        node.style.fillOpacity = v.get_value(frame) + '';
+                        break;
+                    case "color":
+                        node.style.fill = RGBValue.to_css_rgb(v.get_value(frame));
+                        break;
+                }
+            }
+        }
     }
 };
 //# sourceMappingURL=properties.js.map
@@ -348,8 +378,8 @@ const UPDATE = {
 
 class Node {
     id;
-    transform;
-    opacity;
+    // transform?: Transform;
+    // opacity?: OpacityProp;
     _node;
     update_self(frame, node) {
         update(frame, this, node);
@@ -370,8 +400,28 @@ class Node {
             }
         }
     }
+    get opacity() {
+        const v = new NumberValue(1);
+        const o = { value: v, writable: true, enumerable: true };
+        console.log("opacity prop_x", o);
+        Object.defineProperty(this, "opacity", o);
+        return v;
+    }
+    get fill() {
+        const v = new Fill();
+        const o = { value: v, writable: true, enumerable: true };
+        Object.defineProperty(this, "fill", o);
+        return v;
+    }
 }
 class Shape extends Node {
+    // strok fill
+    get prop_x() {
+        const p = { value: { value: 4 } };
+        console.log("prop_x", p);
+        Object.defineProperty(this, "prop_x", p);
+        return p;
+    }
 }
 class Container extends Array {
     id;
@@ -437,15 +487,6 @@ class Container extends Array {
     }
 }
 function update(frame, target, el) {
-    // const { opacity } = target;
-    // if (opacity) {
-    //     const v = opacity.get_value(frame);
-    //     el.style.opacity = v + '';
-    //     // el.style.stroke
-    // }
-    // for (let v of Object.values(target)) {
-    //     v?.update_prop?.(frame, el);
-    // }
     for (let [n, v] of Object.entries(target)) {
         v && UPDATE[n]?.(frame, el, v);
     }
@@ -794,25 +835,6 @@ class StepA extends Action {
         this._base_frame = base_frame;
     }
     run() {
-        // const start = this._start;
-        // const B = this._base_frame;
-        // for (const { prop, entries } of separate_keyframes(
-        //     this._vars,
-        //     this._kf_map!
-        // )) {
-        //     let prev_t = 0;
-        //     for (const { t, value, ease } of entries) {
-        //         const frame = start + t;
-        //         let v;
-        //         if (value == null) {
-        //             v = prop.get_value(start);
-        //         } else {
-        //             v = prop.parse_value(value);
-        //         }
-        //         prop.set_value(frame, v, prev_t, ease);
-        //         prev_t = t;
-        //     }
-        // }
         const { _start, _vars, _kf_map } = this;
         for (const [name, entries] of Object.entries(_kf_map)) {
             for (const prop of enum_props(_vars, name)) {
@@ -1042,13 +1064,6 @@ function* enum_props(vars, name) {
         }
     }
 }
-// function* separate_keyframes(vars: PropMap, kf_map: KFMap) {
-//     for (const [name, entries] of Object.entries(kf_map)) {
-//         for (const prop of enum_props(vars, name)) {
-//             yield { prop, entries };
-//         }
-//     }
-// }
 function Step(steps, vars, params = {}) {
     return new StepA(steps, vars, params);
 }
