@@ -1,16 +1,16 @@
-import { Animatable, Keyframes, NVectorValue, NumberValue } from "./keyframes.js";
-import { Box, Stroke, Transform } from "./properties.js";
+import { Animatable, Keyframes } from "./keyframes.js";
+import { Box, OpacityProp, RectSizeProp, Stroke, Transform } from "./properties.js";
 interface INode {
     id?: string;
     transform?: Transform;
-    opacity?: NumberValue;
+    opacity?: OpacityProp;
     _node?: SVGElement;
     stroke?: Stroke;
 }
 export declare abstract class Node implements INode {
     id?: string;
     transform?: Transform;
-    opacity?: NumberValue;
+    opacity?: OpacityProp;
     _node?: SVGElement;
     abstract as_svg(doc: Document): SVGElement;
     update_self(frame: number, node: SVGElement): void;
@@ -21,9 +21,7 @@ export declare abstract class Shape extends Node {
 }
 export declare abstract class Container extends Array<Node | Container> implements INode {
     id?: string;
-    transform?: Transform;
-    opacity?: NumberValue;
-    stroke?: Stroke;
+    opacity?: OpacityProp;
     _node?: SVGElement;
     abstract as_svg(doc: Document): SVGElement;
     update_self(frame: number, node: SVGElement): boolean;
@@ -41,9 +39,8 @@ export declare class ViewPort extends Container {
     as_svg(doc: Document): SVGSVGElement;
 }
 export declare class Rect extends Shape {
-    size: NVectorValue;
+    size: RectSizeProp;
     as_svg(doc: Document): SVGRectElement;
-    update_self(frame: number, node: SVGElement): void;
 }
 export declare class Root extends ViewPort {
     defs: Array<Node | Container>;

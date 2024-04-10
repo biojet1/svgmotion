@@ -1,13 +1,5 @@
-import { Animatable, Keyframes, NVectorValue } from "./keyframes.js";
-import { Box, ValueSet } from "./properties.js";
-function update(frame, target, el) {
-    const { opacity } = target;
-    if (opacity) {
-        const v = opacity.get_value(frame);
-        el.style.opacity = v + '';
-        // el.style.stroke
-    }
-}
+import { Animatable, Keyframes } from "./keyframes.js";
+import { Box, RectSizeProp, ValueSet } from "./properties.js";
 export class Node {
     id;
     transform;
@@ -37,10 +29,10 @@ export class Shape extends Node {
 }
 export class Container extends Array {
     id;
-    transform;
+    // transform?: Transform;
     opacity;
-    // fill?: Fill;
-    stroke;
+    // // fill?: Fill;
+    // stroke?: Stroke;
     _node;
     update_self(frame, node) {
         update(frame, this, node);
@@ -98,6 +90,17 @@ export class Container extends Array {
         return [min, max];
     }
 }
+function update(frame, target, el) {
+    // const { opacity } = target;
+    // if (opacity) {
+    //     const v = opacity.get_value(frame);
+    //     el.style.opacity = v + '';
+    //     // el.style.stroke
+    // }
+    for (let v of Object.values(target)) {
+        v?.update_prop?.(frame, el);
+    }
+}
 export class Group extends Container {
     as_svg(doc) {
         const con = this._node = doc.createElementNS(NS_SVG, "group");
@@ -123,20 +126,12 @@ export class ViewPort extends Container {
 }
 const NS_SVG = "http://www.w3.org/2000/svg";
 export class Rect extends Shape {
-    size = new NVectorValue([100, 100]);
+    size = new RectSizeProp([100, 100]);
     as_svg(doc) {
         const e = this._node = doc.createElementNS(NS_SVG, "rect");
         // e.width.baseVal.value = this.size
         // e.addEventListener
         return e;
-    }
-    update_self(frame, node) {
-        let x = this.size.get_value(frame);
-        let e = node;
-        e.width.baseVal.value = x[0];
-        e.height.baseVal.value = x[1];
-        // console.log(`Rect:update_self ${frame} ${x}`);
-        super.update_self(frame, node);
     }
 }
 // export class Ellipse extends Shape {

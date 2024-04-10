@@ -1,10 +1,10 @@
 import { Animatable, Keyframes, NVectorValue, NumberValue } from "./keyframes.js";
-import { Box, Fill, Stroke, Transform, ValueSet } from "./properties.js";
+import { Box, Fill, OpacityProp, RectSizeProp, Stroke, Transform, UPDATE, ValueSet } from "./properties.js";
 
 interface INode {
     id?: string;
     transform?: Transform;
-    opacity?: NumberValue;
+    opacity?: OpacityProp;
     _node?: SVGElement;
     // fill?: Fill;
     stroke?: Stroke;
@@ -13,19 +13,12 @@ interface INode {
 
 }
 
-function update(frame: number, target: INode, el: SVGElement) {
-    const { opacity } = target;
-    if (opacity) {
-        const v = opacity.get_value(frame);
-        el.style.opacity = v + '';
-        // el.style.stroke
-    }
-}
+
 
 export abstract class Node implements INode {
     id?: string;
     transform?: Transform;
-    opacity?: NumberValue;
+    opacity?: OpacityProp;
     _node?: SVGElement;
 
     abstract as_svg(doc: Document): SVGElement;
@@ -49,6 +42,7 @@ export abstract class Node implements INode {
             }
         }
     }
+
 }
 
 export abstract class Shape extends Node {
@@ -57,10 +51,10 @@ export abstract class Shape extends Node {
 
 export abstract class Container extends Array<Node | Container> implements INode {
     id?: string;
-    transform?: Transform;
-    opacity?: NumberValue;
-    // fill?: Fill;
-    stroke?: Stroke;
+    // transform?: Transform;
+    opacity?: OpacityProp;
+    // // fill?: Fill;
+    // stroke?: Stroke;
 
     _node?: SVGElement;
 
@@ -124,6 +118,27 @@ export abstract class Container extends Array<Node | Container> implements INode
 
 
 }
+function update(frame: number, target: Node | Container, el: SVGElement) {
+    // const { opacity } = target;
+    // if (opacity) {
+    //     const v = opacity.get_value(frame);
+    //     el.style.opacity = v + '';
+    //     // el.style.stroke
+    // }
+    for (let v of Object.values(target)) {
+
+        v?.update_prop?.(frame, el);
+
+    }
+    // for (let [n, v] of Object.entries(target)) {
+    //     let x = UPDATE[n];
+    //     if (x && vv) {
+    //         x?.(frame, el, v);
+    //     }
+    // }
+
+}
+
 
 export class Group extends Container {
     as_svg(doc: Document) {
@@ -152,21 +167,21 @@ export class ViewPort extends Container {
 
 const NS_SVG = "http://www.w3.org/2000/svg"
 export class Rect extends Shape {
-    size: NVectorValue = new NVectorValue([100, 100]);
+    size: RectSizeProp = new RectSizeProp([100, 100]);
     as_svg(doc: Document) {
         const e = this._node = doc.createElementNS(NS_SVG, "rect");
         // e.width.baseVal.value = this.size
         // e.addEventListener
         return e;
     }
-    update_self(frame: number, node: SVGElement) {
-        let x = this.size.get_value(frame);
-        let e = node as unknown as SVGRectElement;
-        e.width.baseVal.value = x[0];
-        e.height.baseVal.value = x[1];
-        // console.log(`Rect:update_self ${frame} ${x}`);
-        super.update_self(frame, node);
-    }
+    // update_self(frame: number, node: SVGElement) {
+    //     let x = this.size.get_value(frame);
+    //     let e = node as unknown as SVGRectElement;
+    //     e.width.baseVal.value = x[0];
+    //     e.height.baseVal.value = x[1];
+    //     // console.log(`Rect:update_self ${frame} ${x}`);
+    //     super.update_self(frame, node);
+    // }
 }
 
 // export class Ellipse extends Shape {

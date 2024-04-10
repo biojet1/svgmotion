@@ -12,6 +12,9 @@ export class ValueSet {
             }
         }
     }
+    update_prop(frame: number, node: SVGElement) {
+        throw new Error(`Not implemented`);
+    }
 }
 
 export class Box extends ValueSet {
@@ -21,6 +24,14 @@ export class Box extends ValueSet {
         super();
         this.size = new NVectorValue(size);
         this.position = new NVectorValue(position);
+    }
+    update_prop(frame: number, node: SVGSVGElement) {
+        const size = this.size.get_value(frame);
+        const pos = this.position.get_value(frame);
+        node.x.baseVal.value = pos[0];
+        node.y.baseVal.value = pos[1];
+        node.width.baseVal.value = size[0];
+        node.height.baseVal.value = size[1];
     }
 }
 
@@ -43,10 +54,36 @@ export class Transform extends ValueSet {
     skew_axis?: NumberValue;
 
 }
+export const UPDATE: {
+    [key: string]: any;
+} = {
+
+    opacity: function (frame: number, node: SVGElement, prop: NumberValue) {
+        const v = prop.get_value(frame);
+        node.style.opacity = v + '';
+    }
+}
+
+
 export class OpacityProp extends NumberValue {
     update_prop(frame: number, node: SVGElement) {
         const v = this.get_value(frame);
         node.style.opacity = v + '';
+    }
+}
+
+export class RectSizeProp extends NVectorValue {
+    update_prop(frame: number, node: SVGRectElement) {
+        let x = this.get_value(frame);
+        node.width.baseVal.value = x[0];
+        node.height.baseVal.value = x[1];
+    }
+    static {
+        UPDATE['size'] = function (frame: number, node: SVGRectElement, prop: NVectorValue) {
+            let x = prop.get_value(frame);
+            node.width.baseVal.value = x[0];
+            node.height.baseVal.value = x[1];
+        }
     }
 }
 
