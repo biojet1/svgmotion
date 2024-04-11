@@ -11,7 +11,7 @@ export interface IProperty<V> {
         easing?: IEasing | boolean,
         add?: boolean
     ): any;
-    parse_value(x: any): V;
+    check_value(x: any): V;
 }
 
 export interface IAction {

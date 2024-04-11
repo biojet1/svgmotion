@@ -96,6 +96,33 @@ export const UPDATE = {
                 }
             }
         }
-    }
+    },
+    x: function (frame, node, prop) {
+        node.x.baseVal.value = prop.get_value(frame);
+    },
+    y: function (frame, node, prop) {
+        node.y.baseVal.value = prop.get_value(frame);
+    },
+    cx: function (frame, node, prop) {
+        node.cx.baseVal.value = prop.get_value(frame);
+    },
+    cy: function (frame, node, prop) {
+        node.cy.baseVal.value = prop.get_value(frame);
+    },
+    r: function (frame, node, prop) {
+        node.r.baseVal.value = prop.get_value(frame);
+    },
+    width: function (frame, node, prop) {
+        node.width.baseVal.value = prop.get_value(frame);
+    },
+    height: function (frame, node, prop) {
+        node.height.baseVal.value = prop.get_value(frame);
+    },
+    rx: function (frame, node, prop) {
+        node.rx.baseVal.value = prop.get_value(frame);
+    },
+    ry: function (frame, node, prop) {
+        node.ry.baseVal.value = prop.get_value(frame);
+    },
 };
 //# sourceMappingURL=properties.js.map

@@ -30,10 +30,15 @@ export class Keyframes<V> extends Array<KeyframeEntry<V>> {
     }
 }
 
-export abstract class Animatable<V> {
+export class Animatable<V> {
     value!: Keyframes<V> | V;
-    abstract lerp_value(ratio: number, a: V, b: V): V;
-    abstract add_value(a: V, b: V): V;
+    lerp_value(ratio: number, a: V, b: V): V {
+        throw Error(`Not implemented`);
+    }
+    add_value(a: V, b: V): V {
+        throw Error(`Not implemented`);
+        // return a + b;
+    }
     get_value(frame: number) {
         const { value } = this;
         if (value instanceof Keyframes) {
@@ -110,11 +115,74 @@ export abstract class Animatable<V> {
         }
         return kfs.set_value(frame, value);
     }
-    parse_value(x: any): V {
+    check_value(x: any): V {
         return x as V;
     }
     constructor(v: V) {
         this.value = v;
+    }
+}
+
+export class AnimatableD<V> extends Animatable<V> {
+    override get_value(frame: number) {
+        const { value } = this;
+        if (value instanceof Keyframes) {
+            let p = undefined; // previous KeyframeEntry<V>
+            for (const k of value) {
+                if (k.time >= frame) {
+                    return k.value;
+                }
+                p = k;
+            }
+            if (p) {
+                return p.value;
+            }
+            throw new Error(`empty keyframe list`);
+        } else {
+            return value;
+        }
+    }
+    override set_value(
+        frame: number,
+        value: V,
+        start?: number,
+        easing?: IEasing | boolean,
+        add?: boolean
+    ) {
+        let { value: kfs } = this;
+        let last;
+        if (kfs instanceof Keyframes) {
+            last = kfs[kfs.length - 1];
+            if (last) {
+                if (start == undefined) {
+                    // pass
+                } else if (start > last.time) {
+                    last.easing = true;
+                    last = kfs.set_value(start, this.get_value(last.time));
+                } else {
+                    if (start != last.time) {
+                        throw new Error(
+                            `unexpected start=${start} last.time=${last.time} time=${frame}`
+                        );
+                    }
+                }
+            }
+        } else {
+            const v = kfs;
+            kfs = this.value = new Keyframes<V>();
+            if (start != undefined) {
+                last = kfs.set_value(start, v);
+            }
+        }
+        if (last) {
+            if (easing != undefined) {
+                throw new Error(`easing not suppported`);
+            }
+            if (add) {
+                value = this.add_value(last.value, value);
+            }
+        }
+        return kfs.set_value(frame, value);
     }
 }
 
@@ -153,7 +221,7 @@ export class NVectorValue extends Animatable<NVector> {
     add_value(a: NVector, b: NVector): NVector {
         return a.add(b);
     }
-    parse_value(x: any): NVector {
+    check_value(x: any): NVector {
         if (x instanceof NVector) {
             return x;
         } else {
@@ -199,6 +267,14 @@ export class RGBValue extends NVectorValue {
     //     super([x, y]);
     // }
     static to_css_rgb([r, g, b]: Iterable<number>) {
-        return `rgb(${Math.round(r * 255)}, ${Math.round(g * 255)}, ${Math.round(b * 255)})`;
+        return `rgb(${Math.round(r * 255)}, ${Math.round(g * 255)}, ${Math.round(
+            b * 255
+        )})`;
+    }
+}
+
+export class TextValue extends AnimatableD<string> {
+    add_value(a: string, b: string): string {
+        return a + '' + b;
     }
 }

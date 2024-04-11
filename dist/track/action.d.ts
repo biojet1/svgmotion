@@ -5,7 +5,7 @@ export interface IEasing {
 export interface IProperty<V> {
     get_value(time: number): V;
     set_value(time: number, value: V, start?: number, easing?: IEasing | boolean, add?: boolean): any;
-    parse_value(x: any): V;
+    check_value(x: any): V;
 }
 export interface IAction {
     _start?: number;

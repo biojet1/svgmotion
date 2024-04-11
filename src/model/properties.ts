@@ -121,5 +121,33 @@ export const UPDATE: {
                 }
             }
         }
-    }
+    },
+
+    x: function (frame: number, node: SVGRectElement | SVGSVGElement, prop: NumberValue) {
+        node.x.baseVal.value = prop.get_value(frame);
+    },
+    y: function (frame: number, node: SVGRectElement | SVGSVGElement, prop: NumberValue) {
+        node.y.baseVal.value = prop.get_value(frame);
+    },
+    cx: function (frame: number, node: SVGCircleElement | SVGEllipseElement, prop: NumberValue) {
+        node.cx.baseVal.value = prop.get_value(frame);
+    },
+    cy: function (frame: number, node: SVGCircleElement | SVGEllipseElement, prop: NumberValue) {
+        node.cy.baseVal.value = prop.get_value(frame);
+    },
+    r: function (frame: number, node: SVGCircleElement, prop: NumberValue) {
+        node.r.baseVal.value = prop.get_value(frame);
+    },
+    width: function (frame: number, node: SVGRectElement | SVGSVGElement, prop: NumberValue) {
+        node.width.baseVal.value = prop.get_value(frame);
+    },
+    height: function (frame: number, node: SVGRectElement | SVGSVGElement, prop: NumberValue) {
+        node.height.baseVal.value = prop.get_value(frame);
+    },
+    rx: function (frame: number, node: SVGRectElement | SVGEllipseElement, prop: NumberValue) {
+        node.rx.baseVal.value = prop.get_value(frame);
+    },
+    ry: function (frame: number, node: SVGRectElement | SVGEllipseElement, prop: NumberValue) {
+        node.ry.baseVal.value = prop.get_value(frame);
+    },
 }

@@ -24,6 +24,13 @@ export class Keyframes extends Array {
 }
 export class Animatable {
     value;
+    lerp_value(ratio, a, b) {
+        throw Error(`Not implemented`);
+    }
+    add_value(a, b) {
+        throw Error(`Not implemented`);
+        // return a + b;
+    }
     get_value(frame) {
         const { value } = this;
         if (value instanceof Keyframes) {
@@ -98,11 +105,69 @@ export class Animatable {
         }
         return kfs.set_value(frame, value);
     }
-    parse_value(x) {
+    check_value(x) {
         return x;
     }
     constructor(v) {
         this.value = v;
+    }
+}
+export class AnimatableD extends Animatable {
+    get_value(frame) {
+        const { value } = this;
+        if (value instanceof Keyframes) {
+            let p = undefined; // previous KeyframeEntry<V>
+            for (const k of value) {
+                if (k.time >= frame) {
+                    return k.value;
+                }
+                p = k;
+            }
+            if (p) {
+                return p.value;
+            }
+            throw new Error(`empty keyframe list`);
+        }
+        else {
+            return value;
+        }
+    }
+    set_value(frame, value, start, easing, add) {
+        let { value: kfs } = this;
+        let last;
+        if (kfs instanceof Keyframes) {
+            last = kfs[kfs.length - 1];
+            if (last) {
+                if (start == undefined) {
+                    // pass
+                }
+                else if (start > last.time) {
+                    last.easing = true;
+                    last = kfs.set_value(start, this.get_value(last.time));
+                }
+                else {
+                    if (start != last.time) {
+                        throw new Error(`unexpected start=${start} last.time=${last.time} time=${frame}`);
+                    }
+                }
+            }
+        }
+        else {
+            const v = kfs;
+            kfs = this.value = new Keyframes();
+            if (start != undefined) {
+                last = kfs.set_value(start, v);
+            }
+        }
+        if (last) {
+            if (easing != undefined) {
+                throw new Error(`easing not suppported`);
+            }
+            if (add) {
+                value = this.add_value(last.value, value);
+            }
+        }
+        return kfs.set_value(frame, value);
     }
 }
 export class NumberValue extends Animatable {
@@ -137,7 +202,7 @@ export class NVectorValue extends Animatable {
     add_value(a, b) {
         return a.add(b);
     }
-    parse_value(x) {
+    check_value(x) {
         if (x instanceof NVector) {
             return x;
         }
@@ -178,6 +243,11 @@ export class RGBValue extends NVectorValue {
     // }
     static to_css_rgb([r, g, b]) {
         return `rgb(${Math.round(r * 255)}, ${Math.round(g * 255)}, ${Math.round(b * 255)})`;
+    }
+}
+export class TextValue extends AnimatableD {
+    add_value(a, b) {
+        return a + '' + b;
     }
 }
 //# sourceMappingURL=keyframes.js.map

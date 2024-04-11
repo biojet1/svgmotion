@@ -2,8 +2,8 @@
 import test from "tap";
 
 import {
-    KeyframeEntry, Keyframes, NumberValue,
-    NVectorValue, Point, NVector,
+    KeyframeEntry, Keyframes, NumberValue, TextValue,
+    NVectorValue, Point, NVector, Fill,
     ViewPort, RGBValue, Size, Root
 } from "../dist/model/index.js";
 import {
@@ -117,8 +117,13 @@ test.test("Step", (t) => {
         t.equal(r.opacity.value, 0.9);
     }
 
-    {r.fill.color = 
-
+    {
+        console.log('r.fill', r.fill);
+        r.fill = new Fill();
+        console.log('r.fill', r.fill);
+        r.fill = new Fill();
+        console.log('r.fill', r.fill);
+        r.fill = new Fill();
         console.log('r.fill', r.fill);
     }
 
@@ -142,13 +147,30 @@ test.test("Step", (t) => {
         t.same(Array.from(q[3].value), [50, 50]);
     }
 
-    console.log(r.prop_x);
+    // console.log(r.prop_x);
     r.prop_x.value += 20;
-    console.log(r.prop_x);
+    // console.log(r.prop_x);
     t.end();
 
 });
 
 
+test.test("TextValue", (t) => {
+    let x = new TextValue("X");
+    t.equal(x.get_value(0), "X");
+    t.equal(x.get_value(10), "X");
+    t.equal(x.get_value(20), "X");
+    x.set_value(0, "ONE");
+    x.set_value(10, "TWO");
+    x.set_value(20, "3");
+    t.equal(x.get_value(0), "ONE");
+    t.equal(x.get_value(10), "TWO");
+    t.equal(x.get_value(20), "3");
+    console.log(x);
+    t.equal(x.get_value(-5), "ONE");
+    t.equal(x.get_value(5), "TWO");
+    t.equal(x.get_value(15), "3");
+    t.equal(x.get_value(25), "3");
+    t.end();
 
-
+});

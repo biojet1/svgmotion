@@ -50,10 +50,14 @@ export abstract class Node implements INode {
         return v;
     }
     get fill() {
+        console.log("GET fill");
         const v = new Fill();
-        const o = { value: v, writable: true, enumerable: true };
-        Object.defineProperty(this, "fill", o)
+        Object.defineProperty(this, "fill", { value: v, writable: true, enumerable: true })
         return v;
+    }
+    set fill(v: Fill) {
+        console.log("SET fill");
+        Object.defineProperty(this, "fill", { value: v, writable: true, enumerable: true })
     }
     // get transform() {
     //     const v = new Transform();
@@ -77,7 +81,7 @@ export abstract class Shape extends Node {
 export abstract class Container extends Array<Node | Container> implements INode {
     id?: string;
     // transform?: Transform;
-    opacity?: OpacityProp;
+    // opacity?: OpacityProp;
     // // fill?: Fill;
     // stroke?: Stroke;
 
@@ -141,7 +145,11 @@ export abstract class Container extends Array<Node | Container> implements INode
         }
         return [min, max];
     }
-
+    get opacity() {
+        const v = new NumberValue(1);
+        Object.defineProperty(this, "opacity", { value: v, writable: true, enumerable: true })
+        return v;
+    }
 
 }
 function update(frame: number, target: Node | Container, el: SVGElement) {
@@ -201,8 +209,8 @@ export class Rect extends Shape {
 // }
 
 // export class Image extends Node {
-//     href: string = "";
-//     size: NVectorValue = new NVectorValue([100, 100]);
+//     // href: string = "";
+//     // size: NVectorValue = new NVectorValue([100, 100]);
 // }
 export class Root extends ViewPort {
     defs: Array<Node | Container> = [];

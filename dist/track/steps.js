@@ -68,7 +68,7 @@ export class StepA extends Action {
         for (const e of entries) {
             t_max = Math.max(t_max, e.t);
         }
-        this._entries = Array.from(entries);
+        // (this as any)._entries = Array.from(entries);
         this._kf_map = map_keyframes(entries);
         this._start = frame;
         this._end = frame + t_max;
@@ -86,7 +86,7 @@ export class StepA extends Action {
                         v = prop.get_value(_start);
                     }
                     else {
-                        v = prop.parse_value(value);
+                        v = prop.check_value(value);
                     }
                     prop.set_value(frame, v, prev_t, ease);
                     prev_t = t;
