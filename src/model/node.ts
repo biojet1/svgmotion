@@ -15,7 +15,10 @@ interface INode {
 
 
 
+
 export abstract class Node implements INode {
+
+
     id?: string;
     // transform?: Transform;
     // opacity?: OpacityProp;
