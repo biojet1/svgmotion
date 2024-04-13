@@ -64,10 +64,8 @@ export class Node {
     }
 
     *ancestors() {
-        let parent = this._parent;
-        while (parent) {
-            yield parent;
-            parent = parent._parent;
+        for (let p = this._parent; p; p = p._parent) {
+            yield p;
         }
     }
 }
@@ -77,24 +75,12 @@ export class Parent extends Node {
     last_child() {
         let { _first: child } = this;
         if (child) {
-            while (child._next) {
+            for (let next; next = child._next; child = next) {
                 if (child._parent !== this) {
                     throw new Error(`Unexpected parent`);
                 }
-                child = child._next;
             }
         }
-        // for (; child;) {
-        //     if (child._parent !== this) {
-        //         throw new Error(`Unexpected parent`);
-        //     }
-        //     const { _next } = child;
-        //     if (_next) {
-        //         child = _next;
-        //     } else {
-        //         break;
-        //     }
-        // }
         return child;
     }
     first_child() {
@@ -104,8 +90,25 @@ export class Parent extends Node {
     prior_child(child: Node): Parent | Node | undefined {
         let { _first: cur } = this;
         for (let prev; cur; cur = cur._next) {
+            if (cur._parent !== this) {
+                throw new Error(`Unexpected parent`);
+            }
             if (cur === child) {
                 return prev;
+            }
+            prev = cur;
+        }
+        throw new Error(`child not found`);
+    }
+
+    adjacents_of(child: Node) {
+        let { _first: cur } = this;
+        for (let prev; cur; cur = cur._next) {
+            if (cur._parent !== this) {
+                throw new Error(`Unexpected parent`);
+            }
+            if (cur === child) {
+                return [prev, cur._next];
             }
             prev = cur;
         }
@@ -124,9 +127,9 @@ export class Parent extends Node {
         } else if (old._parent !== this) {
             throw new Error(`Invalid parent`);
         }
+        child.detach();
         const { _prev, _next } = old;
         old.detach();
-        child.detach();
         child._parent = this;
         child._next = _next;
         if (_prev) {
@@ -145,9 +148,17 @@ export class Parent extends Node {
         old.place_after(child);
     }
     append_child(child: Node) {
-        if (child === this) {
-            throw new Error(`Invalid child`);
+        {
+            let parent: Parent | undefined = this;
+            do {
+                if (child === parent) {
+                    throw new Error(`Invalid child`);
+                }
+            } while (parent = parent._parent);
         }
+        // if (child === this) {
+        //     throw new Error(`Invalid child`);
+        // }
         child.detach();
         const last = this.last_child();
         child._parent = this;
@@ -168,10 +179,9 @@ export class Parent extends Node {
     }
     *self_and_ancestors() {
         let parent: Parent | undefined = this;
-        while (parent) {
+        do {
             yield parent;
-            parent = parent._parent;
-        }
+        } while (parent = parent._parent)
     }
     *children() {
         for (let { _first: child } = this; child; child = child._next) {

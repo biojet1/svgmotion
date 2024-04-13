@@ -125,11 +125,17 @@ test.test("Item", (t) => {
     t.same(A.toString(), 'A(D(), H(B(), W()), Z())');
     H.insert_after(B, W);
     t.same(A.toString(), 'A(D(), H(W(), B()), Z())');
+    t.same(A.adjacents_of(H), [D, Z]);
     t.same(L.toString(), 'L()');
     t.throws(() => L.append_child(L));
     t.throws(() => L.preppend_child(L));
 
     t.same(L.toString(), 'L()');
+    t.same(H.toString(), 'H(W(), B())');
+
+    t.throws(() => B.append_child(H));
+    t.same(H.toString(), 'H(W(), B())');
+
     t.end();
 
 });

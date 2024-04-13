@@ -15,6 +15,7 @@ export declare class Parent extends Node {
     last_child(): Node | Parent | undefined;
     first_child(): Node | Parent | undefined;
     prior_child(child: Node): Parent | Node | undefined;
+    adjacents_of(child: Node): (Node | undefined)[];
     remove_child(child: Node): Node;
     replace_child(child: Node, old: Node): void;
     insert_after(child: Node, old: Node): void;
