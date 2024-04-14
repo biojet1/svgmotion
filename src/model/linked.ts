@@ -3,18 +3,16 @@ export class Node {
     _prev?: Node;
     _parent?: Parent;
     get _end(): Node {
-        // End node or self
         return this;
     }
     get _start(): Node {
-        // End node or self
         return this;
     }
 
     next_sibling() {
+        // *P -> a b c -> *E
         const node = this._end._next;
         if (node instanceof End) {
-            // P -> a b c -> E
             if (node._parent !== this._parent) {
                 // console.warn([node.parentNode, this.parentNode]);
                 throw new Error("Unexpected following End node");
@@ -25,7 +23,9 @@ export class Node {
     }
 
     previous_sibling() {
-        // N a ^a b ^b c ^c  ^N
+        // a ^a b ^b ...
+        // c  b ^b ...       
+        // N b ^b ...  ^N
         const node = this._start._prev;
         if (node instanceof End) {
             // ...<child/></end>
@@ -47,17 +47,6 @@ export class Node {
         }
     }
 
-    // _linkl(node?: Node) {
-    //     // node<->[THIS]
-    //     if (node === this) {
-    //         throw new Error(`Same node`);
-    //     } else if (node) {
-    //         this._prev = node;
-    //         node._next = this;
-    //     } else {
-    //         delete this._prev;
-    //     }
-    // }
     _detach() {
         const { _prev: prev, _end: { _next: next } } = this;
         // [PREV]<->[THIS]<->[NEXT] => [PREV]<->[NEXT]
@@ -69,9 +58,9 @@ export class Node {
     }
     _attach(prev: Node, next: Node, parent: Parent) {
         const { _start, _end, _parent } = this;
-        if (_parent || _start._prev || _end._next) {
-            throw new Error(`Detach first`);
-        }
+        // if (_parent || _start._prev || _end._next) {
+        //     throw new Error(`Detach first`);
+        // }
         this._parent = parent;
         prev._link_next(_start);
         _end._link_next(next);
@@ -85,6 +74,15 @@ export class Node {
     place_before(...nodes: Array<Node>) {
         const { _parent } = this;
         _parent?.insert_before(this, ...nodes);
+    }
+
+    replace_with(...nodes: Array<Node>) {
+        const { _parent } = this;
+        if (_parent) {
+            const next = this.next_sibling() ?? _parent._end;
+            this.remove();
+            _parent.insert_before(next, ...nodes);
+        }
     }
 
     remove() {
@@ -104,26 +102,38 @@ export abstract class Parent extends Node {
         return this._tail;
     }
     first_child() {
-        // P -> *C -> E
-        for (let { _next, _end } = this; _next && _next !== _end;) {
+        // P  c ... ^P
+        // P  C ^C ... ^P 
+        // P ^P  
+        let { _next, _end } = this;
+        if (_next !== _end) {
             if (_next instanceof End) {
-                throw new Error("Unexpected following End node");
+                throw new Error("Unexpected end node");
+            } else if (!_next) {
+                throw new Error("next expected");
+            } else if (_next._parent !== this) {
+                throw new Error("Unexpected parent");
             }
             return _next;
         }
     }
     last_child() {
-        const prev = this._end._prev;
-        if (prev && prev != this) {
-            return prev._start;
+        // P  ... c  ^P
+        // P  ... C ^C  ^P 
+        // P ^P       
+        const { _prev } = this._end;
+        if (_prev != this) {
+            return _prev?._start;
         }
     }
 
     insert_before(child: Node, ...nodes: Array<Node>) {
+        if (child._parent !== this) {
+            throw new Error('child not found');
+        }
         for (const node of nodes) {
             if (node !== child) {
-                node._detach();
-                node._attach(child._prev ?? this, child, this);
+                node._detach()._attach(child._prev ?? this, child, this);
             }
         }
     }
@@ -131,7 +141,7 @@ export abstract class Parent extends Node {
         this.insert_before(this._end, ...nodes);
     }
     prepend_child(...nodes: Array<Node>) {
-        this.insert_before(this.first_child() || this._end, ...nodes);
+        this.insert_before(this._next || this._end, ...nodes);
     }
 
     remove_child(node: Node) {
@@ -143,7 +153,14 @@ export abstract class Parent extends Node {
         node.remove();
         return node;
     }
-
+    contains(node: Node | Parent) {
+        let p: Node | Parent | undefined = node;
+        do if (p === this) {
+            return true;
+        }
+        while (p = p._parent);
+        return false;
+    }
     *children() {
         let cur = this.first_child();
         for (; cur; cur = cur.next_sibling()) {
@@ -158,12 +175,7 @@ export class End extends Node {
         super();
         this._parent = this._prev = parent;
     }
-    get _start(): Node {
+    override get _start(): Node {
         return this._parent;
     }
 }
-
-function set_adjacent(before: Node, after: Node) {
-    before._next = after;
-    after._prev = before;
-};

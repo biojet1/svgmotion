@@ -11,6 +11,7 @@ export declare class Node {
     _attach(prev: Node, next: Node, parent: Parent): void;
     place_after(...nodes: Array<Node>): void;
     place_before(...nodes: Array<Node>): void;
+    replace_with(...nodes: Array<Node>): void;
     remove(): void;
 }
 export declare abstract class Parent extends Node {
@@ -23,6 +24,7 @@ export declare abstract class Parent extends Node {
     append_child(...nodes: Array<Node>): void;
     prepend_child(...nodes: Array<Node>): void;
     remove_child(node: Node): Node;
+    contains(node: Node | Parent): boolean;
     children(): Generator<Node, void, unknown>;
 }
 export declare class End extends Node {
