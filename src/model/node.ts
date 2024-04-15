@@ -1,5 +1,6 @@
 import { Animatable, Keyframes, NVectorValue, NumberValue } from "./keyframes.js";
 import { Box, Fill, OpacityProp, RectSizeProp, Stroke, Transform, UPDATE, ValueSet } from "./properties.js";
+// import { Node, Parent } from "./linked.js";
 
 interface INode {
     id?: string;
@@ -16,7 +17,7 @@ interface INode {
 
 
 
-export abstract class Node implements INode {
+export abstract class Item implements INode {
 
 
     id?: string;
@@ -70,7 +71,7 @@ export abstract class Node implements INode {
 
 }
 
-export abstract class Shape extends Node {
+export abstract class Shape extends Item {
     // strok fill
     get prop_x() {
         const p = { value: { value: 4 } };
@@ -81,12 +82,8 @@ export abstract class Shape extends Node {
 
 }
 
-export abstract class Container extends Array<Node | Container> implements INode {
+export abstract class Container extends Array<Container | Item> implements INode {
     id?: string;
-    // transform?: Transform;
-    // opacity?: OpacityProp;
-    // // fill?: Fill;
-    // stroke?: Stroke;
 
 
     _node?: SVGElement;
@@ -155,7 +152,7 @@ export abstract class Container extends Array<Node | Container> implements INode
     }
 
 }
-function update(frame: number, target: Node | Container, el: SVGElement) {
+function update(frame: number, target: Item | Container, el: SVGElement) {
     for (let [n, v] of Object.entries(target)) {
         v && UPDATE[n]?.(frame, el, v);
     }
@@ -216,7 +213,7 @@ export class Rect extends Shape {
 //     // size: NVectorValue = new NVectorValue([100, 100]);
 // }
 export class Root extends ViewPort {
-    defs: Array<Node | Container> = [];
+    defs: Array<Item | Container> = [];
 
 
 }

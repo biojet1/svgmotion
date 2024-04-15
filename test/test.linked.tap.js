@@ -49,6 +49,7 @@ test.test("Item", (t) => {
     let I = new Item("I");
     t.same(A.first_child(), undefined);
     t.same(A.last_child(), undefined);
+    t.same(A.root(), undefined);
     t.same(A._parent, undefined);
     t.same(A._next, A._end);
     t.same(A._prev, undefined);
@@ -71,7 +72,8 @@ test.test("Item", (t) => {
     t.same(A._end._end, A._end);
     t.same(A._end._prev, B._end);
     t.same(B._parent, A);
-
+    t.same(A.root(), undefined);
+    t.same(B.root(), A);
     t.same(A.first_child()?.value, 'B');
     t.same(A.last_child()?.value, 'B');
     to_string_check(t, A, 'A(B())');
@@ -126,5 +128,6 @@ test.test("Item", (t) => {
     t.not(I.contains(A));
     t.not(B.contains(A));
     t.not(A.contains(I));
+    t.same(H.root(), A);
     t.end();
 });

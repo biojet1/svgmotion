@@ -1,6 +1,6 @@
 import { Animatable, Keyframes, NumberValue } from "./keyframes.js";
 import { Box, Fill, RectSizeProp, UPDATE, ValueSet } from "./properties.js";
-export class Node {
+export class Item {
     id;
     // transform?: Transform;
     // opacity?: OpacityProp;
@@ -42,7 +42,7 @@ export class Node {
         Object.defineProperty(this, "fill", { value: v, writable: true, enumerable: true });
     }
 }
-export class Shape extends Node {
+export class Shape extends Item {
     // strok fill
     get prop_x() {
         const p = { value: { value: 4 } };
@@ -53,10 +53,6 @@ export class Shape extends Node {
 }
 export class Container extends Array {
     id;
-    // transform?: Transform;
-    // opacity?: OpacityProp;
-    // // fill?: Fill;
-    // stroke?: Stroke;
     _node;
     update_self(frame, node) {
         update(frame, this, node);

@@ -25,7 +25,9 @@ export declare abstract class Parent extends Node {
     prepend_child(...nodes: Array<Node>): void;
     remove_child(node: Node): Node;
     contains(node: Node | Parent): boolean;
+    root(): Parent | undefined;
     children(): Generator<Node, void, unknown>;
+    [Symbol.iterator](): Generator<Node, void, unknown>;
 }
 export declare class End extends Node {
     _parent: Parent;

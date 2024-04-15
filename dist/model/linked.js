@@ -159,9 +159,21 @@ export class Parent extends Node {
         while (p = p._parent);
         return false;
     }
+    root() {
+        let root = this._parent;
+        if (root) {
+            for (let x; x = root._parent; root = x)
+                ;
+        }
+        return root;
+    }
     *children() {
-        let cur = this.first_child();
-        for (; cur; cur = cur.next_sibling()) {
+        for (let cur = this.first_child(); cur; cur = cur.next_sibling()) {
+            yield cur;
+        }
+    }
+    *[Symbol.iterator]() {
+        for (let cur = this.first_child(); cur; cur = cur.next_sibling()) {
             yield cur;
         }
     }

@@ -7,7 +7,7 @@ interface INode {
     _node?: SVGElement;
     stroke?: Stroke;
 }
-export declare abstract class Node implements INode {
+export declare abstract class Item implements INode {
     id?: string;
     _node?: SVGElement;
     abstract as_svg(doc: Document): SVGElement;
@@ -18,14 +18,14 @@ export declare abstract class Node implements INode {
     get fill(): Fill;
     set fill(v: Fill);
 }
-export declare abstract class Shape extends Node {
+export declare abstract class Shape extends Item {
     get prop_x(): {
         value: {
             value: number;
         };
     };
 }
-export declare abstract class Container extends Array<Node | Container> implements INode {
+export declare abstract class Container extends Array<Container | Item> implements INode {
     id?: string;
     _node?: SVGElement;
     abstract as_svg(doc: Document): SVGElement;
@@ -49,6 +49,6 @@ export declare class Rect extends Shape {
     as_svg(doc: Document): SVGRectElement;
 }
 export declare class Root extends ViewPort {
-    defs: Array<Node | Container>;
+    defs: Array<Item | Container>;
 }
 export {};
