@@ -1,5 +1,5 @@
 export default {
-    'entry': './dist/index.js',
+    'entry': './dist/web.js',
     'output': {
         filename: 'svgmotion.web.js',
         path: import.meta.dirname

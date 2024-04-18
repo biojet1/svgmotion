@@ -1,28 +1,20 @@
 import { Animatable, Keyframes, NVectorValue, NumberValue } from "./keyframes.js";
 import { Box, Fill, OpacityProp, RectSizeProp, Stroke, Transform, UPDATE, ValueSet } from "./properties.js";
-// import { Node, Parent } from "./linked.js";
+import { Node, Parent } from "./linked.js";
+import { SVGProps } from "./svgprops.js";
 
 interface INode {
     id?: string;
-    transform?: Transform;
-    opacity?: NumberValue;
     _node?: SVGElement;
-    // fill?: Fill;
-    stroke?: Stroke;
-    // clip
-    // _update(frame: number, node: SVGElement): boolean;
-
 }
 
 
 
 
-export abstract class Item implements INode {
+export abstract class Item extends SVGProps(Node) implements INode {
 
 
     id?: string;
-    // transform?: Transform;
-    // opacity?: OpacityProp;
     _node?: SVGElement;
 
     abstract as_svg(doc: Document): SVGElement;
@@ -46,23 +38,8 @@ export abstract class Item implements INode {
             }
         }
     }
-    get opacity() {
-        const v = new NumberValue(1);
-        const o = { value: v, writable: true, enumerable: true };
-        console.log("opacity prop_x", o)
-        Object.defineProperty(this, "opacity", o)
-        return v;
-    }
-    get fill() {
-        console.log("GET fill");
-        const v = new Fill();
-        Object.defineProperty(this, "fill", { value: v, writable: true, enumerable: true })
-        return v;
-    }
-    set fill(v: Fill) {
-        console.log("SET fill");
-        Object.defineProperty(this, "fill", { value: v, writable: true, enumerable: true })
-    }
+
+
     // get transform() {
     //     const v = new Transform();
     //     Object.defineProperty(this, "transform", { value: v })
@@ -72,23 +49,16 @@ export abstract class Item implements INode {
 }
 
 export abstract class Shape extends Item {
-    // strok fill
-    get prop_x() {
-        const p = { value: { value: 4 } };
-        console.log("prop_x", p)
-        Object.defineProperty(this, "prop_x", p)
-        return p;
-    }
 
 }
 
-export abstract class Container extends Array<Container | Item> implements INode {
+export class Container extends SVGProps(Parent) implements INode {
     id?: string;
-
-
     _node?: SVGElement;
 
-    abstract as_svg(doc: Document): SVGElement;
+    as_svg(doc: Document): SVGElement {
+        throw new Error(`Not implemented`)
+    }
     update_self(frame: number, node: SVGElement): boolean {
         update(frame, this, node);
         return true; // should we call update_node to children
@@ -97,7 +67,7 @@ export abstract class Container extends Array<Container | Item> implements INode
         const node = this._node;
         if (node) {
             if (this.update_self(frame, node)) {
-                for (const sub of this) {
+                for (const sub of this.children<Container | Item>()) {
                     sub.update_node(frame);
                 }
             }
@@ -111,7 +81,7 @@ export abstract class Container extends Array<Container | Item> implements INode
                 yield* v.enum_values();
             }
         }
-        for (const sub of this) {
+        for (const sub of this.children<Container | Item>()) {
             yield* sub.enum_values();
         }
     }
@@ -126,7 +96,8 @@ export abstract class Container extends Array<Container | Item> implements INode
     add_rect(size: Iterable<number> = [100, 100]) {
         const x = new Rect();
         // x.size = new NVectorValue(size);
-        this.push(x);
+        this.append_child(x);
+        let y = this.first_child();
         return x;
 
     }
@@ -145,13 +116,8 @@ export abstract class Container extends Array<Container | Item> implements INode
         }
         return [min, max];
     }
-    get opacity() {
-        const v = new NumberValue(1);
-        Object.defineProperty(this, "opacity", { value: v, writable: true, enumerable: true })
-        return v;
-    }
-
 }
+
 function update(frame: number, target: Item | Container, el: SVGElement) {
     for (let [n, v] of Object.entries(target)) {
         v && UPDATE[n]?.(frame, el, v);
@@ -163,25 +129,44 @@ function update(frame: number, target: Item | Container, el: SVGElement) {
 export class Group extends Container {
     as_svg(doc: Document) {
         const con = this._node = doc.createElementNS(NS_SVG, "group");
-        for (const sub of this) {
+        for (const sub of this.children<Container | Item>()) {
             con.appendChild(sub.as_svg(doc));
         }
         return con;
     }
 }
 
+// Container.prototype
+
 export class ViewPort extends Container {
-    view_port: Box = new Box([0, 0], [100, 100]);
+
+
     as_svg(doc: Document) {
         const con = this._node = doc.createElementNS(NS_SVG, "svg");
-        // e.preserveAspectRatio
-        // this.view_port.size
-        // e.width.baseVal.value = this.size
-        // e.addEventListener
-        for (const sub of this) {
+        for (const sub of this.children<Container | Item>()) {
             con.appendChild(sub.as_svg(doc));
         }
         return con;
+    }
+
+    get view_box() {
+        return this._getx("view_box", new Box([0, 0], [100, 100]));
+    }
+
+    set view_box(v: Box) {
+        this._setx("view_box", v);
+    }
+    get width() {
+        return this._getx("width", new NumberValue(100));
+    }
+    set width(v: NumberValue) {
+        this._setx("width", v);
+    }
+    get height() {
+        return this._getx("height", new NumberValue(100));
+    }
+    set height(v: NumberValue) {
+        this._setx("height", v);
     }
 }
 

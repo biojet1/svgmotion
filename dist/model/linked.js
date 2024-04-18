@@ -35,6 +35,14 @@ export class Node {
         }
         return node;
     }
+    root() {
+        let root = this._parent;
+        if (root) {
+            for (let x; x = root._parent; root = x)
+                ;
+            return root;
+        }
+    }
     _link_next(node) {
         // [THIS]<->node
         if (node === this) {
@@ -51,7 +59,7 @@ export class Node {
     _detach() {
         const { _prev: prev, _end: { _next: next } } = this;
         // [PREV]<->[THIS]<->[NEXT] => [PREV]<->[NEXT]
-        prev && next && prev._link_next(next);
+        prev && prev._link_next(next);
         this._prev = undefined; // or this._start._prev = undefined
         this._end._next = undefined;
         this._parent = undefined;
@@ -158,14 +166,6 @@ export class Parent extends Node {
             }
         while (p = p._parent);
         return false;
-    }
-    root() {
-        let root = this._parent;
-        if (root) {
-            for (let x; x = root._parent; root = x)
-                ;
-        }
-        return root;
     }
     *children() {
         for (let cur = this.first_child(); cur; cur = cur.next_sibling()) {

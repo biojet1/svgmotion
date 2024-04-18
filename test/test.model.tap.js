@@ -16,7 +16,7 @@ test.test("KeyframeEntry", (t) => {
     tr.rotation.set_value(30, 10);
     for (const v of x.enum_values()) {
 
-        console.log(v);
+        // console.log(v);
     }
 
 

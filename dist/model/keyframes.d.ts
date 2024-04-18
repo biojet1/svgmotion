@@ -1,4 +1,4 @@
-export interface IEasing {
+interface IEasing {
     ratio_at(t: number): number;
     reverse(): IEasing;
 }
@@ -56,3 +56,4 @@ export declare class RGBValue extends NVectorValue {
 export declare class TextValue extends AnimatableD<string> {
     add_value(a: string, b: string): string;
 }
+export {};

@@ -1,6 +1,6 @@
 import { cubic_bezier_y_of_x } from "./bezier.js";
 
-export interface IEasing {
+interface IEasing {
     ratio_at(t: number): number;
     reverse(): IEasing;
 }
@@ -267,9 +267,7 @@ export class RGBValue extends NVectorValue {
     //     super([x, y]);
     // }
     static to_css_rgb([r, g, b]: Iterable<number>) {
-        return `rgb(${Math.round(r * 255)}, ${Math.round(g * 255)}, ${Math.round(
-            b * 255
-        )})`;
+        return `rgb(${Math.round((r * 255) % 256)}, ${Math.round((g * 255) % 256)}, ${Math.round((b * 255) % 256)})`;
     }
 }
 

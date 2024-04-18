@@ -98,6 +98,7 @@ test.test("ViewPort", (t) => {
 test.test("Step", (t) => {
     let tr = new Track();
     let root = new Root();
+    let vp = new ViewPort();
     let r = root.add_rect();
     // r.opacity = new NumberValue(0.9);
     r.position = new NVectorValue([10, 30]);
@@ -118,13 +119,13 @@ test.test("Step", (t) => {
     }
 
     {
-        console.log('r.fill', r.fill);
+        // console.log('r.fill', r.fill);
         r.fill = new Fill();
-        console.log('r.fill', r.fill);
+        // console.log('r.fill', r.fill);
         r.fill = new Fill();
-        console.log('r.fill', r.fill);
+        // console.log('r.fill', r.fill);
         r.fill = new Fill();
-        console.log('r.fill', r.fill);
+        // console.log('r.fill', r.fill);
     }
 
     let s = Step(
@@ -147,9 +148,10 @@ test.test("Step", (t) => {
         t.same(Array.from(q[3].value), [50, 50]);
     }
 
-    // console.log(r.prop_x);
-    r.prop_x.value += 20;
-    // console.log(r.prop_x);
+    // console.log(r.prop5);
+    r.prop5.value += 20;
+    console.log("position", vp.position);
+
     t.end();
 
 });
@@ -166,7 +168,7 @@ test.test("TextValue", (t) => {
     t.equal(x.get_value(0), "ONE");
     t.equal(x.get_value(10), "TWO");
     t.equal(x.get_value(20), "3");
-    console.log(x);
+    // console.log(x);
     t.equal(x.get_value(-5), "ONE");
     t.equal(x.get_value(5), "TWO");
     t.equal(x.get_value(15), "3");

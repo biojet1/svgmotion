@@ -38,14 +38,12 @@ export class Stroke extends ValueSet {
 export class Fill extends ValueSet {
     get opacity() {
         const v = new NumberValue(1);
-        const o = { value: v, writable: true, enumerable: true };
-        Object.defineProperty(this, "opacity", o);
+        Object.defineProperty(this, "opacity", { value: v, writable: true, enumerable: true });
         return v;
     }
     get color() {
         const v = new RGBValue([0, 0, 0]);
-        const o = { value: v, writable: true, enumerable: true };
-        Object.defineProperty(this, "color", o);
+        Object.defineProperty(this, "color", { value: v, writable: true, enumerable: true });
         return v;
     }
 }
@@ -113,16 +111,26 @@ export const UPDATE = {
         node.r.baseVal.value = prop.get_value(frame);
     },
     width: function (frame, node, prop) {
-        node.width.baseVal.value = prop.get_value(frame);
+        let q = node.width.baseVal;
+        // console.log("/////", q);
+        q.convertToSpecifiedUnits(1);
+        q.value = prop.get_value(frame);
     },
     height: function (frame, node, prop) {
-        node.height.baseVal.value = prop.get_value(frame);
+        let q = node.height.baseVal;
+        q.convertToSpecifiedUnits(1);
+        q.value = prop.get_value(frame);
     },
     rx: function (frame, node, prop) {
         node.rx.baseVal.value = prop.get_value(frame);
     },
     ry: function (frame, node, prop) {
         node.ry.baseVal.value = prop.get_value(frame);
+    },
+    view_box: function (frame, node, prop) {
+        const s = prop.size.get_value(frame);
+        const p = prop.position.get_value(frame);
+        node.setAttribute("viewBox", `${p[0]} ${p[1]} ${s[0]} ${s[1]}`);
     },
 };
 //# sourceMappingURL=properties.js.map

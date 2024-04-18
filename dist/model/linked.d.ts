@@ -4,9 +4,10 @@ export declare class Node {
     _parent?: Parent;
     get _end(): Node;
     get _start(): Node;
-    next_sibling(): Node | undefined;
-    previous_sibling(): Node | undefined;
-    _link_next(node: Node): void;
+    next_sibling<T extends Node = Node>(): T | undefined;
+    previous_sibling<T extends Node = Node>(): T | undefined;
+    root<T extends Parent = Parent>(): T | undefined;
+    _link_next(node?: Node): void;
     _detach(): this;
     _attach(prev: Node, next: Node, parent: Parent): void;
     place_after(...nodes: Array<Node>): void;
@@ -14,19 +15,18 @@ export declare class Node {
     replace_with(...nodes: Array<Node>): void;
     remove(): void;
 }
-export declare abstract class Parent extends Node {
+export declare class Parent extends Node {
     _tail: End;
     constructor();
     get _end(): Node;
-    first_child(): Node | undefined;
-    last_child(): Node | undefined;
+    first_child<T extends Node = Node>(): T | undefined;
+    last_child<T extends Node = Node>(): T | undefined;
     insert_before(child: Node, ...nodes: Array<Node>): void;
     append_child(...nodes: Array<Node>): void;
     prepend_child(...nodes: Array<Node>): void;
     remove_child(node: Node): Node;
-    contains(node: Node | Parent): boolean;
-    root(): Parent | undefined;
-    children(): Generator<Node, void, unknown>;
+    contains(node: Node): boolean;
+    children<T extends Node = Node>(): Generator<T, void, unknown>;
     [Symbol.iterator](): Generator<Node, void, unknown>;
 }
 export declare class End extends Node {

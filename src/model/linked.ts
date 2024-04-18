@@ -9,7 +9,7 @@ export class Node {
         return this;
     }
 
-    next_sibling() {
+    next_sibling<T extends Node = Node>() {
         // *P -> a b c -> *E
         const node = this._end._next;
         if (node instanceof End) {
@@ -18,24 +18,32 @@ export class Node {
                 throw new Error("Unexpected following End node");
             }
         } else {
-            return node;
+            return node as T;
         }
     }
 
-    previous_sibling() {
+    previous_sibling<T extends Node = Node>() {
         // a ^a b ^b ...
         // c  b ^b ...       
         // N b ^b ...  ^N
         const node = this._start._prev;
         if (node instanceof End) {
             // ...<child/></end>
-            return node._start;
+            return node._start as T;
         } else if (this._parent === node) {
             return undefined;
         }
-        return node;
+        return node as T;
     }
-    _link_next(node: Node) {
+
+    root<T extends Parent = Parent>() {
+        let root = this._parent;
+        if (root) {
+            for (let x; x = root._parent; root = x);
+            return root as T;
+        }
+    }
+    _link_next(node?: Node) {
         // [THIS]<->node
         if (node === this) {
             throw new Error(`Same node`);
@@ -50,7 +58,7 @@ export class Node {
     _detach() {
         const { _prev: prev, _end: { _next: next } } = this;
         // [PREV]<->[THIS]<->[NEXT] => [PREV]<->[NEXT]
-        prev && next && prev._link_next(next);
+        prev && prev._link_next(next);
         this._prev = undefined; // or this._start._prev = undefined
         this._end._next = undefined;
         this._parent = undefined;
@@ -90,7 +98,7 @@ export class Node {
     }
 }
 
-export abstract class Parent extends Node {
+export class Parent extends Node {
     //// Tree
     _tail: End;
     constructor() {
@@ -101,7 +109,7 @@ export abstract class Parent extends Node {
         // End node or self
         return this._tail;
     }
-    first_child() {
+    first_child<T extends Node = Node>() {
         // P  c ... ^P
         // P  C ^C ... ^P 
         // P ^P  
@@ -114,16 +122,16 @@ export abstract class Parent extends Node {
             } else if (_next._parent !== this) {
                 throw new Error("Unexpected parent");
             }
-            return _next;
+            return _next as T;
         }
     }
-    last_child() {
+    last_child<T extends Node = Node>() {
         // P  ... c  ^P
         // P  ... C ^C  ^P 
         // P ^P       
         const { _prev } = this._end;
         if (_prev != this) {
-            return _prev?._start;
+            return _prev?._start as T;
         }
     }
 
@@ -153,7 +161,7 @@ export abstract class Parent extends Node {
         node.remove();
         return node;
     }
-    contains(node: Node | Parent) {
+    contains(node: Node) {
         let p: Node | Parent | undefined = node;
         do if (p === this) {
             return true;
@@ -161,19 +169,13 @@ export abstract class Parent extends Node {
         while (p = p._parent);
         return false;
     }
-    root() {
-        let root = this._parent;
-        if (root) {
-            for (let x; x = root._parent; root = x);
+
+    *children<T extends Node = Node>() {
+        for (let cur = this.first_child(); cur; cur = cur.next_sibling()) {
+            yield cur as T;
         }
-        return root;
     }
 
-    *children() {
-        for (let cur = this.first_child(); cur; cur = cur.next_sibling()) {
-            yield cur;
-        }
-    }
     *[Symbol.iterator]() {
         for (let cur = this.first_child(); cur; cur = cur.next_sibling()) {
             yield cur;

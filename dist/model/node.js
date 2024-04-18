@@ -1,9 +1,9 @@
 import { Animatable, Keyframes, NumberValue } from "./keyframes.js";
-import { Box, Fill, RectSizeProp, UPDATE, ValueSet } from "./properties.js";
-export class Item {
+import { Box, RectSizeProp, UPDATE, ValueSet } from "./properties.js";
+import { Node, Parent } from "./linked.js";
+import { SVGProps } from "./svgprops.js";
+export class Item extends SVGProps(Node) {
     id;
-    // transform?: Transform;
-    // opacity?: OpacityProp;
     _node;
     update_self(frame, node) {
         update(frame, this, node);
@@ -24,36 +24,15 @@ export class Item {
             }
         }
     }
-    get opacity() {
-        const v = new NumberValue(1);
-        const o = { value: v, writable: true, enumerable: true };
-        console.log("opacity prop_x", o);
-        Object.defineProperty(this, "opacity", o);
-        return v;
-    }
-    get fill() {
-        console.log("GET fill");
-        const v = new Fill();
-        Object.defineProperty(this, "fill", { value: v, writable: true, enumerable: true });
-        return v;
-    }
-    set fill(v) {
-        console.log("SET fill");
-        Object.defineProperty(this, "fill", { value: v, writable: true, enumerable: true });
-    }
 }
 export class Shape extends Item {
-    // strok fill
-    get prop_x() {
-        const p = { value: { value: 4 } };
-        console.log("prop_x", p);
-        Object.defineProperty(this, "prop_x", p);
-        return p;
-    }
 }
-export class Container extends Array {
+export class Container extends SVGProps(Parent) {
     id;
     _node;
+    as_svg(doc) {
+        throw new Error(`Not implemented`);
+    }
     update_self(frame, node) {
         update(frame, this, node);
         return true; // should we call update_node to children
@@ -62,7 +41,7 @@ export class Container extends Array {
         const node = this._node;
         if (node) {
             if (this.update_self(frame, node)) {
-                for (const sub of this) {
+                for (const sub of this.children()) {
                     sub.update_node(frame);
                 }
             }
@@ -77,7 +56,7 @@ export class Container extends Array {
                 yield* v.enum_values();
             }
         }
-        for (const sub of this) {
+        for (const sub of this.children()) {
             yield* sub.enum_values();
         }
     }
@@ -91,7 +70,8 @@ export class Container extends Array {
     add_rect(size = [100, 100]) {
         const x = new Rect();
         // x.size = new NVectorValue(size);
-        this.push(x);
+        this.append_child(x);
+        let y = this.first_child();
         return x;
     }
     calc_time_range() {
@@ -109,11 +89,6 @@ export class Container extends Array {
         }
         return [min, max];
     }
-    get opacity() {
-        const v = new NumberValue(1);
-        Object.defineProperty(this, "opacity", { value: v, writable: true, enumerable: true });
-        return v;
-    }
 }
 function update(frame, target, el) {
     for (let [n, v] of Object.entries(target)) {
@@ -123,24 +98,38 @@ function update(frame, target, el) {
 export class Group extends Container {
     as_svg(doc) {
         const con = this._node = doc.createElementNS(NS_SVG, "group");
-        for (const sub of this) {
+        for (const sub of this.children()) {
             con.appendChild(sub.as_svg(doc));
         }
         return con;
     }
 }
+// Container.prototype
 export class ViewPort extends Container {
-    view_port = new Box([0, 0], [100, 100]);
     as_svg(doc) {
         const con = this._node = doc.createElementNS(NS_SVG, "svg");
-        // e.preserveAspectRatio
-        // this.view_port.size
-        // e.width.baseVal.value = this.size
-        // e.addEventListener
-        for (const sub of this) {
+        for (const sub of this.children()) {
             con.appendChild(sub.as_svg(doc));
         }
         return con;
+    }
+    get view_box() {
+        return this._getx("view_box", new Box([0, 0], [100, 100]));
+    }
+    set view_box(v) {
+        this._setx("view_box", v);
+    }
+    get width() {
+        return this._getx("width", new NumberValue(100));
+    }
+    set width(v) {
+        this._setx("width", v);
+    }
+    get height() {
+        return this._getx("height", new NumberValue(100));
+    }
+    set height(v) {
+        this._setx("height", v);
     }
 }
 const NS_SVG = "http://www.w3.org/2000/svg";

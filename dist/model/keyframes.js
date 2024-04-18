@@ -242,7 +242,7 @@ export class RGBValue extends NVectorValue {
     //     super([x, y]);
     // }
     static to_css_rgb([r, g, b]) {
-        return `rgb(${Math.round(r * 255)}, ${Math.round(g * 255)}, ${Math.round(b * 255)})`;
+        return `rgb(${Math.round((r * 255) % 256)}, ${Math.round((g * 255) % 256)}, ${Math.round((b * 255) % 256)})`;
     }
 }
 export class TextValue extends AnimatableD {

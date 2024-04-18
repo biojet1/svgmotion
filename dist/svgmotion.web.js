@@ -35,24 +35,30 @@
 /************************************************************************/
 var __webpack_exports__ = {};
 
-// UNUSED EXPORTS: Action, Actions, Par, ParA, ParE, Rect, Root, Seq, SeqA, Step, StepA, To, ToA, Track, ViewPort, animate
+// UNUSED EXPORTS: animate
 
-// NAMESPACE OBJECT: ./dist/model/index.js
-var model_namespaceObject = {};
-__webpack_require__.r(model_namespaceObject);
-__webpack_require__.d(model_namespaceObject, {
+// NAMESPACE OBJECT: ./dist/index.js
+var dist_namespaceObject = {};
+__webpack_require__.r(dist_namespaceObject);
+__webpack_require__.d(dist_namespaceObject, {
+  Action: () => (Action),
+  Actions: () => (Actions),
   Animatable: () => (Animatable),
+  AnimatableD: () => (AnimatableD),
   Box: () => (Box),
   Container: () => (Container),
   Fill: () => (Fill),
   Group: () => (Group),
+  Item: () => (Item),
   KeyframeEntry: () => (KeyframeEntry),
   Keyframes: () => (Keyframes),
   NVector: () => (NVector),
   NVectorValue: () => (NVectorValue),
-  Node: () => (Node),
   NumberValue: () => (NumberValue),
   OpacityProp: () => (OpacityProp),
+  Par: () => (Par),
+  ParA: () => (ParA),
+  ParE: () => (ParE),
   Point: () => (Point),
   PositionValue: () => (PositionValue),
   RGB: () => (RGB),
@@ -60,31 +66,21 @@ __webpack_require__.d(model_namespaceObject, {
   Rect: () => (Rect),
   RectSizeProp: () => (RectSizeProp),
   Root: () => (Root),
+  Seq: () => (Seq),
+  SeqA: () => (SeqA),
   Shape: () => (Shape),
   Size: () => (Size),
+  Step: () => (Step),
+  StepA: () => (StepA),
   Stroke: () => (Stroke),
+  TextValue: () => (TextValue),
+  To: () => (To),
+  ToA: () => (ToA),
+  Track: () => (Track),
   Transform: () => (Transform),
   UPDATE: () => (UPDATE),
   ValueSet: () => (ValueSet),
   ViewPort: () => (ViewPort)
-});
-
-// NAMESPACE OBJECT: ./dist/track/index.js
-var dist_track_namespaceObject = {};
-__webpack_require__.r(dist_track_namespaceObject);
-__webpack_require__.d(dist_track_namespaceObject, {
-  Action: () => (Action),
-  Actions: () => (Actions),
-  Par: () => (Par),
-  ParA: () => (ParA),
-  ParE: () => (ParE),
-  Seq: () => (Seq),
-  SeqA: () => (SeqA),
-  Step: () => (Step),
-  StepA: () => (StepA),
-  To: () => (To),
-  ToA: () => (ToA),
-  Track: () => (Track)
 });
 
 ;// CONCATENATED MODULE: ./dist/model/keyframes.js
@@ -114,6 +110,13 @@ class Keyframes extends Array {
 }
 class Animatable {
     value;
+    lerp_value(ratio, a, b) {
+        throw Error(`Not implemented`);
+    }
+    add_value(a, b) {
+        throw Error(`Not implemented`);
+        // return a + b;
+    }
     get_value(frame) {
         const { value } = this;
         if (value instanceof Keyframes) {
@@ -188,11 +191,69 @@ class Animatable {
         }
         return kfs.set_value(frame, value);
     }
-    parse_value(x) {
+    check_value(x) {
         return x;
     }
     constructor(v) {
         this.value = v;
+    }
+}
+class AnimatableD extends Animatable {
+    get_value(frame) {
+        const { value } = this;
+        if (value instanceof Keyframes) {
+            let p = undefined; // previous KeyframeEntry<V>
+            for (const k of value) {
+                if (k.time >= frame) {
+                    return k.value;
+                }
+                p = k;
+            }
+            if (p) {
+                return p.value;
+            }
+            throw new Error(`empty keyframe list`);
+        }
+        else {
+            return value;
+        }
+    }
+    set_value(frame, value, start, easing, add) {
+        let { value: kfs } = this;
+        let last;
+        if (kfs instanceof Keyframes) {
+            last = kfs[kfs.length - 1];
+            if (last) {
+                if (start == undefined) {
+                    // pass
+                }
+                else if (start > last.time) {
+                    last.easing = true;
+                    last = kfs.set_value(start, this.get_value(last.time));
+                }
+                else {
+                    if (start != last.time) {
+                        throw new Error(`unexpected start=${start} last.time=${last.time} time=${frame}`);
+                    }
+                }
+            }
+        }
+        else {
+            const v = kfs;
+            kfs = this.value = new Keyframes();
+            if (start != undefined) {
+                last = kfs.set_value(start, v);
+            }
+        }
+        if (last) {
+            if (easing != undefined) {
+                throw new Error(`easing not suppported`);
+            }
+            if (add) {
+                value = this.add_value(last.value, value);
+            }
+        }
+        return kfs.set_value(frame, value);
     }
 }
 class NumberValue extends Animatable {
@@ -227,7 +288,7 @@ class NVectorValue extends Animatable {
     add_value(a, b) {
         return a.add(b);
     }
-    parse_value(x) {
+    check_value(x) {
         if (x instanceof NVector) {
             return x;
         }
@@ -267,7 +328,12 @@ class RGBValue extends NVectorValue {
     //     super([x, y]);
     // }
     static to_css_rgb([r, g, b]) {
-        return `rgb(${Math.round(r * 255)}, ${Math.round(g * 255)}, ${Math.round(b * 255)})`;
+        return `rgb(${Math.round((r * 255) % 256)}, ${Math.round((g * 255) % 256)}, ${Math.round((b * 255) % 256)})`;
+    }
+}
+class TextValue extends AnimatableD {
+    add_value(a, b) {
+        return a + '' + b;
     }
 }
 //# sourceMappingURL=keyframes.js.map
@@ -312,14 +378,12 @@ class Stroke extends ValueSet {
 class Fill extends ValueSet {
     get opacity() {
         const v = new NumberValue(1);
-        const o = { value: v, writable: true, enumerable: true };
-        Object.defineProperty(this, "opacity", o);
+        Object.defineProperty(this, "opacity", { value: v, writable: true, enumerable: true });
         return v;
     }
     get color() {
         const v = new RGBValue([0, 0, 0]);
-        const o = { value: v, writable: true, enumerable: true };
-        Object.defineProperty(this, "color", o);
+        Object.defineProperty(this, "color", { value: v, writable: true, enumerable: true });
         return v;
     }
 }
@@ -370,16 +434,287 @@ const UPDATE = {
                 }
             }
         }
-    }
+    },
+    x: function (frame, node, prop) {
+        node.x.baseVal.value = prop.get_value(frame);
+    },
+    y: function (frame, node, prop) {
+        node.y.baseVal.value = prop.get_value(frame);
+    },
+    cx: function (frame, node, prop) {
+        node.cx.baseVal.value = prop.get_value(frame);
+    },
+    cy: function (frame, node, prop) {
+        node.cy.baseVal.value = prop.get_value(frame);
+    },
+    r: function (frame, node, prop) {
+        node.r.baseVal.value = prop.get_value(frame);
+    },
+    width: function (frame, node, prop) {
+        let q = node.width.baseVal;
+        // console.log("/////", q);
+        q.convertToSpecifiedUnits(1);
+        q.value = prop.get_value(frame);
+    },
+    height: function (frame, node, prop) {
+        let q = node.height.baseVal;
+        q.convertToSpecifiedUnits(1);
+        q.value = prop.get_value(frame);
+    },
+    rx: function (frame, node, prop) {
+        node.rx.baseVal.value = prop.get_value(frame);
+    },
+    ry: function (frame, node, prop) {
+        node.ry.baseVal.value = prop.get_value(frame);
+    },
+    view_box: function (frame, node, prop) {
+        const s = prop.size.get_value(frame);
+        const p = prop.position.get_value(frame);
+        node.setAttribute("viewBox", `${p[0]} ${p[1]} ${s[0]} ${s[1]}`);
+    },
 };
 //# sourceMappingURL=properties.js.map
+;// CONCATENATED MODULE: ./dist/model/linked.js
+class Node {
+    _next;
+    _prev;
+    _parent;
+    get _end() {
+        return this;
+    }
+    get _start() {
+        return this;
+    }
+    next_sibling() {
+        // *P -> a b c -> *E
+        const node = this._end._next;
+        if (node instanceof End) {
+            if (node._parent !== this._parent) {
+                // console.warn([node.parentNode, this.parentNode]);
+                throw new Error("Unexpected following End node");
+            }
+        }
+        else {
+            return node;
+        }
+    }
+    previous_sibling() {
+        // a ^a b ^b ...
+        // c  b ^b ...       
+        // N b ^b ...  ^N
+        const node = this._start._prev;
+        if (node instanceof End) {
+            // ...<child/></end>
+            return node._start;
+        }
+        else if (this._parent === node) {
+            return undefined;
+        }
+        return node;
+    }
+    root() {
+        let root = this._parent;
+        if (root) {
+            for (let x; x = root._parent; root = x)
+                ;
+            return root;
+        }
+    }
+    _link_next(node) {
+        // [THIS]<->node
+        if (node === this) {
+            throw new Error(`Same node`);
+        }
+        else if (node) {
+            this._next = node;
+            node._prev = this;
+        }
+        else {
+            delete this._next;
+        }
+    }
+    _detach() {
+        const { _prev: prev, _end: { _next: next } } = this;
+        // [PREV]<->[THIS]<->[NEXT] => [PREV]<->[NEXT]
+        prev && prev._link_next(next);
+        this._prev = undefined; // or this._start._prev = undefined
+        this._end._next = undefined;
+        this._parent = undefined;
+        return this;
+    }
+    _attach(prev, next, parent) {
+        const { _start, _end, _parent } = this;
+        // if (_parent || _start._prev || _end._next) {
+        //     throw new Error(`Detach first`);
+        // }
+        this._parent = parent;
+        prev._link_next(_start);
+        _end._link_next(next);
+    }
+    place_after(...nodes) {
+        const { _parent } = this;
+        _parent?.insert_before(this.next_sibling() || _parent._end, ...nodes);
+    }
+    place_before(...nodes) {
+        const { _parent } = this;
+        _parent?.insert_before(this, ...nodes);
+    }
+    replace_with(...nodes) {
+        const { _parent } = this;
+        if (_parent) {
+            const next = this.next_sibling() ?? _parent._end;
+            this.remove();
+            _parent.insert_before(next, ...nodes);
+        }
+    }
+    remove() {
+        this._detach();
+    }
+}
+class Parent extends Node {
+    //// Tree
+    _tail;
+    constructor() {
+        super();
+        this._tail = this._next = new End(this);
+    }
+    get _end() {
+        // End node or self
+        return this._tail;
+    }
+    first_child() {
+        // P  c ... ^P
+        // P  C ^C ... ^P 
+        // P ^P  
+        let { _next, _end } = this;
+        if (_next !== _end) {
+            if (_next instanceof End) {
+                throw new Error("Unexpected end node");
+            }
+            else if (!_next) {
+                throw new Error("next expected");
+            }
+            else if (_next._parent !== this) {
+                throw new Error("Unexpected parent");
+            }
+            return _next;
+        }
+    }
+    last_child() {
+        // P  ... c  ^P
+        // P  ... C ^C  ^P 
+        // P ^P       
+        const { _prev } = this._end;
+        if (_prev != this) {
+            return _prev?._start;
+        }
+    }
+    insert_before(child, ...nodes) {
+        if (child._parent !== this) {
+            throw new Error('child not found');
+        }
+        for (const node of nodes) {
+            if (node !== child) {
+                node._detach()._attach(child._prev ?? this, child, this);
+            }
+        }
+    }
+    append_child(...nodes) {
+        this.insert_before(this._end, ...nodes);
+    }
+    prepend_child(...nodes) {
+        this.insert_before(this._next || this._end, ...nodes);
+    }
+    remove_child(node) {
+        if (node instanceof End) {
+            throw new Error("Unexpected End node");
+        }
+        else if (node._parent !== this) {
+            throw new Error('child not found');
+        }
+        node.remove();
+        return node;
+    }
+    contains(node) {
+        let p = node;
+        do
+            if (p === this) {
+                return true;
+            }
+        while (p = p._parent);
+        return false;
+    }
+    *children() {
+        for (let cur = this.first_child(); cur; cur = cur.next_sibling()) {
+            yield cur;
+        }
+    }
+    *[Symbol.iterator]() {
+        for (let cur = this.first_child(); cur; cur = cur.next_sibling()) {
+            yield cur;
+        }
+    }
+}
+class End extends Node {
+    _parent;
+    constructor(parent) {
+        super();
+        this._parent = this._prev = parent;
+    }
+    get _start() {
+        return this._parent;
+    }
+}
+//# sourceMappingURL=linked.js.map
+;// CONCATENATED MODULE: ./dist/model/svgprops.js
+
+
+function SVGProps(Base) {
+    return class SVGProps extends Base {
+        get prop5() {
+            return this._getx("prop5", new NumberValue(45));
+        }
+        set prop5(v) {
+            this._setx("prop5", v);
+        }
+        get fill() {
+            return this._getx("fill", new Fill());
+        }
+        set fill(v) {
+            this._setx("fill", v);
+        }
+        get opacity() {
+            return this._getx("opacity", new NumberValue(1));
+        }
+        set opacity(v) {
+            this._setx("opacity", v);
+        }
+        _getx(name, value) {
+            console.log(`_GETX ${name}`);
+            Object.defineProperty(this, name, {
+                value,
+                writable: true,
+                enumerable: true,
+            });
+            return value;
+        }
+        _setx(name, value) {
+            Object.defineProperty(this, name, {
+                value,
+                writable: true,
+                enumerable: true,
+            });
+        }
+    };
+}
+//# sourceMappingURL=svgprops.js.map
 ;// CONCATENATED MODULE: ./dist/model/node.js
 
 
-class Node {
+
+
+class Item extends SVGProps(Node) {
     id;
-    // transform?: Transform;
-    // opacity?: OpacityProp;
     _node;
     update_self(frame, node) {
         update(frame, this, node);
@@ -400,36 +735,15 @@ class Node {
             }
         }
     }
-    get opacity() {
-        const v = new NumberValue(1);
-        const o = { value: v, writable: true, enumerable: true };
-        console.log("opacity prop_x", o);
-        Object.defineProperty(this, "opacity", o);
-        return v;
-    }
-    get fill() {
-        const v = new Fill();
-        const o = { value: v, writable: true, enumerable: true };
-        Object.defineProperty(this, "fill", o);
-        return v;
-    }
 }
-class Shape extends Node {
-    // strok fill
-    get prop_x() {
-        const p = { value: { value: 4 } };
-        console.log("prop_x", p);
-        Object.defineProperty(this, "prop_x", p);
-        return p;
-    }
+class Shape extends Item {
 }
-class Container extends Array {
+class Container extends SVGProps(Parent) {
     id;
-    // transform?: Transform;
-    opacity;
-    // // fill?: Fill;
-    // stroke?: Stroke;
     _node;
+    as_svg(doc) {
+        throw new Error(`Not implemented`);
+    }
     update_self(frame, node) {
         update(frame, this, node);
         return true; // should we call update_node to children
@@ -438,7 +752,7 @@ class Container extends Array {
         const node = this._node;
         if (node) {
             if (this.update_self(frame, node)) {
-                for (const sub of this) {
+                for (const sub of this.children()) {
                     sub.update_node(frame);
                 }
             }
@@ -453,7 +767,7 @@ class Container extends Array {
                 yield* v.enum_values();
             }
         }
-        for (const sub of this) {
+        for (const sub of this.children()) {
             yield* sub.enum_values();
         }
     }
@@ -467,7 +781,8 @@ class Container extends Array {
     add_rect(size = [100, 100]) {
         const x = new Rect();
         // x.size = new NVectorValue(size);
-        this.push(x);
+        this.append_child(x);
+        let y = this.first_child();
         return x;
     }
     calc_time_range() {
@@ -494,24 +809,38 @@ function update(frame, target, el) {
 class Group extends Container {
     as_svg(doc) {
         const con = this._node = doc.createElementNS(NS_SVG, "group");
-        for (const sub of this) {
+        for (const sub of this.children()) {
             con.appendChild(sub.as_svg(doc));
         }
         return con;
     }
 }
+// Container.prototype
 class ViewPort extends Container {
-    view_port = new Box([0, 0], [100, 100]);
     as_svg(doc) {
         const con = this._node = doc.createElementNS(NS_SVG, "svg");
-        // e.preserveAspectRatio
-        // this.view_port.size
-        // e.width.baseVal.value = this.size
-        // e.addEventListener
-        for (const sub of this) {
+        for (const sub of this.children()) {
             con.appendChild(sub.as_svg(doc));
         }
         return con;
+    }
+    get view_box() {
+        return this._getx("view_box", new Box([0, 0], [100, 100]));
+    }
+    set view_box(v) {
+        this._setx("view_box", v);
+    }
+    get width() {
+        return this._getx("width", new NumberValue(100));
+    }
+    set width(v) {
+        this._setx("width", v);
+    }
+    get height() {
+        return this._getx("height", new NumberValue(100));
+    }
+    set height(v) {
+        this._setx("height", v);
     }
 }
 const NS_SVG = "http://www.w3.org/2000/svg";
@@ -528,8 +857,8 @@ class Rect extends Shape {
 //     size: NVectorValue = new NVectorValue([100, 100]);
 // }
 // export class Image extends Node {
-//     href: string = "";
-//     size: NVectorValue = new NVectorValue([100, 100]);
+//     // href: string = "";
+//     // size: NVectorValue = new NVectorValue([100, 100]);
 // }
 class Root extends ViewPort {
     defs = [];
@@ -828,7 +1157,7 @@ class StepA extends Action {
         for (const e of entries) {
             t_max = Math.max(t_max, e.t);
         }
-        this._entries = Array.from(entries);
+        // (this as any)._entries = Array.from(entries);
         this._kf_map = map_keyframes(entries);
         this._start = frame;
         this._end = frame + t_max;
@@ -846,7 +1175,7 @@ class StepA extends Action {
                         v = prop.get_value(_start);
                     }
                     else {
-                        v = prop.parse_value(value);
+                        v = prop.check_value(value);
                     }
                     prop.set_value(frame, v, prev_t, ease);
                     prev_t = t;
@@ -1076,9 +1405,8 @@ function Step(steps, vars, params = {}) {
 ;// CONCATENATED MODULE: ./dist/index.js
 
 
-
-
-// export * from "./track/steps.js";
+//# sourceMappingURL=index.js.map
+;// CONCATENATED MODULE: ./dist/web.js
 
 function animate(root, fps) {
     const [start, end] = root.calc_time_range();
@@ -1111,9 +1439,9 @@ function animate(root, fps) {
 globalThis.svgmotion = {
     root: function () {
         return new Root();
-    }, animate, ...model_namespaceObject, ...dist_track_namespaceObject,
+    }, animate, ...dist_namespaceObject,
 };
 globalThis.animate = animate;
-//# sourceMappingURL=index.js.map
+//# sourceMappingURL=web.js.map
 /******/ })()
 ;
