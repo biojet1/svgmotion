@@ -24,7 +24,7 @@ export class Node {
 
     previous_sibling<T extends Node = Node>() {
         // a ^a b ^b ...
-        // c  b ^b ...       
+        // c  b ^b ...
         // N b ^b ...  ^N
         const node = this._start._prev;
         if (node instanceof End) {
@@ -39,10 +39,11 @@ export class Node {
     root<T extends Parent = Parent>() {
         let root = this._parent;
         if (root) {
-            for (let x; x = root._parent; root = x);
+            for (let x; (x = root._parent); root = x);
             return root as T;
         }
     }
+
     _link_next(node?: Node) {
         // [THIS]<->node
         if (node === this) {
@@ -56,7 +57,10 @@ export class Node {
     }
 
     _detach() {
-        const { _prev: prev, _end: { _next: next } } = this;
+        const {
+            _prev: prev,
+            _end: { _next: next },
+        } = this;
         // [PREV]<->[THIS]<->[NEXT] => [PREV]<->[NEXT]
         prev && prev._link_next(next);
         this._prev = undefined; // or this._start._prev = undefined
@@ -111,8 +115,8 @@ export class Parent extends Node {
     }
     first_child<T extends Node = Node>() {
         // P  c ... ^P
-        // P  C ^C ... ^P 
-        // P ^P  
+        // P  C ^C ... ^P
+        // P ^P
         let { _next, _end } = this;
         if (_next !== _end) {
             if (_next instanceof End) {
@@ -127,8 +131,8 @@ export class Parent extends Node {
     }
     last_child<T extends Node = Node>() {
         // P  ... c  ^P
-        // P  ... C ^C  ^P 
-        // P ^P       
+        // P  ... C ^C  ^P
+        // P ^P
         const { _prev } = this._end;
         if (_prev != this) {
             return _prev?._start as T;
@@ -137,7 +141,7 @@ export class Parent extends Node {
 
     insert_before(child: Node, ...nodes: Array<Node>) {
         if (child._parent !== this) {
-            throw new Error('child not found');
+            throw new Error("child not found");
         }
         for (const node of nodes) {
             if (node !== child) {
@@ -156,17 +160,18 @@ export class Parent extends Node {
         if (node instanceof End) {
             throw new Error("Unexpected End node");
         } else if (node._parent !== this) {
-            throw new Error('child not found');
+            throw new Error("child not found");
         }
         node.remove();
         return node;
     }
     contains(node: Node) {
         let p: Node | Parent | undefined = node;
-        do if (p === this) {
-            return true;
-        }
-        while (p = p._parent);
+        do
+            if (p === this) {
+                return true;
+            }
+        while ((p = p._parent));
         return false;
     }
 
@@ -180,6 +185,12 @@ export class Parent extends Node {
         for (let cur = this.first_child(); cur; cur = cur.next_sibling()) {
             yield cur;
         }
+    }
+
+    root_or_self<T extends this>(): T {
+        let root: Parent = this;
+        for (let x; (x = root._parent); root = x);
+        return root as T;
     }
 }
 

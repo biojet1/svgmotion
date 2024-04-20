@@ -28,6 +28,7 @@ export declare class Parent extends Node {
     contains(node: Node): boolean;
     children<T extends Node = Node>(): Generator<T, void, unknown>;
     [Symbol.iterator](): Generator<Node, void, unknown>;
+    root_or_self<T extends this>(): T;
 }
 export declare class End extends Node {
     _parent: Parent;

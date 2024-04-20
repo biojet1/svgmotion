@@ -33,11 +33,20 @@ export function SVGProps<TBase extends Constructor>(Base: TBase) {
             return value;
         }
         _setx<T>(name: string, value: T) {
+            console.log(`_SETX ${name}`);
             Object.defineProperty(this, name, {
                 value,
                 writable: true,
                 enumerable: true,
             });
         }
+        // static _setxx<T>(name: string, value: T) {
+        //     console.log(`_SETX ${name}`);
+        //     Object.defineProperty(this, name, {
+        //         value,
+        //         writable: true,
+        //         enumerable: true,
+        //     });
+        // }
     };
 }

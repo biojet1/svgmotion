@@ -1,4 +1,4 @@
-import { Animatable, Keyframes, NumberValue } from "./keyframes.js";
+import { Animatable, Keyframes, NumberValue, TextValue } from "./keyframes.js";
 import { Box, Fill, RectSizeProp } from "./properties.js";
 import { Node, Parent } from "./linked.js";
 interface INode {
@@ -41,14 +41,17 @@ export declare class Container extends Container_base implements INode {
     update_node(frame: number): void;
     enum_values(): Generator<Animatable<any>, void, unknown>;
     enum_keyframes(): Generator<Keyframes<any>, void, unknown>;
-    add_rect(size?: Iterable<number>): Rect;
     calc_time_range(): number[];
+    add_rect(size?: Iterable<number>): Rect;
+    add_view(): ViewPort;
+    add_group(): Group;
+    add_path(): Path;
 }
 export declare class Group extends Container {
     as_svg(doc: Document): SVGElement;
 }
 export declare class ViewPort extends Container {
-    as_svg(doc: Document): SVGSVGElement;
+    as_svg(doc: Document): SVGElement;
     get view_box(): Box;
     set view_box(v: Box);
     get width(): NumberValue;
@@ -56,11 +59,31 @@ export declare class ViewPort extends Container {
     get height(): NumberValue;
     set height(v: NumberValue);
 }
+export declare class Path extends Shape {
+    as_svg(doc: Document): SVGElement;
+    get d(): TextValue;
+    set d(v: TextValue);
+}
 export declare class Rect extends Shape {
     size: RectSizeProp;
-    as_svg(doc: Document): SVGRectElement;
+    as_svg(doc: Document): SVGElement;
+    get width(): NumberValue;
+    set width(v: NumberValue);
+    get height(): NumberValue;
+    set height(v: NumberValue);
+    get x(): NumberValue;
+    set x(v: NumberValue);
+    get y(): NumberValue;
+    set y(v: NumberValue);
 }
 export declare class Root extends ViewPort {
-    defs: Array<Item | Container>;
+    defs: {
+        [key: string]: Item | Container;
+    };
+    id_map: {
+        [key: string]: Item | Container;
+    };
+    as_svg(doc: Document): SVGElement;
+    remember_id(id: string, node: Item | Container): void;
 }
 export {};

@@ -1,5 +1,20 @@
-import { Animatable, Keyframes, NVectorValue, NumberValue } from "./keyframes.js";
-import { Box, Fill, OpacityProp, RectSizeProp, Stroke, Transform, UPDATE, ValueSet } from "./properties.js";
+import {
+    Animatable,
+    Keyframes,
+    NVectorValue,
+    NumberValue,
+    TextValue,
+} from "./keyframes.js";
+import {
+    Box,
+    Fill,
+    OpacityProp,
+    RectSizeProp,
+    Stroke,
+    Transform,
+    UPDATE,
+    ValueSet,
+} from "./properties.js";
 import { Node, Parent } from "./linked.js";
 import { SVGProps } from "./svgprops.js";
 
@@ -8,12 +23,7 @@ interface INode {
     _node?: SVGElement;
 }
 
-
-
-
 export abstract class Item extends SVGProps(Node) implements INode {
-
-
     id?: string;
     _node?: SVGElement;
 
@@ -29,7 +39,7 @@ export abstract class Item extends SVGProps(Node) implements INode {
             this.update_self(frame, node);
         }
     }
-    * enum_values(): Generator<Animatable<any>, void, unknown> {
+    *enum_values(): Generator<Animatable<any>, void, unknown> {
         for (let v of Object.values(this)) {
             if (v instanceof Animatable) {
                 yield v;
@@ -39,25 +49,21 @@ export abstract class Item extends SVGProps(Node) implements INode {
         }
     }
 
-
     // get transform() {
     //     const v = new Transform();
     //     Object.defineProperty(this, "transform", { value: v })
     //     return v;
     // }
-
 }
 
-export abstract class Shape extends Item {
-
-}
+export abstract class Shape extends Item { }
 
 export class Container extends SVGProps(Parent) implements INode {
     id?: string;
     _node?: SVGElement;
 
     as_svg(doc: Document): SVGElement {
-        throw new Error(`Not implemented`)
+        throw new Error(`Not implemented`);
     }
     update_self(frame: number, node: SVGElement): boolean {
         update(frame, this, node);
@@ -73,7 +79,7 @@ export class Container extends SVGProps(Parent) implements INode {
             }
         }
     }
-    * enum_values(): Generator<Animatable<any>, void, unknown> {
+    *enum_values(): Generator<Animatable<any>, void, unknown> {
         for (let v of Object.values(this)) {
             if (v instanceof Animatable) {
                 yield v;
@@ -86,20 +92,12 @@ export class Container extends SVGProps(Parent) implements INode {
         }
     }
 
-    * enum_keyframes(): Generator<Keyframes<any>, void, unknown> {
+    *enum_keyframes(): Generator<Keyframes<any>, void, unknown> {
         for (let { value } of this.enum_values()) {
             if (value instanceof Keyframes) {
                 yield value;
             }
         }
-    }
-    add_rect(size: Iterable<number> = [100, 100]) {
-        const x = new Rect();
-        // x.size = new NVectorValue(size);
-        this.append_child(x);
-        let y = this.first_child();
-        return x;
-
     }
     calc_time_range() {
         let max = 0;
@@ -116,37 +114,54 @@ export class Container extends SVGProps(Parent) implements INode {
         }
         return [min, max];
     }
+    add_rect(size: Iterable<number> = [100, 100]) {
+        const x = new Rect();
+        // x.size = new NVectorValue(size);
+        this.append_child(x);
+        return x;
+    }
+    add_view() {
+        const x = new ViewPort();
+        this.append_child(x);
+        return x;
+    }
+    add_group() {
+        const x = new Group();
+        this.append_child(x);
+        return x;
+    }
+    add_path() {
+        const x = new Path();
+        this.append_child(x);
+        return x;
+    }
 }
 
 function update(frame: number, target: Item | Container, el: SVGElement) {
     for (let [n, v] of Object.entries(target)) {
         v && UPDATE[n]?.(frame, el, v);
     }
-
 }
 
-
 export class Group extends Container {
-    as_svg(doc: Document) {
-        const con = this._node = doc.createElementNS(NS_SVG, "group");
+    override as_svg(doc: Document): SVGElement {
+        const con = (this._node = doc.createElementNS(NS_SVG, "g"));
         for (const sub of this.children<Container | Item>()) {
             con.appendChild(sub.as_svg(doc));
         }
-        return con;
+        return set_svg(con, this);
     }
 }
 
 // Container.prototype
 
 export class ViewPort extends Container {
-
-
-    as_svg(doc: Document) {
-        const con = this._node = doc.createElementNS(NS_SVG, "svg");
+    override as_svg(doc: Document): SVGElement {
+        const con = (this._node = doc.createElementNS(NS_SVG, "svg"));
         for (const sub of this.children<Container | Item>()) {
             con.appendChild(sub.as_svg(doc));
         }
-        return con;
+        return set_svg(con, this);
     }
 
     get view_box() {
@@ -168,25 +183,61 @@ export class ViewPort extends Container {
     set height(v: NumberValue) {
         this._setx("height", v);
     }
+
 }
 
-const NS_SVG = "http://www.w3.org/2000/svg"
-export class Rect extends Shape {
-    size: RectSizeProp = new RectSizeProp([100, 100]);
-    as_svg(doc: Document) {
-        const e = this._node = doc.createElementNS(NS_SVG, "rect");
+const NS_SVG = "http://www.w3.org/2000/svg";
+
+export class Path extends Shape {
+    override as_svg(doc: Document): SVGElement {
+        const e = (this._node = doc.createElementNS(NS_SVG, "path"));
         // e.width.baseVal.value = this.size
         // e.addEventListener
-        return e;
+        return set_svg(e, this);
     }
-    // update_self(frame: number, node: SVGElement) {
-    //     let x = this.size.get_value(frame);
-    //     let e = node as unknown as SVGRectElement;
-    //     e.width.baseVal.value = x[0];
-    //     e.height.baseVal.value = x[1];
-    //     // console.log(`Rect:update_self ${frame} ${x}`);
-    //     super.update_self(frame, node);
-    // }
+    get d() {
+        return this._getx("d", new TextValue(""));
+    }
+    set d(v: TextValue) {
+        this._setx("d", v);
+    }
+
+}
+export class Rect extends Shape {
+    size: RectSizeProp = new RectSizeProp([100, 100]);
+    override as_svg(doc: Document): SVGElement {
+        const e = (this._node = doc.createElementNS(NS_SVG, "rect"));
+        // e.width.baseVal.value = this.size
+        // e.addEventListener
+        return set_svg(e, this);
+    }
+    get width() {
+        return this._getx("width", new NumberValue(100));
+    }
+    set width(v: NumberValue) {
+        this._setx("width", v);
+    }
+    ///
+    get height() {
+        return this._getx("height", new NumberValue(100));
+    }
+    set height(v: NumberValue) {
+        this._setx("height", v);
+    }
+    ///
+    get x() {
+        return this._getx("x", new NumberValue(0));
+    }
+    set x(v: NumberValue) {
+        this._setx("x", v);
+    }
+    ///
+    get y() {
+        return this._getx("y", new NumberValue(0));
+    }
+    set y(v: NumberValue) {
+        this._setx("y", v);
+    }
 }
 
 // export class Ellipse extends Shape {
@@ -197,8 +248,30 @@ export class Rect extends Shape {
 //     // href: string = "";
 //     // size: NVectorValue = new NVectorValue([100, 100]);
 // }
+
+function set_svg(elem: SVGElement, node: Item | Container): SVGElement {
+    const { id } = node;
+    if (id) {
+        elem.id = id;
+    }
+    return elem;
+}
+
 export class Root extends ViewPort {
-    defs: Array<Item | Container> = [];
-
-
+    defs: { [key: string]: Item | Container } = {};
+    id_map: { [key: string]: Item | Container } = {};
+    override as_svg(doc: Document): SVGElement {
+        const n = super.as_svg(doc);
+        const defs = doc.createElementNS(NS_SVG, "defs");
+        for (let [n, v] of Object.entries(this.defs)) {
+            defs.appendChild(v.as_svg(doc));
+        }
+        if (defs.firstElementChild) {
+            n.insertBefore(defs, n.firstChild);
+        }
+        return set_svg(n, this);
+    }
+    remember_id(id: string, node: Item | Container) {
+        this.id_map[id] = node;
+    }
 }

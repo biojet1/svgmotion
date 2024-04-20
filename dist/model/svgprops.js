@@ -30,6 +30,7 @@ export function SVGProps(Base) {
             return value;
         }
         _setx(name, value) {
+            console.log(`_SETX ${name}`);
             Object.defineProperty(this, name, {
                 value,
                 writable: true,

@@ -132,5 +132,9 @@ export const UPDATE = {
         const p = prop.position.get_value(frame);
         node.setAttribute("viewBox", `${p[0]} ${p[1]} ${s[0]} ${s[1]}`);
     },
+    d: function (frame, node, prop) {
+        const s = prop.get_value(frame);
+        node.setAttribute("d", s);
+    },
 };
 //# sourceMappingURL=properties.js.map

@@ -42,5 +42,9 @@
     "puppeteer": "^22.6.0",
     "tap": "^18.7.1",
     "yargs": "^17.7.2"
+  },
+  "prettier": {
+    "trailingComma": "es5",
+    "tabWidth": 4
   }
 }

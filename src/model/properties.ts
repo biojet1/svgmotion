@@ -1,5 +1,5 @@
 import { viewbox_transform } from "domspec/dist/svg/attr-transform.js";
-import { Animatable, NVectorValue, NumberValue, PositionValue, RGBValue } from "./keyframes.js";
+import { Animatable, NVectorValue, NumberValue, PositionValue, RGBValue, TextValue } from "./keyframes.js";
 
 export class ValueSet {
     *enum_values(): Generator<Animatable<any>, void, unknown> {
@@ -161,5 +161,8 @@ export const UPDATE: {
         const p = prop.position.get_value(frame);
         node.setAttribute("viewBox", `${p[0]} ${p[1]} ${s[0]} ${s[1]}`);
     },
-
+    d: function (frame: number, node: SVGPathElement, prop: TextValue) {
+        const s = prop.get_value(frame);
+        node.setAttribute("d", s);
+    },
 }

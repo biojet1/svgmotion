@@ -2,7 +2,7 @@
 import test from "tap";
 import { parse_svg } from "../dist/parse.js";
 import { SVGDocument, XMLSerializer } from "domspec";
-import { RGB } from "../dist/index.js";
+import { RGB, Root } from "../dist/index.js";
 test.test("Item", (t) => {
 
     parse_svg("../../python/flottie/example/res/thank_you_tp.svg").then((root) => {
@@ -13,7 +13,7 @@ test.test("Item", (t) => {
         const doc = new SVGDocument();
         const nod = root.as_svg(doc);
         // console.log(`width`, nod.width.baseVal.value, nod.width.baseVal.unitType);
-        console.log(root.prop5);
+        // console.log(root.prop5);
         root.fill.color.value = new RGB(1, 1, 0);
         root.update_node(0);
 
