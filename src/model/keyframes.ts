@@ -9,6 +9,12 @@ export class KeyframeEntry<V> {
     time: number = 0;
     value!: V;
     easing?: IEasing | boolean;
+
+    to_json() {
+        // const { value } = this;
+        // t, i, o
+        return {}
+    }
 }
 
 export class Keyframes<V> extends Array<KeyframeEntry<V>> {
@@ -39,6 +45,13 @@ export class Animatable<V> {
         throw Error(`Not implemented`);
         // return a + b;
     }
+    value_to_json(a: V): any {
+        throw Error(`Not implemented`);
+    }
+    value_from_json(a: any): V {
+        throw Error(`Not implemented`);
+    }
+
     get_value(frame: number) {
         const { value } = this;
         if (value instanceof Keyframes) {
@@ -121,6 +134,16 @@ export class Animatable<V> {
     constructor(v: V) {
         this.value = v;
     }
+    to_json() {
+        const { value } = this;
+        if (value instanceof Keyframes) {
+            value.map((v) => this.value_to_json(v.value));
+            return { value: value }
+        } else {
+            return { value: value }
+        }
+    }
+
 }
 
 export class AnimatableD<V> extends Animatable<V> {

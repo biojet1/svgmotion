@@ -1,15 +1,16 @@
 "uses strict";
 import test from "tap";
-import { parse_svg } from "../dist/parse.js";
+import { parse_svg } from "../dist/parse_dom.js";
 import { SVGDocument, XMLSerializer } from "domspec";
 import { RGB, Root } from "../dist/index.js";
 test.test("Item", (t) => {
 
     parse_svg("../../python/flottie/example/res/thank_you_tp.svg").then((root) => {
-        // console.log(root);
+        // console.log("root", root);
         for (let [n, v] of Object.entries(root)) {
             //  console.log("---", n, v);
         }
+
         const doc = new SVGDocument();
         const nod = root.as_svg(doc);
         // console.log(`width`, nod.width.baseVal.value, nod.width.baseVal.unitType);

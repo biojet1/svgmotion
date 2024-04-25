@@ -1,5 +1,5 @@
 import { NumberValue } from "./keyframes.js";
-import { Fill } from "./properties.js";
+import { Fill, Transform } from "./properties.js";
 export function SVGProps(Base) {
     return class SVGProps extends Base {
         get prop5() {
@@ -8,18 +8,28 @@ export function SVGProps(Base) {
         set prop5(v) {
             this._setx("prop5", v);
         }
+        /// fill
         get fill() {
             return this._getx("fill", new Fill());
         }
         set fill(v) {
             this._setx("fill", v);
         }
+        /// opacity
         get opacity() {
             return this._getx("opacity", new NumberValue(1));
         }
         set opacity(v) {
             this._setx("opacity", v);
         }
+        /// transform
+        get transform() {
+            return this._getx("transform", new Transform());
+        }
+        set transform(v) {
+            this._setx("transform", v);
+        }
+        ///
         _getx(name, value) {
             console.log(`_GETX ${name}`);
             Object.defineProperty(this, name, {

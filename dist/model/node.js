@@ -1,5 +1,6 @@
 import { Animatable, Keyframes, NumberValue, TextValue, } from "./keyframes.js";
-import { Box, RectSizeProp, UPDATE, ValueSet, } from "./properties.js";
+import { Box, RectSizeProp, ValueSet, } from "./properties.js";
+import { UPDATE } from "./update_dom.js";
 import { Node, Parent } from "./linked.js";
 import { SVGProps } from "./svgprops.js";
 export class Item extends SVGProps(Node) {
@@ -133,23 +134,40 @@ export class ViewPort extends Container {
     set view_box(v) {
         this._setx("view_box", v);
     }
+    ///
     get width() {
         return this._getx("width", new NumberValue(100));
     }
     set width(v) {
         this._setx("width", v);
     }
+    ///
     get height() {
         return this._getx("height", new NumberValue(100));
     }
     set height(v) {
         this._setx("height", v);
     }
+    ///
+    get fit_view() {
+        return this._getx("d", new TextValue(""));
+    }
+    set fit_view(v) {
+        this._setx("d", v);
+    }
+    ///
+    get zoom_pan() {
+        return this._getx("d", new TextValue("disable"));
+    }
+    set zoom_pan(v) {
+        this._setx("d", v);
+    }
 }
 const NS_SVG = "http://www.w3.org/2000/svg";
 export class Path extends Shape {
     as_svg(doc) {
         const e = (this._node = doc.createElementNS(NS_SVG, "path"));
+        // e.setAttribute("d", this.d.get_value);
         // e.width.baseVal.value = this.size
         // e.addEventListener
         return set_svg(e, this);
@@ -169,6 +187,7 @@ export class Rect extends Shape {
         // e.addEventListener
         return set_svg(e, this);
     }
+    ///
     get width() {
         return this._getx("width", new NumberValue(100));
     }
@@ -195,6 +214,20 @@ export class Rect extends Shape {
     }
     set y(v) {
         this._setx("y", v);
+    }
+    ///
+    get rx() {
+        return this._getx("rx", new NumberValue(0));
+    }
+    set rx(v) {
+        this._setx("rx", v);
+    }
+    ///
+    get ry() {
+        return this._getx("ry", new NumberValue(0));
+    }
+    set ry(v) {
+        this._setx("ry", v);
     }
 }
 // export class Ellipse extends Shape {

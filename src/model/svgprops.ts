@@ -1,5 +1,5 @@
 import { NumberValue } from "./keyframes.js";
-import { Fill } from "./properties.js";
+import { Fill, Transform } from "./properties.js";
 
 export type Constructor = new (...args: any[]) => {};
 export function SVGProps<TBase extends Constructor>(Base: TBase) {
@@ -10,19 +10,29 @@ export function SVGProps<TBase extends Constructor>(Base: TBase) {
         set prop5(v: NumberValue) {
             this._setx("prop5", v);
         }
+        /// fill
         get fill() {
             return this._getx("fill", new Fill());
         }
         set fill(v: Fill) {
             this._setx("fill", v);
         }
+        /// opacity
         get opacity() {
             return this._getx("opacity", new NumberValue(1));
         }
         set opacity(v: NumberValue) {
             this._setx("opacity", v);
         }
+        /// transform
+        get transform() {
+            return this._getx("transform", new Transform());
+        }
+        set transform(v: Transform) {
+            this._setx("transform", v);
+        }
 
+        ///
         _getx<T>(name: string, value: T): T {
             console.log(`_GETX ${name}`);
             Object.defineProperty(this, name, {

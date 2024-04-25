@@ -1,44 +1,34 @@
-import { DOMParser } from "domspec";
+// import { DOMParser } from "domspec";
 const NS_SVG = "http://www.w3.org/2000/svg";
 export function parse_svg(src, opt = {}) {
-    return DOMParser.loadXML(src, { ...opt, type: "image/svg+xml" })
-        .then((doc) => {
-        const base = opt.base || src;
-        const root = doc.documentElement;
-        // console.info(`loadrd "${src}" ${root?.localName}`);
-        if (root.namespaceURI != NS_SVG) {
-            throw new Error(`not svg namespace ${root.namespaceURI}`);
-        }
-        else if (root.localName != "svg") {
-            throw new Error(`not svg tag ${root.localName}`);
-        }
-        else {
-            const con = new Doc();
-            console.log(doc.innerHTML);
-            const f = walk(root, con);
-            return f;
-        }
-    })
-        .catch((err) => {
-        console.error(`Failed to load "${src}"`);
-        throw err;
+    return import("domspec").then((domspec) => {
+        console.log("domspec", domspec.DOMParser.loadXML);
+        return domspec.DOMParser.loadXML(src, { ...opt, type: "image/svg+xml" })
+            .then((doc) => {
+            const base = opt.base || src;
+            const root = doc.documentElement;
+            console.info(`loadrd "${src}" ${root?.localName}`);
+            if (root.namespaceURI != NS_SVG) {
+                throw new Error(`not svg namespace ${root.namespaceURI}`);
+            }
+            else if (root.localName != "svg") {
+                throw new Error(`not svg tag ${root.localName}`);
+            }
+            else {
+                const con = new Doc();
+                console.log(doc.innerHTML);
+                const f = walk(root, con);
+                return f;
+            }
+        })
+            .catch((err) => {
+            console.error(`Failed to load "${src}"`);
+            throw err;
+        });
     });
 }
 import { ViewPort, Container, Root } from "./model/node.js";
 import { NVector } from "./model/keyframes.js";
-class Obj {
-    create(elem) {
-        throw new Error(`not implemented`);
-    }
-}
-class svg extends Obj {
-    _props = {
-        size: 7,
-    };
-    create(elem) {
-        return new ViewPort();
-    }
-}
 export const A1 = {
     svg: function (e, parent) {
         let elem = e;
@@ -109,6 +99,16 @@ export const A1 = {
                         u.size.value = new NVector([v[2], v[3]]);
                     }
                     break;
+                case "preserveAspectRatio":
+                    {
+                        n.fit_view.value = value;
+                    }
+                    break;
+                case "zoomAndPan":
+                    {
+                        n.zoom_pan.value = value;
+                    }
+                    break;
                 default:
                     set_common_attr(n, name, value, e);
             }
@@ -130,6 +130,12 @@ export const A1 = {
                     break;
                 case "x":
                     n.x.value = parseFloat(value);
+                    break;
+                case "ry":
+                    n.ry.value = parseFloat(value);
+                    break;
+                case "rx":
+                    n.rx.value = parseFloat(value);
                     break;
                 default:
                     set_common_attr(n, name, value, e);
@@ -175,8 +181,8 @@ function get_root(cur) {
     }
     throw new Error(`Unexpected ${cur.constructor.name} ${cur._parent?.constructor.name}`);
 }
-function set_common_attr(node, name, value, elem) {
-    // console.log(`set_common_attr ${name}="${value}" ${elem.localName} ${node.constructor.name}`);
+function set_common_attr(node, name, value, elem, style = false) {
+    console.log(`set_common_attr ${name}="${value}" ${elem.localName} ${node.constructor.name} ${style}`);
     switch (name) {
         case "id":
             if (value) {
@@ -185,12 +191,17 @@ function set_common_attr(node, name, value, elem) {
             }
             break;
         case "transform":
+            if (value) {
+                node.transform.parse(value);
+                console.log("transform", Object.keys(node.transform), node.transform, node.transform.position, node.transform.get_matrix(0), node.transform.position.get_value(0));
+                console.log("decompose", node.transform.get_matrix(0).decompose());
+            }
             break;
         case "style":
             const asm = elem.attributeStyleMap;
             for (const [sname, value] of asm.entries()) {
-                console.log("STYLE", sname, value, value.constructor.name);
-                // _set_attr(node, name, value, elem);
+                // console.log("STYLE", sname, value, value.constructor.name, style);
+                // set_common_attr(node, sname, value.toString(), elem, true);
             }
             break;
         default:
@@ -203,10 +214,10 @@ function* enum_attrs(e) {
     const attrs = e.attributes;
     for (let i = attrs.length; i-- > 0;) {
         const attr = attrs[i];
-        // console.log(`enum_attrs`, e.localName, localName, namespaceURI);  
+        // console.log(`enum_attrs`, e.localName, localName, namespaceURI);
         if (attr != undefined) {
             const { localName, namespaceURI, value } = attr;
-            console.log(`enum_attrs`, e.localName, localName, namespaceURI, i);
+            // console.log(`enum_attrs`, e.localName, localName, namespaceURI, i);
             if (!namespaceURI || namespaceURI == NS_SVG) {
                 yield [localName, value];
             }
@@ -232,4 +243,4 @@ function walk(elem, parent) {
         throw new Error(`No processor for "${elem.localName}"`);
     }
 }
-//# sourceMappingURL=parse.js.map
+//# sourceMappingURL=parse_dom.js.map

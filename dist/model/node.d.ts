@@ -1,5 +1,5 @@
 import { Animatable, Keyframes, NumberValue, TextValue } from "./keyframes.js";
-import { Box, Fill, RectSizeProp } from "./properties.js";
+import { Box, Fill, RectSizeProp, Transform } from "./properties.js";
 import { Node, Parent } from "./linked.js";
 interface INode {
     id?: string;
@@ -10,6 +10,7 @@ declare const Item_base: {
         prop5: NumberValue;
         fill: Fill;
         opacity: NumberValue;
+        transform: Transform;
         _getx<T>(name: string, value: T): T;
         _setx<T_1>(name: string, value: T_1): void;
     };
@@ -29,6 +30,7 @@ declare const Container_base: {
         prop5: NumberValue;
         fill: Fill;
         opacity: NumberValue;
+        transform: Transform;
         _getx<T>(name: string, value: T): T;
         _setx<T_1>(name: string, value: T_1): void;
     };
@@ -58,6 +60,10 @@ export declare class ViewPort extends Container {
     set width(v: NumberValue);
     get height(): NumberValue;
     set height(v: NumberValue);
+    get fit_view(): TextValue;
+    set fit_view(v: TextValue);
+    get zoom_pan(): TextValue;
+    set zoom_pan(v: TextValue);
 }
 export declare class Path extends Shape {
     as_svg(doc: Document): SVGElement;
@@ -75,6 +81,10 @@ export declare class Rect extends Shape {
     set x(v: NumberValue);
     get y(): NumberValue;
     set y(v: NumberValue);
+    get rx(): NumberValue;
+    set rx(v: NumberValue);
+    get ry(): NumberValue;
+    set ry(v: NumberValue);
 }
 export declare class Root extends ViewPort {
     defs: {

@@ -2,6 +2,11 @@ export class KeyframeEntry {
     time = 0;
     value;
     easing;
+    to_json() {
+        // const { value } = this;
+        // t, i, o
+        return {};
+    }
 }
 export class Keyframes extends Array {
     set_value(time, value) {
@@ -30,6 +35,12 @@ export class Animatable {
     add_value(a, b) {
         throw Error(`Not implemented`);
         // return a + b;
+    }
+    value_to_json(a) {
+        throw Error(`Not implemented`);
+    }
+    value_from_json(a) {
+        throw Error(`Not implemented`);
     }
     get_value(frame) {
         const { value } = this;
@@ -110,6 +121,16 @@ export class Animatable {
     }
     constructor(v) {
         this.value = v;
+    }
+    to_json() {
+        const { value } = this;
+        if (value instanceof Keyframes) {
+            value.map((v) => this.value_to_json(v.value));
+            return { value: value };
+        }
+        else {
+            return { value: value };
+        }
     }
 }
 export class AnimatableD extends Animatable {

@@ -6,6 +6,7 @@ export declare class KeyframeEntry<V> {
     time: number;
     value: V;
     easing?: IEasing | boolean;
+    to_json(): {};
 }
 export declare class Keyframes<V> extends Array<KeyframeEntry<V>> {
     set_value(time: number, value: V): KeyframeEntry<V>;
@@ -14,10 +15,17 @@ export declare class Animatable<V> {
     value: Keyframes<V> | V;
     lerp_value(ratio: number, a: V, b: V): V;
     add_value(a: V, b: V): V;
+    value_to_json(a: V): any;
+    value_from_json(a: any): V;
     get_value(frame: number): V;
     set_value(frame: number, value: V, start?: number, easing?: IEasing | boolean, add?: boolean): KeyframeEntry<V>;
     check_value(x: any): V;
     constructor(v: V);
+    to_json(): {
+        value: Keyframes<V>;
+    } | {
+        value: V;
+    };
 }
 export declare class AnimatableD<V> extends Animatable<V> {
     get_value(frame: number): V;
