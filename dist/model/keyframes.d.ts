@@ -1,12 +1,7 @@
-interface IEasing {
-    ratio_at(t: number): number;
-    reverse(): IEasing;
-}
 export declare class KeyframeEntry<V> {
     time: number;
     value: V;
-    easing?: IEasing | boolean;
-    to_json(): {};
+    easing?: Iterable<number> | boolean;
 }
 export declare class Keyframes<V> extends Array<KeyframeEntry<V>> {
     set_value(time: number, value: V): KeyframeEntry<V>;
@@ -18,23 +13,43 @@ export declare class Animatable<V> {
     value_to_json(a: V): any;
     value_from_json(a: any): V;
     get_value(frame: number): V;
-    set_value(frame: number, value: V, start?: number, easing?: IEasing | boolean, add?: boolean): KeyframeEntry<V>;
+    set_value(frame: number, value: V, start?: number, easing?: Iterable<number> | boolean, add?: boolean): KeyframeEntry<V>;
     check_value(x: any): V;
-    constructor(v: V);
+    constructor(v: Keyframes<V> | V);
     to_json(): {
-        value: Keyframes<V>;
+        k: ({
+            t: number;
+            k: any;
+            h?: undefined;
+            o?: undefined;
+            i?: undefined;
+        } | {
+            t: number;
+            h: boolean;
+            k: any;
+            o?: undefined;
+            i?: undefined;
+        } | {
+            t: number;
+            o: number[];
+            i: number[];
+            k: any;
+            h?: undefined;
+        })[];
+        v?: undefined;
     } | {
-        value: V;
+        v: V;
+        k?: undefined;
     };
 }
 export declare class AnimatableD<V> extends Animatable<V> {
     get_value(frame: number): V;
-    set_value(frame: number, value: V, start?: number, easing?: IEasing | boolean, add?: boolean): KeyframeEntry<V>;
+    set_value(frame: number, value: V, start?: number, easing?: Iterable<number> | boolean, add?: boolean): KeyframeEntry<V>;
 }
 export declare class NumberValue extends Animatable<number> {
     lerp_value(r: number, a: number, b: number): number;
     add_value(a: number, b: number): number;
-    constructor(v?: number);
+    constructor(v?: number | Keyframes<number>);
 }
 export declare class NVector extends Float64Array {
     add(that: NVector): NVector;
@@ -45,7 +60,9 @@ export declare class NVectorValue extends Animatable<NVector> {
     lerp_value(r: number, a: NVector, b: NVector): NVector;
     add_value(a: NVector, b: NVector): NVector;
     check_value(x: any): NVector;
-    constructor(v: Iterable<number>);
+    value_to_json(a: NVector): any;
+    value_from_json(a: any): NVector;
+    constructor(v: NVector | Keyframes<NVector>);
 }
 export declare class Point extends NVector {
     constructor(x?: number, y?: number);
@@ -64,4 +81,3 @@ export declare class RGBValue extends NVectorValue {
 export declare class TextValue extends AnimatableD<string> {
     add_value(a: string, b: string): string;
 }
-export {};

@@ -2,6 +2,7 @@ import { NumberValue } from "./keyframes.js";
 import { Fill, Transform } from "./properties.js";
 export function SVGProps(Base) {
     return class SVGProps extends Base {
+        static tag = '';
         get prop5() {
             return this._getx("prop5", new NumberValue(45));
         }

@@ -1,20 +1,36 @@
 import { cubic_bezier_y_of_x } from "./bezier.js";
 
-interface IEasing {
-    ratio_at(t: number): number;
-    reverse(): IEasing;
+function ratio_at(a: Iterable<number>, t: number) {
+    const [ox, oy, ix, iy] = a;
+    return cubic_bezier_y_of_x([0, 0], [ox, oy], [ix, iy], [1, 1])(t);
 }
 
+function kfe_from_json<V>(x: { t: number, h: boolean, o: Iterable<number>, i: Iterable<number> }, value: V): KeyframeEntry<V> {
+    const { t: time, h, o, i } = x;
+    if (h) {
+        return { time, easing: true, value };
+    } else if (o && i) {
+        const [ox, oy] = o;
+        const [ix, iy] = o;
+        return { time, easing: [ox, oy, ix, iy], value };
+    }
+    return { time, value };
+}
+function kfe_to_json<V>(kfe: KeyframeEntry<V>, value: any) {
+    const { time: t, easing } = kfe;
+    if (!easing) {
+        return { t, k: value };
+    } else if (easing === true) {
+        return { t, h: true, k: value };
+    } else {
+        const [ox, oy, ix, iy] = easing;
+        return { t, o: [ox, oy], i: [ix, iy], k: value };
+    }
+}
 export class KeyframeEntry<V> {
     time: number = 0;
     value!: V;
-    easing?: IEasing | boolean;
-
-    to_json() {
-        // const { value } = this;
-        // t, i, o
-        return {}
-    }
+    easing?: Iterable<number> | boolean;
 }
 
 export class Keyframes<V> extends Array<KeyframeEntry<V>> {
@@ -68,7 +84,7 @@ export class Animatable<V> {
                         } else if (r == 1) {
                             return k.value;
                         } else if (p.easing && p.easing !== true) {
-                            r = p.easing.ratio_at(r);
+                            r = ratio_at(p.easing, r);
                         }
                         return this.lerp_value(r, p.value, k.value);
                     } else {
@@ -90,7 +106,7 @@ export class Animatable<V> {
         frame: number,
         value: V,
         start?: number,
-        easing?: IEasing | boolean,
+        easing?: Iterable<number> | boolean,
         add?: boolean
     ) {
         let { value: kfs } = this;
@@ -131,18 +147,38 @@ export class Animatable<V> {
     check_value(x: any): V {
         return x as V;
     }
-    constructor(v: V) {
-        this.value = v;
+    constructor(v: Keyframes<V> | V) {
+        if (v == null) {
+            throw new Error(
+                `unexpected value=${v}`
+            );
+
+        } else {
+            this.value = v;
+        }
     }
     to_json() {
         const { value } = this;
         if (value instanceof Keyframes) {
-            value.map((v) => this.value_to_json(v.value));
-            return { value: value }
+            return { k: value.map((v) => kfe_to_json(v, this.value_to_json(v.value))) }
         } else {
-            return { value: value }
+            return { v: value }
         }
     }
+
+    // static from_json<K extends Animatable<V>>(x: { k?: { t: number, h: boolean, o: Iterable<number>, i: Iterable<number>, v: any }[], v: any }): K {
+    //     // const { k } = x;
+    //     // if (k == null) {
+    //     //     return new this(this.value_from_json(x.v));
+    //     // } else {
+    //     //     return new this(k.map((v) =>
+    //     //         kfe_from_json(v, this.value_from_json(v.v)
+    //     //         )
+    //     //     ));
+    //     // }
+    //     throw Error(`Not implemented`);
+    // }
+
 
 }
 
@@ -169,7 +205,7 @@ export class AnimatableD<V> extends Animatable<V> {
         frame: number,
         value: V,
         start?: number,
-        easing?: IEasing | boolean,
+        easing?: Iterable<number> | boolean,
         add?: boolean
     ) {
         let { value: kfs } = this;
@@ -217,7 +253,7 @@ export class NumberValue extends Animatable<number> {
         return a + b;
     }
 
-    constructor(v: number = 0) {
+    constructor(v: number | Keyframes<number> = 0) {
         super(v);
     }
 }
@@ -235,24 +271,35 @@ export class NVector extends Float64Array {
         const b = that.map((v, i) => v * t);
         return new NVector(a.map((v, i) => v + b[i]));
     }
+    // static from(x: ArrayLike<number>) {
+    //     return new NVector(x);
+    // }
 }
 
 export class NVectorValue extends Animatable<NVector> {
-    lerp_value(r: number, a: NVector, b: NVector): NVector {
+    override lerp_value(r: number, a: NVector, b: NVector): NVector {
         return a.lerp(b, r);
     }
-    add_value(a: NVector, b: NVector): NVector {
+    override add_value(a: NVector, b: NVector): NVector {
         return a.add(b);
     }
-    check_value(x: any): NVector {
+    override  check_value(x: any): NVector {
         if (x instanceof NVector) {
             return x;
         } else {
             return new NVector(x);
         }
     }
-    constructor(v: Iterable<number>) {
-        super(NVector.from(v) as NVector);
+    override value_to_json(a: NVector): any {
+        return [...a];
+    }
+
+    override  value_from_json(a: any): NVector {
+        return new NVector(a);
+    }
+
+    constructor(v: NVector | Keyframes<NVector>) {
+        super(v);
     }
 }
 // def Point(x, y):

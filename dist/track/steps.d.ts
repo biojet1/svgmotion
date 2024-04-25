@@ -1,13 +1,13 @@
-import { Action, IProperty, IEasing } from "./action.js";
+import { Action, IProperty } from "./action.js";
 export interface Entry {
     t: number;
-    ease?: IEasing | boolean;
+    ease?: Iterable<number> | boolean;
     [key: string]: any;
 }
 export interface UserEntry {
     dur?: number;
     t?: number;
-    ease?: IEasing | boolean;
+    ease?: Iterable<number> | boolean;
     [key: string]: any;
 }
 export interface PropMap {
@@ -16,14 +16,14 @@ export interface PropMap {
 interface KF {
     t: number;
     value: any;
-    ease?: IEasing | boolean;
+    ease?: Iterable<number> | boolean;
 }
 interface KFMap {
     [key: string]: KF[];
 }
 interface Params {
     dur?: number;
-    easing?: IEasing | boolean;
+    easing?: Iterable<number> | boolean;
     bounce?: boolean;
     repeat?: number;
     max_dur?: number;
@@ -31,7 +31,7 @@ interface Params {
 export declare class StepA extends Action {
     _steps: Array<UserEntry>;
     _max_dur?: number;
-    _easing?: IEasing | boolean;
+    _easing?: Iterable<number> | boolean;
     _bounce?: boolean;
     _repeat?: number;
     _base_frame: number;

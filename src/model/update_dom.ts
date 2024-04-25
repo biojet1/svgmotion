@@ -1,4 +1,5 @@
 import { NVectorValue, NumberValue, RGBValue, TextValue } from "./keyframes.js";
+import { Container, Item } from "./node.js";
 import { Transform, Fill, Box } from "./properties.js";
 
 
@@ -19,24 +20,6 @@ export const UPDATE: {
         let x = prop.get_value(frame);
         node.x.baseVal.value = x[0];
         node.y.baseVal.value = x[1];
-    },
-    transform: function (frame: number, node: SVGElement, prop: Transform) {
-        const m = prop.get_matrix(frame);
-        node.setAttribute("transform", m.toString());
-    },
-    fill: function (frame: number, node: SVGSVGElement, prop: Fill) {
-        for (let [n, v] of Object.entries(prop)) {
-            if (v) {
-                switch (n) {
-                    case "opacity":
-                        node.style.fillOpacity = (v as NumberValue).get_value(frame) + '';
-                        break;
-                    case "color":
-                        node.style.fill = RGBValue.to_css_rgb((v as RGBValue).get_value(frame));
-                        break;
-                }
-            }
-        }
     },
 
     x: function (frame: number, node: SVGRectElement | SVGSVGElement, prop: NumberValue) {
@@ -72,7 +55,6 @@ export const UPDATE: {
     ry: function (frame: number, node: SVGRectElement | SVGEllipseElement, prop: NumberValue) {
         node.ry.baseVal.value = prop.get_value(frame);
     },
-
     view_box: function (frame: number, node: SVGRectElement | SVGSVGElement, prop: Box) {
         const s = prop.size.get_value(frame);
         const p = prop.position.get_value(frame);
@@ -86,4 +68,39 @@ export const UPDATE: {
         const s = prop.get_value(frame);
         node.setAttribute("preserveAspectRatio", s);
     },
+    transform: function (frame: number, node: SVGElement, prop: Transform) {
+        const m = prop.get_matrix(frame);
+        node.setAttribute("transform", m.toString());
+    },
+    fill: function (frame: number, node: SVGSVGElement, prop: Fill) {
+        for (let [n, v] of Object.entries(prop)) {
+            if (v) {
+                switch (n) {
+                    case "opacity":
+                        node.style.fillOpacity = (v as NumberValue).get_value(frame) + '';
+                        break;
+                    case "color":
+                        node.style.fill = RGBValue.to_css_rgb((v as RGBValue).get_value(frame));
+                        break;
+                }
+            }
+        }
+    },
 };
+
+
+// export const FROM_JSON: {
+//     [key: string]: any;
+// } = {
+//     opacity: function (node: Item|Container, prop: NumberValue, x:any) {
+//         const { k } = x;
+//         if (k == null) {
+//             return new NumberValue((x.v));
+//         } else {
+//             return new NumberValue(k.map((v) =>
+//                 kfe_from_json(v, this.value_from_json(v.v)
+//                 )
+//             ));
+//         }
+//     },
+// };

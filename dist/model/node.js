@@ -1,11 +1,15 @@
-import { Animatable, Keyframes, NumberValue, TextValue, } from "./keyframes.js";
-import { Box, RectSizeProp, ValueSet, } from "./properties.js";
+import { Animatable, Keyframes, NVector, NumberValue, PositionValue, TextValue, } from "./keyframes.js";
+import { Box, ValueSet, } from "./properties.js";
 import { UPDATE } from "./update_dom.js";
 import { Node, Parent } from "./linked.js";
 import { SVGProps } from "./svgprops.js";
 export class Item extends SVGProps(Node) {
     id;
     _node;
+    as_svg(doc) {
+        const e = (this._node = doc.createElementNS(NS_SVG, this.constructor.tag));
+        return set_svg(e, this);
+    }
     update_self(frame, node) {
         update(frame, this, node);
     }
@@ -32,7 +36,11 @@ export class Container extends SVGProps(Parent) {
     id;
     _node;
     as_svg(doc) {
-        throw new Error(`Not implemented`);
+        const con = (this._node = doc.createElementNS(NS_SVG, this.constructor.tag));
+        for (const sub of this.children()) {
+            con.appendChild(sub.as_svg(doc));
+        }
+        return set_svg(con, this);
     }
     update_self(frame, node) {
         update(frame, this, node);
@@ -104,6 +112,8 @@ export class Container extends SVGProps(Parent) {
         this.append_child(x);
         return x;
     }
+    to_json() {
+    }
 }
 function update(frame, target, el) {
     for (let [n, v] of Object.entries(target)) {
@@ -111,23 +121,11 @@ function update(frame, target, el) {
     }
 }
 export class Group extends Container {
-    as_svg(doc) {
-        const con = (this._node = doc.createElementNS(NS_SVG, "g"));
-        for (const sub of this.children()) {
-            con.appendChild(sub.as_svg(doc));
-        }
-        return set_svg(con, this);
-    }
+    static tag = 'g';
 }
-// Container.prototype
 export class ViewPort extends Container {
-    as_svg(doc) {
-        const con = (this._node = doc.createElementNS(NS_SVG, "svg"));
-        for (const sub of this.children()) {
-            con.appendChild(sub.as_svg(doc));
-        }
-        return set_svg(con, this);
-    }
+    static tag = 'svg';
+    ///
     get view_box() {
         return this._getx("view_box", new Box([0, 0], [100, 100]));
     }
@@ -165,13 +163,8 @@ export class ViewPort extends Container {
 }
 const NS_SVG = "http://www.w3.org/2000/svg";
 export class Path extends Shape {
-    as_svg(doc) {
-        const e = (this._node = doc.createElementNS(NS_SVG, "path"));
-        // e.setAttribute("d", this.d.get_value);
-        // e.width.baseVal.value = this.size
-        // e.addEventListener
-        return set_svg(e, this);
-    }
+    static tag = 'path';
+    ///
     get d() {
         return this._getx("d", new TextValue(""));
     }
@@ -180,13 +173,7 @@ export class Path extends Shape {
     }
 }
 export class Rect extends Shape {
-    size = new RectSizeProp([100, 100]);
-    as_svg(doc) {
-        const e = (this._node = doc.createElementNS(NS_SVG, "rect"));
-        // e.width.baseVal.value = this.size
-        // e.addEventListener
-        return set_svg(e, this);
-    }
+    static tag = 'rect';
     ///
     get width() {
         return this._getx("width", new NumberValue(100));
@@ -228,6 +215,13 @@ export class Rect extends Shape {
     }
     set ry(v) {
         this._setx("ry", v);
+    }
+    ///
+    get size() {
+        return this._getx("size", new PositionValue(new NVector([100, 100])));
+    }
+    set size(v) {
+        this._setx("size", v);
     }
 }
 // export class Ellipse extends Shape {

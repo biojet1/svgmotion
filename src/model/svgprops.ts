@@ -4,6 +4,7 @@ import { Fill, Transform } from "./properties.js";
 export type Constructor = new (...args: any[]) => {};
 export function SVGProps<TBase extends Constructor>(Base: TBase) {
     return class SVGProps extends Base {
+        static tag = '';
         get prop5() {
             return this._getx("prop5", new NumberValue(45));
         }
@@ -50,13 +51,5 @@ export function SVGProps<TBase extends Constructor>(Base: TBase) {
                 enumerable: true,
             });
         }
-        // static _setxx<T>(name: string, value: T) {
-        //     console.log(`_SETX ${name}`);
-        //     Object.defineProperty(this, name, {
-        //         value,
-        //         writable: true,
-        //         enumerable: true,
-        //     });
-        // }
     };
 }

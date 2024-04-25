@@ -202,7 +202,8 @@ function resolve_bounce(steps) {
             const e = { ...vars, t: t_max + (t_max - t) };
             if (ease != undefined) {
                 if (ease && ease !== true) {
-                    e.ease = ease.reversed();
+                    const [ox, oy, ix, iy] = ease;
+                    e.ease = [1 - ix, 1 - iy, 1 - ox, 1 - oy];
                 }
                 else {
                     e.ease = ease;

@@ -1,11 +1,11 @@
-import { IAction, Action, IEasing } from "./action.js";
+import { IAction, Action } from "./action.js";
 
 
 export class Track {
     frame: number = 0;
     frame_rate: number = 60;
     _hint_dur: number = 60; // 1s * frame_rate
-    _easing?: IEasing | boolean;
+    _easing?: Iterable<number> | boolean;
     sec(n: number) {
         return this.frame_rate * n;
     }

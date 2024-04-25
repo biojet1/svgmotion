@@ -62,7 +62,7 @@ export declare class Matrix {
     static skew(x: number, y: number): Matrix;
     static skewX(x: number): Matrix;
     static skewY(y: number): Matrix;
-    static rotate(ang: number, x?: number, y?: number): Matrix;
+    static rotate(deg: number, x?: number, y?: number): Matrix;
     static scale(scaleX: number, scaleY?: number): Matrix;
     static identity(): Matrix;
 }

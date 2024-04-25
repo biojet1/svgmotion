@@ -1,15 +1,15 @@
 import {
     Animatable,
     Keyframes,
+    NVector,
     NVectorValue,
     NumberValue,
+    PositionValue,
     TextValue,
 } from "./keyframes.js";
 import {
     Box,
     Fill,
-    OpacityProp,
-    RectSizeProp,
     Stroke,
     Transform,
     ValueSet,
@@ -27,7 +27,10 @@ export abstract class Item extends SVGProps(Node) implements INode {
     id?: string;
     _node?: SVGElement;
 
-    abstract as_svg(doc: Document): SVGElement;
+    as_svg(doc: Document): SVGElement {
+        const e = (this._node = doc.createElementNS(NS_SVG, (<typeof Container>this.constructor).tag));
+        return set_svg(e, this);
+    }
 
     update_self(frame: number, node: SVGElement): void {
         update(frame, this, node);
@@ -49,11 +52,7 @@ export abstract class Item extends SVGProps(Node) implements INode {
         }
     }
 
-    // get transform() {
-    //     const v = new Transform();
-    //     Object.defineProperty(this, "transform", { value: v })
-    //     return v;
-    // }
+
 }
 
 export abstract class Shape extends Item { }
@@ -62,9 +61,15 @@ export class Container extends SVGProps(Parent) implements INode {
     id?: string;
     _node?: SVGElement;
 
+
     as_svg(doc: Document): SVGElement {
-        throw new Error(`Not implemented`);
+        const con = (this._node = doc.createElementNS(NS_SVG, (<typeof Container>this.constructor).tag));
+        for (const sub of this.children<Container | Item>()) {
+            con.appendChild(sub.as_svg(doc));
+        }
+        return set_svg(con, this);
     }
+
     update_self(frame: number, node: SVGElement): boolean {
         update(frame, this, node);
         return true; // should we call update_node to children
@@ -135,6 +140,9 @@ export class Container extends SVGProps(Parent) implements INode {
         this.append_child(x);
         return x;
     }
+    to_json() {
+
+    }
 }
 
 function update(frame: number, target: Item | Container, el: SVGElement) {
@@ -144,30 +152,16 @@ function update(frame: number, target: Item | Container, el: SVGElement) {
 }
 
 export class Group extends Container {
-    override as_svg(doc: Document): SVGElement {
-        const con = (this._node = doc.createElementNS(NS_SVG, "g"));
-        for (const sub of this.children<Container | Item>()) {
-            con.appendChild(sub.as_svg(doc));
-        }
-        return set_svg(con, this);
-    }
+    static tag = 'g';
 }
 
-// Container.prototype
 
 export class ViewPort extends Container {
-    override as_svg(doc: Document): SVGElement {
-        const con = (this._node = doc.createElementNS(NS_SVG, "svg"));
-        for (const sub of this.children<Container | Item>()) {
-            con.appendChild(sub.as_svg(doc));
-        }
-        return set_svg(con, this);
-    }
-
+    static tag = 'svg';
+    ///
     get view_box() {
         return this._getx("view_box", new Box([0, 0], [100, 100]));
     }
-
     set view_box(v: Box) {
         this._setx("view_box", v);
     }
@@ -204,29 +198,17 @@ export class ViewPort extends Container {
 const NS_SVG = "http://www.w3.org/2000/svg";
 
 export class Path extends Shape {
-    override as_svg(doc: Document): SVGElement {
-        const e = (this._node = doc.createElementNS(NS_SVG, "path"));
-        // e.setAttribute("d", this.d.get_value);
-        // e.width.baseVal.value = this.size
-        // e.addEventListener
-        return set_svg(e, this);
-    }
+    static tag = 'path';
+    ///
     get d() {
         return this._getx("d", new TextValue(""));
     }
     set d(v: TextValue) {
         this._setx("d", v);
     }
-
 }
 export class Rect extends Shape {
-    size: RectSizeProp = new RectSizeProp([100, 100]);
-    override as_svg(doc: Document): SVGElement {
-        const e = (this._node = doc.createElementNS(NS_SVG, "rect"));
-        // e.width.baseVal.value = this.size
-        // e.addEventListener
-        return set_svg(e, this);
-    }
+    static tag = 'rect';
     ///
     get width() {
         return this._getx("width", new NumberValue(100));
@@ -268,6 +250,13 @@ export class Rect extends Shape {
     }
     set ry(v: NumberValue) {
         this._setx("ry", v);
+    }
+    ///
+    get size() {
+        return this._getx("size", new PositionValue(new NVector([100, 100])));
+    }
+    set size(v: PositionValue) {
+        this._setx("size", v);
     }
 }
 

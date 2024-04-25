@@ -1,10 +1,6 @@
-export interface IEasing {
-    ratio_at(t: number): number;
-    reversed(): IEasing;
-}
 export interface IProperty<V> {
     get_value(time: number): V;
-    set_value(time: number, value: V, start?: number, easing?: IEasing | boolean, add?: boolean): any;
+    set_value(time: number, value: V, start?: number, easing?: Iterable<number> | boolean, add?: boolean): any;
     check_value(x: any): V;
 }
 export interface IAction {
@@ -16,7 +12,7 @@ export interface IAction {
     run(): void;
 }
 export interface IParent {
-    _easing?: IEasing | boolean;
+    _easing?: Iterable<number> | boolean;
     _hint_dur?: number;
     frame_rate: number;
     to_frame(sec: number): number;
@@ -35,7 +31,7 @@ export declare abstract class Actions extends Array<Action | Actions> implements
     _end: number;
     frame_rate: number;
     _hint_dur?: number;
-    _easing?: IEasing | boolean;
+    _easing?: Iterable<number> | boolean;
     ready(parent: IParent): void;
     run(): void;
     get_active_dur(): number;
@@ -59,7 +55,7 @@ export declare class ParA extends Actions {
 export declare function Par(...items: Array<Action | Actions>): ParA;
 export declare function ParE(...items: Array<Action | Actions>): ParA;
 export declare class ToA extends Action {
-    _easing?: IEasing | boolean;
+    _easing?: Iterable<number> | boolean;
     constructor(props: IProperty<any>[], value: any, dur?: number);
 }
 export declare function To(props: IProperty<any>[], value: any, dur?: number): ToA;

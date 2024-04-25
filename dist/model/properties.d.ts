@@ -41,7 +41,3 @@ export declare class Transform extends ValueSet {
     to_json(): void;
     from_json(x: any): void;
 }
-export declare class OpacityProp extends NumberValue {
-}
-export declare class RectSizeProp extends NVectorValue {
-}

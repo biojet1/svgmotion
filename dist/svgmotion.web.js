@@ -55,7 +55,6 @@ __webpack_require__.d(dist_namespaceObject, {
   NVector: () => (NVector),
   NVectorValue: () => (NVectorValue),
   NumberValue: () => (NumberValue),
-  OpacityProp: () => (OpacityProp),
   Par: () => (Par),
   ParA: () => (ParA),
   ParE: () => (ParE),
@@ -65,7 +64,6 @@ __webpack_require__.d(dist_namespaceObject, {
   RGB: () => (RGB),
   RGBValue: () => (RGBValue),
   Rect: () => (Rect),
-  RectSizeProp: () => (RectSizeProp),
   Root: () => (Root),
   Seq: () => (Seq),
   SeqA: () => (SeqA),
@@ -83,7 +81,106 @@ __webpack_require__.d(dist_namespaceObject, {
   ViewPort: () => (ViewPort)
 });
 
+;// CONCATENATED MODULE: ./dist/model/bezier.js
+function cubic_bezier_y_of_x(p1, p2, p3, p4) {
+    // Return the bezier parameter size"""
+    // ((bx0, by0), (bx1, by1), (bx2, by2), (bx3, by3)) = bez
+    // # parametric bezier
+    const { abs } = Math;
+    const [x0, y0] = p1;
+    const [bx1, by1] = p2;
+    const [bx2, by2] = p3;
+    const [bx3, by3] = p4;
+    const cx = 3 * (bx1 - x0);
+    const bx = 3 * (bx2 - bx1) - cx;
+    const ax = bx3 - x0 - cx - bx;
+    const cy = 3 * (by1 - y0);
+    const by = 3 * (by2 - by1) - cy;
+    const ay = by3 - y0 - cy - by;
+    function sampleCurveX(t) {
+        return ((ax * t + bx) * t + cx) * t;
+    }
+    function sampleCurveY(t) {
+        return ((ay * t + by) * t + cy) * t;
+    }
+    function sampleCurveDerivativeX(t) {
+        return (3.0 * ax * t + 2.0 * bx) * t + cx;
+    }
+    function solveCurveX(x) {
+        let t0;
+        let t1;
+        let t2;
+        let x2;
+        let d2;
+        let i;
+        const epsilon = 1e-5; // Precision
+        // First try a few iterations of Newton's method -- normally very fast.
+        for (t2 = x, i = 0; i < 32; i += 1) {
+            x2 = sampleCurveX(t2) - x;
+            if (abs(x2) < epsilon)
+                return t2;
+            d2 = sampleCurveDerivativeX(t2);
+            if (abs(d2) < epsilon)
+                break;
+            t2 -= x2 / d2;
+        }
+        // No solution found - use bi-section
+        t0 = 0.0;
+        t1 = 1.0;
+        t2 = x;
+        if (t2 < t0)
+            return t0;
+        if (t2 > t1)
+            return t1;
+        while (t0 < t1) {
+            x2 = sampleCurveX(t2);
+            if (abs(x2 - x) < epsilon)
+                return t2;
+            if (x > x2)
+                t0 = t2;
+            else
+                t1 = t2;
+            t2 = (t1 - t0) * 0.5 + t0;
+        }
+        // Give up
+        return t2;
+    }
+    return function cubicBezierYOfX(t) {
+        return sampleCurveY(solveCurveX(t));
+    };
+}
+//# sourceMappingURL=bezier.js.map
 ;// CONCATENATED MODULE: ./dist/model/keyframes.js
+
+function ratio_at(a, t) {
+    const [ox, oy, ix, iy] = a;
+    return cubic_bezier_y_of_x([0, 0], [ox, oy], [ix, iy], [1, 1])(t);
+}
+function kfe_from_json(x, value) {
+    const { t: time, h, o, i } = x;
+    if (h) {
+        return { time, easing: true, value };
+    }
+    else if (o && i) {
+        const [ox, oy] = o;
+        const [ix, iy] = o;
+        return { time, easing: [ox, oy, ix, iy], value };
+    }
+    return { time, value };
+}
+function kfe_to_json(kfe, value) {
+    const { time: t, easing } = kfe;
+    if (!easing) {
+        return { t, k: value };
+    }
+    else if (easing === true) {
+        return { t, h: true, k: value };
+    }
+    else {
+        const [ox, oy, ix, iy] = easing;
+        return { t, o: [ox, oy], i: [ix, iy], k: value };
+    }
+}
 class KeyframeEntry {
     time = 0;
     value;
@@ -117,6 +214,12 @@ class Animatable {
         throw Error(`Not implemented`);
         // return a + b;
     }
+    value_to_json(a) {
+        throw Error(`Not implemented`);
+    }
+    value_from_json(a) {
+        throw Error(`Not implemented`);
+    }
     get_value(frame) {
         const { value } = this;
         if (value instanceof Keyframes) {
@@ -135,7 +238,7 @@ class Animatable {
                             return k.value;
                         }
                         else if (p.easing && p.easing !== true) {
-                            r = p.easing.ratio_at(r);
+                            r = ratio_at(p.easing, r);
                         }
                         return this.lerp_value(r, p.value, k.value);
                     }
@@ -195,7 +298,21 @@ class Animatable {
         return x;
     }
     constructor(v) {
-        this.value = v;
+        if (v == null) {
+            throw new Error(`unexpected value=${v}`);
+        }
+        else {
+            this.value = v;
+        }
+    }
+    to_json() {
+        const { value } = this;
+        if (value instanceof Keyframes) {
+            return { k: value.map((v) => kfe_to_json(v, this.value_to_json(v.value))) };
+        }
+        else {
+            return { v: value };
+        }
     }
 }
 class AnimatableD extends Animatable {
@@ -296,8 +413,14 @@ class NVectorValue extends Animatable {
             return new NVector(x);
         }
     }
+    value_to_json(a) {
+        return [...a];
+    }
+    value_from_json(a) {
+        return new NVector(a);
+    }
     constructor(v) {
-        super(NVector.from(v));
+        super(v);
     }
 }
 // def Point(x, y):
@@ -456,6 +579,28 @@ class Matrix {
                     : `scale(${scaleX}${scaleX == scaleY ? '' : ' ' + scaleY})`}`;
             },
         };
+    }
+    // https://github.com/svg/svgo/blob/8d6385bd9ab49d1d300a10268930238baa5eb269/plugins/_transforms.js#L461
+    take_apart() {
+        const { a, b, c, d, e, f } = this;
+        let rotation, scale, skew, r, skew_axis;
+        const delta = a * d - b * c;
+        if (a !== 0 || b !== 0) {
+            r = Math.hypot(a, b);
+            // rotation = ((b < 0 ? -1 : 1) * Math.acos(a / r)) * 180 / Math.PI;
+            rotation = ((b > 0 ? 1 : -1) * Math.acos(a / r)) * 180 / Math.PI;
+            scale = [r, delta / r];
+            skew_axis = 0;
+        }
+        else {
+            r = Math.hypot(c, d);
+            // rotation = 90 + ((d < 0 ? -1 : 1) * Math.acos(c / r) * 180 / Math.PI);
+            rotation = 90 - ((d > 0 ? Math.acos(-c / r) : -Math.acos(c / r)) * 180 / Math.PI);
+            scale = [delta / r, r];
+            skew_axis = 90;
+        }
+        skew = Math.atan2((a * c + b * d), r * r) * 180 / Math.PI;
+        return { rotation, scale, skew, skew_axis, translation: [e, f] };
     }
     toArray() {
         const { a, b, c, d, e, f } = this;
@@ -636,8 +781,8 @@ class Matrix {
     static skewY(y) {
         return this.skew(0, y);
     }
-    static rotate(ang, x = 0, y = 0) {
-        const θ = ((ang % 360) * PI) / 180;
+    static rotate(deg, x = 0, y = 0) {
+        const θ = ((deg % 360) * PI) / 180;
         const cosθ = cos(θ);
         const sinθ = sin(θ);
         return this.matrix(cosθ, sinθ, -sinθ, cosθ, x ? -cosθ * x + sinθ * y + x : 0, y ? -sinθ * x - cosθ * y + y : 0);
@@ -723,30 +868,22 @@ class Box extends ValueSet {
     constructor(position, size) {
         super();
         if (size) {
-            this.size = new PositionValue(size);
+            this.size = new PositionValue(new NVector(size));
         }
         if (position) {
-            this.position = new PositionValue(position);
+            this.position = new PositionValue(new NVector(position));
         }
     }
-    // update_prop(frame: number, node: SVGSVGElement) {
-    //     const size = this.size.get_value(frame);
-    //     const pos = this.position.get_value(frame);
-    //     node.x.baseVal.value = pos[0];
-    //     node.y.baseVal.value = pos[1];
-    //     node.width.baseVal.value = size[0];
-    //     node.height.baseVal.value = size[1];
-    // }
     /// size
     get size() {
-        return this._getx("size", new PositionValue([100, 100]));
+        return this._getx("size", new PositionValue(new NVector([100, 100])));
     }
     set size(v) {
         this._setx("size", v);
     }
     /// position
     get position() {
-        return this._getx("position", new PositionValue([100, 100]));
+        return this._getx("position", new PositionValue(new NVector([0, 0])));
     }
     set position(v) {
         this._setx("position", v);
@@ -771,7 +908,7 @@ class Fill extends ValueSet {
     }
     /// opacity
     get color() {
-        return this._getx("color", new RGBValue([0, 0, 0]));
+        return this._getx("color", new RGBValue(new NVector([0, 0, 0])));
     }
     set color(v) {
         this._setx("color", v);
@@ -780,51 +917,109 @@ class Fill extends ValueSet {
 class Transform extends ValueSet {
     get_matrix(frame) {
         let m = Matrix.identity();
-        const { anchor, scale, skew, rotation } = this;
+        const { anchor, scale, skew, rotation, position } = this;
+        console.log("get_matrix before position", m);
+        if (position) {
+            const [x, y] = position.get_value(frame);
+            // console.log(" position", x, y, Matrix.translate(x, y));
+            if (x || y) {
+                m = m.cat(Matrix.translate(x, y));
+            }
+        }
+        console.log("get_matrix after position", m);
         if (anchor) {
-            const a = anchor.get_value(frame);
-            m.multiply(Matrix.translate(-a[0], -a[1]));
+            const [x, y] = anchor.get_value(frame);
+            if (x || y) {
+                m = m.cat(Matrix.translate(-x, -y));
+            }
         }
         if (scale) {
-            const a = scale.get_value(frame);
-            m.multiply(Matrix.scale(-a[0], -a[1]));
+            const [x, y] = scale.get_value(frame);
+            if (!(x === 1 && y === 1)) {
+                m = m.cat(Matrix.scale(x, y));
+            }
+        }
+        console.log("get_matrix before rotation", m);
+        if (rotation) {
+            let s = rotation.get_value(frame);
+            if (s) {
+                m = m.rotate(-s);
+            }
+            console.log("get_matrix after rotation", m, s, Matrix.rotate(-s));
         }
         if (skew) {
             let s = skew.get_value(frame);
             if (s) {
-                s = -s * Math.PI / 180.0;
                 const { skew_axis } = this;
-                const a = skew_axis.get_value(frame) * Math.PI / 180.0;
+                const a = skew_axis.get_value(frame);
                 m = m.multiply(Matrix.rotate(-a));
-                m = m.multiply(Matrix.skewX(s));
+                m = m.multiply(Matrix.skewX(-s));
                 m = m.multiply(Matrix.rotate(a));
             }
         }
-        if (rotation) {
-            let s = rotation.get_value(frame);
-            if (s) {
-                m = m.cat(Matrix.rotate(-s));
-            }
-        }
+        console.log("get_matrix", m);
         return m;
+    }
+    parse(s) {
+        const { rotation, scale, skew, skew_axis, translation } = Matrix.parse(s).take_apart();
+        if (translation[0] !== 0 || translation[1] !== 0) {
+            this.position = new PositionValue(new NVector([-translation[0], -translation[1]]));
+        }
+        if (scale[0] !== 1 || scale[1] !== 1) {
+            this.scale = new PositionValue(new NVector(scale));
+        }
+        if (rotation !== 0) {
+            this.rotation.value = -rotation;
+        }
+        if (skew !== 0) {
+            this.skew_axis.value = skew_axis;
+            this.skew.value = -skew;
+        }
+        // if (rotate) {
+        //     this.rotation.value = rotate;
+        // }
+        // if (skewX) {
+        //     this.skew.value = skewX;
+        // }
+        // dest_trans.position.value -= dest_trans.anchor_point.value
+        // dest_trans.anchor_point.value = NVector(0, 0)
+        // trans = matrix.extract_transform()
+        // dest_trans.skew_axis.value = math.degrees(trans["skew_axis"])
+        // dest_trans.skew.value = -math.degrees(trans["skew_angle"])
+        // dest_trans.position.value += trans["translation"]
+        // dest_trans.rotation.value -= math.degrees(trans["angle"])
+        // dest_trans.scale.value *= trans["scale"]
+        // const { translateX, translateY, scaleX, scaleY, rotate, skewX } = Matrix.parse(s).decompose();
+        // if (translateX || translateY) {
+        //     this.position = new PositionValue([translateX, translateY]);
+        // }
+        // if (scaleX || scaleY) {
+        //     this.scale = new PositionValue([scaleX, scaleY]);
+        // }
+        // if (rotate) {
+        //     this.rotation.value = rotate;
+        // }
+        // if (skewX) {
+        //     this.skew.value = skewX;
+        // }
     }
     /// anchor
     get anchor() {
-        return this._getx("anchor", new PositionValue([0, 0]));
+        return this._getx("anchor", new PositionValue(new NVector([0, 0])));
     }
     set anchor(v) {
         this._setx("anchor", v);
     }
     /// position
     get position() {
-        return this._getx("position", new PositionValue([0, 0]));
+        return this._getx("position", new PositionValue(new NVector([0, 0])));
     }
     set position(v) {
         this._setx("position", v);
     }
     /// scale
     get scale() {
-        return this._getx("scale", new NVectorValue([0, 0]));
+        return this._getx("scale", new NVectorValue(new NVector([1, 1])));
     }
     set scale(v) {
         this._setx("scale", v);
@@ -850,10 +1045,11 @@ class Transform extends ValueSet {
     set skew_axis(v) {
         this._setx("skew_axis", v);
     }
-}
-class OpacityProp extends NumberValue {
-}
-class RectSizeProp extends NVectorValue {
+    ///
+    to_json() {
+    }
+    from_json(x) {
+    }
 }
 //# sourceMappingURL=properties.js.map
 ;// CONCATENATED MODULE: ./dist/model/update_dom.js
@@ -872,24 +1068,6 @@ const UPDATE = {
         let x = prop.get_value(frame);
         node.x.baseVal.value = x[0];
         node.y.baseVal.value = x[1];
-    },
-    transform: function (frame, node, prop) {
-        const m = prop.get_matrix(frame);
-        node.setAttribute("transform", m.toString());
-    },
-    fill: function (frame, node, prop) {
-        for (let [n, v] of Object.entries(prop)) {
-            if (v) {
-                switch (n) {
-                    case "opacity":
-                        node.style.fillOpacity = v.get_value(frame) + '';
-                        break;
-                    case "color":
-                        node.style.fill = RGBValue.to_css_rgb(v.get_value(frame));
-                        break;
-                }
-            }
-        }
     },
     x: function (frame, node, prop) {
         node.x.baseVal.value = prop.get_value(frame);
@@ -936,7 +1114,40 @@ const UPDATE = {
         const s = prop.get_value(frame);
         node.setAttribute("preserveAspectRatio", s);
     },
+    transform: function (frame, node, prop) {
+        const m = prop.get_matrix(frame);
+        node.setAttribute("transform", m.toString());
+    },
+    fill: function (frame, node, prop) {
+        for (let [n, v] of Object.entries(prop)) {
+            if (v) {
+                switch (n) {
+                    case "opacity":
+                        node.style.fillOpacity = v.get_value(frame) + '';
+                        break;
+                    case "color":
+                        node.style.fill = RGBValue.to_css_rgb(v.get_value(frame));
+                        break;
+                }
+            }
+        }
+    },
 };
+// export const FROM_JSON: {
+//     [key: string]: any;
+// } = {
+//     opacity: function (node: Item|Container, prop: NumberValue, x:any) {
+//         const { k } = x;
+//         if (k == null) {
+//             return new NumberValue((x.v));
+//         } else {
+//             return new NumberValue(k.map((v) =>
+//                 kfe_from_json(v, this.value_from_json(v.v)
+//                 )
+//             ));
+//         }
+//     },
+// };
 //# sourceMappingURL=update_dom.js.map
 ;// CONCATENATED MODULE: ./dist/model/linked.js
 class Node {
@@ -1036,6 +1247,8 @@ class Node {
     }
 }
 class Parent extends Node {
+    // class End2{
+    // };
     //// Tree
     _tail;
     constructor() {
@@ -1141,6 +1354,7 @@ class End extends Node {
 
 function SVGProps(Base) {
     return class SVGProps extends Base {
+        static tag = '';
         get prop5() {
             return this._getx("prop5", new NumberValue(45));
         }
@@ -1198,6 +1412,10 @@ function SVGProps(Base) {
 class Item extends SVGProps(Node) {
     id;
     _node;
+    as_svg(doc) {
+        const e = (this._node = doc.createElementNS(NS_SVG, this.constructor.tag));
+        return set_svg(e, this);
+    }
     update_self(frame, node) {
         update(frame, this, node);
     }
@@ -1224,7 +1442,11 @@ class Container extends SVGProps(Parent) {
     id;
     _node;
     as_svg(doc) {
-        throw new Error(`Not implemented`);
+        const con = (this._node = doc.createElementNS(NS_SVG, this.constructor.tag));
+        for (const sub of this.children()) {
+            con.appendChild(sub.as_svg(doc));
+        }
+        return set_svg(con, this);
     }
     update_self(frame, node) {
         update(frame, this, node);
@@ -1296,6 +1518,8 @@ class Container extends SVGProps(Parent) {
         this.append_child(x);
         return x;
     }
+    to_json() {
+    }
 }
 function update(frame, target, el) {
     for (let [n, v] of Object.entries(target)) {
@@ -1303,23 +1527,11 @@ function update(frame, target, el) {
     }
 }
 class Group extends Container {
-    as_svg(doc) {
-        const con = (this._node = doc.createElementNS(NS_SVG, "g"));
-        for (const sub of this.children()) {
-            con.appendChild(sub.as_svg(doc));
-        }
-        return set_svg(con, this);
-    }
+    static tag = 'g';
 }
-// Container.prototype
 class ViewPort extends Container {
-    as_svg(doc) {
-        const con = (this._node = doc.createElementNS(NS_SVG, "svg"));
-        for (const sub of this.children()) {
-            con.appendChild(sub.as_svg(doc));
-        }
-        return set_svg(con, this);
-    }
+    static tag = 'svg';
+    ///
     get view_box() {
         return this._getx("view_box", new Box([0, 0], [100, 100]));
     }
@@ -1357,13 +1569,8 @@ class ViewPort extends Container {
 }
 const NS_SVG = "http://www.w3.org/2000/svg";
 class Path extends Shape {
-    as_svg(doc) {
-        const e = (this._node = doc.createElementNS(NS_SVG, "path"));
-        // e.setAttribute("d", this.d.get_value);
-        // e.width.baseVal.value = this.size
-        // e.addEventListener
-        return set_svg(e, this);
-    }
+    static tag = 'path';
+    ///
     get d() {
         return this._getx("d", new TextValue(""));
     }
@@ -1372,13 +1579,7 @@ class Path extends Shape {
     }
 }
 class Rect extends Shape {
-    size = new RectSizeProp([100, 100]);
-    as_svg(doc) {
-        const e = (this._node = doc.createElementNS(NS_SVG, "rect"));
-        // e.width.baseVal.value = this.size
-        // e.addEventListener
-        return set_svg(e, this);
-    }
+    static tag = 'rect';
     ///
     get width() {
         return this._getx("width", new NumberValue(100));
@@ -1420,6 +1621,13 @@ class Rect extends Shape {
     }
     set ry(v) {
         this._setx("ry", v);
+    }
+    ///
+    get size() {
+        return this._getx("size", new PositionValue(new NVector([100, 100])));
+    }
+    set size(v) {
+        this._setx("size", v);
     }
 }
 // export class Ellipse extends Shape {
@@ -1882,7 +2090,8 @@ function resolve_bounce(steps) {
             const e = { ...vars, t: t_max + (t_max - t) };
             if (ease != undefined) {
                 if (ease && ease !== true) {
-                    e.ease = ease.reversed();
+                    const [ox, oy, ix, iy] = ease;
+                    e.ease = [1 - ix, 1 - iy, 1 - ox, 1 - oy];
                 }
                 else {
                     e.ease = ease;

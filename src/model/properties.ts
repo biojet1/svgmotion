@@ -1,5 +1,4 @@
-import { viewbox_transform } from "domspec/dist/svg/attr-transform.js";
-import { Animatable, NVectorValue, NumberValue, PositionValue, RGBValue } from "./keyframes.js";
+import { Animatable, NVector, NVectorValue, NumberValue, PositionValue, RGBValue } from "./keyframes.js";
 import { Matrix } from "./matrix.js";
 
 export class ValueSet {
@@ -42,30 +41,23 @@ export class Box extends ValueSet {
     constructor(position: Iterable<number>, size: Iterable<number>) {
         super();
         if (size) {
-            this.size = new PositionValue(size);
+            this.size = new PositionValue(new NVector(size));
         }
         if (position) {
-            this.position = new PositionValue(position);
+            this.position = new PositionValue(new NVector(position));
         }
     }
-    // update_prop(frame: number, node: SVGSVGElement) {
-    //     const size = this.size.get_value(frame);
-    //     const pos = this.position.get_value(frame);
-    //     node.x.baseVal.value = pos[0];
-    //     node.y.baseVal.value = pos[1];
-    //     node.width.baseVal.value = size[0];
-    //     node.height.baseVal.value = size[1];
-    // }
+
     /// size
     get size() {
-        return this._getx("size", new PositionValue([100, 100]));
+        return this._getx("size", new PositionValue(new NVector([100, 100])));
     }
     set size(v: PositionValue) {
         this._setx("size", v);
     }
     /// position
     get position() {
-        return this._getx("position", new PositionValue([100, 100]));
+        return this._getx("position", new PositionValue(new NVector([0, 0])));
     }
     set position(v: PositionValue) {
         this._setx("position", v);
@@ -92,7 +84,7 @@ export class Fill extends ValueSet {
     }
     /// opacity
     get color() {
-        return this._getx("color", new RGBValue([0, 0, 0]));
+        return this._getx("color", new RGBValue(new NVector([0, 0, 0])));
     }
     set color(v: RGBValue) {
         this._setx("color", v);
@@ -107,28 +99,37 @@ export class Transform extends ValueSet {
         let m = Matrix.identity();
         const { anchor, scale, skew, rotation, position } = this;
 
-        console.log("before position", m);
+        console.log("get_matrix before position", m);
         if (position) {
             const [x, y] = position.get_value(frame);
-            console.log(" position", x, y, Matrix.translate(x, y));
-            m = m.cat(Matrix.translate(x, y));
+            // console.log(" position", x, y, Matrix.translate(x, y));
+            if (x || y) {
+                m = m.cat(Matrix.translate(x, y));
+            }
         }
-        console.log("after position", m);
+        console.log("get_matrix after position", m);
 
         if (anchor) {
             const [x, y] = anchor.get_value(frame);
-            m = m.cat(Matrix.translate(-x, -y));
+            if (x || y) {
+                m = m.cat(Matrix.translate(-x, -y));
+            }
         }
         if (scale) {
             const [x, y] = scale.get_value(frame);
-            m = m.cat(Matrix.scale(x, y));
+            if (!(x === 1 && y === 1)) {
+                m = m.cat(Matrix.scale(x, y));
+            }
         }
+        console.log("get_matrix before rotation", m);
         if (rotation) {
             let s = rotation.get_value(frame);
             if (s) {
-                m = m.cat(Matrix.rotate(-s));
+                m = m.rotate(-s);
             }
+            console.log("get_matrix after rotation", m, s, Matrix.rotate(-s));
         }
+
         if (skew) {
             let s = skew.get_value(frame);
             if (s) {
@@ -139,17 +140,17 @@ export class Transform extends ValueSet {
                 m = m.multiply(Matrix.rotate(a));
             }
         }
-
+        console.log("get_matrix", m);
         return m;
     }
     parse(s: string) {
         const { rotation, scale, skew, skew_axis, translation } = Matrix.parse(s).take_apart();
 
         if (translation[0] !== 0 || translation[1] !== 0) {
-            this.position = new PositionValue([-translation[0], -translation[1]]);
+            this.position = new PositionValue(new NVector([-translation[0], -translation[1]]));
         }
         if (scale[0] !== 1 || scale[1] !== 1) {
-            this.scale = new PositionValue(scale);
+            this.scale = new PositionValue(new NVector(scale));
         }
         if (rotation !== 0) {
             this.rotation.value = -rotation;
@@ -193,21 +194,21 @@ export class Transform extends ValueSet {
     }
     /// anchor
     get anchor() {
-        return this._getx("anchor", new PositionValue([0, 0]));
+        return this._getx("anchor", new PositionValue(new NVector([0, 0])));
     }
     set anchor(v: PositionValue) {
         this._setx("anchor", v);
     }
     /// position
     get position() {
-        return this._getx("position", new PositionValue([0, 0]));
+        return this._getx("position", new PositionValue(new NVector([0, 0])));
     }
     set position(v: PositionValue) {
         this._setx("position", v);
     }
     /// scale
     get scale() {
-        return this._getx("scale", new NVectorValue([0, 0]));
+        return this._getx("scale", new NVectorValue(new NVector([1, 1])));
     }
     set scale(v: NVectorValue) {
         this._setx("scale", v);
@@ -233,6 +234,7 @@ export class Transform extends ValueSet {
     set skew_axis(v: NumberValue) {
         this._setx("skew_axis", v);
     }
+    ///
     to_json() {
 
     }
@@ -243,21 +245,5 @@ export class Transform extends ValueSet {
 
 }
 
-
-
-export class OpacityProp extends NumberValue {
-    // update_prop(frame: number, node: SVGElement) {
-    //     const v = this.get_value(frame);
-    //     node.style.opacity = v + '';
-    // }
-}
-
-export class RectSizeProp extends NVectorValue {
-    // update_prop(frame: number, node: SVGRectElement) {
-    //     let x = this.get_value(frame);
-    //     node.width.baseVal.value = x[0];
-    //     node.height.baseVal.value = x[1];
-    // }
-}
 
 

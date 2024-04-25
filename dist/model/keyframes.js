@@ -1,12 +1,37 @@
+import { cubic_bezier_y_of_x } from "./bezier.js";
+function ratio_at(a, t) {
+    const [ox, oy, ix, iy] = a;
+    return cubic_bezier_y_of_x([0, 0], [ox, oy], [ix, iy], [1, 1])(t);
+}
+function kfe_from_json(x, value) {
+    const { t: time, h, o, i } = x;
+    if (h) {
+        return { time, easing: true, value };
+    }
+    else if (o && i) {
+        const [ox, oy] = o;
+        const [ix, iy] = o;
+        return { time, easing: [ox, oy, ix, iy], value };
+    }
+    return { time, value };
+}
+function kfe_to_json(kfe, value) {
+    const { time: t, easing } = kfe;
+    if (!easing) {
+        return { t, k: value };
+    }
+    else if (easing === true) {
+        return { t, h: true, k: value };
+    }
+    else {
+        const [ox, oy, ix, iy] = easing;
+        return { t, o: [ox, oy], i: [ix, iy], k: value };
+    }
+}
 export class KeyframeEntry {
     time = 0;
     value;
     easing;
-    to_json() {
-        // const { value } = this;
-        // t, i, o
-        return {};
-    }
 }
 export class Keyframes extends Array {
     set_value(time, value) {
@@ -60,7 +85,7 @@ export class Animatable {
                             return k.value;
                         }
                         else if (p.easing && p.easing !== true) {
-                            r = p.easing.ratio_at(r);
+                            r = ratio_at(p.easing, r);
                         }
                         return this.lerp_value(r, p.value, k.value);
                     }
@@ -120,16 +145,20 @@ export class Animatable {
         return x;
     }
     constructor(v) {
-        this.value = v;
+        if (v == null) {
+            throw new Error(`unexpected value=${v}`);
+        }
+        else {
+            this.value = v;
+        }
     }
     to_json() {
         const { value } = this;
         if (value instanceof Keyframes) {
-            value.map((v) => this.value_to_json(v.value));
-            return { value: value };
+            return { k: value.map((v) => kfe_to_json(v, this.value_to_json(v.value))) };
         }
         else {
-            return { value: value };
+            return { v: value };
         }
     }
 }
@@ -231,8 +260,14 @@ export class NVectorValue extends Animatable {
             return new NVector(x);
         }
     }
+    value_to_json(a) {
+        return [...a];
+    }
+    value_from_json(a) {
+        return new NVector(a);
+    }
     constructor(v) {
-        super(NVector.from(v));
+        super(v);
     }
 }
 // def Point(x, y):

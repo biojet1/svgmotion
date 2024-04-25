@@ -67,11 +67,14 @@ test.test("NVectorValue", (t) => {
         t.equal(u[3], 6);
         t.equal(u[4], undefined);
     }
-
+    t.match(v.to_json(), { v: [3, 4, 5, 6] });
+    // t.match(NVectorValue.from_json({ v: [3, 4, 5, 6] }), { v: [3, 4, 5, 6] });
     v.set_value(0, new NVector([3, 4]));
     v.set_value(60, new NVector([4, 5]));
-    // console.log(v, v.value);
+    // console.log(new NVectorValue().value);
     t.throws(() => new NVectorValue());
+
+
     t.end();
 
 });
@@ -104,6 +107,7 @@ test.test("Step", (t) => {
     r.position = new NVectorValue([10, 30]);
     t.equal(r.position.value[0], 10);
     t.equal(r.position.value[1], 30);
+    t.equal(vp.constructor.tag, 'svg');
 
 
     {

@@ -14,24 +14,6 @@ export const UPDATE = {
         node.x.baseVal.value = x[0];
         node.y.baseVal.value = x[1];
     },
-    transform: function (frame, node, prop) {
-        const m = prop.get_matrix(frame);
-        node.setAttribute("transform", m.toString());
-    },
-    fill: function (frame, node, prop) {
-        for (let [n, v] of Object.entries(prop)) {
-            if (v) {
-                switch (n) {
-                    case "opacity":
-                        node.style.fillOpacity = v.get_value(frame) + '';
-                        break;
-                    case "color":
-                        node.style.fill = RGBValue.to_css_rgb(v.get_value(frame));
-                        break;
-                }
-            }
-        }
-    },
     x: function (frame, node, prop) {
         node.x.baseVal.value = prop.get_value(frame);
     },
@@ -77,5 +59,38 @@ export const UPDATE = {
         const s = prop.get_value(frame);
         node.setAttribute("preserveAspectRatio", s);
     },
+    transform: function (frame, node, prop) {
+        const m = prop.get_matrix(frame);
+        node.setAttribute("transform", m.toString());
+    },
+    fill: function (frame, node, prop) {
+        for (let [n, v] of Object.entries(prop)) {
+            if (v) {
+                switch (n) {
+                    case "opacity":
+                        node.style.fillOpacity = v.get_value(frame) + '';
+                        break;
+                    case "color":
+                        node.style.fill = RGBValue.to_css_rgb(v.get_value(frame));
+                        break;
+                }
+            }
+        }
+    },
 };
+// export const FROM_JSON: {
+//     [key: string]: any;
+// } = {
+//     opacity: function (node: Item|Container, prop: NumberValue, x:any) {
+//         const { k } = x;
+//         if (k == null) {
+//             return new NumberValue((x.v));
+//         } else {
+//             return new NumberValue(k.map((v) =>
+//                 kfe_from_json(v, this.value_from_json(v.v)
+//                 )
+//             ));
+//         }
+//     },
+// };
 //# sourceMappingURL=update_dom.js.map

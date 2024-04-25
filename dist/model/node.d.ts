@@ -1,5 +1,5 @@
-import { Animatable, Keyframes, NumberValue, TextValue } from "./keyframes.js";
-import { Box, Fill, RectSizeProp, Transform } from "./properties.js";
+import { Animatable, Keyframes, NumberValue, PositionValue, TextValue } from "./keyframes.js";
+import { Box, Fill, Transform } from "./properties.js";
 import { Node, Parent } from "./linked.js";
 interface INode {
     id?: string;
@@ -14,11 +14,12 @@ declare const Item_base: {
         _getx<T>(name: string, value: T): T;
         _setx<T_1>(name: string, value: T_1): void;
     };
+    tag: string;
 } & typeof Node;
 export declare abstract class Item extends Item_base implements INode {
     id?: string;
     _node?: SVGElement;
-    abstract as_svg(doc: Document): SVGElement;
+    as_svg(doc: Document): SVGElement;
     update_self(frame: number, node: SVGElement): void;
     update_node(frame: number): void;
     enum_values(): Generator<Animatable<any>, void, unknown>;
@@ -34,6 +35,7 @@ declare const Container_base: {
         _getx<T>(name: string, value: T): T;
         _setx<T_1>(name: string, value: T_1): void;
     };
+    tag: string;
 } & typeof Parent;
 export declare class Container extends Container_base implements INode {
     id?: string;
@@ -48,12 +50,13 @@ export declare class Container extends Container_base implements INode {
     add_view(): ViewPort;
     add_group(): Group;
     add_path(): Path;
+    to_json(): void;
 }
 export declare class Group extends Container {
-    as_svg(doc: Document): SVGElement;
+    static tag: string;
 }
 export declare class ViewPort extends Container {
-    as_svg(doc: Document): SVGElement;
+    static tag: string;
     get view_box(): Box;
     set view_box(v: Box);
     get width(): NumberValue;
@@ -66,13 +69,12 @@ export declare class ViewPort extends Container {
     set zoom_pan(v: TextValue);
 }
 export declare class Path extends Shape {
-    as_svg(doc: Document): SVGElement;
+    static tag: string;
     get d(): TextValue;
     set d(v: TextValue);
 }
 export declare class Rect extends Shape {
-    size: RectSizeProp;
-    as_svg(doc: Document): SVGElement;
+    static tag: string;
     get width(): NumberValue;
     set width(v: NumberValue);
     get height(): NumberValue;
@@ -85,6 +87,8 @@ export declare class Rect extends Shape {
     set rx(v: NumberValue);
     get ry(): NumberValue;
     set ry(v: NumberValue);
+    get size(): PositionValue;
+    set size(v: PositionValue);
 }
 export declare class Root extends ViewPort {
     defs: {

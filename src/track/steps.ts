@@ -1,15 +1,15 @@
-import { Action, IProperty, IParent, IEasing } from "./action.js";
+import { Action, IProperty, IParent } from "./action.js";
 
 export interface Entry {
     t: number; // offset in seconds
-    ease?: IEasing | boolean;
+    ease?: Iterable<number> | boolean;
     [key: string]: any;
 }
 
 export interface UserEntry {
     dur?: number;
     t?: number; // offset in seconds
-    ease?: IEasing | boolean;
+    ease?: Iterable<number> | boolean;
     [key: string]: any;
 }
 
@@ -20,7 +20,7 @@ export interface PropMap {
 interface KF {
     t: number;
     value: any;
-    ease?: IEasing | boolean;
+    ease?: Iterable<number> | boolean;
 }
 
 interface KFMap {
@@ -29,7 +29,7 @@ interface KFMap {
 
 interface Params {
     dur?: number;
-    easing?: IEasing | boolean;
+    easing?: Iterable<number> | boolean;
     bounce?: boolean;
     repeat?: number;
     max_dur?: number;
@@ -38,7 +38,7 @@ interface Params {
 export class StepA extends Action {
     _steps: Array<UserEntry>;
     _max_dur?: number;
-    _easing?: IEasing | boolean;
+    _easing?: Iterable<number> | boolean;
     _bounce?: boolean;
     _repeat?: number;
     _base_frame: number;
@@ -250,7 +250,8 @@ function resolve_bounce(steps: Array<Entry>): Array<Entry> {
             const e: Entry = { ...vars, t: t_max + (t_max - t) };
             if (ease != undefined) {
                 if (ease && ease !== true) {
-                    e.ease = ease.reversed()
+                    const [ox, oy, ix, iy] = ease;
+                    e.ease = [1 - ix, 1 - iy, 1 - ox, 1 - oy];
                 } else {
                     e.ease = ease;
                 }

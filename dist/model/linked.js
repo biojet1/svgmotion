@@ -95,6 +95,8 @@ export class Node {
     }
 }
 export class Parent extends Node {
+    // class End2{
+    // };
     //// Tree
     _tail;
     constructor() {

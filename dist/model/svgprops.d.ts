@@ -10,4 +10,5 @@ export declare function SVGProps<TBase extends Constructor>(Base: TBase): {
         _getx<T>(name: string, value: T): T;
         _setx<T_1>(name: string, value: T_1): void;
     };
+    tag: string;
 } & TBase;

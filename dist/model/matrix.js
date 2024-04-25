@@ -318,8 +318,8 @@ export class Matrix {
     static skewY(y) {
         return this.skew(0, y);
     }
-    static rotate(ang, x = 0, y = 0) {
-        const θ = ((ang % 360) * PI) / 180;
+    static rotate(deg, x = 0, y = 0) {
+        const θ = ((deg % 360) * PI) / 180;
         const cosθ = cos(θ);
         const sinθ = sin(θ);
         return this.matrix(cosθ, sinθ, -sinθ, cosθ, x ? -cosθ * x + sinθ * y + x : 0, y ? -sinθ * x - cosθ * y + y : 0);
