@@ -1,4 +1,4 @@
-import { NVectorValue, NumberValue, RGBValue, TextValue } from "./keyframes.js";
+import { Keyframes, NVectorValue, NumberValue, RGBValue, TextValue, kfe_from_json } from "./keyframes.js";
 import { Container, Item } from "./node.js";
 import { Transform, Fill, Box } from "./properties.js";
 
@@ -89,18 +89,20 @@ export const UPDATE: {
 };
 
 
-// export const FROM_JSON: {
-//     [key: string]: any;
-// } = {
-//     opacity: function (node: Item|Container, prop: NumberValue, x:any) {
-//         const { k } = x;
-//         if (k == null) {
-//             return new NumberValue((x.v));
-//         } else {
-//             return new NumberValue(k.map((v) =>
-//                 kfe_from_json(v, this.value_from_json(v.v)
-//                 )
-//             ));
-//         }
-//     },
-// };
+export const FROM_JSON: {
+    [key: string]: any;
+} = {
+    opacity: function (node: Item | Container, prop: NumberValue, x: { k: { t: number, v: number }[], v: number }) {
+        const { k } = x;
+        if (k == null) {
+            return new NumberValue(x.v);
+        } else {
+            const kfs = new Keyframes<number>();
+            kfs.push(...k.map((v) =>
+                kfe_from_json<number>(v, this.value_from_json(v.v)
+                )
+            ));
+            return new NumberValue(kfs);
+        }
+    },
+};

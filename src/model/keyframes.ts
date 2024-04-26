@@ -5,7 +5,10 @@ function ratio_at(a: Iterable<number>, t: number) {
     return cubic_bezier_y_of_x([0, 0], [ox, oy], [ix, iy], [1, 1])(t);
 }
 
-function kfe_from_json<V>(x: { t: number, h: boolean, o: Iterable<number>, i: Iterable<number> }, value: V): KeyframeEntry<V> {
+export function kfe_from_json<V>(
+    x: { t: number; h?: boolean; o?: Iterable<number>; i?: Iterable<number> },
+    value: V
+): KeyframeEntry<V> {
     const { t: time, h, o, i } = x;
     if (h) {
         return { time, easing: true, value };
@@ -19,22 +22,27 @@ function kfe_from_json<V>(x: { t: number, h: boolean, o: Iterable<number>, i: It
 function kfe_to_json<V>(kfe: KeyframeEntry<V>, value: any) {
     const { time: t, easing } = kfe;
     if (!easing) {
-        return { t, k: value };
+        return { t, v: value };
     } else if (easing === true) {
-        return { t, h: true, k: value };
+        return { t, h: true, v: value };
     } else {
         const [ox, oy, ix, iy] = easing;
-        return { t, o: [ox, oy], i: [ix, iy], k: value };
+        return { t, o: [ox, oy], i: [ix, iy], v: value };
     }
 }
-export class KeyframeEntry<V> {
-    time: number = 0;
-    value!: V;
+// export class KeyframeEntry<V> {
+//     time: number = 0;
+//     value!: V;
+//     easing?: Iterable<number> | boolean;
+// }
+export interface KeyframeEntry<V> {
+    time: number;
+    value: V;
     easing?: Iterable<number> | boolean;
 }
 
 export class Keyframes<V> extends Array<KeyframeEntry<V>> {
-    set_value(time: number, value: V) {
+    set_value(time: number, value: V): KeyframeEntry<V> {
         let last = this[this.length - 1];
         if (last) {
             if (last.time == time) {
@@ -44,10 +52,12 @@ export class Keyframes<V> extends Array<KeyframeEntry<V>> {
                 throw new Error(`keyframe is incremental`);
             }
         }
-        const kf = new KeyframeEntry<V>();
-        kf.time = time;
-        kf.value = value;
-        this.push(kf);
+        const kf = { time, value };
+        this.push({ time, value });
+        // const kf = new KeyframeEntry<V>();
+        // kf.time = time;
+        // kf.value = value;
+        // this.push(kf);
         return kf;
     }
 }
@@ -149,20 +159,21 @@ export class Animatable<V> {
     }
     constructor(v: Keyframes<V> | V) {
         if (v == null) {
-            throw new Error(
-                `unexpected value=${v}`
-            );
-
+            throw new Error(`unexpected value=${v}`);
         } else {
             this.value = v;
         }
     }
-    to_json() {
+    to_json(): { v: V } | { k: { t: number; h?: boolean; o?: Iterable<number>; i?: Iterable<number> }[] } {
         const { value } = this;
         if (value instanceof Keyframes) {
-            return { k: value.map((v) => kfe_to_json(v, this.value_to_json(v.value))) }
+            return {
+                k: value.map((v) =>
+                    kfe_to_json(v, this.value_to_json(v.value))
+                ),
+            };
         } else {
-            return { v: value }
+            return { v: value };
         }
     }
 
@@ -178,8 +189,6 @@ export class Animatable<V> {
     //     // }
     //     throw Error(`Not implemented`);
     // }
-
-
 }
 
 export class AnimatableD<V> extends Animatable<V> {
@@ -252,7 +261,9 @@ export class NumberValue extends Animatable<number> {
     add_value(a: number, b: number): number {
         return a + b;
     }
-
+    override value_to_json(v: number): any {
+        return v;
+    }
     constructor(v: number | Keyframes<number> = 0) {
         super(v);
     }
@@ -283,7 +294,7 @@ export class NVectorValue extends Animatable<NVector> {
     override add_value(a: NVector, b: NVector): NVector {
         return a.add(b);
     }
-    override  check_value(x: any): NVector {
+    override check_value(x: any): NVector {
         if (x instanceof NVector) {
             return x;
         } else {
@@ -294,7 +305,7 @@ export class NVectorValue extends Animatable<NVector> {
         return [...a];
     }
 
-    override  value_from_json(a: any): NVector {
+    override value_from_json(a: any): NVector {
         return new NVector(a);
     }
 
@@ -337,12 +348,14 @@ export class RGBValue extends NVectorValue {
     //     super([x, y]);
     // }
     static to_css_rgb([r, g, b]: Iterable<number>) {
-        return `rgb(${Math.round((r * 255) % 256)}, ${Math.round((g * 255) % 256)}, ${Math.round((b * 255) % 256)})`;
+        return `rgb(${Math.round((r * 255) % 256)}, ${Math.round(
+            (g * 255) % 256
+        )}, ${Math.round((b * 255) % 256)})`;
     }
 }
 
 export class TextValue extends AnimatableD<string> {
     add_value(a: string, b: string): string {
-        return a + '' + b;
+        return a + "" + b;
     }
 }

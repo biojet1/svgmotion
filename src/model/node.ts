@@ -28,7 +28,7 @@ export abstract class Item extends SVGProps(Node) implements INode {
     _node?: SVGElement;
 
     as_svg(doc: Document): SVGElement {
-        const e = (this._node = doc.createElementNS(NS_SVG, (<typeof Container>this.constructor).tag));
+        const e = (this._node = doc.createElementNS(NS_SVG, (<typeof Item>this.constructor).tag));
         return set_svg(e, this);
     }
 
@@ -51,7 +51,10 @@ export abstract class Item extends SVGProps(Node) implements INode {
             }
         }
     }
-
+    // to_json() {
+    //     const o = { tag: (<typeof Container>this.constructor).tag };
+    //     return o;
+    // }
 
 }
 
@@ -140,9 +143,19 @@ export class Container extends SVGProps(Parent) implements INode {
         this.append_child(x);
         return x;
     }
-    to_json() {
-
+    override to_json() {
+        let o = super.to_json();
+        o.nodes = [...this.children<Container | Item>()].map(v => v.to_json());
+        return o;
     }
+    // static {
+    //     // this.prototype._attax_propch = 2;
+    //     Object.defineProperty(this, "the_name", {
+    //         value: "the_value",
+    //         writable: true,
+    //         enumerable: true,
+    //     });
+    // }
 }
 
 function update(frame: number, target: Item | Container, el: SVGElement) {

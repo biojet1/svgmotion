@@ -1,5 +1,5 @@
-import { NumberValue } from "./keyframes.js";
-import { Fill, Transform } from "./properties.js";
+import { Animatable, NumberValue } from "./keyframes.js";
+import { Fill, Transform, ValueSet } from "./properties.js";
 
 export type Constructor = new (...args: any[]) => {};
 export function SVGProps<TBase extends Constructor>(Base: TBase) {
@@ -50,6 +50,19 @@ export function SVGProps<TBase extends Constructor>(Base: TBase) {
                 writable: true,
                 enumerable: true,
             });
+        }
+        ///
+        to_json() {
+            const o: any = { tag: (<typeof SVGProps>this.constructor).tag };
+            // o['entries'] = Object.entries(this);
+            for (let [k, v] of Object.entries(this)) {
+                if (v instanceof Animatable) {
+                    o[k] = v.to_json();
+                } else if (v instanceof ValueSet) {
+                    o[k] = v.to_json();
+                }
+            }
+            return o;
         }
     };
 }

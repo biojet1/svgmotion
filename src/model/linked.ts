@@ -1,5 +1,5 @@
 export class Node {
-    _next?: Node;
+    protected _next?: Node;
     _prev?: Node;
     _parent?: Parent;
     get _end(): Node {
@@ -43,7 +43,9 @@ export class Node {
             return root as T;
         }
     }
-
+    parent<T extends Parent = Parent>() {
+        return this._parent;
+    }
     _link_next(node?: Node) {
         // [THIS]<->node
         if (node === this) {

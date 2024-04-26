@@ -14,6 +14,7 @@ test.test("KeyframeEntry", (t) => {
     let tr = x.transform = new Transform();
     tr.rotation = new NumberValue(30);
     tr.rotation.set_value(30, 10);
+    console.info(tr.to_json());
     for (const v of x.enum_values()) {
 
         // console.log(v);

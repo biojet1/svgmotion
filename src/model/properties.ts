@@ -13,9 +13,25 @@ export class ValueSet {
             }
         }
     }
-    update_prop(frame: number, node: SVGElement) {
-        throw new Error(`Not implemented`);
+    to_json() {
+        let u: any = {};
+        for (let [k, v] of Object.entries(this)) {
+            if (v instanceof Animatable) {
+                u[k] = v.to_json();
+            }
+        }
+        return u;
     }
+    from_json(u: any) {
+        for (let [k, v] of Object.entries(u)) {
+            // this.constructor.props
+            // if (v instanceof Animatable) {
+            //     u[k] = v.to_json();
+            // }
+        }
+
+    }
+    ///
     _getx<T>(name: string, value: T): T {
         console.log(`_GETX ${name}`);
         Object.defineProperty(this, name, {
@@ -36,8 +52,6 @@ export class ValueSet {
 }
 
 export class Box extends ValueSet {
-    // size: PositionValue;
-    // position: PositionValue;
     constructor(position: Iterable<number>, size: Iterable<number>) {
         super();
         if (size) {
@@ -62,6 +76,8 @@ export class Box extends ValueSet {
     set position(v: PositionValue) {
         this._setx("position", v);
     }
+    ///  
+    // static position = {'p'}
 }
 
 export class Stroke extends ValueSet {
@@ -99,7 +115,7 @@ export class Transform extends ValueSet {
         let m = Matrix.identity();
         const { anchor, scale, skew, rotation, position } = this;
 
-        console.log("get_matrix before position", m);
+        // console.log("get_matrix before position", m);
         if (position) {
             const [x, y] = position.get_value(frame);
             // console.log(" position", x, y, Matrix.translate(x, y));
@@ -107,7 +123,7 @@ export class Transform extends ValueSet {
                 m = m.cat(Matrix.translate(x, y));
             }
         }
-        console.log("get_matrix after position", m);
+        // console.log("get_matrix after position", m);
 
         if (anchor) {
             const [x, y] = anchor.get_value(frame);
@@ -121,13 +137,13 @@ export class Transform extends ValueSet {
                 m = m.cat(Matrix.scale(x, y));
             }
         }
-        console.log("get_matrix before rotation", m);
+        // console.log("get_matrix before rotation", m);
         if (rotation) {
             let s = rotation.get_value(frame);
             if (s) {
                 m = m.rotate(-s);
             }
-            console.log("get_matrix after rotation", m, s, Matrix.rotate(-s));
+            // console.log("get_matrix after rotation", m, s, Matrix.rotate(-s));
         }
 
         if (skew) {
@@ -140,7 +156,7 @@ export class Transform extends ValueSet {
                 m = m.multiply(Matrix.rotate(a));
             }
         }
-        console.log("get_matrix", m);
+        // console.log("get_matrix", m);
         return m;
     }
     parse(s: string) {
@@ -235,9 +251,7 @@ export class Transform extends ValueSet {
         this._setx("skew_axis", v);
     }
     ///
-    to_json() {
 
-    }
     from_json(x: any) {
 
     }

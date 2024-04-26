@@ -2,21 +2,21 @@
 import test from "tap";
 
 import {
-    KeyframeEntry, Keyframes, NumberValue, TextValue,
+    Keyframes, NumberValue, TextValue,
     NVectorValue, Point, NVector, Fill,
     ViewPort, RGBValue, Size, Root
 } from "../dist/model/index.js";
 import {
     Step, Track
 } from "../dist/index.js";
-test.test("KeyframeEntry", (t) => {
-    let kfe = new KeyframeEntry();
+// test.test("KeyframeEntry", (t) => {
+//     let kfe = new KeyframeEntry();
 
-    // console.log(kfe);
+//     // console.log(kfe);
 
-    t.end();
+//     t.end();
 
-});
+// });
 
 test.test("Keyframes", (t) => {
     let kfs = new Keyframes();
@@ -92,7 +92,7 @@ test.test("ViewPort", (t) => {
     // v[0].fun();
     // r.opacity = 
 
-    // console.log(root.calc_time_range());
+    console.log(root.to_json());
 
     t.end();
 
