@@ -1,14 +1,24 @@
 import { cubic_bezier_y_of_x } from "./bezier.js";
+export interface KFBase {
+    t: number;
+    h?: boolean;
+    o?: Iterable<number>;
+    i?: Iterable<number>;
+}
+
+export interface KFEntry<V> extends KFBase {
+    v: V;
+}
+
+export type Value<V> = { k: KFEntry<V>[] } | { v: V };
+export type ValueP<V> = { k?: KFEntry<V>[], v?: V };
 
 function ratio_at(a: Iterable<number>, t: number) {
     const [ox, oy, ix, iy] = a;
     return cubic_bezier_y_of_x([0, 0], [ox, oy], [ix, iy], [1, 1])(t);
 }
 
-export function kfe_from_json<V>(
-    x: { t: number; h?: boolean; o?: Iterable<number>; i?: Iterable<number> },
-    value: V
-): KeyframeEntry<V> {
+export function kfe_from_json<V>(x: KFBase, value: V): KeyframeEntry<V> {
     const { t: time, h, o, i } = x;
     if (h) {
         return { time, easing: true, value };
@@ -19,7 +29,7 @@ export function kfe_from_json<V>(
     }
     return { time, value };
 }
-function kfe_to_json<V>(kfe: KeyframeEntry<V>, value: any) {
+function kfe_to_json<V>(kfe: KeyframeEntry<V>, value: any): KFEntry<V> {
     const { time: t, easing } = kfe;
     if (!easing) {
         return { t, v: value };
@@ -30,11 +40,7 @@ function kfe_to_json<V>(kfe: KeyframeEntry<V>, value: any) {
         return { t, o: [ox, oy], i: [ix, iy], v: value };
     }
 }
-// export class KeyframeEntry<V> {
-//     time: number = 0;
-//     value!: V;
-//     easing?: Iterable<number> | boolean;
-// }
+
 export interface KeyframeEntry<V> {
     time: number;
     value: V;
@@ -54,10 +60,6 @@ export class Keyframes<V> extends Array<KeyframeEntry<V>> {
         }
         const kf = { time, value };
         this.push({ time, value });
-        // const kf = new KeyframeEntry<V>();
-        // kf.time = time;
-        // kf.value = value;
-        // this.push(kf);
         return kf;
     }
 }
@@ -166,7 +168,7 @@ export class Animatable<V> {
             this.value = v;
         }
     }
-    to_json(): { v: V } | { k: { t: number; h?: boolean; o?: Iterable<number>; i?: Iterable<number> }[] } {
+    to_json(): Value<V> {
         const { value } = this;
         if (value instanceof Keyframes) {
             return {
@@ -179,13 +181,13 @@ export class Animatable<V> {
         }
     }
 
-    from_json(x: { k?: { t: number, h: boolean, o: Iterable<number>, i: Iterable<number>, v: any }[], v: any }) {
+    from_json(x: ValueP<any>) {
         const { k, v } = x;
         if (k) {
             const kfs = new Keyframes<V>();
-            kfs.push(...k.map((x) =>
-                kfe_from_json(x, this.value_from_json(x.v))
-            ));
+            kfs.push(
+                ...k.map((x) => kfe_from_json(x, this.value_from_json(x.v)))
+            );
             this.value = kfs;
         } else if (v) {
             this.value = this.value_from_json(x.v);
@@ -362,7 +364,7 @@ export class RGBValue extends NVectorValue {
 }
 
 export class TextValue extends AnimatableD<string> {
-    override   add_value(a: string, b: string): string {
+    override add_value(a: string, b: string): string {
         return a + "" + b;
     }
     override parse_value(s: string) {

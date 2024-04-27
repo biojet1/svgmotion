@@ -1,4 +1,4 @@
-import { Animatable, NumberValue } from "./keyframes.js";
+import { Animatable, NumberValue, Value } from "./keyframes.js";
 import { Fill, Transform, ValueSet } from "./properties.js";
 
 export type Constructor = new (...args: any[]) => {};
@@ -64,12 +64,16 @@ export function SVGProps<TBase extends Constructor>(Base: TBase) {
             }
             return o;
         }
-        //
-        // from_json(o: ChildNode | ParentNode) {
-
-
-
-        // }
+        props_from_json(props: { [key: string]: Value<any> }) {
+            for (let [k, v] of Object.entries(props)) {
+                const p = (this as any)[k];
+                if (p instanceof Animatable || p instanceof ValueSet) {
+                    p.from_json(v);
+                } else {
+                    throw new Error(`Unexpected property "${k}" (${v})`);
+                }
+            }
+        }
     };
 }
 

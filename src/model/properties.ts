@@ -1,4 +1,4 @@
-import { Animatable, NVector, NVectorValue, NumberValue, PositionValue, RGBValue } from "./keyframes.js";
+import { Animatable, NVector, NVectorValue, NumberValue, PositionValue, RGBValue, Value } from "./keyframes.js";
 import { Matrix } from "./matrix.js";
 
 export class ValueSet {
@@ -23,12 +23,8 @@ export class ValueSet {
         }
         return u;
     }
-    from_json(u: { k?: { t: number, h: boolean, o: Iterable<number>, i: Iterable<number>, v: any }[], v: any }) {
+    from_json(u: Value<any>) {
         for (let [k, v] of Object.entries(u)) {
-            // this.constructor.props
-            // if (v instanceof Animatable) {
-            //     u[k] = v.to_json();
-            // }
             const p = (this as any)[k];
             if (p instanceof Animatable) {
                 p.from_json(v);
@@ -36,7 +32,6 @@ export class ValueSet {
                 throw new Error(`Unexpected property "${k}" (${v})`);
             }
         }
-
     }
     ///
     _getx<T>(name: string, value: T): T {

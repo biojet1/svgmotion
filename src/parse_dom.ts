@@ -73,9 +73,8 @@ export const TAG_DOM: {
                     u.size.value = new NVector([v[2], v[3]]);
                 }
                     break;
-                case "preserveAspectRatio": {
-                    node.fit_view.value = value;
-                }
+                case "preserveAspectRatio":
+                    node.fit_view.parse_value(value);
                     break;
                 case "zoomAndPan":
                     node.zoom_pan.parse_value(value);
@@ -104,22 +103,22 @@ export const TAG_DOM: {
         for (const [name, value] of enum_attrs(e)) {
             switch (name) {
                 case "height":
-                    node.height.value = parseFloat(value);
+                    node.height.parse_value(value);
                     break;
                 case "width":
-                    node.width.value = parseFloat(value);
+                    node.width.parse_value(value);
                     break;
                 case "y":
-                    node.y.value = parseFloat(value);
+                    node.y.parse_value(value);
                     break;
                 case "x":
-                    node.x.value = parseFloat(value);
+                    node.x.parse_value(value);
                     break;
                 case "ry":
-                    node.ry.value = parseFloat(value);
+                    node.ry.parse_value(value);
                     break;
                 case "rx":
-                    node.rx.value = parseFloat(value);
+                    node.rx.parse_value(value);
                     break;
                 default:
                     set_common_attr(node, name, value, e);
