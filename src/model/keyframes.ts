@@ -69,12 +69,14 @@ export class Animatable<V> {
     }
     add_value(a: V, b: V): V {
         throw Error(`Not implemented`);
-        // return a + b;
     }
     value_to_json(a: V): any {
         throw Error(`Not implemented`);
     }
     value_from_json(a: any): V {
+        throw Error(`Not implemented`);
+    }
+    parse_value(a: string) {
         throw Error(`Not implemented`);
     }
 
@@ -173,22 +175,24 @@ export class Animatable<V> {
                 ),
             };
         } else {
-            return { v: value };
+            return { v: this.value_to_json(value) };
         }
     }
 
-    // static from_json<K extends Animatable<V>>(x: { k?: { t: number, h: boolean, o: Iterable<number>, i: Iterable<number>, v: any }[], v: any }): K {
-    //     // const { k } = x;
-    //     // if (k == null) {
-    //     //     return new this(this.value_from_json(x.v));
-    //     // } else {
-    //     //     return new this(k.map((v) =>
-    //     //         kfe_from_json(v, this.value_from_json(v.v)
-    //     //         )
-    //     //     ));
-    //     // }
-    //     throw Error(`Not implemented`);
-    // }
+    from_json(x: { k?: { t: number, h: boolean, o: Iterable<number>, i: Iterable<number>, v: any }[], v: any }) {
+        const { k, v } = x;
+        if (k) {
+            const kfs = new Keyframes<V>();
+            kfs.push(...k.map((x) =>
+                kfe_from_json(x, this.value_from_json(x.v))
+            ));
+            this.value = kfs;
+        } else if (v) {
+            this.value = this.value_from_json(x.v);
+        } else {
+            throw Error(`No k, v`);
+        }
+    }
 }
 
 export class AnimatableD<V> extends Animatable<V> {
@@ -255,14 +259,17 @@ export class AnimatableD<V> extends Animatable<V> {
 }
 
 export class NumberValue extends Animatable<number> {
-    lerp_value(r: number, a: number, b: number): number {
+    override lerp_value(r: number, a: number, b: number): number {
         return a * (1 - r) + b * r;
     }
-    add_value(a: number, b: number): number {
+    override add_value(a: number, b: number): number {
         return a + b;
     }
     override value_to_json(v: number): any {
         return v;
+    }
+    override parse_value(s: string) {
+        this.value = parseFloat(s);
     }
     constructor(v: number | Keyframes<number> = 0) {
         super(v);
@@ -302,7 +309,7 @@ export class NVectorValue extends Animatable<NVector> {
         }
     }
     override value_to_json(a: NVector): any {
-        return [...a];
+        return Array.from(a);
     }
 
     override value_from_json(a: any): NVector {
@@ -355,7 +362,10 @@ export class RGBValue extends NVectorValue {
 }
 
 export class TextValue extends AnimatableD<string> {
-    add_value(a: string, b: string): string {
+    override   add_value(a: string, b: string): string {
         return a + "" + b;
+    }
+    override parse_value(s: string) {
+        this.value = s;
     }
 }

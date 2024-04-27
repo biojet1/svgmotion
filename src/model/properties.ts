@@ -2,6 +2,7 @@ import { Animatable, NVector, NVectorValue, NumberValue, PositionValue, RGBValue
 import { Matrix } from "./matrix.js";
 
 export class ValueSet {
+    // [key: string]: Animatable;
     *enum_values(): Generator<Animatable<any>, void, unknown> {
         for (const sub of Object.values(this)) {
             if (sub instanceof Animatable) {
@@ -22,12 +23,18 @@ export class ValueSet {
         }
         return u;
     }
-    from_json(u: any) {
+    from_json(u: { k?: { t: number, h: boolean, o: Iterable<number>, i: Iterable<number>, v: any }[], v: any }) {
         for (let [k, v] of Object.entries(u)) {
             // this.constructor.props
             // if (v instanceof Animatable) {
             //     u[k] = v.to_json();
             // }
+            const p = (this as any)[k];
+            if (p instanceof Animatable) {
+                p.from_json(v);
+            } else {
+                throw new Error(`Unexpected property "${k}" (${v})`);
+            }
         }
 
     }
@@ -61,7 +68,6 @@ export class Box extends ValueSet {
             this.position = new PositionValue(new NVector(position));
         }
     }
-
     /// size
     get size() {
         return this._getx("size", new PositionValue(new NVector([100, 100])));
@@ -76,8 +82,6 @@ export class Box extends ValueSet {
     set position(v: PositionValue) {
         this._setx("position", v);
     }
-    ///  
-    // static position = {'p'}
 }
 
 export class Stroke extends ValueSet {
@@ -251,12 +255,6 @@ export class Transform extends ValueSet {
         this._setx("skew_axis", v);
     }
     ///
-
-    from_json(x: any) {
-
-    }
-
-
 }
 
 

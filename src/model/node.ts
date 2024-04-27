@@ -2,18 +2,11 @@ import {
     Animatable,
     Keyframes,
     NVector,
-    NVectorValue,
     NumberValue,
     PositionValue,
     TextValue,
 } from "./keyframes.js";
-import {
-    Box,
-    Fill,
-    Stroke,
-    Transform,
-    ValueSet,
-} from "./properties.js";
+import { Box, ValueSet } from "./properties.js";
 import { UPDATE } from "./update_dom.js";
 import { Node, Parent } from "./linked.js";
 import { SVGProps } from "./svgprops.js";
@@ -28,7 +21,10 @@ export abstract class Item extends SVGProps(Node) implements INode {
     _node?: SVGElement;
 
     as_svg(doc: Document): SVGElement {
-        const e = (this._node = doc.createElementNS(NS_SVG, (<typeof Item>this.constructor).tag));
+        const e = (this._node = doc.createElementNS(
+            NS_SVG,
+            (<typeof Item>this.constructor).tag
+        ));
         return set_svg(e, this);
     }
 
@@ -51,11 +47,6 @@ export abstract class Item extends SVGProps(Node) implements INode {
             }
         }
     }
-    // to_json() {
-    //     const o = { tag: (<typeof Container>this.constructor).tag };
-    //     return o;
-    // }
-
 }
 
 export abstract class Shape extends Item { }
@@ -64,9 +55,11 @@ export class Container extends SVGProps(Parent) implements INode {
     id?: string;
     _node?: SVGElement;
 
-
     as_svg(doc: Document): SVGElement {
-        const con = (this._node = doc.createElementNS(NS_SVG, (<typeof Container>this.constructor).tag));
+        const con = (this._node = doc.createElementNS(
+            NS_SVG,
+            (<typeof Container>this.constructor).tag
+        ));
         for (const sub of this.children<Container | Item>()) {
             con.appendChild(sub.as_svg(doc));
         }
@@ -145,7 +138,12 @@ export class Container extends SVGProps(Parent) implements INode {
     }
     override to_json() {
         let o = super.to_json();
-        o.nodes = [...this.children<Container | Item>()].map(v => v.to_json());
+        o.nodes = [...this.children<Container | Item>()].map((v) =>
+            v.to_json()
+        );
+
+        // const x = (<typeof Container>this.constructor)['zo'];
+
         return o;
     }
     // static {
@@ -165,12 +163,11 @@ function update(frame: number, target: Item | Container, el: SVGElement) {
 }
 
 export class Group extends Container {
-    static tag = 'g';
+    static tag = "g";
 }
 
-
 export class ViewPort extends Container {
-    static tag = 'svg';
+    static tag = "svg";
     ///
     get view_box() {
         return this._getx("view_box", new Box([0, 0], [100, 100]));
@@ -193,25 +190,42 @@ export class ViewPort extends Container {
         this._setx("height", v);
     }
     ///
+    get x() {
+        return this._getx("x", new NumberValue(0));
+    }
+    set x(v: NumberValue) {
+        this._setx("x", v);
+    }
+    ///
+    get y() {
+        return this._getx("y", new NumberValue(0));
+    }
+    set y(v: NumberValue) {
+        this._setx("y", v);
+    }
+    ///
     get fit_view() {
-        return this._getx("d", new TextValue(""));
+        return this._getx("fit_view", new TextValue(""));
     }
     set fit_view(v: TextValue) {
-        this._setx("d", v);
+        this._setx("fit_view", v);
     }
     ///
     get zoom_pan() {
-        return this._getx("d", new TextValue("disable"));
+        return this._getx("zoom_pan", new TextValue("disable"));
     }
     set zoom_pan(v: TextValue) {
-        this._setx("d", v);
+        this._setx("zoom_pan", v);
     }
+    static zoom_pan = { property: { name: 'zoom_pan' } };
 }
+ViewPort.zoom_pan = { property: { name: 'zoom_pan_2' } };
+ViewPort.opacity = { name: 'opacity_2' };
 
 const NS_SVG = "http://www.w3.org/2000/svg";
 
 export class Path extends Shape {
-    static tag = 'path';
+    static tag = "path";
     ///
     get d() {
         return this._getx("d", new TextValue(""));
@@ -221,7 +235,7 @@ export class Path extends Shape {
     }
 }
 export class Rect extends Shape {
-    static tag = 'rect';
+    static tag = "rect";
     ///
     get width() {
         return this._getx("width", new NumberValue(100));
@@ -271,6 +285,7 @@ export class Rect extends Shape {
     set size(v: PositionValue) {
         this._setx("size", v);
     }
+    // 
 }
 
 // export class Ellipse extends Shape {

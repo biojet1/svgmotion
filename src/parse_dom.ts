@@ -34,150 +34,123 @@ import { ViewPort, Item, Container, Root } from "./model/node.js";
 import { NVector, NumberValue } from "./model/keyframes.js";
 import { Parent, Node } from "./model/linked.js";
 
-export const A1: {
+export const TAG_DOM: {
     [key: string]: (elem: SVGElement, parent: Container) => Item | Container;
 } = {
     svg: function (e: SVGElement, parent: Container) {
         let elem = e as SVGSVGElement;
-
-        let n;
+        // Node
+        let node;
         if (parent instanceof Doc) {
-            n = parent.add_root();
+            node = parent.add_root();
         } else {
-            n = parent.add_view();
+            node = parent.add_view();
         }
-
-        // let vb = elem.viewBox.baseVal;
-        // if (vb) {
-        //     const u = n.view_box;
-        //     u.position.value = new NVector([vb.x, vb.y]);
-        //     u.size.value = new NVector([vb.width, vb.height]);
-        // }
-        // let w = elem.width.baseVal;
-        // if (w != null) {
-        //     n.width = new NumberValue(w.value);
-        // }
-        // let h = elem.height.baseVal;
-        // if (h != null) {
-        //     n.height = new NumberValue(h.value);
-        // }
-        //    for(const a of elem.attributes){
-
-        //    }
-        // console.info(
-        //     `getAttributeNames ${elem?.localName} ${elem.getAttributeNames()}`
-        // );
-
+        // Defs
         {
             for (const child of [...e.children]) {
                 const { id, namespaceURI, localName } = child;
                 if (localName == "defs" && namespaceURI == NS_SVG) {
-                    const defs = get_root(n).defs;
+                    const defs = get_root(node).defs;
                     child.remove();
                     for (const sub of [...child.children]) {
-                        const m = walk(sub as SVGElement, n);
+                        const m = walk(sub as SVGElement, node);
                         m.remove();
                         defs[id] = m;
                     }
                 }
             }
         }
-        // console.info(`svg _read ${elem?.localName} ${vp.constructor.name} ${elem.viewBox.baseVal}`);
+        // Properties console.info(`svg _read ${elem?.localName} ${vp.constructor.name} ${elem.viewBox.baseVal}`);
         for (const [name, value] of enum_attrs(e)) {
             switch (name) {
-                case "height":
-                    n.height.value = parseFloat(value);
-                    break;
-                case "width":
-                    n.width.value = parseFloat(value);
-                    break;
-                // case "y": {
-                //     n.y.value = parseFloat(value);
-                //     break;
-                // }
-                // case "x": {
-                //     n.y.value = parseFloat(value);
-                //     break;
-                // }
                 case "version":
                     break;
-                case "viewBox":
-                    {
-                        const v = value.split(/[\s,]+/).map(parseFloat);
-                        const u = n.view_box;
-                        u.position.value = new NVector([v[0], v[1]]);
-                        u.size.value = new NVector([v[2], v[3]]);
-                    }
+                case "viewBox": {
+                    const v = value.split(/[\s,]+/).map(parseFloat);
+                    const u = node.view_box;
+                    u.position.value = new NVector([v[0], v[1]]);
+                    u.size.value = new NVector([v[2], v[3]]);
+                }
                     break;
-                case "preserveAspectRatio":
-                    {
-                        n.fit_view.value = value;
-                    }
+                case "preserveAspectRatio": {
+                    node.fit_view.value = value;
+                }
                     break;
                 case "zoomAndPan":
-                    {
-                        n.zoom_pan.value = value;
-                    }
+                    node.zoom_pan.parse_value(value);
+                    break;
+                case "height":
+                    node.height.parse_value(value);
+                    break;
+                case "width":
+                    node.width.parse_value(value);
+                    break;
+                case "y":
+                    node.y.parse_value(value);
+                    break;
+                case "x":
+                    node.y.parse_value(value);
                     break;
                 default:
-                    set_common_attr(n, name, value, e);
+                    set_common_attr(node, name, value, e);
             }
         }
 
-        return n;
+        return node;
     },
     rect: function (e: SVGElement, parent: Container) {
-        let n = parent.add_rect();
+        let node = parent.add_rect();
         for (const [name, value] of enum_attrs(e)) {
             switch (name) {
                 case "height":
-                    n.height.value = parseFloat(value);
+                    node.height.value = parseFloat(value);
                     break;
                 case "width":
-                    n.width.value = parseFloat(value);
+                    node.width.value = parseFloat(value);
                     break;
                 case "y":
-                    n.y.value = parseFloat(value);
+                    node.y.value = parseFloat(value);
                     break;
                 case "x":
-                    n.x.value = parseFloat(value);
+                    node.x.value = parseFloat(value);
                     break;
                 case "ry":
-                    n.ry.value = parseFloat(value);
+                    node.ry.value = parseFloat(value);
                     break;
                 case "rx":
-                    n.rx.value = parseFloat(value);
+                    node.rx.value = parseFloat(value);
                     break;
                 default:
-                    set_common_attr(n, name, value, e);
+                    set_common_attr(node, name, value, e);
             }
         }
 
-        return n;
+        return node;
     },
     g: function (e: SVGElement, parent: Container) {
-        let n = parent.add_group();
+        let node = parent.add_group();
+        // Properties
         for (const [name, value] of enum_attrs(e)) {
-            set_common_attr(n, name, value, e);
+            set_common_attr(node, name, value, e);
         }
-
-        return n;
+        return node;
     },
     path: function (e: SVGElement, parent: Container) {
-        let n = parent.add_path();
-        console.info(`PATH`, e.getAttributeNames(), e.innerHTML);
+        let node = parent.add_path();
+        // Properties
+        // console.info(`PATH`, e.getAttributeNames(), e.innerHTML);
         for (const [name, value] of enum_attrs(e)) {
             // console.info(`PATH ATTR _ ${name} ${value}`);
             switch (name) {
                 case "d":
-                    n.d.value = value;
+                    node.d.value = value;
                     break;
                 default:
-                    set_common_attr(n, name, value, e);
+                    set_common_attr(node, name, value, e);
             }
         }
-
-        return n;
+        return node;
     },
 };
 
@@ -269,19 +242,19 @@ function* enum_attrs(e: SVGElement) {
 }
 
 function walk(elem: SVGElement, parent: Container) {
-    const f = A1[elem.localName];
-    if (f) {
+    const make_node = TAG_DOM[elem.localName];
+    if (make_node) {
         // console.log(`walk--`, parent.constructor.name);
-        const x = f(elem, parent);
+        const node = make_node(elem, parent);
         // console.log(`walk ${ x.constructor.name }`, elem.localName);
-        if (x instanceof Container) {
+        if (node instanceof Container) {
             for (const child of elem.children) {
                 if (child.namespaceURI == "http://www.w3.org/2000/svg") {
-                    walk(child as SVGElement, x);
+                    walk(child as SVGElement, node);
                 }
             }
         }
-        return x;
+        return node;
     } else {
         throw new Error(`No processor for "${elem.localName}"`);
     }

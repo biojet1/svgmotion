@@ -26,7 +26,7 @@
   "scripts": {
     "c8rephtml": "c8 report -r html",
     "compile": "npx tsc -d --sourcemap",
-    "clean": "rm dist/*.*",
+    "clean": "rm -r dist/*",
     "c8test": "c8 npx tap -t600 --disable-coverage --reporter=terse 'test/**/*.tap.*js'",
     "try": "npm run compile && npm run test",
     "webpack": "npm run compile && npx webpack",

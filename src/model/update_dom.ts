@@ -88,21 +88,3 @@ export const UPDATE: {
     },
 };
 
-
-export const FROM_JSON: {
-    [key: string]: any;
-} = {
-    opacity: function (node: Item | Container, prop: NumberValue, x: { k: { t: number, v: number }[], v: number }) {
-        const { k } = x;
-        if (k == null) {
-            return new NumberValue(x.v);
-        } else {
-            const kfs = new Keyframes<number>();
-            kfs.push(...k.map((v) =>
-                kfe_from_json<number>(v, this.value_from_json(v.v)
-                )
-            ));
-            return new NumberValue(kfs);
-        }
-    },
-};

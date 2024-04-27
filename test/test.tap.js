@@ -4,7 +4,7 @@ import test from "tap";
 import {
     Keyframes, NumberValue, TextValue,
     NVectorValue, Point, NVector, Fill,
-    ViewPort, RGBValue, Size, Root
+    ViewPort, RGBValue, Size, Root, from_json
 } from "../dist/model/index.js";
 import {
     Step, Track
@@ -85,15 +85,24 @@ test.test("ViewPort", (t) => {
     // v.push(new Ellipse());
     let r = root.add_rect();
     // console.info(r.size);
+    root.view_box;
     r.size.set_value(0, new Size(50, 50));
     r.size.set_value(50, new Size(50, 100));
     // v.set_value(0, new NVector([3, 4]));
     // v.set_value(60, new NVector([4, 5]));
     // v[0].fun();
     // r.opacity = 
-
-    console.log(root.to_json());
-
+    // console.log(Array.from(root.view_box.size.value));
+    const json = root.to_json();
+    console.log(JSON.stringify(json, null, 4));
+    console.log(root.constructor['opacity']);
+    console.log(root.constructor['zoom_pan']);
+    const { tag, nodes, ...props } = json;
+    console.log(tag, nodes, props);
+    t.equal(tag, "svg");
+    t.equal(nodes[0].tag, "rect");
+    t.same([...props.view_box.size.v], [100, 100]);
+    console.log(from_json(json));
     t.end();
 
 });
