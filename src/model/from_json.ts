@@ -10,10 +10,9 @@ class Doc extends ViewPort {
 const TAGS: {
     [key: string]: (
         parent: Container,
-        props: { [key: string]: Value<any> }
     ) => Item | Container;
 } = {
-    svg: function (parent: Container, props) {
+    svg: function (parent: Container) {
         let node;
         if (parent instanceof Doc) {
             node = parent.add_root();
@@ -22,11 +21,11 @@ const TAGS: {
         }
         return node;
     },
-    g: function (parent: Container, props) {
+    g: function (parent: Container) {
         let node = parent.add_group();
         return node;
     },
-    rect: function (parent: Container, props) {
+    rect: function (parent: Container) {
         let node = parent.add_rect();
         return node;
     },
@@ -42,7 +41,7 @@ function walk(obj: Object, parent: Container) {
     const { tag, nodes, ...props } = obj;
     const make_node = TAGS[tag];
     if (make_node) {
-        const node = make_node(parent, props);
+        const node = make_node(parent);
         node.props_from_json(props);
         if (node instanceof Container) {
             if (nodes) {

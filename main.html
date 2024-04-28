@@ -15,12 +15,6 @@
         </style>
         <script src="./dist/svgmotion.web.js"></script>
         <script type="module">
-            // let root = svgmotion.root();
-            // let rect = root.add_rect();
-            // let svg = root.as_svg(document);
-            // console.log(Object.entries(rect));
-            // document.body.appendChild(svg);
-            // root.update_node(0);
             const {
                 Size,
                 animate,
@@ -38,7 +32,6 @@
             console.info(animate);
             r.position = new NVectorValue([10, 10]);
             let tr = new Track();
-
             tr.feed(
                 Par(
                     Seq(
@@ -81,11 +74,9 @@
                     )
                 )
             );
-
             console.log(root);
             let svg = root.as_svg(document);
             document.body.appendChild(svg);
-
             animate(root, 60);
         </script>
     </head>

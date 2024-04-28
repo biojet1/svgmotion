@@ -1,5 +1,5 @@
 export class Node {
-    protected _next?: Node;
+    _next?: Node;
     _prev?: Node;
     _parent?: Parent;
     get _end(): Node {

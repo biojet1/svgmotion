@@ -7,21 +7,18 @@ import {
     TextValue,
 } from "./keyframes.js";
 import { Box, ValueSet } from "./properties.js";
-import { UPDATE } from "./update_dom.js";
 import { Node, Parent } from "./linked.js";
 import { SVGProps } from "./svgprops.js";
+import { update, update_dom } from "./update_dom.js";
 
-interface INode {
-    id?: string;
-    _node?: SVGElement;
-}
 
-export abstract class Item extends SVGProps(Node) implements INode {
+
+export abstract class Item extends SVGProps(Node) {
     id?: string;
-    _node?: SVGElement;
+    _element?: SVGElement;
 
     as_svg(doc: Document): SVGElement {
-        const e = (this._node = doc.createElementNS(
+        const e = (this._element = doc.createElementNS(
             NS_SVG,
             (<typeof Item>this.constructor).tag
         ));
@@ -33,7 +30,7 @@ export abstract class Item extends SVGProps(Node) implements INode {
     }
 
     update_node(frame: number): void {
-        const node = this._node;
+        const node = this._element;
         if (node) {
             this.update_self(frame, node);
         }
@@ -51,12 +48,12 @@ export abstract class Item extends SVGProps(Node) implements INode {
 
 export abstract class Shape extends Item { }
 
-export class Container extends SVGProps(Parent) implements INode {
+export class Container extends SVGProps(Parent) {
     id?: string;
-    _node?: SVGElement;
+    _element?: SVGElement;
 
     as_svg(doc: Document): SVGElement {
-        const con = (this._node = doc.createElementNS(
+        const con = (this._element = doc.createElementNS(
             NS_SVG,
             (<typeof Container>this.constructor).tag
         ));
@@ -71,7 +68,7 @@ export class Container extends SVGProps(Parent) implements INode {
         return true; // should we call update_node to children
     }
     update_node(frame: number) {
-        const node = this._node;
+        const node = this._element;
         if (node) {
             if (this.update_self(frame, node)) {
                 for (const sub of this.children<Container | Item>()) {
@@ -80,6 +77,10 @@ export class Container extends SVGProps(Parent) implements INode {
             }
         }
     }
+    update_dom(frame: number) {
+        update_dom(frame, this);
+    }
+
     *enum_values(): Generator<Animatable<any>, void, unknown> {
         for (let v of Object.values(this)) {
             if (v instanceof Animatable) {
@@ -141,24 +142,7 @@ export class Container extends SVGProps(Parent) implements INode {
         o.nodes = [...this.children<Container | Item>()].map((v) =>
             v.to_json()
         );
-
-        // const x = (<typeof Container>this.constructor)['zo'];
-
         return o;
-    }
-    // static {
-    //     // this.prototype._attax_propch = 2;
-    //     Object.defineProperty(this, "the_name", {
-    //         value: "the_value",
-    //         writable: true,
-    //         enumerable: true,
-    //     });
-    // }
-}
-
-function update(frame: number, target: Item | Container, el: SVGElement) {
-    for (let [n, v] of Object.entries(target)) {
-        v && UPDATE[n]?.(frame, el, v);
     }
 }
 
@@ -217,10 +201,7 @@ export class ViewPort extends Container {
     set zoom_pan(v: TextValue) {
         this._setx("zoom_pan", v);
     }
-    static zoom_pan = { property: { name: 'zoom_pan' } };
 }
-ViewPort.zoom_pan = { property: { name: 'zoom_pan_2' } };
-ViewPort.opacity = { name: 'opacity_2' };
 
 const NS_SVG = "http://www.w3.org/2000/svg";
 
@@ -234,6 +215,7 @@ export class Path extends Shape {
         this._setx("d", v);
     }
 }
+
 export class Rect extends Shape {
     static tag = "rect";
     ///

@@ -54,11 +54,8 @@ export function SVGProps<TBase extends Constructor>(Base: TBase) {
         ///
         to_json() {
             const o: any = { tag: (<typeof SVGProps>this.constructor).tag };
-            // o['entries'] = Object.entries(this);
             for (let [k, v] of Object.entries(this)) {
-                if (v instanceof Animatable) {
-                    o[k] = v.to_json();
-                } else if (v instanceof ValueSet) {
+                if (v instanceof Animatable || v instanceof ValueSet) {
                     o[k] = v.to_json();
                 }
             }
