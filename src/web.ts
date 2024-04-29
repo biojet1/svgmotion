@@ -12,7 +12,6 @@ export function animate(root: all.Root, fps: number) {
             const t = performance.now();
             {
                 // console.info(`${frame} t=${t} frames=${frames} ${start}-${end}`);
-                // root.update_node(frame);
                 root.update_dom(frame);
             }
             frame = (frame + 1) % frames;
@@ -26,7 +25,6 @@ export function animate(root: all.Root, fps: number) {
         }
         requestAnimationFrame(render);
     } else {
-        // root.update_node(0);
         root.update_dom(0);
     }
 }

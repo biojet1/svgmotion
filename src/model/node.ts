@@ -9,14 +9,11 @@ import {
 import { Box, ValueSet } from "./properties.js";
 import { Node, Parent } from "./linked.js";
 import { SVGProps } from "./svgprops.js";
-import { update, update_dom } from "./update_dom.js";
+import { update_dom } from "./update_dom.js";
 
-
+const NS_SVG = "http://www.w3.org/2000/svg";
 
 export abstract class Item extends SVGProps(Node) {
-    id?: string;
-    _element?: SVGElement;
-
     as_svg(doc: Document): SVGElement {
         const e = (this._element = doc.createElementNS(
             NS_SVG,
@@ -25,16 +22,6 @@ export abstract class Item extends SVGProps(Node) {
         return set_svg(e, this);
     }
 
-    update_self(frame: number, node: SVGElement): void {
-        update(frame, this, node);
-    }
-
-    update_node(frame: number): void {
-        const node = this._element;
-        if (node) {
-            this.update_self(frame, node);
-        }
-    }
     *enum_values(): Generator<Animatable<any>, void, unknown> {
         for (let v of Object.values(this)) {
             if (v instanceof Animatable) {
@@ -49,8 +36,6 @@ export abstract class Item extends SVGProps(Node) {
 export abstract class Shape extends Item { }
 
 export class Container extends SVGProps(Parent) {
-    id?: string;
-    _element?: SVGElement;
 
     as_svg(doc: Document): SVGElement {
         const con = (this._element = doc.createElementNS(
@@ -63,20 +48,7 @@ export class Container extends SVGProps(Parent) {
         return set_svg(con, this);
     }
 
-    update_self(frame: number, node: SVGElement): boolean {
-        update(frame, this, node);
-        return true; // should we call update_node to children
-    }
-    update_node(frame: number) {
-        const node = this._element;
-        if (node) {
-            if (this.update_self(frame, node)) {
-                for (const sub of this.children<Container | Item>()) {
-                    sub.update_node(frame);
-                }
-            }
-        }
-    }
+
     update_dom(frame: number) {
         update_dom(frame, this);
     }
@@ -203,7 +175,7 @@ export class ViewPort extends Container {
     }
 }
 
-const NS_SVG = "http://www.w3.org/2000/svg";
+
 
 export class Path extends Shape {
     static tag = "path";
@@ -304,4 +276,25 @@ export class Root extends ViewPort {
     remember_id(id: string, node: Item | Container) {
         this.id_map[id] = node;
     }
+}
+export class Head extends Container {
+    defs: { [key: string]: Item | Container } = {};
+    id_map: { [key: string]: Item | Container } = {};
+    constructor() {
+        super();
+    }
+    get viewport() {
+        let x = this.first_child();
+        if (x instanceof ViewPort) {
+            return x;
+        } else if (!x) {
+            this.remove_children();
+            x = this.add_view();
+        }
+        if (x instanceof ViewPort) {
+            return x;
+        }
+        throw new Error("Unexpected");
+    }
+
 }

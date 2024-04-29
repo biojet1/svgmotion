@@ -1,11 +1,9 @@
-import { Keyframes, NVectorValue, NumberValue, RGBValue, TextValue, kfe_from_json } from "./keyframes.js";
+import { NVectorValue, NumberValue, RGBValue, TextValue } from "./keyframes.js";
 import { Container, Item } from "./node.js";
 import { Node } from "./linked.js";
 import { Transform, Fill, Box } from "./properties.js";
 
-
-
-export const UPDATE: {
+const PROP_MAP: {
     [key: string]: any;
 } = {
     opacity: function (frame: number, node: SVGElement, prop: NumberValue) {
@@ -89,20 +87,14 @@ export const UPDATE: {
     },
 };
 
-export function update(frame: number, target: Item | Container, el: SVGElement) {
-    for (let [n, v] of Object.entries(target)) {
-        v && UPDATE[n]?.(frame, el, v);
-    }
-}
-
 export function update_dom(frame: number, target: Item | Container) {
     const { _start, _end: end } = target;
     let cur: Node | undefined = _start;
     do {
         const elem = (cur as any)._element;
         if (elem) {
-            for (let [n, v] of Object.entries(target)) {
-                v && UPDATE[n]?.(frame, elem, v);
+            for (let [n, v] of Object.entries(cur)) {
+                v && PROP_MAP[n]?.(frame, elem, v);
             }
         }
     } while (cur !== end && (cur = cur._next));

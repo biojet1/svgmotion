@@ -1,40 +1,10 @@
-// import { DOMParser } from "domspec";
+
+import { ViewPort, Item, Container, Root } from "./node.js";
+import { NVector, NumberValue } from "./keyframes.js";
+import { Parent, Node } from "./linked.js";
 
 const NS_SVG = "http://www.w3.org/2000/svg";
-export function parse_svg(
-    src: string | URL,
-    opt: { xinclude?: boolean; base?: string | URL } = {}
-) {
-    return import("domspec").then((domspec) => {
-        console.log("domspec", domspec.DOMParser.loadXML);
-        return domspec.DOMParser.loadXML(src, { ...opt, type: "image/svg+xml" })
-            .then((doc) => {
-                const base = opt.base || src;
-                const root = (doc as unknown as XMLDocument).documentElement;
-                console.info(`loadrd "${src}" ${root?.localName}`);
-                if (root.namespaceURI != NS_SVG) {
-                    throw new Error(`not svg namespace ${root.namespaceURI}`);
-                } else if (root.localName != "svg") {
-                    throw new Error(`not svg tag ${root.localName}`);
-                } else {
-                    const con = new Doc();
-                    console.log(doc.innerHTML);
-                    const f = walk(root as unknown as SVGSVGElement, con);
-                    return f;
-                }
-            })
-            .catch((err) => {
-                console.error(`Failed to load "${src}"`);
-                throw err;
-            });
-    });
-}
-
-import { ViewPort, Item, Container, Root } from "./model/node.js";
-import { NVector, NumberValue } from "./model/keyframes.js";
-import { Parent, Node } from "./model/linked.js";
-
-export const TAG_DOM: {
+const TAG_DOM: {
     [key: string]: (elem: SVGElement, parent: Container) => Item | Container;
 } = {
     svg: function (e: SVGElement, parent: Container) {
@@ -257,4 +227,33 @@ function walk(elem: SVGElement, parent: Container) {
     } else {
         throw new Error(`No processor for "${elem.localName}"`);
     }
+}
+
+export function parse_svg(
+    src: string | URL,
+    opt: { xinclude?: boolean; base?: string | URL } = {}
+) {
+    return import("domspec").then((domspec) => {
+        // console.log("domspec", domspec.DOMParser.loadXML);
+        return domspec.DOMParser.loadXML(src, { ...opt, type: "image/svg+xml" })
+            .then((doc) => {
+                const base = opt.base || src;
+                const root = (doc as unknown as XMLDocument).documentElement;
+                // console.info(`loadrd "${src}" ${root?.localName}`);
+                if (root.namespaceURI != NS_SVG) {
+                    throw new Error(`not svg namespace ${root.namespaceURI}`);
+                } else if (root.localName != "svg") {
+                    throw new Error(`not svg tag ${root.localName}`);
+                } else {
+                    const con = new Doc();
+                    // console.log(doc.innerHTML);
+                    const f = walk(root as unknown as SVGSVGElement, con);
+                    return f;
+                }
+            })
+            .catch((err) => {
+                console.error(`Failed to load "${src}"`);
+                throw err;
+            });
+    });
 }

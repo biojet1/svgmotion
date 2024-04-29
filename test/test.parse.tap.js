@@ -1,8 +1,8 @@
 "uses strict";
 import test from "tap";
-import { parse_svg } from "../dist/parse_dom.js";
 import { SVGDocument, XMLSerializer } from "domspec";
-import { RGB, Root } from "../dist/index.js";
+import { parse_svg } from "../dist/model/from_dom.js";
+import { RGB, Root, } from "../dist/index.js";
 test.test("Item", (t) => {
 
     parse_svg("../../python/flottie/example/res/thank_you_tp.svg").then((root) => {
@@ -16,7 +16,7 @@ test.test("Item", (t) => {
         // console.log(`width`, nod.width.baseVal.value, nod.width.baseVal.unitType);
         // console.log(root.prop5);
         root.fill.color.value = new RGB(1, 1, 0);
-        root.update_node(0);
+        root.update_dom(0);
 
         // console.log(`width`, nod.width.baseVal.value, nod.width.baseVal.unitType);
         const ser = new XMLSerializer();

@@ -1,75 +1,74 @@
-// import { render_svg } from './index.js';
-export function main() {
+import * as lib from './index.js';
+
+interface AnimMod {
+    name: string;
+    svg?: string;
+    animate: (mod: typeof lib) => void;
+}
+export async function main() {
+    const path = await import('path');
     const args = process.argv.slice(2);
-    return import('yargs')
-        .then((yargs) => yargs.default(args)).then((yinst) => {
-            return yinst
-                .usage('$0 <svg> <output>', 'convert svg file to png, webp, jpeg ')
+    return import("yargs")
+        .then((yargs) => {
+            let cd = process.cwd();
+            return yargs
+                .default(args)
                 .strict()
+                .command(
+                    "gen <script>",
+                    "generate animation file",
+                    (yargs) =>
+                        yargs
+                            .help()
+                            .alias("h", "help").positional("script", {})
+                            .options({
+                                fps: {
+                                    describe: "frames per second",
+                                    type: "number",
+                                },
+                                output: {
+                                    alias: 'o',
+                                    describe: 'output file',
+                                    count: true,
+                                },
+                                verbose: {
+                                    alias: 'v',
+                                    describe: 'verbosity',
+                                    count: true,
+                                },
+                            }),
+                    (args) => {
+                        console.log("gen", args);
+                        const script = args.script as string;
+                        (import(cd ? path.resolve(cd, script) : script) as Promise<AnimMod>).then(({ animate }) => {
+                            console.log("import gen", animate);
+                            return animate(lib);
+                        })
+                    }
+                )
+                .command("render", "render animation file", {
+                    jsinfile: {
+                        alias: "u",
+                        default: "http://yargs.js.org/",
+                    },
+                })
+                .command("html", "convert animation file to html", {
+                    jsinfile: {
+                        alias: "u",
+                        default: "http://yargs.js.org/",
+                    },
+                })
+                .command("svg", "convert animation file to svg", {
+                    jsinfile: {
+                        alias: "u",
+                        default: "http://yargs.js.org/",
+                    },
+                })
                 .help()
                 .version()
-                .demand(1)
-                .options({
-                    width: {
-                        describe: 'set width',
-                        type: 'number',
-                    },
-                    height: {
-                        describe: 'set height',
-                        type: 'number',
-                    },
-                    par: {
-                        describe: 'set preserveAspectRatio',
-                        type: 'string',
-                    },
-                    quality: {
-                        describe: 'Quality of the image, between 0-100. Not applicable to png images',
-                        type: 'number',
-                    },
-                    type: {
-                        describe: `image type if piping to stdout`,
-                        choices: ['png', 'jpeg', 'webp']
-                    },
-                    bgcolor: {
-                        describe: `set backgroung color`,
-                        type: 'string',
-                    },
-                }).argv;
-        }).then((opt) => {
-            // const { bgcolor, svg, quality, type, width, height } = opt;
-            // let src = svg as string;
-            // // console.log(opt);
-            // let uri = undefined;
-            // let path = undefined;
-            // let output = opt.output as string;
-            // if (src.indexOf('://') < 0) {
-            //     path = src;
-            // } else {
-            //     uri = src;
-            // }
-            // function tp(x: string) {
-            //     if (x.startsWith('p')) {
-            //         return 'png';
-            //     } else if (x.startsWith('j')) {
-            //         return 'jpeg';
-            //     } else if (x.startsWith('w')) {
-            //         return 'webp';
-            //     }
-            //     return undefined;
-            // }
-            // if (!output) {
-            //     throw new Error(`No output`);
-            // }
-            // render_svg({
-            //     uri, path,
-            //     output, width, height,
-            //     quality, bgcolor,
-            //     type: type ? tp(type) : undefined,
-            // }).then((blob) => {
-            //     if (blob && output == '-') {
-            //         process.stdout.write(blob);
-            //     }
-            // });
+                .strictCommands()
+                .demandCommand()
+                .parse();
         })
         ;
 }

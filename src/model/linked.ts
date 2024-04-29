@@ -105,9 +105,6 @@ export class Node {
 }
 
 export class Parent extends Node {
-    // class End2{
-
-    // };
     //// Tree
     _tail: End;
     constructor() {
@@ -170,6 +167,14 @@ export class Parent extends Node {
         node.remove();
         return node;
     }
+
+    remove_children() {
+        let cur;
+        while (cur = this.first_child()) {
+            cur.remove();
+        }
+    }
+
     contains(node: Node) {
         let p: Node | Parent | undefined = node;
         do

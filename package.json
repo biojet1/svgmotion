@@ -6,6 +6,13 @@
   "type": "module",
   "license": "AGPL-version-3.0",
   "private": false,
+  "exports": {
+    ".": "./dist/index.js",
+    "./main": "./dist/main.js"
+  },
+  "bin": {
+    "svgmotion": "./svgmotion.js"
+  },
   "engines": {
     "node": ">= 14.0.0",
     "npm": ">= 6.0.0"

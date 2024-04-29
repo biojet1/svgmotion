@@ -1,10 +1,13 @@
 import { Animatable, NumberValue, Value } from "./keyframes.js";
 import { Fill, Transform, ValueSet } from "./properties.js";
-
+// import { Node, Parent } from "./linked.js";
 export type Constructor = new (...args: any[]) => {};
 export function SVGProps<TBase extends Constructor>(Base: TBase) {
     return class SVGProps extends Base {
+        id?: string;
+        _element?: SVGElement;
         static tag = '';
+        ///
         get prop5() {
             return this._getx("prop5", new NumberValue(45));
         }
@@ -25,7 +28,7 @@ export function SVGProps<TBase extends Constructor>(Base: TBase) {
         set opacity(v: NumberValue) {
             this._setx("opacity", v);
         }
-        static opacity = { name: 'opacity' };
+        // static opacity = { name: 'opacity' };
         /// transform
         get transform() {
             return this._getx("transform", new Transform());
@@ -71,6 +74,14 @@ export function SVGProps<TBase extends Constructor>(Base: TBase) {
                 }
             }
         }
+        //
+        // root<T extends Parent = Parent>() {
+        //     let root = this._parent;
+        //     if (root) {
+        //         for (let x; (x = root._parent); root = x);
+        //         return root as T;
+        //     }
+        // }
     };
 }
 
