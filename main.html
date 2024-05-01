@@ -25,10 +25,13 @@
                 Seq,
                 Par,
                 Step,
+                Doc,
             } = svgmotion;
 
-            let root = svgmotion.root();
-            let r = root.add_rect();
+            const doc = new Doc();
+            const { viewport } = doc;
+
+            let r = viewport.add_rect();
             // console.info(animate);
             r.position = new NVectorValue([10, 10]);
             let tr = new Track();
@@ -74,10 +77,10 @@
                     )
                 )
             );
-            console.log(root);
-            let svg = root.as_svg(document);
+            console.log(doc);
+            let svg = doc.to_dom(document);
             document.body.appendChild(svg);
-            animate(root, 60);
+            animate(doc, 60);
         </script>
     </head>
     <body></body>

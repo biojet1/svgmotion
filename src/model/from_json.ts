@@ -1,24 +1,13 @@
 import { Value } from "./keyframes.js";
-import { Container, Item, Root, ViewPort } from "./node.js";
+import { Container, Doc, Item, PlainNode, ViewPort } from "./node.js";
 
-class Doc extends ViewPort {
-    _root?: Root;
-    add_root() {
-        return (this._root = new Root());
-    }
-}
 const TAGS: {
     [key: string]: (
         parent: Container,
     ) => Item | Container;
 } = {
     svg: function (parent: Container) {
-        let node;
-        if (parent instanceof Doc) {
-            node = parent.add_root();
-        } else {
-            node = parent.add_view();
-        }
+        let node = parent.add_view();
         return node;
     },
     g: function (parent: Container) {
@@ -31,13 +20,7 @@ const TAGS: {
     },
 };
 
-interface Object {
-    tag: string;
-    nodes: Object[];
-    opacity: Value<any>;
-}
-
-function walk(obj: Object, parent: Container) {
+export function from_json_walk(obj: PlainNode, parent: Container) {
     const { tag, nodes, ...props } = obj;
     const make_node = TAGS[tag];
     if (make_node) {
@@ -46,7 +29,7 @@ function walk(obj: Object, parent: Container) {
         if (node instanceof Container) {
             if (nodes) {
                 for (const child of nodes) {
-                    walk(child, node);
+                    from_json_walk(child, node);
                 }
             }
         } else if (nodes != undefined) {
@@ -58,7 +41,4 @@ function walk(obj: Object, parent: Container) {
     }
 }
 
-export function from_json(src: Object) {
-    const con = new Doc();
-    return walk(src, con);
-}
+

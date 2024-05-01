@@ -4,19 +4,11 @@ import test from "tap";
 import {
     Keyframes, NumberValue, TextValue,
     NVectorValue, Point, NVector, Fill,
-    ViewPort, RGBValue, Size, Root, from_json
+    ViewPort, Doc, Size
 } from "../dist/model/index.js";
 import {
     Step, Track
 } from "../dist/index.js";
-// test.test("KeyframeEntry", (t) => {
-//     let kfe = new KeyframeEntry();
-
-//     // console.log(kfe);
-
-//     t.end();
-
-// });
 
 test.test("Keyframes", (t) => {
     let kfs = new Keyframes();
@@ -80,12 +72,13 @@ test.test("NVectorValue", (t) => {
 });
 
 test.test("ViewPort", (t) => {
-    let root = new Root();
+    let head = new Doc();
+    let vp = head.viewport;
     // v.push(new Rect());
     // v.push(new Ellipse());
-    let r = root.add_rect();
+    let r = vp.add_rect();
     // console.info(r.size);
-    root.view_box;
+    vp.view_box;
     r.size.set_value(0, new Size(50, 50));
     r.size.set_value(50, new Size(50, 100));
     // v.set_value(0, new NVector([3, 4]));
@@ -93,16 +86,18 @@ test.test("ViewPort", (t) => {
     // v[0].fun();
     // r.opacity = 
     // console.log(Array.from(root.view_box.size.value));
-    const json = root.to_json();
+    const json = head.to_json();
     console.log(JSON.stringify(json, null, 4));
-    console.log(root.constructor['opacity']);
-    console.log(root.constructor['zoom_pan']);
-    const { tag, nodes, ...props } = json;
+    console.log(vp.constructor['opacity']);
+    console.log(vp.constructor['zoom_pan']);
+    const { tag, nodes, ...props } = json.root;
     console.log(tag, nodes, props);
     t.equal(tag, "svg");
     t.equal(nodes[0].tag, "rect");
     t.same([...props.view_box.size.v], [100, 100]);
-    t.same(from_json(json).to_json(), json);
+    let head2 = new Doc();
+    head2.from_json(json);
+    t.same(head2.to_json(), json);
     // console.log(JSON.stringify(from_json(json).to_json(), null, 4));
 
     t.end();
@@ -111,7 +106,8 @@ test.test("ViewPort", (t) => {
 
 test.test("Step", (t) => {
     let tr = new Track();
-    let root = new Root();
+    let head = new Doc();
+    let root = head.viewport;
     let vp = new ViewPort();
     let r = root.add_rect();
     // r.opacity = new NumberValue(0.9);

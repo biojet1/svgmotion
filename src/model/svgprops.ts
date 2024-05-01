@@ -82,6 +82,8 @@ export function SVGProps<TBase extends Constructor>(Base: TBase) {
         //         return root as T;
         //     }
         // }
+
+
     };
 }
 

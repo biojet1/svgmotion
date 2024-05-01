@@ -5,16 +5,18 @@ import {
     NumberValue,
     PositionValue,
     TextValue,
+    Value,
 } from "./keyframes.js";
 import { Box, ValueSet } from "./properties.js";
 import { Node, Parent } from "./linked.js";
 import { SVGProps } from "./svgprops.js";
 import { update_dom } from "./update_dom.js";
+import { from_json_walk } from "./from_json.js";
 
 const NS_SVG = "http://www.w3.org/2000/svg";
 
 export abstract class Item extends SVGProps(Node) {
-    as_svg(doc: Document): SVGElement {
+    to_dom(doc: typeof SVGElement.prototype.ownerDocument): SVGElement {
         const e = (this._element = doc.createElementNS(
             NS_SVG,
             (<typeof Item>this.constructor).tag
@@ -37,13 +39,13 @@ export abstract class Shape extends Item { }
 
 export class Container extends SVGProps(Parent) {
 
-    as_svg(doc: Document): SVGElement {
+    to_dom(doc: typeof SVGElement.prototype.ownerDocument): SVGElement {
         const con = (this._element = doc.createElementNS(
             NS_SVG,
             (<typeof Container>this.constructor).tag
         ));
         for (const sub of this.children<Container | Item>()) {
-            con.appendChild(sub.as_svg(doc));
+            con.appendChild(sub.to_dom(doc));
         }
         return set_svg(con, this);
     }
@@ -116,6 +118,18 @@ export class Container extends SVGProps(Parent) {
         );
         return o;
     }
+    get_id(id: string) {
+        const { _start, _end: end } = this;
+        let cur: Node | undefined = _start;
+        do {
+            if (cur instanceof Item || cur instanceof Container) {
+                if (cur.id === id) {
+                    return cur;
+                }
+            }
+        } while (cur !== end && (cur = cur._next));
+    }
+
 }
 
 export class Group extends Container {
@@ -259,27 +273,10 @@ function set_svg(elem: SVGElement, node: Item | Container): SVGElement {
     return elem;
 }
 
-export class Root extends ViewPort {
+export class Doc extends Container {
     defs: { [key: string]: Item | Container } = {};
-    id_map: { [key: string]: Item | Container } = {};
-    override as_svg(doc: Document): SVGElement {
-        const n = super.as_svg(doc);
-        const defs = doc.createElementNS(NS_SVG, "defs");
-        for (let [n, v] of Object.entries(this.defs)) {
-            defs.appendChild(v.as_svg(doc));
-        }
-        if (defs.firstElementChild) {
-            n.insertBefore(defs, n.firstChild);
-        }
-        return set_svg(n, this);
-    }
-    remember_id(id: string, node: Item | Container) {
-        this.id_map[id] = node;
-    }
-}
-export class Head extends Container {
-    defs: { [key: string]: Item | Container } = {};
-    id_map: { [key: string]: Item | Container } = {};
+    all: { [key: string]: Item | Container } = {};
+    version: string = "0.0.1";
     constructor() {
         super();
     }
@@ -297,4 +294,64 @@ export class Head extends Container {
         throw new Error("Unexpected");
     }
 
+    set_viewport(vp: ViewPort) {
+        this.remove_children();
+        this.append_child(vp);
+    }
+    remember_id(id: string, node: Item | Container) {
+        this.all[id] = node;
+    }
+    override to_json(): PlainDoc {
+        const { version, viewport, defs } = this;
+        return {
+            version, root: viewport.to_json(),
+            defs: Object.fromEntries(Object.entries(defs).map(([k, v]) => [k, v.to_json()]))
+        };
+    }
+
+    from_json(src: PlainDoc) {
+        const { version, root, defs } = src;
+        if (!version) {
+            throw new Error("No version {${Object.keys(src)}}");
+        } else if (! /^\d+\.\d+\.\d+$/.test(version)) {
+            throw new Error("Invalid version");
+        } else {
+            this.version = version;
+        }
+        this.defs = {};
+        if (defs) {
+            Object.entries(defs).map(([k, v]) => {
+                this.defs[k] = from_json_walk(v, this);
+            });
+        }
+        if (!root) {
+            throw new Error("No root");
+        } else {
+            this.set_viewport(from_json_walk(root, this) as ViewPort);
+        }
+    }
+    // new_view, new_rect
+    to_dom(doc: typeof SVGElement.prototype.ownerDocument): SVGElement {
+        const element = this.viewport.to_dom(doc);
+        const defs = doc.createElementNS(NS_SVG, "defs");
+        for (let [n, v] of Object.entries(this.defs)) {
+            defs.appendChild(v.to_dom(doc));
+        }
+        if (defs.firstElementChild) {
+            element.insertBefore(defs, element.firstChild);
+        }
+        return element;
+    }
+}
+
+export interface PlainNode {
+    tag: string;
+    nodes: PlainNode[];
+    opacity: Value<any>;
+}
+
+export interface PlainDoc {
+    version: string;
+    root: PlainNode;
+    defs: { [key: string]: PlainNode };
 }

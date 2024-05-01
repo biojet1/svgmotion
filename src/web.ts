@@ -1,6 +1,6 @@
 import * as all from "./index.js";
 
-export function animate(root: all.Root, fps: number) {
+export function animate(root: all.Doc, fps: number) {
     const [start, end] = root.calc_time_range();
     if (end >= start) {
 
@@ -31,11 +31,5 @@ export function animate(root: all.Root, fps: number) {
 
 // globalThis.requestAnimationFrame()
 
-(globalThis as unknown as any).svgmotion = {
-    root: function () {
-        return new all.Root();
-    }, animate, ...all,
+(globalThis as unknown as any).svgmotion = { animate, ...all };
 
-};
-
-(globalThis as unknown as any).animate = animate;

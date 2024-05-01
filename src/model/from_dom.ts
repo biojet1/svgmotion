@@ -1,5 +1,5 @@
 
-import { ViewPort, Item, Container, Root } from "./node.js";
+import { ViewPort, Item, Container, Doc } from "./node.js";
 import { NVector, NumberValue } from "./keyframes.js";
 import { Parent, Node } from "./linked.js";
 
@@ -10,12 +10,7 @@ const TAG_DOM: {
     svg: function (e: SVGElement, parent: Container) {
         let elem = e as SVGSVGElement;
         // Node
-        let node;
-        if (parent instanceof Doc) {
-            node = parent.add_root();
-        } else {
-            node = parent.add_view();
-        }
+        let node = parent.add_view();
         // Defs
         {
             for (const child of [...e.children]) {
@@ -123,17 +118,10 @@ const TAG_DOM: {
     },
 };
 
-class Doc extends ViewPort {
-    _root?: Root;
-    add_root() {
-        const x = new Root();
-        return (this._root = x);
-    }
-}
 
-function get_root(cur: Node) {
+function get_root(cur: Container | Item) {
     for (let x: Node | undefined = cur; x; x = x._parent) {
-        if (x instanceof Root) {
+        if (x instanceof Doc) {
             return x;
         }
     }
@@ -245,10 +233,10 @@ export function parse_svg(
                 } else if (root.localName != "svg") {
                     throw new Error(`not svg tag ${root.localName}`);
                 } else {
-                    const con = new Doc();
+                    const doc = new Doc();
                     // console.log(doc.innerHTML);
-                    const f = walk(root as unknown as SVGSVGElement, con);
-                    return f;
+                    const f = walk(root as unknown as SVGSVGElement, doc);
+                    return doc;
                 }
             })
             .catch((err) => {

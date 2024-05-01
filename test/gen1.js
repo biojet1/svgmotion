@@ -1,7 +1,7 @@
 
 export async function animate(lib) {
-    const { Head } = lib;
-    const h = new Head();
-    console.log(h.viewport);
+    const { Doc } = lib;
+    const h = new Doc();
+    console.log(h.viewport.view_box);
 
 }
