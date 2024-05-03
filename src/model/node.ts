@@ -7,7 +7,7 @@ import {
     TextValue,
     Value,
 } from "./keyframes.js";
-import { Box, ValueSet } from "./properties.js";
+import { Box, ValueSet, xset, xget } from "./properties.js";
 import { Node, Parent } from "./linked.js";
 import { SVGProps } from "./svgprops.js";
 import { update_dom } from "./update_dom.js";
@@ -140,52 +140,52 @@ export class ViewPort extends Container {
     static tag = "svg";
     ///
     get view_box() {
-        return this._getx("view_box", new Box([0, 0], [100, 100]));
+        return xget(this, "view_box", new Box([0, 0], [100, 100]));
     }
     set view_box(v: Box) {
-        this._setx("view_box", v);
+        xset(this, "view_box", v);
     }
     ///
     get width() {
-        return this._getx("width", new NumberValue(100));
+        return xget(this, "width", new NumberValue(100));
     }
     set width(v: NumberValue) {
-        this._setx("width", v);
+        xset(this, "width", v);
     }
     ///
     get height() {
-        return this._getx("height", new NumberValue(100));
+        return xget(this, "height", new NumberValue(100));
     }
     set height(v: NumberValue) {
-        this._setx("height", v);
+        xset(this, "height", v);
     }
     ///
     get x() {
-        return this._getx("x", new NumberValue(0));
+        return xget(this, "x", new NumberValue(0));
     }
     set x(v: NumberValue) {
-        this._setx("x", v);
+        xset(this, "x", v);
     }
     ///
     get y() {
-        return this._getx("y", new NumberValue(0));
+        return xget(this, "y", new NumberValue(0));
     }
     set y(v: NumberValue) {
-        this._setx("y", v);
+        xset(this, "y", v);
     }
     ///
     get fit_view() {
-        return this._getx("fit_view", new TextValue(""));
+        return xget(this, "fit_view", new TextValue(""));
     }
     set fit_view(v: TextValue) {
-        this._setx("fit_view", v);
+        xset(this, "fit_view", v);
     }
     ///
     get zoom_pan() {
-        return this._getx("zoom_pan", new TextValue("disable"));
+        return xget(this, "zoom_pan", new TextValue("disable"));
     }
     set zoom_pan(v: TextValue) {
-        this._setx("zoom_pan", v);
+        xset(this, "zoom_pan", v);
     }
 }
 
@@ -195,10 +195,10 @@ export class Path extends Shape {
     static tag = "path";
     ///
     get d() {
-        return this._getx("d", new TextValue(""));
+        return xget(this, "d", new TextValue(""));
     }
     set d(v: TextValue) {
-        this._setx("d", v);
+        xset(this, "d", v);
     }
 }
 
@@ -206,52 +206,52 @@ export class Rect extends Shape {
     static tag = "rect";
     ///
     get width() {
-        return this._getx("width", new NumberValue(100));
+        return xget(this, "width", new NumberValue(100));
     }
     set width(v: NumberValue) {
-        this._setx("width", v);
+        xset(this, "width", v);
     }
     ///
     get height() {
-        return this._getx("height", new NumberValue(100));
+        return xget(this, "height", new NumberValue(100));
     }
     set height(v: NumberValue) {
-        this._setx("height", v);
+        xset(this, "height", v);
     }
     ///
     get x() {
-        return this._getx("x", new NumberValue(0));
+        return xget(this, "x", new NumberValue(0));
     }
     set x(v: NumberValue) {
-        this._setx("x", v);
+        xset(this, "x", v);
     }
     ///
     get y() {
-        return this._getx("y", new NumberValue(0));
+        return xget(this, "y", new NumberValue(0));
     }
     set y(v: NumberValue) {
-        this._setx("y", v);
+        xset(this, "y", v);
     }
     ///
     get rx() {
-        return this._getx("rx", new NumberValue(0));
+        return xget(this, "rx", new NumberValue(0));
     }
     set rx(v: NumberValue) {
-        this._setx("rx", v);
+        xset(this, "rx", v);
     }
     ///
     get ry() {
-        return this._getx("ry", new NumberValue(0));
+        return xget(this, "ry", new NumberValue(0));
     }
     set ry(v: NumberValue) {
-        this._setx("ry", v);
+        xset(this, "ry", v);
     }
     ///
     get size() {
-        return this._getx("size", new PositionValue(new NVector([100, 100])));
+        return xget(this, "size", new PositionValue(new NVector([100, 100])));
     }
     set size(v: PositionValue) {
-        this._setx("size", v);
+        xset(this, "size", v);
     }
     // 
 }

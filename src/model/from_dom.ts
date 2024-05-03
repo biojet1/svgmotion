@@ -151,18 +151,6 @@ function set_common_attr(
         case "transform":
             if (value) {
                 node.transform.parse(value);
-                // console.log(
-                //     "transform",
-                //     Object.keys(node.transform),
-                //     node.transform,
-                //     node.transform.position,
-                //     node.transform.get_matrix(0),
-                //     node.transform.position.get_value(0)
-                // );
-                // console.log(
-                //     "decompose",
-                //     node.transform.get_matrix(0).decompose()
-                // );
             }
             break;
 

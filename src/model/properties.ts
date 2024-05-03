@@ -1,6 +1,24 @@
 import { Animatable, NVector, NVectorValue, NumberValue, PositionValue, RGBValue, Value } from "./keyframes.js";
 import { Matrix } from "./matrix.js";
 
+export function xget<T>(that: any, name: string, value: T): T {
+    // console.log(`_GETX ${name}`);
+    Object.defineProperty(that, name, {
+        value,
+        writable: true,
+        enumerable: true,
+    });
+    return value;
+}
+export function xset<T>(that: any, name: string, value: T) {
+    // console.log(`_SETX ${name}`);
+    Object.defineProperty(that, name, {
+        value,
+        writable: true,
+        enumerable: true,
+    });
+}
+
 export class ValueSet {
     // [key: string]: Animatable;
     *enum_values(): Generator<Animatable<any>, void, unknown> {
@@ -33,24 +51,6 @@ export class ValueSet {
             }
         }
     }
-    ///
-    _getx<T>(name: string, value: T): T {
-        console.log(`_GETX ${name}`);
-        Object.defineProperty(this, name, {
-            value,
-            writable: true,
-            enumerable: true,
-        });
-        return value;
-    }
-    _setx<T>(name: string, value: T) {
-        console.log(`_SETX ${name}`);
-        Object.defineProperty(this, name, {
-            value,
-            writable: true,
-            enumerable: true,
-        });
-    }
 }
 
 export class Box extends ValueSet {
@@ -65,44 +65,44 @@ export class Box extends ValueSet {
     }
     /// size
     get size() {
-        return this._getx("size", new PositionValue(new NVector([100, 100])));
+        return xget(this, "size", new PositionValue(new NVector([100, 100])));
     }
     set size(v: PositionValue) {
-        this._setx("size", v);
+        xset(this, "size", v);
     }
     /// position
     get position() {
-        return this._getx("position", new PositionValue(new NVector([0, 0])));
+        return xget(this, "position", new PositionValue(new NVector([0, 0])));
     }
     set position(v: PositionValue) {
-        this._setx("position", v);
+        xset(this, "position", v);
     }
 }
 
 export class Stroke extends ValueSet {
     /// width
     get width() {
-        return this._getx("width", new NumberValue(1));
+        return xget(this, "width", new NumberValue(1));
     }
     set width(v: NumberValue) {
-        this._setx("width", v);
+        xset(this, "width", v);
     }
 }
 
 export class Fill extends ValueSet {
     /// opacity
     get opacity() {
-        return this._getx("opacity", new NumberValue(1));
+        return xget(this, "opacity", new NumberValue(1));
     }
     set opacity(v: NumberValue) {
-        this._setx("opacity", v);
+        xset(this, "opacity", v);
     }
     /// opacity
     get color() {
-        return this._getx("color", new RGBValue(new NVector([0, 0, 0])));
+        return xget(this, "color", new RGBValue(new NVector([0, 0, 0])));
     }
     set color(v: RGBValue) {
-        this._setx("color", v);
+        xset(this, "color", v);
     }
 }
 
@@ -115,13 +115,7 @@ export class Transform extends ValueSet {
         const { anchor, scale, skew, rotation, position } = this;
 
         // console.log("get_matrix before position", m);
-        if (position) {
-            const [x, y] = position.get_value(frame);
-            // console.log(" position", x, y, Matrix.translate(x, y));
-            if (x || y) {
-                m = m.cat(Matrix.translate(x, y));
-            }
-        }
+
         // console.log("get_matrix after position", m);
 
         if (anchor) {
@@ -156,13 +150,29 @@ export class Transform extends ValueSet {
             }
         }
         // console.log("get_matrix", m);
+        if (position) {
+            const [x, y] = position.get_value(frame);
+            // console.log(" position", x, y, Matrix.translate(x, y));
+            if (x || y) {
+                m = m.cat(Matrix.translate(x, y));
+            }
+        }
         return m;
+    }
+    clear() {
+        const o: any = this;
+        delete o['anchor'];
+        delete o['scale'];
+        delete o['rotation'];
+        delete o['skew_axis'];
+        delete o['skew'];
+        delete o['position'];
     }
     parse(s: string) {
         const { rotation, scale, skew, skew_axis, translation } = Matrix.parse(s).take_apart();
-
+        this.clear();
         if (translation[0] !== 0 || translation[1] !== 0) {
-            this.position = new PositionValue(new NVector([-translation[0], -translation[1]]));
+            this.anchor = new PositionValue(new NVector([-translation[0], -translation[1]]));
         }
         if (scale[0] !== 1 || scale[1] !== 1) {
             this.scale = new PositionValue(new NVector(scale));
@@ -209,45 +219,45 @@ export class Transform extends ValueSet {
     }
     /// anchor
     get anchor() {
-        return this._getx("anchor", new PositionValue(new NVector([0, 0])));
+        return xget(this, "anchor", new PositionValue(new NVector([0, 0])));
     }
     set anchor(v: PositionValue) {
-        this._setx("anchor", v);
+        xset(this, "anchor", v);
     }
     /// position
     get position() {
-        return this._getx("position", new PositionValue(new NVector([0, 0])));
+        return xget(this, "position", new PositionValue(new NVector([0, 0])));
     }
     set position(v: PositionValue) {
-        this._setx("position", v);
+        xset(this, "position", v);
     }
     /// scale
     get scale() {
-        return this._getx("scale", new NVectorValue(new NVector([1, 1])));
+        return xget(this, "scale", new NVectorValue(new NVector([1, 1])));
     }
     set scale(v: NVectorValue) {
-        this._setx("scale", v);
+        xset(this, "scale", v);
     }
     /// rotation
     get rotation() {
-        return this._getx("rotation", new NumberValue(0));
+        return xget(this, "rotation", new NumberValue(0));
     }
     set rotation(v: NumberValue) {
-        this._setx("rotation", v);
+        xset(this, "rotation", v);
     }
     /// skew
     get skew() {
-        return this._getx("skew", new NumberValue(0));
+        return xget(this, "skew", new NumberValue(0));
     }
     set skew(v: NumberValue) {
-        this._setx("skew", v);
+        xset(this, "skew", v);
     }
     /// skew_axis
     get skew_axis() {
-        return this._getx("skew_axis", new NumberValue(0));
+        return xget(this, "skew_axis", new NumberValue(0));
     }
     set skew_axis(v: NumberValue) {
-        this._setx("skew_axis", v);
+        xset(this, "skew_axis", v);
     }
     ///
 }

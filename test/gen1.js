@@ -1,7 +1,9 @@
 
+
+import { Doc } from "svgmotion";
 export async function animate(lib) {
-    const { Doc } = lib;
-    const h = new Doc();
-    console.log(h.viewport.view_box);
+    const doc = new Doc();
+    await doc.load_svg("../../python/flottie/example/res/thank_you_tp.svg");
+    return doc;
 
 }

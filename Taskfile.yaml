@@ -1,0 +1,30 @@
+version: "3"
+
+tasks:
+    compile:
+        method: timestamp
+        cmds:
+            - npx tsc -d --sourcemap
+        sources:
+            - src/**/*.ts
+        generates:
+            - dist/**/*.js
+
+    webpack:
+        method: none
+        deps: [compile]
+        cmds:
+            - npx webpack
+
+    test:
+        method: none
+        deps: [webpack]
+        cmds:
+            - npm run test
+
+    gen1:
+        method: none
+        deps: [webpack]
+        cmds:
+            - |
+                npx svgmotion gen -o /tmp/gen1.html test/gen1.js

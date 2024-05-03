@@ -1,5 +1,5 @@
 import { Animatable, NumberValue, Value } from "./keyframes.js";
-import { Fill, Transform, ValueSet } from "./properties.js";
+import { Fill, Transform, ValueSet, xset, xget } from "./properties.js";
 // import { Node, Parent } from "./linked.js";
 export type Constructor = new (...args: any[]) => {};
 export function SVGProps<TBase extends Constructor>(Base: TBase) {
@@ -9,51 +9,32 @@ export function SVGProps<TBase extends Constructor>(Base: TBase) {
         static tag = '';
         ///
         get prop5() {
-            return this._getx("prop5", new NumberValue(45));
+            return xget(this, "prop5", new NumberValue(45));
         }
         set prop5(v: NumberValue) {
-            this._setx("prop5", v);
+            xset(this, "prop5", v);
         }
         /// fill
         get fill() {
-            return this._getx("fill", new Fill());
+            return xget(this, "fill", new Fill());
         }
         set fill(v: Fill) {
-            this._setx("fill", v);
+            xset(this, "fill", v);
         }
         /// opacity
         get opacity() {
-            return this._getx("opacity", new NumberValue(1));
+            return xget(this, "opacity", new NumberValue(1));
         }
         set opacity(v: NumberValue) {
-            this._setx("opacity", v);
+            xset(this, "opacity", v);
         }
         /// transform
         get transform() {
-            return this._getx("transform", new Transform());
+            return xget(this, "transform", new Transform());
         }
         set transform(v: Transform) {
-            this._setx("transform", v);
+            xset(this, "transform", v);
         }
-        ///
-        _getx<T>(name: string, value: T): T {
-            console.log(`_GETX ${name}`);
-            Object.defineProperty(this, name, {
-                value,
-                writable: true,
-                enumerable: true,
-            });
-            return value;
-        }
-        _setx<T>(name: string, value: T) {
-            console.log(`_SETX ${name}`);
-            Object.defineProperty(this, name, {
-                value,
-                writable: true,
-                enumerable: true,
-            });
-        }
-        ///
         to_json() {
             const o: any = { tag: (<typeof SVGProps>this.constructor).tag };
             for (let [k, v] of Object.entries(this)) {

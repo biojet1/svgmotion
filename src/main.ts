@@ -5,7 +5,7 @@ import * as lib from './index.js';
 import { Doc } from "./model/node.js";
 declare module "./model/node" {
     interface Doc {
-        save_html(file: string): void;
+        save_html(file: string): Promise<void>;
     }
 }
 Doc.prototype.save_html = async function (file: string) {
@@ -53,7 +53,7 @@ export async function main() {
                                 output: {
                                     alias: 'o',
                                     describe: 'output file',
-                                    count: true,
+                                    type: "string",
                                 },
                                 verbose: {
                                     alias: 'v',
@@ -68,7 +68,9 @@ export async function main() {
                             console.log("import gen", animate);
                             return animate(lib);
                         }).then((doc) => {
-                            // doc.
+                            if (args.output) {
+                                return doc.save_html(args.output);
+                            }
                         });
                     }
                 )
