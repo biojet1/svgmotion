@@ -245,3 +245,44 @@ export function parse_svg(
             });
     });
 }
+
+export function load_svg(
+    parent: Container,
+    src: string | URL,
+    opt: { xinclude?: boolean; base?: string | URL } = {}
+) {
+    return import("domspec").then((domspec) => {
+        // console.log("domspec", domspec.DOMParser.loadXML);
+        return domspec.DOMParser.loadXML(src, { ...opt, type: "image/svg+xml" })
+            .then((doc) => {
+                const base = opt.base || src;
+                const root = (doc as unknown as XMLDocument).documentElement;
+                // console.info(`loadrd "${src}" ${root?.localName}`);
+                if (root.namespaceURI != NS_SVG) {
+                    throw new Error(`not svg namespace ${root.namespaceURI}`);
+                }
+                if (parent instanceof Doc) {
+                    if (root.localName != "svg") {
+                        throw new Error(`not svg tag ${root.localName}`);
+                    }
+                }
+                const f = walk(root as unknown as SVGSVGElement, parent);
+            })
+            .catch((err) => {
+                console.error(`Failed to load "${src}"`);
+                throw err;
+            });
+    });
+}
+
+declare module "./node" {
+    interface Container {
+        load_svg(src: string | URL, opt: { xinclude?: boolean; base?: string | URL }): void;
+    }
+}
+
+Container.prototype.load_svg = function (src: string | URL,
+    opt: { xinclude?: boolean; base?: string | URL }) {
+    return load_svg(this, src, opt);
+}
+

@@ -29,7 +29,26 @@ export function animate(root: all.Doc, fps: number) {
     }
 }
 
-// globalThis.requestAnimationFrame()
+declare module "./model/node" {
+    interface Doc {
+        animate(params: {
+            fps: number,
+            parent: string | Element | null
 
-(globalThis as unknown as any).svgmotion = { animate, ...all };
+        }): void;
+    }
+}
+
+all.Doc.prototype.animate = function ({ fps = 60, parent }) {
+    if (typeof parent === 'string') {
+        parent = document.getElementById(parent);
+    }
+    if (parent) {
+        let svg = this.to_dom(document);
+        parent.appendChild(svg);
+    }
+    animate(this, fps);
+};
+
+(globalThis as unknown as any).svgmotion = all;
 

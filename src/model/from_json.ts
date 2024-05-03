@@ -18,6 +18,10 @@ const TAGS: {
         let node = parent.add_rect();
         return node;
     },
+    path: function (parent: Container) {
+        let node = parent.add_path();
+        return node;
+    },
 };
 
 export function from_json_walk(obj: PlainNode, parent: Container) {
@@ -40,5 +44,3 @@ export function from_json_walk(obj: PlainNode, parent: Container) {
         throw new Error(`No processor for "${tag}"`);
     }
 }
-
-

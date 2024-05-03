@@ -67,19 +67,19 @@ export class Keyframes<V> extends Array<KeyframeEntry<V>> {
 export class Animatable<V> {
     value!: Keyframes<V> | V;
     lerp_value(ratio: number, a: V, b: V): V {
-        throw Error(`Not implemented`);
+        throw Error(`Not implemented by '${this.constructor.name}'`);
     }
     add_value(a: V, b: V): V {
-        throw Error(`Not implemented`);
+        throw Error(`Not implemented by '${this.constructor.name}'`);
     }
     value_to_json(a: V): any {
-        throw Error(`Not implemented`);
+        throw Error(`Not implemented by '${this.constructor.name}'`);
     }
     value_from_json(a: any): V {
-        throw Error(`Not implemented`);
+        throw Error(`Not implemented by '${this.constructor.name}'`);
     }
     parse_value(a: string) {
-        throw Error(`Not implemented`);
+        throw Error(`Not implemented by '${this.constructor.name}'`);
     }
 
     get_value(frame: number) {
@@ -183,16 +183,17 @@ export class Animatable<V> {
 
     from_json(x: ValueP<any>) {
         const { k, v } = x;
-        if (k) {
+        if (k != undefined) {
             const kfs = new Keyframes<V>();
             kfs.push(
                 ...k.map((x) => kfe_from_json(x, this.value_from_json(x.v)))
             );
             this.value = kfs;
-        } else if (v) {
+        } else if (v != undefined) {
             this.value = this.value_from_json(x.v);
         } else {
-            throw Error(`No k, v`);
+            // console.error(x);
+            throw Error(`No k, v (${Object.entries(x)})`);
         }
     }
 }
@@ -270,6 +271,10 @@ export class NumberValue extends Animatable<number> {
     override value_to_json(v: number): any {
         return v;
     }
+    override value_from_json(a: any): number {
+        return a as number;
+    }
+
     override parse_value(s: string) {
         this.value = parseFloat(s);
     }
@@ -369,5 +374,11 @@ export class TextValue extends AnimatableD<string> {
     }
     override parse_value(s: string) {
         this.value = s;
+    }
+    override value_to_json(s: string) {
+        return s;
+    }
+    override value_from_json(a: any): string {
+        return a + '';
     }
 }

@@ -28,7 +28,6 @@ export function SVGProps<TBase extends Constructor>(Base: TBase) {
         set opacity(v: NumberValue) {
             this._setx("opacity", v);
         }
-        // static opacity = { name: 'opacity' };
         /// transform
         get transform() {
             return this._getx("transform", new Transform());

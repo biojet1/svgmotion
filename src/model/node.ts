@@ -301,6 +301,12 @@ export class Doc extends Container {
     remember_id(id: string, node: Item | Container) {
         this.all[id] = node;
     }
+    override add_view(): ViewPort {
+        this.remove_children();
+        return super.add_view();
+
+    }
+
     override to_json(): PlainDoc {
         const { version, viewport, defs } = this;
         return {
@@ -315,19 +321,20 @@ export class Doc extends Container {
             throw new Error("No version {${Object.keys(src)}}");
         } else if (! /^\d+\.\d+\.\d+$/.test(version)) {
             throw new Error("Invalid version");
-        } else {
-            this.version = version;
+        } else if (!root) {
+            throw new Error("No root");
         }
+        const vp = from_json_walk(root, this);
+        if (!(vp instanceof ViewPort)) {
+            throw new Error("ViewPort expected");
+        }
+        this.version = version;
         this.defs = {};
+        this.set_viewport(from_json_walk(root, this) as ViewPort);
         if (defs) {
             Object.entries(defs).map(([k, v]) => {
                 this.defs[k] = from_json_walk(v, this);
             });
-        }
-        if (!root) {
-            throw new Error("No root");
-        } else {
-            this.set_viewport(from_json_walk(root, this) as ViewPort);
         }
     }
     // new_view, new_rect

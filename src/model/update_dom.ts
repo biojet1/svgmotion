@@ -1,7 +1,7 @@
-import { NVectorValue, NumberValue, RGBValue, TextValue } from "./keyframes.js";
+import { Animatable, NVectorValue, NumberValue, RGBValue, TextValue } from "./keyframes.js";
 import { Container, Item } from "./node.js";
 import { Node } from "./linked.js";
-import { Transform, Fill, Box } from "./properties.js";
+import { Transform, Fill, Box, ValueSet } from "./properties.js";
 
 const PROP_MAP: {
     [key: string]: any;
@@ -94,7 +94,15 @@ export function update_dom(frame: number, target: Item | Container) {
         const elem = (cur as any)._element;
         if (elem) {
             for (let [n, v] of Object.entries(cur)) {
-                v && PROP_MAP[n]?.(frame, elem, v);
+                if (v instanceof ValueSet || v instanceof Animatable) {
+                    const f = PROP_MAP[n];
+                    if (f) {
+                        f(frame, elem, v);
+                    } else {
+                        throw new Error("ViewPort expected");
+                    }
+                }
+
             }
         }
     } while (cur !== end && (cur = cur._next));

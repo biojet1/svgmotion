@@ -78,9 +78,12 @@
                 )
             );
             console.log(doc);
-            let svg = doc.to_dom(document);
-            document.body.appendChild(svg);
-            animate(doc, 60);
+
+            doc.animate({ parent: document.body });
+            /*
+            const doc = new Doc();
+            doc.from_json({}).animate()
+            */
         </script>
     </head>
     <body></body>
