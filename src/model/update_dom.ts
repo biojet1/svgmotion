@@ -1,7 +1,7 @@
 import { Animatable, NVectorValue, NumberValue, RGBValue, TextValue } from "./keyframes.js";
 import { Container, Item } from "./node.js";
 import { Node } from "./linked.js";
-import { Transform, Fill, Box, ValueSet } from "./properties.js";
+import { Transform, Fill, Box, ValueSet, Font, Stroke } from "./properties.js";
 
 const PROP_MAP: {
     [key: string]: any;
@@ -85,6 +85,45 @@ const PROP_MAP: {
             }
         }
     },
+    stroke: function (frame: number, node: SVGSVGElement, prop: Stroke) {
+        for (let [n, v] of Object.entries(prop)) {
+            switch (n) {
+                case "opacity":
+                    node.style.strokeOpacity = v.get_value(frame) + '';
+                    break;
+                case "width":
+                    node.style.strokeWidth = v.get_value(frame);
+                    break;
+            }
+
+        }
+    },
+    font: function (frame: number, node: SVGSVGElement, prop: Font) {
+        for (let [n, v] of Object.entries(prop)) {
+            switch (n) {
+                case "weight":
+                    node.style.fontWeight = v.get_value(frame);
+                    break;
+                case "size":
+                    node.style.fontSize = v.get_value(frame);
+                    break;
+                case "family":
+                    node.style.fontFamily = v.get_value(frame);
+                    break;
+            }
+
+        }
+    },
+
+    line_height: function (frame: number, node: SVGElement, prop: NumberValue) {
+        node.style.lineHeight = prop.get_value(frame) + '';
+    },
+    text_align: function (frame: number, node: SVGElement, prop: TextValue) {
+        node.style.textAlign = prop.get_value(frame) + '';
+    },
+    white_space: function (frame: number, node: SVGElement, prop: TextValue) {
+        node.style.whiteSpace = prop.get_value(frame) + '';
+    },
 };
 
 export function update_dom(frame: number, target: Item | Container) {
@@ -99,7 +138,7 @@ export function update_dom(frame: number, target: Item | Container) {
                     if (f) {
                         f(frame, elem, v);
                     } else {
-                        throw new Error("ViewPort expected");
+                        throw new Error(`Unexpected property ${n}`);
                     }
                 }
 

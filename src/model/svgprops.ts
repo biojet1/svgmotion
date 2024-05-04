@@ -1,5 +1,5 @@
-import { Animatable, NumberValue, Value } from "./keyframes.js";
-import { Fill, Transform, ValueSet, xset, xget } from "./properties.js";
+import { Animatable, NumberValue, TextValue, Value } from "./keyframes.js";
+import { Fill, Transform, ValueSet, xset, xget, Font, Stroke } from "./properties.js";
 // import { Node, Parent } from "./linked.js";
 export type Constructor = new (...args: any[]) => {};
 export function SVGProps<TBase extends Constructor>(Base: TBase) {
@@ -21,12 +21,27 @@ export function SVGProps<TBase extends Constructor>(Base: TBase) {
         set fill(v: Fill) {
             xset(this, "fill", v);
         }
+        /// stroke
+        get stroke() {
+            return xget(this, "stroke", new Stroke());
+        }
+        set stroke(v: Stroke) {
+            xset(this, "stroke", v);
+        }
+
         /// opacity
         get opacity() {
             return xget(this, "opacity", new NumberValue(1));
         }
         set opacity(v: NumberValue) {
             xset(this, "opacity", v);
+        }
+        /// Font
+        get font() {
+            return xget(this, "font", new Font());
+        }
+        set font(v: Font) {
+            xset(this, "font", v);
         }
         /// transform
         get transform() {
@@ -35,6 +50,28 @@ export function SVGProps<TBase extends Constructor>(Base: TBase) {
         set transform(v: Transform) {
             xset(this, "transform", v);
         }
+        // line_height
+        get line_height() {
+            return xget(this, "line_height", new NumberValue(1));
+        }
+        set line_height(v: NumberValue) {
+            xset(this, "line_height", v);
+        }
+        /// text-align
+        get text_align() {
+            return xget(this, "text_align", new TextValue('center'));
+        }
+        set text_align(v: TextValue) {
+            xset(this, "text_align", v);
+        }
+        /// white-space
+        get white_space() {
+            return xget(this, "white_space", new TextValue('pre'));
+        }
+        set white_space(v: TextValue) {
+            xset(this, "white_space", v);
+        }
+        //
         to_json() {
             const o: any = { tag: (<typeof SVGProps>this.constructor).tag };
             for (let [k, v] of Object.entries(this)) {
@@ -54,16 +91,6 @@ export function SVGProps<TBase extends Constructor>(Base: TBase) {
                 }
             }
         }
-        //
-        // root<T extends Parent = Parent>() {
-        //     let root = this._parent;
-        //     if (root) {
-        //         for (let x; (x = root._parent); root = x);
-        //         return root as T;
-        //     }
-        // }
-
-
     };
 }
 

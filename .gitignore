@@ -130,4 +130,5 @@ out
 .pnp.*
 
 .tap/
+.task/
 dist/

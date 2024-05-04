@@ -1,4 +1,4 @@
-import { Animatable, NVector, NVectorValue, NumberValue, PositionValue, RGBValue, Value } from "./keyframes.js";
+import { Animatable, NVector, NVectorValue, NumberValue, PositionValue, RGBValue, TextValue, Value } from "./keyframes.js";
 import { Matrix } from "./matrix.js";
 
 export function xget<T>(that: any, name: string, value: T): T {
@@ -87,6 +87,13 @@ export class Stroke extends ValueSet {
     set width(v: NumberValue) {
         xset(this, "width", v);
     }
+    /// opacity
+    get color() {
+        return xget(this, "color", new RGBValue(new NVector([0, 0, 0])));
+    }
+    set color(v: RGBValue) {
+        xset(this, "color", v);
+    }
 }
 
 export class Fill extends ValueSet {
@@ -104,6 +111,32 @@ export class Fill extends ValueSet {
     set color(v: RGBValue) {
         xset(this, "color", v);
     }
+    // 
+}
+export class Font extends ValueSet {
+    /// weight
+    get weight() {
+        return xget(this, "weight", new TextValue('normal'));
+    }
+    set weight(v: TextValue) {
+        xset(this, "weight", v);
+    }
+    /// size
+    get size() {
+        return xget(this, "size", new TextValue('normal'));
+    }
+    set size(v: TextValue) {
+        xset(this, "size", v);
+    }
+    /// font-family
+    get family() {
+        return xget(this, "family", new TextValue('monospace'));
+    }
+    set family(v: TextValue) {
+        xset(this, "family", v);
+    }
+
+
 }
 
 

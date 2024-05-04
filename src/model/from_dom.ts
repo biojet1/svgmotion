@@ -137,9 +137,9 @@ function set_common_attr(
     elem: SVGElement,
     style: boolean = false
 ) {
-    console.log(
-        `set_common_attr ${name}="${value}" ${elem.localName} ${node.constructor.name} ${style}`
-    );
+    // console.log(
+    //     `set_common_attr ${name}="${value}" ${elem.localName} ${node.constructor.name} ${style}`
+    // );
     switch (name) {
         case "id":
             if (value) {
@@ -153,19 +153,69 @@ function set_common_attr(
                 node.transform.parse(value);
             }
             break;
-
+        case "font-weight":
+            if (value) {
+                node.font.weight.parse_value(value);
+            }
+            break;
+        case "font-size":
+            if (value) {
+                node.font.size.parse_value(value);
+            }
+            break;
+        case "font-family":
+            if (value) {
+                node.font.family.parse_value(value);
+            }
+            break;
+        case "line-height":// .text?
+            if (value) {
+                node.line_height.parse_value(value);
+            }
+            break;
+        case "text-align":// .text?
+            if (value) {
+                node.text_align.parse_value(value);
+            }
+            break;
+        case "white-space":// .text?
+            if (value) {
+                node.white_space.parse_value(value);
+            }
+            break;
+        case "fill":// 
+            if (value) {
+                node.fill.color.parse_value(value);
+            }
+            break;
+        case "stroke":// 
+            if (value) {
+                node.stroke.color.parse_value(value);
+            }
+            break;
+        case "stroke-width":// 
+            if (value) {
+                node.stroke.width.parse_value(value);
+            }
+            break;
         case "style":
             const asm = elem.attributeStyleMap;
             for (const [sname, value] of asm.entries()) {
-                // console.log("STYLE", sname, value, value.constructor.name, style);
-                // set_common_attr(node, sname, value.toString(), elem, true);
+                console.log("STYLE", sname, value, value.constructor.name, style);
+                set_common_attr(node, sname, value.toString(), elem, true);
             }
             break;
+        case "shape-inside":
+            break;
+
 
         default:
-            if (!name.startsWith("aria-")) {
+            if (!(name.startsWith("aria-") || name.startsWith("-inkscape"))) {
+                // console.log(
+                //     `set_common_attr No ${name}="${value}" ${elem.localName} ${node.constructor.name} ${style}`
+                // );
                 throw new Error(
-                    `Unexpected attribute ${name}="${value}" ${elem.localName} ${node.constructor.name}`
+                    `Unexpected attribute [${name}]="${value}" tag="${elem.localName}" node="${node.constructor.name}"`
                 );
             }
     }

@@ -1,6 +1,7 @@
 export * from "./model/index.js";
 export * from "./track/index.js";
 export * from "./model/from_dom.js";
+export * from "./helper/parse_color.js";
 import * as lib from './index.js';
 import { Doc } from "./model/node.js";
 declare module "./model/node" {

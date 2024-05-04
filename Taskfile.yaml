@@ -3,18 +3,22 @@ version: "3"
 tasks:
     compile:
         method: timestamp
-        cmds:
-            - npx tsc -d --sourcemap
         sources:
             - src/**/*.ts
         generates:
             - dist/**/*.js
+        cmds:
+            - npx tsc -d --sourcemap
 
     webpack:
-        method: none
-        deps: [compile]
+        method: timestamp
+        sources:
+            - src/**/*.ts
+        generates:
+            - dist/svgmotion.web.js
         cmds:
             - npx webpack
+        deps: [compile]
 
     test:
         method: none
@@ -23,7 +27,7 @@ tasks:
             - npm run test
 
     gen1:
-        method: none
+        method: timestamp
         deps: [webpack]
         cmds:
             - |
