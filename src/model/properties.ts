@@ -88,11 +88,40 @@ export class Stroke extends ValueSet {
         xset(this, "width", v);
     }
     /// opacity
+    get opacity() {
+        return xget(this, "opacity", new NumberValue(1));
+    }
+    set opacity(v: NumberValue) {
+        xset(this, "opacity", v);
+    }
+    /// color
     get color() {
         return xget(this, "color", new RGBValue(new NVector([0, 0, 0])));
     }
     set color(v: RGBValue) {
         xset(this, "color", v);
+    }
+    /// stroke-miterlimit
+    get miter_limit() {
+        return xget(this, "miter_limit", new NumberValue(4));
+    }
+    set miter_limit(v: NumberValue) {
+        xset(this, "miter_limit", v);
+    }
+    // stroke-dashoffset
+    get dash_offset() {
+        return xget(this, "dash_offset", new NumberValue(1));
+    }
+    set dash_offset(v: NumberValue) {
+        xset(this, "dash_offset", v);
+    }
+
+    // stroke-array
+    get dash_array() {
+        return xget(this, "dash_array", new NVectorValue(new NVector([1, 1])));
+    }
+    set dash_array(v: NVectorValue) {
+        xset(this, "dash_array", v);
     }
 }
 
@@ -104,7 +133,7 @@ export class Fill extends ValueSet {
     set opacity(v: NumberValue) {
         xset(this, "opacity", v);
     }
-    /// opacity
+    /// color
     get color() {
         return xget(this, "color", new RGBValue(new NVector([0, 0, 0])));
     }

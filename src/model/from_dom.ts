@@ -116,6 +116,30 @@ const TAG_DOM: {
         }
         return node;
     },
+    circle: function (e: SVGElement, parent: Container) {
+        let node = parent.add_circle();
+        // Properties
+        // console.info(`PATH`, e.getAttributeNames(), e.innerHTML);
+        for (const [name, value] of enum_attrs(e)) {
+            // console.info(`PATH ATTR _ ${name} ${value}`);
+            switch (name) {
+                case "r":
+                    node.r.parse_value(value);
+                    break;
+                case "cx":
+                    node.cx.parse_value(value);
+                    break;
+                case "cy":
+                    node.cy.parse_value(value);
+                    break;
+                default:
+                    set_common_attr(node, name, value, e);
+            }
+        }
+        return node;
+    },
+
+
 };
 
 
@@ -193,9 +217,30 @@ function set_common_attr(
                 node.stroke.color.parse_value(value);
             }
             break;
+        case "stroke-opacity":// 
+            if (value) {
+                node.stroke.opacity.parse_value(value);
+            }
+            break;
         case "stroke-width":// 
             if (value) {
                 node.stroke.width.parse_value(value);
+            }
+            break;
+        case "stroke-miterlimit":// 
+            if (value) {
+                node.stroke.miter_limit.parse_value(value);
+            }
+            break;
+
+        case "stroke-dasharray":// 
+            if (value) {
+                node.stroke.dash_array.parse_value(value);
+            }
+            break;
+        case "stroke-dashoffset":// 
+            if (value) {
+                node.stroke.dash_offset.parse_value(value);
             }
             break;
         case "style":

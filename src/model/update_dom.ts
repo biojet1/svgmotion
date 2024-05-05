@@ -79,7 +79,7 @@ const PROP_MAP: {
                         node.style.fillOpacity = (v as NumberValue).get_value(frame) + '';
                         break;
                     case "color":
-                        node.style.fill = RGBValue.to_css_rgb((v as RGBValue).get_value(frame));
+                        node.style.fill = v.format_value(frame);
                         break;
                 }
             }
@@ -88,12 +88,25 @@ const PROP_MAP: {
     stroke: function (frame: number, node: SVGSVGElement, prop: Stroke) {
         for (let [n, v] of Object.entries(prop)) {
             switch (n) {
+                case "color":
+                    node.style.stroke = v.format_value(frame);
+                    break;
                 case "opacity":
                     node.style.strokeOpacity = v.get_value(frame) + '';
                     break;
                 case "width":
                     node.style.strokeWidth = v.get_value(frame);
                     break;
+                case "miter_limit":
+                    node.style.strokeMiterlimit = v.get_value(frame);
+                    break;
+                case "dash_array":
+                    node.style.strokeDasharray = v.get_value(frame);
+                    break;
+                case "dash_offset":
+                    node.style.strokeDashoffset = v.get_value(frame);
+                    break;
+
             }
 
         }

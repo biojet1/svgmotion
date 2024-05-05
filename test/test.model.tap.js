@@ -20,7 +20,10 @@ test.test("KeyframeEntry", (t) => {
         // console.log(v);
     }
 
+    x.stroke.dash_array.parse_value("4 5 6");
 
+    console.log("x.stroke.dash_array", x.stroke.dash_array.to_json());
+    t.same(x.stroke.dash_array.to_json(), { v: [4, 5, 6] });
 
     t.end();
 

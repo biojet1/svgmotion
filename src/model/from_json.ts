@@ -22,6 +22,10 @@ const TAGS: {
         let node = parent.add_path();
         return node;
     },
+    circle: function (parent: Container) {
+        let node = parent.add_circle();
+        return node;
+    },
 };
 
 export function from_json_walk(obj: PlainNode, parent: Container) {
@@ -37,10 +41,10 @@ export function from_json_walk(obj: PlainNode, parent: Container) {
                 }
             }
         } else if (nodes != undefined) {
-            throw new Error(`unexpectde nodes in "${tag}"`);
+            throw new Error(`unexpected nodes in "${tag}"`);
         }
         return node;
     } else {
-        throw new Error(`No processor for "${tag}"`);
+        throw new Error(`No node factory for "${tag}"`);
     }
 }

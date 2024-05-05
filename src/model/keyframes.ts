@@ -65,23 +65,25 @@ export class Keyframes<V> extends Array<KeyframeEntry<V>> {
 }
 
 export class Animatable<V> {
-    value!: Keyframes<V> | V;
+    value!: Keyframes<V> | V | null;
     lerp_value(ratio: number, a: V, b: V): V {
         throw Error(`Not implemented by '${this.constructor.name}'`);
     }
     add_value(a: V, b: V): V {
         throw Error(`Not implemented by '${this.constructor.name}'`);
     }
-    value_to_json(a: V): any {
+    value_to_json(a: V | null): any {
         throw Error(`Not implemented by '${this.constructor.name}'`);
     }
     value_from_json(a: any): V {
         throw Error(`Not implemented by '${this.constructor.name}'`);
     }
     parse_value(a: string) {
-        throw Error(`Not implemented by '${this.constructor.name}'`);
+        throw Error(`Not implemented by '${this.constructor.name}' ("${a}")`);
     }
-
+    format_value(frame: number): string {
+        throw Error(`Not implemented by '${this.constructor.name}' ("${frame}")`);
+    }
     get_value(frame: number) {
         const { value } = this;
         if (value instanceof Keyframes) {
@@ -112,6 +114,9 @@ export class Animatable<V> {
             }
             throw new Error(`empty keyframe list`);
         } else {
+            if (value == null) {
+                throw new Error(`value cant be null`);
+            }
             return value;
         }
     }
@@ -145,7 +150,9 @@ export class Animatable<V> {
             const v = kfs;
             kfs = this.value = new Keyframes<V>();
             if (start != undefined) {
-                last = kfs.set_value(start, v);
+                if (v != null) {
+                    last = kfs.set_value(start, v);
+                }
             }
         }
         if (last) {
@@ -191,6 +198,8 @@ export class Animatable<V> {
             this.value = kfs;
         } else if (v != undefined) {
             this.value = this.value_from_json(x.v);
+        } else if (v === null) {
+            this.value = null;
         } else {
             // console.error(x);
             throw Error(`No k, v (${Object.entries(x)})`);
@@ -214,6 +223,9 @@ export class AnimatableD<V> extends Animatable<V> {
             }
             throw new Error(`empty keyframe list`);
         } else {
+            if (value == null) {
+                throw new Error(`value cant be null`);
+            }
             return value;
         }
     }
@@ -246,7 +258,9 @@ export class AnimatableD<V> extends Animatable<V> {
             const v = kfs;
             kfs = this.value = new Keyframes<V>();
             if (start != undefined) {
-                last = kfs.set_value(start, v);
+                if (v != null) {
+                    last = kfs.set_value(start, v);
+                }
             }
         }
         if (last) {
@@ -316,11 +330,24 @@ export class NVectorValue extends Animatable<NVector> {
         }
     }
     override value_to_json(a: NVector): any {
-        return Array.from(a);
+        if (a == null) {
+            return null;
+        }
+        return Array.from(a); // NaN -> null
     }
 
     override value_from_json(a: any): NVector {
+        if (a[0] === null) {
+            a = a.map(() => null);
+        }
         return new NVector(a);
+    }
+
+    override parse_value(s: string) {
+        this.value = this.value_from_json(s.split(/[\s,]+/).map(function (str) {
+            return parseFloat(str.trim());
+        }));
+
     }
 
     constructor(v: NVector | Keyframes<NVector>) {
@@ -349,6 +376,12 @@ export class RGB extends NVector {
         super([r, g, b]);
     }
 }
+export class RGBNone extends RGB {
+    constructor() {
+        super(NaN, NaN, NaN);
+    }
+}
+
 // def Point3D(x, y, z):
 //     return NVector(x, y, z)
 export class PositionValue extends NVectorValue {
@@ -361,11 +394,25 @@ export class RGBValue extends NVectorValue {
     // constructor(x: number = 0, y: number = 0) {
     //     super([x, y]);
     // }
-    static to_css_rgb([r, g, b]: Iterable<number>) {
+    static to_css_rgb([r, g, b, a]: Iterable<number>) {
+        if (a == 0) {
+            return 'none';
+        }
         return `rgb(${Math.round((r * 255) % 256)}, ${Math.round(
             (g * 255) % 256
         )}, ${Math.round((b * 255) % 256)})`;
     }
+    override format_value(frame: number): string {
+        if (this.value == null) {
+            return 'none';
+        }
+        const c = this.get_value(frame);
+        // console.log("format_value", c.constructor.name);
+
+        return RGBValue.to_css_rgb(c);
+    }
+
+
 }
 
 export class TextValue extends AnimatableD<string> {

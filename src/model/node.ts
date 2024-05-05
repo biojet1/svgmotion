@@ -92,7 +92,6 @@ export class Container extends SVGProps(Parent) {
     }
     add_rect(size: Iterable<number> = [100, 100]) {
         const x = new Rect();
-        // x.size = new NVectorValue(size);
         this.append_child(x);
         return x;
     }
@@ -111,6 +110,12 @@ export class Container extends SVGProps(Parent) {
         this.append_child(x);
         return x;
     }
+    add_circle() {
+        const x = new Circle();
+        this.append_child(x);
+        return x;
+    }
+    ///
     override to_json() {
         let o = super.to_json();
         o.nodes = [...this.children<Container | Item>()].map((v) =>
@@ -129,7 +134,6 @@ export class Container extends SVGProps(Parent) {
             }
         } while (cur !== end && (cur = cur._next));
     }
-
 }
 
 export class Group extends Container {
@@ -254,6 +258,31 @@ export class Rect extends Shape {
         xset(this, "size", v);
     }
     // 
+}
+
+export class Circle extends Shape {
+    static tag = "circle";
+    ///
+    get cx() {
+        return xget(this, "cx", new NumberValue(0));
+    }
+    set cx(v: NumberValue) {
+        xset(this, "cx", v);
+    }
+    ///
+    get cy() {
+        return xget(this, "cy", new NumberValue(0));
+    }
+    set cy(v: NumberValue) {
+        xset(this, "cy", v);
+    }
+    ///
+    get r() {
+        return xget(this, "r", new NumberValue(0));
+    }
+    set r(v: NumberValue) {
+        xset(this, "r", v);
+    }
 }
 
 // export class Ellipse extends Shape {

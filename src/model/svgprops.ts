@@ -6,7 +6,7 @@ export function SVGProps<TBase extends Constructor>(Base: TBase) {
     return class SVGProps extends Base {
         id?: string;
         _element?: SVGElement;
-        static tag = '';
+        static tag = '?';
         ///
         get prop5() {
             return xget(this, "prop5", new NumberValue(45));

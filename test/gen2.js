@@ -4,11 +4,9 @@ import { Doc, Track, Step } from "svgmotion";
 export async function animate(lib) {
     const doc = new Doc();
     const tr = new Track();
-    await doc.load_svg("test/shapes.svg");
-    console.log(doc.get_rect().stroke);
-    const maru = doc.get_circle("maru");
-
-
+    await doc.load_svg("../../python/flottie/example/res/thank_you_tp.svg");
+    console.log(doc);
+    const p = doc.viewport.first_child().first_child().first_child();
 
     tr.feed(
         Step(
@@ -41,7 +39,7 @@ export async function animate(lib) {
                 // X: r.opacity,
                 // B: r.position,
                 // C: r.fill.color,
-                R: maru.transform.rotation,
+                R: p.transform.rotation,
             }
         ));
 
