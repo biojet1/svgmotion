@@ -120,6 +120,8 @@ export class Animatable<V> {
             return value;
         }
     }
+    // set_at()
+    // get_at() set()
 
     set_value(
         frame: number,
@@ -141,7 +143,7 @@ export class Animatable<V> {
                 } else {
                     if (start != last.time) {
                         throw new Error(
-                            `unexpected start=${start} last.time=${last.time} time=${frame}`
+                            `unexpected start=${start} last.time=${last.time} time=${frame} value=${value}`
                         );
                     }
                 }
@@ -288,7 +290,10 @@ export class NumberValue extends Animatable<number> {
     override value_from_json(a: any): number {
         return a as number;
     }
-
+    override format_value(frame: number): string {
+        const c = this.get_value(frame);
+        return c + '';
+    }
     override parse_value(s: string) {
         this.value = parseFloat(s);
     }
@@ -337,9 +342,6 @@ export class NVectorValue extends Animatable<NVector> {
     }
 
     override value_from_json(a: any): NVector {
-        if (a[0] === null) {
-            a = a.map(() => null);
-        }
         return new NVector(a);
     }
 

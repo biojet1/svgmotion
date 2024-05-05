@@ -7,6 +7,9 @@ export function xget<T>(that: any, name: string, value: T): T {
         value,
         writable: true,
         enumerable: true,
+        configurable: true,
+
+
     });
     return value;
 }
@@ -174,51 +177,66 @@ export class Transform extends ValueSet {
 
     get_matrix(frame: number) {
         let m = Matrix.identity();
-        const { anchor, scale, skew, rotation, position } = this;
-
-        // console.log("get_matrix before position", m);
-
-        // console.log("get_matrix after position", m);
-
-        if (anchor) {
-            const [x, y] = anchor.get_value(frame);
-            if (x || y) {
-                m = m.cat(Matrix.translate(-x, -y));
+        let p: number[] | undefined;
+        let a: number[] | undefined;
+        let s: number[] | undefined;
+        let r: number | undefined;
+        let k: number | undefined;
+        let x: number | undefined;
+        for (const n of Object.keys(this)) {
+            switch (n) {
+                case "position":
+                    p = [...this.position.get_value(frame)];
+                    break;
+                case "anchor":
+                    a = [...this.anchor.get_value(frame)];
+                    break;
+                case "scale":
+                    s = [...this.scale.get_value(frame)];
+                    break;
+                case "skew":
+                    k = this.skew.get_value(frame);
+                    break;
+                case "skew_axis":
+                    x = this.skew_axis.get_value(frame);
+                    break;
             }
+
         }
-        if (scale) {
-            const [x, y] = scale.get_value(frame);
-            if (!(x === 1 && y === 1)) {
-                m = m.cat(Matrix.scale(x, y));
+        if (p) {
+            if (a) {
+                m = m.cat(Matrix.translate(p[0] - a[0], p[1] - a[1]));
+            } else {
+                m = m.cat(Matrix.translate(p[0], p[1]));
             }
+        } else if (a) {
+            m = m.cat(Matrix.translate(-a[0], -a[1]));
+        }
+
+        if (s) {
+            m = m.cat(Matrix.scale(s[0], s[1]));
         }
         // console.log("get_matrix before rotation", m);
-        if (rotation) {
-            let s = rotation.get_value(frame);
-            if (s) {
-                m = m.rotate(-s);
-            }
+        if (r) {
+            m = m.rotate(-r);
             // console.log("get_matrix after rotation", m, s, Matrix.rotate(-s));
         }
 
-        if (skew) {
-            let s = skew.get_value(frame);
-            if (s) {
-                const { skew_axis } = this;
-                const a = skew_axis.get_value(frame);
-                m = m.multiply(Matrix.rotate(-a));
-                m = m.multiply(Matrix.skewX(-s));
-                m = m.multiply(Matrix.rotate(a));
+        if (k) {
+            if (x) {
+                m = m.multiply(Matrix.rotate(-x));
+                m = m.multiply(Matrix.skewX(-k));
+                m = m.multiply(Matrix.rotate(x));
+            } else {
+                m = m.multiply(Matrix.skewX(-k));
             }
         }
         // console.log("get_matrix", m);
-        if (position) {
-            const [x, y] = position.get_value(frame);
-            // console.log(" position", x, y, Matrix.translate(x, y));
-            if (x || y) {
-                m = m.cat(Matrix.translate(x, y));
-            }
-        }
+        // if (p) {
+        //     // console.log(" position", x, y, Matrix.translate(x, y));
+        //     m = m.cat(Matrix.translate(p[0], p[1]));
+        // }
+
         return m;
     }
     clear() {

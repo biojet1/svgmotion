@@ -1,7 +1,7 @@
 "uses strict";
 import test from "tap";
 import { SVGDocument, XMLSerializer } from "domspec";
-import { RGB, Doc, Track, Step } from "../dist/main.js";
+import { RGB, Doc, Track, Step } from "svgmotion";
 test.test("Item", async (t) => {
 
     const doc = new Doc();

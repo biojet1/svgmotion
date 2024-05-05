@@ -76,7 +76,7 @@ const PROP_MAP: {
             if (v) {
                 switch (n) {
                     case "opacity":
-                        node.style.fillOpacity = (v as NumberValue).get_value(frame) + '';
+                        node.style.fillOpacity = (v as NumberValue).format_value(frame);
                         break;
                     case "color":
                         node.style.fill = v.format_value(frame);

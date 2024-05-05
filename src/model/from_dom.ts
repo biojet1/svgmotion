@@ -212,6 +212,11 @@ function set_common_attr(
                 node.fill.color.parse_value(value);
             }
             break;
+        case "fill-opacity":// 
+            if (value) {
+                node.fill.opacity.parse_value(value);
+            }
+            break;
         case "stroke":// 
             if (value) {
                 node.stroke.color.parse_value(value);
@@ -251,9 +256,8 @@ function set_common_attr(
             }
             break;
         case "shape-inside":
+        case "paint-order":
             break;
-
-
         default:
             if (!(name.startsWith("aria-") || name.startsWith("-inkscape"))) {
                 // console.log(
@@ -329,33 +333,30 @@ export function parse_svg(
     });
 }
 
-export function load_svg(
+export async function load_svg(
     parent: Container,
     src: string | URL,
     opt: { xinclude?: boolean; base?: string | URL } = {}
 ) {
-    return import("domspec").then((domspec) => {
-        // console.log("domspec", domspec.DOMParser.loadXML);
-        return domspec.DOMParser.loadXML(src, { ...opt, type: "image/svg+xml" })
-            .then((doc) => {
-                const base = opt.base || src;
-                const root = (doc as unknown as XMLDocument).documentElement;
-                // console.info(`loadrd "${src}" ${root?.localName}`);
-                if (root.namespaceURI != NS_SVG) {
-                    throw new Error(`not svg namespace ${root.namespaceURI}`);
-                }
-                if (parent instanceof Doc) {
-                    if (root.localName != "svg") {
-                        throw new Error(`not svg tag ${root.localName}`);
-                    }
-                }
-                const f = walk(root as unknown as SVGSVGElement, parent);
-            })
-            .catch((err) => {
-                console.error(`Failed to load "${src}"`);
-                throw err;
-            });
-    });
+    const domspec = await import("domspec");
+    try {
+        const doc = await domspec.DOMParser.loadXML(src, { ...opt, type: "image/svg+xml" });
+        const base = opt.base || src;
+        const root = (doc as unknown as XMLDocument).documentElement;
+        // console.info(`loadrd "${src}" ${root?.localName}`);
+        if (root.namespaceURI != NS_SVG) {
+            throw new Error(`not svg namespace ${root.namespaceURI}`);
+        }
+        if (parent instanceof Doc) {
+            if (root.localName != "svg") {
+                throw new Error(`not svg tag ${root.localName}`);
+            }
+        }
+        const f = walk(root as unknown as SVGSVGElement, parent);
+    } catch (err) {
+        console.error(`Failed to load "${src}"`);
+        throw err;
+    }
 }
 
 declare module "./node" {

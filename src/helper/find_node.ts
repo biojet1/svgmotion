@@ -11,40 +11,40 @@ declare module "../model/node" {
 }
 
 Container.prototype.get_rect = function (x: number | string = 0) {
-    return get_node(this, Rect, x);
+    return get_node(this, x, Rect);
 }
 
 Container.prototype.get_circle = function (x: number | string = 0) {
-    return get_node(this, Circle, x);
+    return get_node(this, x, Circle);
 }
 
 Container.prototype.get_group = function (x: number | string = 0) {
-    return get_node(this, Group, x);
+    return get_node(this, x, Group);
 }
 
 Container.prototype.get_view = function (x: number | string = 0) {
-    return get_node(this, ViewPort, x);
+    return get_node(this, x, ViewPort);
 }
 
 Container.prototype.get_path = function (x: number | string = 0) {
-    return get_node(this, Path, x);
+    return get_node(this, x, Path);
 }
 
-function get_node<T>(that: Container, K: { new(...args: any[]): T }, x: number | string = 0): T {
-    const n = find_node(that, K, x);
+
+function get_node<T>(that: Container, x: number | string = 0, K: { new(...args: any[]): T }): T {
+    const n = find_node(that, x, K);
     if (n) {
         return n;
     }
     throw new Error(`not found '${x}'`);
 }
 
-function find_node<T>(that: Container, K: { new(...args: any[]): T }, x: number | string = 0): T | void {
+function find_node<T>(that: Container, x: number | string = 0, K: { new(...args: any[]): T }): T | void {
     if (typeof x == "number") {
         for (const n of enum_node_type(that, K)) {
-            if (x-- > 0) {
-                continue;
+            if (!(x-- > 0)) {
+                return n;
             }
-            return n;
         }
     } else {
         for (const n of enum_node_type(that, K)) {

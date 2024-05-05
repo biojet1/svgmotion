@@ -82,16 +82,25 @@ export class StepA extends Action {
                         case "ease":
                             v == undefined || (e[k] = easing);
                             continue;
+
+
+
                     }
-                    names.push(k);
+                    if (vars[k]) {
+                        names.push(k);
+                    } else {
+                        delete e[k];
+                    }
+
                 }
             });
-            // drop propertye not present
+            // drop property not present
             for (const [k, _] of Object.entries(this._vars)) {
                 if (names.indexOf(k) < 0) {
                     delete vars[k];
                 }
             }
+            // console.log("vars", vars, this._vars);
         };
     }
     resolve(frame: number, base_frame: number, hint_dur: number): void {
@@ -124,10 +133,10 @@ export class StepA extends Action {
     }
 
     run(): void {
-        const { _start, _vars, _kf_map } = this;
+        const { _start, _vars, _kf_map, _base_frame } = this;
         for (const [name, entries] of Object.entries(_kf_map!)) {
             for (const prop of enum_props(_vars, name)) {
-                let prev_t = 0;
+                let prev_t = _base_frame;
                 for (const { t, value, ease } of entries) {
                     const frame = _start + t;
                     let v;
@@ -137,7 +146,7 @@ export class StepA extends Action {
                         v = prop.check_value(value);
                     }
                     prop.set_value(frame, v, prev_t, ease);
-                    prev_t = t;
+                    prev_t = frame;
                 }
             }
         }
@@ -152,6 +161,7 @@ function resolve_t(
     max_dur?: number
 ) {
     const entries = new Array<Entry>();
+    const names = Object.keys(vars);
     steps.forEach((e, i, a) => {
         let t_max: number | undefined = undefined;
         if (e.t == undefined) {
@@ -205,7 +215,9 @@ function resolve_t(
                     first[n] = null;
                 }
                 entries.push(first);
+
             }
+
         } else {
             if (!(i === 0 && t == 0)) {
                 throw new Error(`Unexpected`);
@@ -220,8 +232,10 @@ function resolve_t(
                 }
             }
         }
+
         entries.push(e as Entry);
     });
+
     return entries;
 }
 // def resolve_bounce(steps: list[Entry]):
@@ -337,7 +351,8 @@ function map_keyframes(steps: Array<Entry>): KFMap {
             })
             .sort((a, b) => a.t - b.t);
         if (x[0].t != 0) {
-            throw new Error(`No t=0 ${x[0]}`);
+            console.log(name, entries);
+            throw new Error(`No t=0 t:${x[0].t} t:${x[0].value}`);
         }
         kf_map[name] = x;
     }

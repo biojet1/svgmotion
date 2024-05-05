@@ -359,7 +359,7 @@ export class Doc extends Container {
         }
         this.version = version;
         this.defs = {};
-        this.set_viewport(from_json_walk(root, this) as ViewPort);
+        this.set_viewport(vp);
         if (defs) {
             Object.entries(defs).map(([k, v]) => {
                 this.defs[k] = from_json_walk(v, this);
