@@ -1,5 +1,6 @@
 import * as all from "./index.js";
-
+export * from "./helper/update_dom.js";
+export * from "./helper/from_json.js";
 export function animate(root: all.Doc, fps: number) {
     const [start, end] = root.calc_time_range();
     if (end >= start) {

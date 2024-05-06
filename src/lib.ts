@@ -1,8 +1,11 @@
 export * from "./model/index.js";
 export * from "./track/index.js";
 export * from "./helper/from_dom.js";
+export * from "./helper/to_json.js";
+export * from "./helper/from_json.js";
 export * from "./helper/parse_color.js";
 export * from "./helper/find_node.js";
+export * from "./helper/update_dom.js";
 import { Doc } from "./model/node.js";
 declare module "./model/node" {
     interface Doc {

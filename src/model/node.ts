@@ -7,23 +7,12 @@ import {
     TextValue,
     Value,
 } from "./keyframes.js";
-import { Box, ValueSet, xset, xget } from "./properties.js";
+import { Box, ValueSet, xset, xget } from "./valuesets.js";
 import { Node, Parent } from "./linked.js";
-import { SVGProps } from "./svgprops.js";
-import { update_dom } from "../helper/update_dom.js";
-import { from_json_walk } from "../helper/from_json.js";
+import { BaseProps } from "./baseprops.js";
 
-const NS_SVG = "http://www.w3.org/2000/svg";
 
-export abstract class Item extends SVGProps(Node) {
-    to_dom(doc: typeof SVGElement.prototype.ownerDocument): SVGElement {
-        const e = (this._element = doc.createElementNS(
-            NS_SVG,
-            (<typeof Item>this.constructor).tag
-        ));
-        return set_svg(e, this);
-    }
-
+export abstract class Item extends BaseProps(Node) {
     *enum_values(): Generator<Animatable<any>, void, unknown> {
         for (let v of Object.values(this)) {
             if (v instanceof Animatable) {
@@ -37,24 +26,7 @@ export abstract class Item extends SVGProps(Node) {
 
 export abstract class Shape extends Item { }
 
-export class Container extends SVGProps(Parent) {
-
-    to_dom(doc: typeof SVGElement.prototype.ownerDocument): SVGElement {
-        const con = (this._element = doc.createElementNS(
-            NS_SVG,
-            (<typeof Container>this.constructor).tag
-        ));
-        for (const sub of this.children<Container | Item>()) {
-            con.appendChild(sub.to_dom(doc));
-        }
-        return set_svg(con, this);
-    }
-
-
-    update_dom(frame: number) {
-        update_dom(frame, this);
-    }
-
+export class Container extends BaseProps(Parent) {
     *enum_values(): Generator<Animatable<any>, void, unknown> {
         for (let v of Object.values(this)) {
             if (v instanceof Animatable) {
@@ -116,13 +88,6 @@ export class Container extends SVGProps(Parent) {
         return x;
     }
     ///
-    override to_json() {
-        let o = super.to_json();
-        o.nodes = [...this.children<Container | Item>()].map((v) =>
-            v.to_json()
-        );
-        return o;
-    }
     get_id(id: string) {
         const { _start, _end: end } = this;
         let cur: Node | undefined = _start;
@@ -193,8 +158,6 @@ export class ViewPort extends Container {
     }
 }
 
-
-
 export class Path extends Shape {
     static tag = "path";
     ///
@@ -257,7 +220,7 @@ export class Rect extends Shape {
     set size(v: PositionValue) {
         xset(this, "size", v);
     }
-    // 
+    //
 }
 
 export class Circle extends Shape {
@@ -294,14 +257,6 @@ export class Circle extends Shape {
 //     // size: NVectorValue = new NVectorValue([100, 100]);
 // }
 
-function set_svg(elem: SVGElement, node: Item | Container): SVGElement {
-    const { id } = node;
-    if (id) {
-        elem.id = id;
-    }
-    return elem;
-}
-
 export class Doc extends Container {
     defs: { [key: string]: Item | Container } = {};
     all: { [key: string]: Item | Container } = {};
@@ -309,7 +264,7 @@ export class Doc extends Container {
     constructor() {
         super();
     }
-    get viewport() {
+    get view() {
         let x = this.first_child();
         if (x instanceof ViewPort) {
             return x;
@@ -333,57 +288,14 @@ export class Doc extends Container {
     override add_view(): ViewPort {
         this.remove_children();
         return super.add_view();
-
-    }
-
-    override to_json(): PlainDoc {
-        const { version, viewport, defs } = this;
-        return {
-            version, root: viewport.to_json(),
-            defs: Object.fromEntries(Object.entries(defs).map(([k, v]) => [k, v.to_json()]))
-        };
-    }
-
-    from_json(src: PlainDoc) {
-        const { version, root, defs } = src;
-        if (!version) {
-            throw new Error("No version {${Object.keys(src)}}");
-        } else if (! /^\d+\.\d+\.\d+$/.test(version)) {
-            throw new Error("Invalid version");
-        } else if (!root) {
-            throw new Error("No root");
-        }
-        const vp = from_json_walk(root, this);
-        if (!(vp instanceof ViewPort)) {
-            throw new Error("ViewPort expected");
-        }
-        this.version = version;
-        this.defs = {};
-        this.set_viewport(vp);
-        if (defs) {
-            Object.entries(defs).map(([k, v]) => {
-                this.defs[k] = from_json_walk(v, this);
-            });
-        }
     }
     // new_view, new_rect
-    to_dom(doc: typeof SVGElement.prototype.ownerDocument): SVGElement {
-        const element = this.viewport.to_dom(doc);
-        const defs = doc.createElementNS(NS_SVG, "defs");
-        for (let [n, v] of Object.entries(this.defs)) {
-            defs.appendChild(v.to_dom(doc));
-        }
-        if (defs.firstElementChild) {
-            element.insertBefore(defs, element.firstChild);
-        }
-        return element;
-    }
 }
 
 export interface PlainNode {
     tag: string;
     nodes: PlainNode[];
-    opacity: Value<any>;
+    opacity?: Value<any>;
 }
 
 export interface PlainDoc {

@@ -6,7 +6,7 @@ export async function animate(lib) {
     const tr = new Track();
     await doc.load_svg("../../python/flottie/example/res/thank_you_tp.svg");
     console.log(doc);
-    const p = doc.viewport.first_child().first_child().first_child();
+    const p = doc.view.first_child().first_child().first_child();
 
     tr.feed(
         Step(

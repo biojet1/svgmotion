@@ -4,11 +4,9 @@ import test from "tap";
 import {
     Keyframes, NumberValue, TextValue,
     NVectorValue, Point, NVector, Fill,
-    ViewPort, Doc, Size
-} from "../dist/model/index.js";
-import {
+    ViewPort, Doc, Size,
     Step, Track
-} from "../dist/index.js";
+} from "svgmotion";
 
 test.test("Keyframes", (t) => {
     let kfs = new Keyframes();
@@ -73,7 +71,7 @@ test.test("NVectorValue", (t) => {
 
 test.test("ViewPort", (t) => {
     let head = new Doc();
-    let vp = head.viewport;
+    let vp = head.view;
     // v.push(new Rect());
     // v.push(new Ellipse());
     let r = vp.add_rect();
@@ -107,7 +105,7 @@ test.test("ViewPort", (t) => {
 test.test("Step", (t) => {
     let tr = new Track();
     let head = new Doc();
-    let root = head.viewport;
+    let root = head.view;
     let vp = new ViewPort();
     let r = root.add_rect();
     // r.opacity = new NumberValue(0.9);

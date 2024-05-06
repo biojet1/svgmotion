@@ -1,11 +1,11 @@
 import { Animatable, NumberValue, TextValue, Value } from "./keyframes.js";
-import { Fill, Transform, ValueSet, xset, xget, Font, Stroke } from "./properties.js";
-// import { Node, Parent } from "./linked.js";
-export type Constructor = new (...args: any[]) => {};
-export function SVGProps<TBase extends Constructor>(Base: TBase) {
-    return class SVGProps extends Base {
+import { Fill, Transform, ValueSet, xset, xget, Font, Stroke } from "./valuesets.js";
+import { Node, Parent } from "./linked.js";
+export type Constructor = (new (...args: any[]) => Parent) | (new (...args: any[]) => Node);
+export function BaseProps<TBase extends Constructor>(Base: TBase) {
+    return class BaseProps extends Base {
         id?: string;
-        _element?: SVGElement;
+
         static tag = '?';
         ///
         get prop5() {
@@ -72,25 +72,6 @@ export function SVGProps<TBase extends Constructor>(Base: TBase) {
             xset(this, "white_space", v);
         }
         //
-        to_json() {
-            const o: any = { tag: (<typeof SVGProps>this.constructor).tag };
-            for (let [k, v] of Object.entries(this)) {
-                if (v instanceof Animatable || v instanceof ValueSet) {
-                    o[k] = v.to_json();
-                }
-            }
-            return o;
-        }
-        props_from_json(props: { [key: string]: Value<any> }) {
-            for (let [k, v] of Object.entries(props)) {
-                const p = (this as any)[k];
-                if (p instanceof Animatable || p instanceof ValueSet) {
-                    p.from_json(v);
-                } else {
-                    throw new Error(`Unexpected property "${k}" (${v})`);
-                }
-            }
-        }
     };
 }
 

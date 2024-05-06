@@ -1,7 +1,7 @@
 import { Animatable, NVectorValue, NumberValue, RGBValue, TextValue } from "../model/keyframes.js";
-import { Container, Item } from "../model/node.js";
+import { Container, Doc, Item } from "../model/node.js";
 import { Node } from "../model/linked.js";
-import { Transform, Fill, Box, ValueSet, Font, Stroke } from "../model/properties.js";
+import { Transform, Fill, Box, ValueSet, Font, Stroke } from "../model/valuesets.js";
 
 const PROP_MAP: {
     [key: string]: any;
@@ -139,7 +139,7 @@ const PROP_MAP: {
     },
 };
 
-export function update_dom(frame: number, target: Item | Container) {
+function update_dom(frame: number, target: Item | Container) {
     const { _start, _end: end } = target;
     let cur: Node | undefined = _start;
     do {
@@ -158,4 +158,69 @@ export function update_dom(frame: number, target: Item | Container) {
             }
         }
     } while (cur !== end && (cur = cur._next));
+}
+
+const NS_SVG = "http://www.w3.org/2000/svg";
+
+declare module "../model/node" {
+    interface Container {
+        _element?: SVGElement;
+        to_dom(doc: typeof SVGElement.prototype.ownerDocument): SVGElement;
+        update_dom(frame: number): void;
+    }
+    interface Item {
+        _element?: SVGElement;
+        to_dom(doc: typeof SVGElement.prototype.ownerDocument): SVGElement;
+        update_dom(frame: number): void;
+    }
+    interface Doc {
+        to_dom(doc: typeof SVGElement.prototype.ownerDocument): SVGElement;
+    }
+}
+
+function set_svg(elem: SVGElement, node: Item | Container): SVGElement {
+    const { id } = node;
+    if (id) {
+        elem.id = id;
+    }
+    return elem;
+}
+
+Container.prototype.to_dom = function (doc: typeof SVGElement.prototype.ownerDocument): SVGElement {
+    const con = (this._element = doc.createElementNS(
+        NS_SVG,
+        (<typeof Container>this.constructor).tag
+    ));
+    for (const sub of this.children<Container | Item>()) {
+        con.appendChild(sub.to_dom(doc));
+    }
+    return set_svg(con, this);
+}
+
+Item.prototype.to_dom = function (doc: typeof SVGElement.prototype.ownerDocument): SVGElement {
+    const e = (this._element = doc.createElementNS(
+        NS_SVG,
+        (<typeof Item>this.constructor).tag
+    ));
+    return set_svg(e, this);
+}
+
+Doc.prototype.to_dom = function to_dom(doc: typeof SVGElement.prototype.ownerDocument): SVGElement {
+    const element = this.view.to_dom(doc);
+    const defs = doc.createElementNS(NS_SVG, "defs");
+    for (let [n, v] of Object.entries(this.defs)) {
+        defs.appendChild(v.to_dom(doc));
+    }
+    if (defs.firstElementChild) {
+        element.insertBefore(defs, element.firstChild);
+    }
+    return element;
+}
+
+Item.prototype.update_dom = function (frame: number) {
+    update_dom(frame, this);
+}
+
+Container.prototype.update_dom = function (frame: number) {
+    update_dom(frame, this);
 }

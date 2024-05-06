@@ -9,8 +9,8 @@ test.test("Item", async (t) => {
     await doc.load_svg("../../python/flottie/example/res/thank_you_tp.svg");
     // console.log("doc", doc);
     {
-        doc.viewport.fill.color.value = new RGB(1, 1, 0);
-        const p = doc.viewport.first_child().first_child().first_child();
+        doc.view.fill.color.value = new RGB(1, 1, 0);
+        const p = doc.view.first_child().first_child().first_child();
 
         // console.log("first_child", );
 
