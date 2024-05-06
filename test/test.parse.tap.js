@@ -1,16 +1,16 @@
 "uses strict";
 import test from "tap";
 import { SVGDocument, XMLSerializer } from "domspec";
-import { RGB, Root, Track, Step } from "svgmotion";
+import { RGB, Root, Step } from "svgmotion";
 test.test("Item", async (t) => {
 
-    const doc = new Root();
-    const tr = new Track();
-    await doc.load_svg("../../python/flottie/example/res/thank_you_tp.svg");
+    const anim = new Root();
+    const tr = anim.track();
+    await anim.load_svg("../../python/flottie/example/res/thank_you_tp.svg");
     // console.log("doc", doc);
     {
-        doc.view.fill.color.value = new RGB(1, 1, 0);
-        const p = doc.view.first_child().first_child().first_child();
+        anim.view.fill.color.value = new RGB(1, 1, 0);
+        const p = anim.view.first_child().first_child().first_child();
 
         // console.log("first_child", );
 
@@ -50,17 +50,17 @@ test.test("Item", async (t) => {
             ));
     }
 
-    const nod = doc.to_dom(new SVGDocument());
+    const nod = anim.to_dom(new SVGDocument());
 
 
 
-    doc.update_dom(0);
+    anim.update_dom(0);
 
 
     // console.log(`width`, nod.width.baseVal.value, nod.width.baseVal.unitType);
     const ser = new XMLSerializer();
     // console.log(ser.serializeToString(nod));
-    console.log(doc.save_html('/tmp/svgm.html'));
+    console.log(anim.save_html('/tmp/svgm.html'));
     t.end();
 
 });

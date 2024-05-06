@@ -1,12 +1,12 @@
-import { Root, Track, Step, NVector } from "svgmotion";
+import { Root, Step, NVector } from "svgmotion";
 export async function animate(lib) {
-    const doc = new Root();
-    const tr = new Track();
-    await doc.load_svg("test/shapes.svg");
+    const anim = new Root();
+    const tr = anim.track();
+    await anim.load_svg("test/shapes.svg");
 
-    const maru1 = doc.get_circle("maru");
-    const maru2 = doc.get_circle("maru2");
-    const r2 = doc.get_rect("r2");
+    const maru1 = anim.get_circle("maru");
+    const maru2 = anim.get_circle("maru2");
+    const r2 = anim.get_rect("r2");
 
     delete maru1.cx;
     delete maru1.cy;
@@ -37,11 +37,11 @@ export async function animate(lib) {
         )
     );
     console.log("TR", r2.transform);
-    tr.feed(
+    anim.track().feed(
         Step([{ dur: 1, Y: 100, X: 100 }], {
             X: maru2.cx,
             Y: maru2.cy,
         })
     );
-    return doc;
+    return anim;
 }

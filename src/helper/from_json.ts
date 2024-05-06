@@ -88,13 +88,15 @@ declare module "../model/node" {
 }
 
 Root.prototype.from_json = function (src: PlainRoot) {
-    const { version, view, defs } = src;
+    const { version, view, defs, frame_rate } = src;
     if (!version) {
         throw new Error("No version {${Object.keys(src)}}");
     } else if (!/^\d+\.\d+\.\d+$/.test(version)) {
         throw new Error("Invalid version");
     } else if (!view) {
         throw new Error("No view");
+    } else if (!frame_rate) {
+        throw new Error("No frame_rate");
     }
     const vp = from_json_walk(view, this);
     if (!(vp instanceof ViewPort)) {

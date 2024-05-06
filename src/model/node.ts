@@ -10,7 +10,19 @@ import {
 import { Box, ValueSet, xset, xget } from "./valuesets.js";
 import { Node, Parent } from "./linked.js";
 import { BaseProps } from "./baseprops.js";
+import { Track } from "../track/track.js";
+export interface PlainNode {
+    tag: string;
+    nodes: PlainNode[];
+    opacity?: Value<any>;
+}
 
+export interface PlainRoot {
+    version: string;
+    view: PlainNode;
+    defs: { [key: string]: PlainNode };
+    frame_rate: number;
+}
 export abstract class Item extends BaseProps(Node) {
     *enum_values(): Generator<Animatable<any>, void, unknown> {
         for (let v of Object.values(this)) {
@@ -61,32 +73,7 @@ export class Container extends BaseProps(Parent) {
         }
         return [min, max];
     }
-    // add_rect(size: Iterable<number> = [100, 100]) {
-    //     const x = new Rect();
-    //     this.append_child(x);
-    //     return x;
-    // }
-    // add_view() {
-    //     const x = new ViewPort();
-    //     this.append_child(x);
-    //     return x;
-    // }
-    // add_group() {
-    //     const x = new Group();
-    //     this.append_child(x);
-    //     return x;
-    // }
-    // add_path() {
-    //     const x = new Path();
-    //     this.append_child(x);
-    //     return x;
-    // }
-    // add_circle() {
-    //     const x = new Circle();
-    //     this.append_child(x);
-    //     return x;
-    // }
-    ///
+
     get_id(id: string) {
         const { _start, _end: end } = this;
         let cur: Node | undefined = _start;
@@ -318,6 +305,7 @@ export class Line extends Shape {
 export class Root extends Container {
     defs: { [key: string]: Item | Container } = {};
     all: { [key: string]: Item | Container } = {};
+    frame_rate: number = 60;
     version: string = "0.0.1";
     // view
     get view() {
@@ -348,16 +336,13 @@ export class Root extends Container {
     }
 
     // new_view, new_rect
+    track(frame: number = 0) {
+        const tr = new Track();
+        tr.frame_rate = this.frame_rate;
+        tr._hint_dur = 1 * this.frame_rate;
+        tr.frame = frame;
+        return tr;
+    }
 }
 
-export interface PlainNode {
-    tag: string;
-    nodes: PlainNode[];
-    opacity?: Value<any>;
-}
 
-export interface PlainRoot {
-    version: string;
-    view: PlainNode;
-    defs: { [key: string]: PlainNode };
-}

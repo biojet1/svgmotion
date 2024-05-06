@@ -361,11 +361,11 @@ export async function load_svg(
 
 declare module "../model/node" {
     interface Container {
-        load_svg(src: string | URL, opt: { xinclude?: boolean; base?: string | URL }): void;
+        load_svg(src: string | URL, opt: { xinclude?: boolean; base?: string | URL }): Promise<void>;
     }
 }
 
-Container.prototype.load_svg = function (src: string | URL,
+Container.prototype.load_svg = async function (src: string | URL,
     opt: { xinclude?: boolean; base?: string | URL }) {
     return load_svg(this, src, opt);
 }

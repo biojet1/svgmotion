@@ -1,12 +1,12 @@
 
 
-import { Root, Track, Step } from "svgmotion";
+import { Root, Step } from "svgmotion";
 export async function animate(lib) {
-    const doc = new Root();
-    const tr = new Track();
-    await doc.load_svg("../../python/flottie/example/res/thank_you_tp.svg");
-    console.log(doc);
-    const p = doc.view.first_child().first_child().first_child();
+    const anim = new Root();
+    const tr = anim.track();
+    await anim.load_svg("../../python/flottie/example/res/thank_you_tp.svg");
+    console.log(anim);
+    const p = anim.view.first_child().first_child().first_child();
 
     tr.feed(
         Step(
@@ -43,6 +43,6 @@ export async function animate(lib) {
             }
         ));
 
-    return doc;
+    return anim;
 
 }

@@ -40,9 +40,9 @@ Item.prototype.to_json = function (): PlainNode {
 }
 
 Root.prototype.to_json = function (): PlainRoot {
-    const { version, view, defs } = this;
+    const { version, view, defs, frame_rate } = this;
     return {
-        version,
+        version, frame_rate,
         view: view.to_json(),
         defs: Object.fromEntries(
             Object.entries(defs).map(([k, v]) => [k, v.to_json()])
