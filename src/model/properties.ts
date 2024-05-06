@@ -264,38 +264,7 @@ export class Transform extends ValueSet {
             this.skew_axis.value = skew_axis;
             this.skew.value = -skew;
         }
-
-
-        // if (rotate) {
-        //     this.rotation.value = rotate;
-        // }
-        // if (skewX) {
-        //     this.skew.value = skewX;
-        // }
-
-        // dest_trans.position.value -= dest_trans.anchor_point.value
-        // dest_trans.anchor_point.value = NVector(0, 0)
-        // trans = matrix.extract_transform()
-        // dest_trans.skew_axis.value = math.degrees(trans["skew_axis"])
-        // dest_trans.skew.value = -math.degrees(trans["skew_angle"])
-        // dest_trans.position.value += trans["translation"]
-        // dest_trans.rotation.value -= math.degrees(trans["angle"])
-        // dest_trans.scale.value *= trans["scale"]
-
-        // const { translateX, translateY, scaleX, scaleY, rotate, skewX } = Matrix.parse(s).decompose();
-        // if (translateX || translateY) {
-        //     this.position = new PositionValue([translateX, translateY]);
-        // }
-        // if (scaleX || scaleY) {
-        //     this.scale = new PositionValue([scaleX, scaleY]);
-        // }
-        // if (rotate) {
-        //     this.rotation.value = rotate;
-        // }
-        // if (skewX) {
-        //     this.skew.value = skewX;
-        // }
-
+        // Sc * Ro * Sk * T = 
     }
     /// anchor
     get anchor() {

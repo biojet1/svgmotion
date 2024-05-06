@@ -1,7 +1,7 @@
 
-import { ViewPort, Item, Container, Doc } from "./node.js";
-import { NVector, NumberValue } from "./keyframes.js";
-import { Parent, Node } from "./linked.js";
+import { Item, Container, Doc } from "../model/node.js";
+import { NVector } from "../model/keyframes.js";
+import { Node } from "../model/linked.js";
 
 const NS_SVG = "http://www.w3.org/2000/svg";
 const TAG_DOM: {
@@ -359,7 +359,7 @@ export async function load_svg(
     }
 }
 
-declare module "./node" {
+declare module "../model/node" {
     interface Container {
         load_svg(src: string | URL, opt: { xinclude?: boolean; base?: string | URL }): void;
     }

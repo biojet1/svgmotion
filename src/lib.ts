@@ -1,6 +1,6 @@
 export * from "./model/index.js";
 export * from "./track/index.js";
-export * from "./model/from_dom.js";
+export * from "./helper/from_dom.js";
 export * from "./helper/parse_color.js";
 export * from "./helper/find_node.js";
 import { Doc } from "./model/node.js";

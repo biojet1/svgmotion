@@ -1,7 +1,7 @@
-import { Animatable, NVectorValue, NumberValue, RGBValue, TextValue } from "./keyframes.js";
-import { Container, Item } from "./node.js";
-import { Node } from "./linked.js";
-import { Transform, Fill, Box, ValueSet, Font, Stroke } from "./properties.js";
+import { Animatable, NVectorValue, NumberValue, RGBValue, TextValue } from "../model/keyframes.js";
+import { Container, Item } from "../model/node.js";
+import { Node } from "../model/linked.js";
+import { Transform, Fill, Box, ValueSet, Font, Stroke } from "../model/properties.js";
 
 const PROP_MAP: {
     [key: string]: any;

@@ -10,8 +10,8 @@ import {
 import { Box, ValueSet, xset, xget } from "./properties.js";
 import { Node, Parent } from "./linked.js";
 import { SVGProps } from "./svgprops.js";
-import { update_dom } from "./update_dom.js";
-import { from_json_walk } from "./from_json.js";
+import { update_dom } from "../helper/update_dom.js";
+import { from_json_walk } from "../helper/from_json.js";
 
 const NS_SVG = "http://www.w3.org/2000/svg";
 
