@@ -64,3 +64,19 @@ test.test("Item", async (t) => {
     t.end();
 
 });
+
+test.test("Item", async (t) => {
+
+    const anim = new Root();
+    await anim.load_svg("res/polygon01.svg");
+    const tr = anim.track();
+    console.log(anim.view);
+
+    const nod = anim.to_dom(new SVGDocument());
+    anim.update_dom(0);
+    const ser = new XMLSerializer();
+    console.log(ser.serializeToString(nod));
+    console.log(anim.save_html('/tmp/polygon01.html'));
+    t.end();
+
+});

@@ -42,18 +42,29 @@ export async function animate(lib) {
     delete e1.cx;
     anim.track().feed(
         Step([
-            { dur: 0.5, P: [100, 100], EY: 30, EX: 30 },
-            { dur: 0.5, Y: 100, X: 100, EY: 10, EX: 30, },
-            { dur: 0.5, P: [400, 100], EY: 30, EX: 30 },
-            { dur: 0.5, EX: 10 },
-            { dur: 0.5, P: [400, 400], EX: 30 },
+            { P: [100, 100] },
+            { dur: 1, P: [400, 100] },
+            { dur: 1, P: [400, 400] },
+            { dur: 1, P: [100, 400] },
+            { dur: 1, P: [100, 100] },
         ], {
-            X: maru2.cx,
-            Y: maru2.cy,
             P: e1.transform.position,
-            EY: e1.ry,
-            EX: e1.rx,
         }, { easing: Easing.inoutexpo })
     );
+    anim.track().feed(
+        Step([
+            { t: 0, EX: 40, EY: 40, ease: Easing.linear },
+            { dur: 1, EY: 10, ease: Easing.linear },
+            { dur: 1, EX: 40, EY: 40, ease: Easing.linear },
+            { dur: 1, EX: 10, EY: 10 },
+            { dur: 1, EX: 40, EY: 40 },
+            // { dur: 1, EX: 40, EY: 40 },
+        ], {
+            EY: e1.ry,
+            EX: e1.rx,
+        }, { easing: true })
+    );
+    console.log(e1.ry.value);
+
     return anim;
 }

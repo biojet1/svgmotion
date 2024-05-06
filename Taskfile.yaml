@@ -26,6 +26,16 @@ tasks:
         deps: [webpack]
         cmds:
             - npm run test
+    c8test:
+        method: none
+        deps: [webpack]
+        cmds:
+            - c8 npx tap -t600 --disable-coverage --reporter=terse 'test/**/*.tap.*js'
+    c8html:
+        method: none
+        deps: [c8test]
+        cmds:
+            - c8 report -r html
 
     gen1:
         method: timestamp
@@ -33,3 +43,8 @@ tasks:
         cmds:
             - |
                 npx svgmotion gen -o /tmp/gen1.html test/gen1.js
+
+    tapx:
+        deps: [compile]
+        cmds:
+            - npx tap -t600 --disable-coverage --reporter=terse {{.CLI_ARGS}}

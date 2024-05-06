@@ -1,4 +1,4 @@
-import { Animatable, NVectorValue, NumberValue, RGBValue, TextValue } from "../model/keyframes.js";
+import { Animatable, NVectorValue, NumberValue, PointsValue, RGBValue, TextValue } from "../model/keyframes.js";
 import { Container, Root, Item } from "../model/node.js";
 import { Node } from "../model/linked.js";
 import { Transform, Fill, Box, ValueSet, Font, Stroke } from "../model/valuesets.js";
@@ -137,6 +137,12 @@ const PROP_MAP: {
     white_space: function (frame: number, node: SVGElement, prop: TextValue) {
         node.style.whiteSpace = prop.get_value(frame) + '';
     },
+
+    points: function (frame: number, node: SVGElement, prop: PointsValue) {
+        const v = prop.get_value(frame);
+        node.setAttribute("points", v.map(([a, b]) => `${a},${b}`).join(' '));
+    },
+
 };
 
 function update_dom(frame: number, target: Item | Container) {
@@ -154,7 +160,6 @@ function update_dom(frame: number, target: Item | Container) {
                         throw new Error(`Unexpected property ${n}`);
                     }
                 }
-
             }
         }
     } while (cur !== end && (cur = cur._next));

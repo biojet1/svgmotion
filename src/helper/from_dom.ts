@@ -2,6 +2,37 @@
 import { Item, Container, Root } from "../model/node.js";
 import { NVector } from "../model/keyframes.js";
 import { Node } from "../model/linked.js";
+const BOTH_MATCH =
+    /^\s*(([-+]?[0-9]+(\.[0-9]*)?|[-+]?\.[0-9]+)([eE][-+]?[0-9]+)?)\s*(in|pt|px|mm|cm|m|km|Q|pc|yd|ft||%|em|ex|ch|rem|vw|vh|vmin|vmax|deg|grad|rad|turn|s|ms|Hz|kHz|dpi|dpcm|dppx)\s*$/i;
+const CONVERSIONS: { [k: string]: number } = {
+    in: 96.0,
+    pt: 1.3333333333333333,
+    px: 1.0,
+    mm: 3.779527559055118,
+    cm: 37.79527559055118,
+    m: 3779.527559055118,
+    km: 3779527.559055118,
+    Q: 0.94488188976378,
+    pc: 16.0,
+    yd: 3456.0,
+    ft: 1152.0,
+};
+function parse_len(value: string, fail = false) {
+    const m = BOTH_MATCH.exec(value);
+    if (m) {
+        const num = parseFloat(m[1]);
+        const suf = m.pop();
+        if (suf) {
+            const unit = CONVERSIONS[suf.toLowerCase()];
+            if (unit > 1) {
+                return num * unit;
+            }
+        } else {
+            return num;
+        }
+    }
+    throw new Error(`Unexpected length "${value}"`);
+}
 
 const NS_SVG = "http://www.w3.org/2000/svg";
 const TAG_DOM: {
@@ -20,8 +51,10 @@ const TAG_DOM: {
                     child.remove();
                     for (const sub of [...child.children]) {
                         const m = walk(sub as SVGElement, node);
-                        m.remove();
-                        defs[id] = m;
+                        if (m) {
+                            m.remove();
+                            defs[id] = m;
+                        }
                     }
                 }
             }
@@ -45,10 +78,10 @@ const TAG_DOM: {
                     node.zoom_pan.parse_value(value);
                     break;
                 case "height":
-                    node.height.parse_value(value);
+                    node.height.value = parse_len(value);
                     break;
                 case "width":
-                    node.width.parse_value(value);
+                    node.width.value = parse_len(value);
                     break;
                 case "y":
                     node.y.parse_value(value);
@@ -163,7 +196,32 @@ const TAG_DOM: {
         }
         return node;
     },
-
+    polygon: function (e: SVGElement, parent: Container) {
+        let node = parent.add_polygon();
+        for (const [name, value] of enum_attrs(e)) {
+            switch (name) {
+                case "points":
+                    node.points.parse_value(value);
+                    break;
+                default:
+                    set_common_attr(node, name, value, e);
+            }
+        }
+        return node;
+    },
+    polyline: function (e: SVGElement, parent: Container) {
+        let node = parent.add_polyline();
+        for (const [name, value] of enum_attrs(e)) {
+            switch (name) {
+                case "points":
+                    node.points.parse_value(value);
+                    break;
+                default:
+                    set_common_attr(node, name, value, e);
+            }
+        }
+        return node;
+    }
 };
 
 
@@ -310,7 +368,12 @@ function* enum_attrs(e: SVGElement) {
 }
 
 function walk(elem: SVGElement, parent: Container) {
-    const make_node = TAG_DOM[elem.localName];
+    const { localName: tag } = elem;
+    switch (tag) {
+        case "desc":
+            return;
+    }
+    const make_node = TAG_DOM[tag];
     if (make_node) {
         // console.log(`walk--`, parent.constructor.name);
         const node = make_node(elem, parent);
@@ -324,7 +387,8 @@ function walk(elem: SVGElement, parent: Container) {
         }
         return node;
     } else {
-        throw new Error(`No processor for "${elem.localName}"`);
+
+        throw new Error(`No processor for "${tag}"`);
     }
 }
 

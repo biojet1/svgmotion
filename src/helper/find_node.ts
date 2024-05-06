@@ -6,6 +6,8 @@ import {
     Item,
     Line,
     Path,
+    Polygon,
+    Polyline,
     Rect,
     ViewPort,
 } from "../model/node.js";
@@ -17,6 +19,8 @@ declare module "../model/node" {
         get_group(x: number | string): Group;
         get_line(x: number | string): Line;
         get_path(x: number | string): Path;
+        get_polygon(x: number | string): Polygon;
+        get_polyline(x: number | string): Polyline;
         get_rect(x: number | string): Rect;
         get_view(x: number | string): ViewPort;
         find_circle(x: number | string): Circle | void;
@@ -24,6 +28,8 @@ declare module "../model/node" {
         find_group(x: number | string): Group | void;
         find_line(x: number | string): Line | void;
         find_path(x: number | string): Path | void;
+        find_polygon(x: number | string): Polygon | void;
+        find_polyline(x: number | string): Polyline | void;
         find_rect(x: number | string): Rect | void;
         find_view(x: number | string): ViewPort | void;
     }
@@ -43,6 +49,12 @@ Container.prototype.get_line = function (x: number | string = 0) {
 };
 Container.prototype.get_path = function (x: number | string = 0) {
     return get_node(this, x, Path);
+};
+Container.prototype.get_polygon = function (x: number | string = 0) {
+    return get_node(this, x, Polygon);
+};
+Container.prototype.get_polyline = function (x: number | string = 0) {
+    return get_node(this, x, Polyline);
 };
 Container.prototype.get_rect = function (x: number | string = 0) {
     return get_node(this, x, Rect);
@@ -70,6 +82,16 @@ Container.prototype.find_line = function (x: number | string = 0): Line | void {
 };
 Container.prototype.find_path = function (x: number | string = 0): Path | void {
     return find_node(this, x, Path);
+};
+Container.prototype.find_polygon = function (
+    x: number | string = 0
+): Polygon | void {
+    return find_node(this, x, Polygon);
+};
+Container.prototype.find_polyline = function (
+    x: number | string = 0
+): Polyline | void {
+    return find_node(this, x, Polyline);
 };
 Container.prototype.find_rect = function (x: number | string = 0): Rect | void {
     return find_node(this, x, Rect);

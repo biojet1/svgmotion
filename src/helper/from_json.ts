@@ -12,6 +12,8 @@ import {
     Group,
     Ellipse,
     Circle,
+    Polyline,
+    Polygon,
 } from "../model/node.js";
 import { ValueSet } from "../model/valuesets.js";
 
@@ -32,6 +34,12 @@ const TAGS: {
     },
     path: function (parent: Container) {
         return parent.add_path();
+    },
+    polygon: function (parent: Container) {
+        return parent.add_polygon();
+    },
+    polyline: function (parent: Container) {
+        return parent.add_polyline();
     },
     rect: function (parent: Container) {
         return parent.add_rect();
@@ -83,6 +91,8 @@ declare module "../model/node" {
         add_group(): Group;
         add_line(): Line;
         add_path(): Path;
+        add_polygon(): Polygon;
+        add_polyline(): Polyline;
         add_rect(): Rect;
         add_view(): ViewPort;
     }
@@ -134,6 +144,16 @@ Container.prototype.add_line = function () {
 };
 Container.prototype.add_path = function () {
     const x = new Path();
+    this.append_child(x);
+    return x;
+};
+Container.prototype.add_polygon = function () {
+    const x = new Polygon();
+    this.append_child(x);
+    return x;
+};
+Container.prototype.add_polyline = function () {
+    const x = new Polyline();
     this.append_child(x);
     return x;
 };

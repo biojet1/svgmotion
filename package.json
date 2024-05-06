@@ -54,5 +54,10 @@
   "prettier": {
     "trailingComma": "es5",
     "tabWidth": 4
+  },
+  "c8": {
+    "reports-dir": "/tmp/svgm.c8/rep",
+    "temp-directory": "/tmp/svgm.c8/tmp",
+    "src": "dist"
   }
 }

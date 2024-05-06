@@ -433,3 +433,23 @@ export class TextValue extends AnimatableD<string> {
         return a + '';
     }
 }
+
+export class PointsValue extends AnimatableD<number[][]> {
+    override value_to_json(s: number[][]) {
+        return s;
+    }
+    override value_from_json(a: any): number[][] {
+        return a as number[][];
+    }
+    override parse_value(s: string) {
+        const nums = s.split(/[\s,]+/).map(function (str) {
+            return parseFloat(str.trim());
+        });
+        const points: number[][] = [];
+        for (let n = nums.length - 1; n-- > 0; n--) {
+            points.push([nums.shift()!, nums.shift()!]);
+
+        }
+        this.value = points;
+    }
+}

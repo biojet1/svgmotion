@@ -73,9 +73,9 @@ export class StepA extends Action {
             // collect names, parse inputs
             const names: Array<string> = [];
             this._steps.map((e, i, a) => {
-                if (easing) {
-                    if (!e.ease) {
-                        e.ease = easing
+                if (easing != undefined) {
+                    if (e.ease == undefined) {
+                        e.ease = easing;
                     }
                 }
                 for (const [k, v] of Object.entries(e)) {

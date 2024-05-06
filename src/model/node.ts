@@ -3,6 +3,7 @@ import {
     Keyframes,
     NVector,
     NumberValue,
+    PointsValue,
     PositionValue,
     TextValue,
     Value,
@@ -264,6 +265,7 @@ export class Ellipse extends Shape {
     set ry(v: NumberValue) {
         xset(this, "ry", v);
     }
+    // name:rx, kind:NumberValue, args:0, 
 }
 
 export class Line extends Shape {
@@ -295,6 +297,27 @@ export class Line extends Shape {
     }
     set y2(v: NumberValue) {
         xset(this, "y2", v);
+    }
+}
+
+export class Polyline extends Shape {
+    static tag = "polyline";
+    /// points
+    get points() {
+        return xget(this, "points", new PointsValue([]));
+    }
+    set points(v: PointsValue) {
+        xset(this, "points", v);
+    }
+}
+export class Polygon extends Shape {
+    static tag = "polygon";
+    /// points
+    get points() {
+        return xget(this, "points", new PointsValue([]));
+    }
+    set points(v: PointsValue) {
+        xset(this, "points", v);
     }
 }
 // export class Image extends Node {
