@@ -2,7 +2,7 @@ version: "3"
 
 tasks:
     compile:
-        method: timestamp
+        # method: timestamp
         sources:
             - src/**/*.ts
         generates:
@@ -11,9 +11,10 @@ tasks:
             - npx tsc -d --sourcemap
 
     webpack:
-        method: timestamp
+        # method: timestamp
         sources:
             - src/**/*.ts
+            - webpack.config.mjs
         generates:
             - dist/svgmotion.web.js
         cmds:

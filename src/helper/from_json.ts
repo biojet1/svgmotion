@@ -1,11 +1,22 @@
 import { Animatable, Value } from "../model/keyframes.js";
-import { Container, Root, Item, PlainRoot, PlainNode, ViewPort } from "../model/node.js";
+import {
+    Container,
+    Root,
+    Item,
+    PlainRoot,
+    PlainNode,
+    ViewPort,
+    Rect,
+    Path,
+    Line,
+    Group,
+    Ellipse,
+    Circle,
+} from "../model/node.js";
 import { ValueSet } from "../model/valuesets.js";
 
 const TAGS: {
-    [key: string]: (
-        parent: Container,
-    ) => Item | Container;
+    [key: string]: (parent: Container) => Item | Container;
 } = {
     svg: function (parent: Container) {
         let node = parent.add_view();
@@ -65,6 +76,15 @@ declare module "../model/node" {
     interface Root {
         from_json(src: PlainRoot): void;
     }
+    interface Container {
+        add_circle(): Circle;
+        add_ellipse(): Ellipse;
+        add_group(): Group;
+        add_line(): Line;
+        add_path(): Path;
+        add_rect(): Rect;
+        add_view(): ViewPort;
+    }
 }
 
 Root.prototype.from_json = function (src: PlainRoot) {
@@ -88,4 +108,39 @@ Root.prototype.from_json = function (src: PlainRoot) {
             this.defs[k] = from_json_walk(v, this);
         });
     }
-}
+};
+Container.prototype.add_circle = function () {
+    const x = new Circle();
+    this.append_child(x);
+    return x;
+};
+Container.prototype.add_ellipse = function () {
+    const x = new Ellipse();
+    this.append_child(x);
+    return x;
+};
+Container.prototype.add_group = function () {
+    const x = new Group();
+    this.append_child(x);
+    return x;
+};
+Container.prototype.add_line = function () {
+    const x = new Line();
+    this.append_child(x);
+    return x;
+};
+Container.prototype.add_path = function () {
+    const x = new Path();
+    this.append_child(x);
+    return x;
+};
+Container.prototype.add_rect = function () {
+    const x = new Rect();
+    this.append_child(x);
+    return x;
+};
+Container.prototype.add_view = function () {
+    const x = new ViewPort();
+    this.append_child(x);
+    return x;
+};

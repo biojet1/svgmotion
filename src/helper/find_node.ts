@@ -1,37 +1,90 @@
-import { Circle, Container, Group, Item, Path, Rect, ViewPort } from "../model/node.js";
+import {
+    Circle,
+    Container,
+    Ellipse,
+    Group,
+    Item,
+    Line,
+    Path,
+    Rect,
+    ViewPort,
+} from "../model/node.js";
 
 declare module "../model/node" {
     interface Container {
-        get_rect(x: number | string): Rect;
         get_circle(x: number | string): Circle;
+        get_ellipse(x: number | string): Ellipse;
         get_group(x: number | string): Group;
-        get_view(x: number | string): ViewPort;
+        get_line(x: number | string): Line;
         get_path(x: number | string): Path;
+        get_rect(x: number | string): Rect;
+        get_view(x: number | string): ViewPort;
+        find_circle(x: number | string): Circle | void;
+        find_ellipse(x: number | string): Ellipse | void;
+        find_group(x: number | string): Group | void;
+        find_line(x: number | string): Line | void;
+        find_path(x: number | string): Path | void;
+        find_rect(x: number | string): Rect | void;
+        find_view(x: number | string): ViewPort | void;
     }
-}
-
-Container.prototype.get_rect = function (x: number | string = 0) {
-    return get_node(this, x, Rect);
 }
 
 Container.prototype.get_circle = function (x: number | string = 0) {
     return get_node(this, x, Circle);
-}
-
+};
+Container.prototype.get_ellipse = function (x: number | string = 0) {
+    return get_node(this, x, Ellipse);
+};
 Container.prototype.get_group = function (x: number | string = 0) {
     return get_node(this, x, Group);
-}
-
-Container.prototype.get_view = function (x: number | string = 0) {
-    return get_node(this, x, ViewPort);
-}
-
+};
+Container.prototype.get_line = function (x: number | string = 0) {
+    return get_node(this, x, Line);
+};
 Container.prototype.get_path = function (x: number | string = 0) {
     return get_node(this, x, Path);
-}
+};
+Container.prototype.get_rect = function (x: number | string = 0) {
+    return get_node(this, x, Rect);
+};
+Container.prototype.get_view = function (x: number | string = 0) {
+    return get_node(this, x, ViewPort);
+};
+Container.prototype.find_circle = function (
+    x: number | string = 0
+): Circle | void {
+    return find_node(this, x, Circle);
+};
+Container.prototype.find_ellipse = function (
+    x: number | string = 0
+): Ellipse | void {
+    return find_node(this, x, Ellipse);
+};
+Container.prototype.find_group = function (
+    x: number | string = 0
+): Group | void {
+    return find_node(this, x, Group);
+};
+Container.prototype.find_line = function (x: number | string = 0): Line | void {
+    return find_node(this, x, Line);
+};
+Container.prototype.find_path = function (x: number | string = 0): Path | void {
+    return find_node(this, x, Path);
+};
+Container.prototype.find_rect = function (x: number | string = 0): Rect | void {
+    return find_node(this, x, Rect);
+};
+Container.prototype.find_view = function (
+    x: number | string = 0
+): ViewPort | void {
+    return find_node(this, x, ViewPort);
+};
 
-
-function get_node<T>(that: Container, x: number | string = 0, K: { new(...args: any[]): T }): T {
+function get_node<T>(
+    that: Container,
+    x: number | string = 0,
+    K: { new(...args: any[]): T }
+): T {
     const n = find_node(that, x, K);
     if (n) {
         return n;
@@ -39,7 +92,11 @@ function get_node<T>(that: Container, x: number | string = 0, K: { new(...args: 
     throw new Error(`not found '${x}'`);
 }
 
-function find_node<T>(that: Container, x: number | string = 0, K: { new(...args: any[]): T }): T | void {
+function find_node<T>(
+    that: Container,
+    x: number | string = 0,
+    K: { new(...args: any[]): T }
+): T | void {
     if (typeof x == "number") {
         for (const n of enum_node_type(that, K)) {
             if (!(x-- > 0)) {

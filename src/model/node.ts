@@ -61,31 +61,31 @@ export class Container extends BaseProps(Parent) {
         }
         return [min, max];
     }
-    add_rect(size: Iterable<number> = [100, 100]) {
-        const x = new Rect();
-        this.append_child(x);
-        return x;
-    }
-    add_view() {
-        const x = new ViewPort();
-        this.append_child(x);
-        return x;
-    }
-    add_group() {
-        const x = new Group();
-        this.append_child(x);
-        return x;
-    }
-    add_path() {
-        const x = new Path();
-        this.append_child(x);
-        return x;
-    }
-    add_circle() {
-        const x = new Circle();
-        this.append_child(x);
-        return x;
-    }
+    // add_rect(size: Iterable<number> = [100, 100]) {
+    //     const x = new Rect();
+    //     this.append_child(x);
+    //     return x;
+    // }
+    // add_view() {
+    //     const x = new ViewPort();
+    //     this.append_child(x);
+    //     return x;
+    // }
+    // add_group() {
+    //     const x = new Group();
+    //     this.append_child(x);
+    //     return x;
+    // }
+    // add_path() {
+    //     const x = new Path();
+    //     this.append_child(x);
+    //     return x;
+    // }
+    // add_circle() {
+    //     const x = new Circle();
+    //     this.append_child(x);
+    //     return x;
+    // }
     ///
     get_id(id: string) {
         const { _start, _end: end } = this;
@@ -280,7 +280,7 @@ export class Ellipse extends Shape {
 }
 
 export class Line extends Shape {
-    static tag = "ellipse";
+    static tag = "line";
     /// x1
     get x1() {
         return xget(this, "x1", new NumberValue(0));

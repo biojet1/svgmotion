@@ -1,7 +1,7 @@
 import { Root } from "./model/node.js";
 
 export * from "./model/index.js";
-export * from "./track/index.js";
+// export * from "./track/index.js";
 export * from "./helper/update_dom.js";
 export * from "./helper/from_json.js";
 
