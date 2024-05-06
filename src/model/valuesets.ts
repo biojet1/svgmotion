@@ -118,7 +118,6 @@ export class Stroke extends ValueSet {
     set dash_offset(v: NumberValue) {
         xset(this, "dash_offset", v);
     }
-
     // stroke-array
     get dash_array() {
         return xget(this, "dash_array", new NVectorValue(new NVector([1, 1])));
@@ -167,8 +166,6 @@ export class Font extends ValueSet {
     set family(v: TextValue) {
         xset(this, "family", v);
     }
-
-
 }
 
 

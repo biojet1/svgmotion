@@ -4,7 +4,7 @@ import test from "tap";
 import {
     Keyframes, NumberValue, TextValue,
     NVectorValue, Point, NVector, Fill,
-    ViewPort, Doc, Size,
+    ViewPort, Root, Size,
     Step, Track
 } from "svgmotion";
 
@@ -70,8 +70,8 @@ test.test("NVectorValue", (t) => {
 });
 
 test.test("ViewPort", (t) => {
-    let head = new Doc();
-    let vp = head.view;
+    let doc = new Root();
+    let vp = doc.view;
     // v.push(new Rect());
     // v.push(new Ellipse());
     let r = vp.add_rect();
@@ -83,17 +83,16 @@ test.test("ViewPort", (t) => {
     // v.set_value(60, new NVector([4, 5]));
     // v[0].fun();
     // r.opacity = 
-    // console.log(Array.from(root.view_box.size.value));
-    const json = head.to_json();
+    const json = doc.to_json();
     console.log(JSON.stringify(json, null, 4));
     console.log(vp.constructor['opacity']);
     console.log(vp.constructor['zoom_pan']);
-    const { tag, nodes, ...props } = json.root;
+    const { tag, nodes, ...props } = json.view;
     console.log(tag, nodes, props);
     t.equal(tag, "svg");
     t.equal(nodes[0].tag, "rect");
     t.same([...props.view_box.size.v], [100, 100]);
-    let head2 = new Doc();
+    let head2 = new Root();
     head2.from_json(json);
     t.same(head2.to_json(), json);
     // console.log(JSON.stringify(from_json(json).to_json(), null, 4));
@@ -104,10 +103,10 @@ test.test("ViewPort", (t) => {
 
 test.test("Step", (t) => {
     let tr = new Track();
-    let head = new Doc();
-    let root = head.view;
+    let head = new Root();
+    let view = head.view;
     let vp = new ViewPort();
-    let r = root.add_rect();
+    let r = view.add_rect();
     // r.opacity = new NumberValue(0.9);
     r.position = new NVectorValue([10, 30]);
     t.equal(r.position.value[0], 10);

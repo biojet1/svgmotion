@@ -1,5 +1,5 @@
 import { Animatable, Value } from "../model/keyframes.js";
-import { Container, Doc, Item, PlainDoc, PlainNode, ViewPort } from "../model/node.js";
+import { Container, Root, Item, PlainRoot, PlainNode, ViewPort } from "../model/node.js";
 import { ValueSet } from "../model/valuesets.js";
 
 
@@ -10,7 +10,7 @@ declare module "../model/node" {
     interface Item {
         to_json(): any;
     }
-    interface Doc {
+    interface Root {
         to_json(): any;
     }
 }
@@ -39,11 +39,11 @@ Item.prototype.to_json = function (): PlainNode {
     return o;
 }
 
-Doc.prototype.to_json = function (): PlainDoc {
+Root.prototype.to_json = function (): PlainRoot {
     const { version, view, defs } = this;
     return {
         version,
-        root: view.to_json(),
+        view: view.to_json(),
         defs: Object.fromEntries(
             Object.entries(defs).map(([k, v]) => [k, v.to_json()])
         ),

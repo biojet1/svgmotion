@@ -1,5 +1,5 @@
 import { Animatable, NVectorValue, NumberValue, RGBValue, TextValue } from "../model/keyframes.js";
-import { Container, Doc, Item } from "../model/node.js";
+import { Container, Root, Item } from "../model/node.js";
 import { Node } from "../model/linked.js";
 import { Transform, Fill, Box, ValueSet, Font, Stroke } from "../model/valuesets.js";
 
@@ -173,7 +173,7 @@ declare module "../model/node" {
         to_dom(doc: typeof SVGElement.prototype.ownerDocument): SVGElement;
         update_dom(frame: number): void;
     }
-    interface Doc {
+    interface Root {
         to_dom(doc: typeof SVGElement.prototype.ownerDocument): SVGElement;
     }
 }
@@ -205,7 +205,7 @@ Item.prototype.to_dom = function (doc: typeof SVGElement.prototype.ownerDocument
     return set_svg(e, this);
 }
 
-Doc.prototype.to_dom = function to_dom(doc: typeof SVGElement.prototype.ownerDocument): SVGElement {
+Root.prototype.to_dom = function to_dom(doc: typeof SVGElement.prototype.ownerDocument): SVGElement {
     const element = this.view.to_dom(doc);
     const defs = doc.createElementNS(NS_SVG, "defs");
     for (let [n, v] of Object.entries(this.defs)) {

@@ -1,5 +1,5 @@
 export default {
-    'entry': './dist/web.js',
+    'entry': './dist/webpack.js',
     'output': {
         filename: 'svgmotion.web.js',
         path: import.meta.dirname

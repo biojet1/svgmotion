@@ -1,6 +1,6 @@
-import { Doc, Track, Step, NVector } from "svgmotion";
+import { Root, Track, Step, NVector } from "svgmotion";
 export async function animate(lib) {
-    const doc = new Doc();
+    const doc = new Root();
     const tr = new Track();
     await doc.load_svg("test/shapes.svg");
 

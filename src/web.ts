@@ -1,8 +1,12 @@
-import * as all from "./index.js";
+import { Root } from "./model/node.js";
+
+export * from "./model/index.js";
+export * from "./track/index.js";
 export * from "./helper/update_dom.js";
 export * from "./helper/from_json.js";
-export function animate(root: all.Doc, fps: number) {
-    const [start, end] = root.calc_time_range();
+
+export function animate(anim: Root, fps: number) {
+    const [start, end] = anim.calc_time_range();
     if (end >= start) {
 
         const mspf = 1000 / fps; // miliseconds per frame
@@ -13,7 +17,7 @@ export function animate(root: all.Doc, fps: number) {
             const t = performance.now();
             {
                 // console.info(`${frame} t=${t} frames=${frames} ${start}-${end}`);
-                root.update_dom(frame);
+                anim.update_dom(frame);
             }
             frame = (frame + 1) % frames;
             const excess = mspf - (performance.now() - t);
@@ -26,12 +30,12 @@ export function animate(root: all.Doc, fps: number) {
         }
         requestAnimationFrame(render);
     } else {
-        root.update_dom(0);
+        anim.update_dom(0);
     }
 }
 
 declare module "./model/node" {
-    interface Doc {
+    interface Root {
         animate(params: {
             fps: number,
             parent: string | Element | null
@@ -40,7 +44,7 @@ declare module "./model/node" {
     }
 }
 
-all.Doc.prototype.animate = function ({ fps = 60, parent }) {
+Root.prototype.animate = function ({ fps = 60, parent }) {
     if (typeof parent === 'string') {
         parent = document.getElementById(parent);
     }
@@ -51,5 +55,5 @@ all.Doc.prototype.animate = function ({ fps = 60, parent }) {
     animate(this, fps);
 };
 
-(globalThis as unknown as any).svgmotion = all;
+
 

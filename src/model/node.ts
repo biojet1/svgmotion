@@ -11,7 +11,6 @@ import { Box, ValueSet, xset, xget } from "./valuesets.js";
 import { Node, Parent } from "./linked.js";
 import { BaseProps } from "./baseprops.js";
 
-
 export abstract class Item extends BaseProps(Node) {
     *enum_values(): Generator<Animatable<any>, void, unknown> {
         for (let v of Object.values(this)) {
@@ -248,22 +247,79 @@ export class Circle extends Shape {
     }
 }
 
-// export class Ellipse extends Shape {
-//     size: NVectorValue = new NVectorValue([100, 100]);
-// }
+export class Ellipse extends Shape {
+    static tag = "ellipse";
+    /// cx
+    get cx() {
+        return xget(this, "cx", new NumberValue(0));
+    }
+    set cx(v: NumberValue) {
+        xset(this, "cx", v);
+    }
+    /// cy
+    get cy() {
+        return xget(this, "cy", new NumberValue(0));
+    }
+    set cy(v: NumberValue) {
+        xset(this, "cy", v);
+    }
+    /// rx
+    get rx() {
+        return xget(this, "rx", new NumberValue(0));
+    }
+    set rx(v: NumberValue) {
+        xset(this, "rx", v);
+    }
+    /// ry
+    get ry() {
+        return xget(this, "ry", new NumberValue(0));
+    }
+    set ry(v: NumberValue) {
+        xset(this, "ry", v);
+    }
+}
 
+export class Line extends Shape {
+    static tag = "ellipse";
+    /// x1
+    get x1() {
+        return xget(this, "x1", new NumberValue(0));
+    }
+    set x1(v: NumberValue) {
+        xset(this, "x1", v);
+    }
+    /// y1
+    get y1() {
+        return xget(this, "y1", new NumberValue(0));
+    }
+    set y1(v: NumberValue) {
+        xset(this, "y1", v);
+    }
+    /// x2
+    get x2() {
+        return xget(this, "x2", new NumberValue(0));
+    }
+    set x2(v: NumberValue) {
+        xset(this, "x2", v);
+    }
+    /// y2
+    get y2() {
+        return xget(this, "y2", new NumberValue(0));
+    }
+    set y2(v: NumberValue) {
+        xset(this, "y2", v);
+    }
+}
 // export class Image extends Node {
 //     // href: string = "";
 //     // size: NVectorValue = new NVectorValue([100, 100]);
 // }
 
-export class Doc extends Container {
+export class Root extends Container {
     defs: { [key: string]: Item | Container } = {};
     all: { [key: string]: Item | Container } = {};
     version: string = "0.0.1";
-    constructor() {
-        super();
-    }
+    // view
     get view() {
         let x = this.first_child();
         if (x instanceof ViewPort) {
@@ -278,17 +334,19 @@ export class Doc extends Container {
         throw new Error("Unexpected");
     }
 
-    set_viewport(vp: ViewPort) {
+    set_view(vp: ViewPort) {
         this.remove_children();
         this.append_child(vp);
-    }
-    remember_id(id: string, node: Item | Container) {
-        this.all[id] = node;
     }
     override add_view(): ViewPort {
         this.remove_children();
         return super.add_view();
     }
+    // etc
+    remember_id(id: string, node: Item | Container) {
+        this.all[id] = node;
+    }
+
     // new_view, new_rect
 }
 
@@ -298,8 +356,8 @@ export interface PlainNode {
     opacity?: Value<any>;
 }
 
-export interface PlainDoc {
+export interface PlainRoot {
     version: string;
-    root: PlainNode;
+    view: PlainNode;
     defs: { [key: string]: PlainNode };
 }

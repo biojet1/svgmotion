@@ -1,7 +1,6 @@
 "uses strict";
 
-import * as all from "../dist/index.js";
-import { Item, Container } from "../dist/index.js";
+import * as all from "../dist/lib.js";
 // const { Item, Container } = all;
 
 function* ptypes(class_dec) {

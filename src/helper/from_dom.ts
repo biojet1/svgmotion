@@ -1,5 +1,5 @@
 
-import { Item, Container, Doc } from "../model/node.js";
+import { Item, Container, Root } from "../model/node.js";
 import { NVector } from "../model/keyframes.js";
 import { Node } from "../model/linked.js";
 
@@ -145,7 +145,7 @@ const TAG_DOM: {
 
 function get_root(cur: Container | Item) {
     for (let x: Node | undefined = cur; x; x = x._parent) {
-        if (x instanceof Doc) {
+        if (x instanceof Root) {
             return x;
         }
     }
@@ -313,16 +313,16 @@ export function parse_svg(
         return domspec.DOMParser.loadXML(src, { ...opt, type: "image/svg+xml" })
             .then((doc) => {
                 const base = opt.base || src;
-                const root = (doc as unknown as XMLDocument).documentElement;
-                // console.info(`loadrd "${src}" ${root?.localName}`);
-                if (root.namespaceURI != NS_SVG) {
-                    throw new Error(`not svg namespace ${root.namespaceURI}`);
-                } else if (root.localName != "svg") {
-                    throw new Error(`not svg tag ${root.localName}`);
+                const top = (doc as unknown as XMLDocument).documentElement;
+                // console.info(`loadrd "${src}" ${top?.localName}`);
+                if (top.namespaceURI != NS_SVG) {
+                    throw new Error(`not svg namespace ${top.namespaceURI}`);
+                } else if (top.localName != "svg") {
+                    throw new Error(`not svg tag ${top.localName}`);
                 } else {
-                    const doc = new Doc();
+                    const doc = new Root();
                     // console.log(doc.innerHTML);
-                    const f = walk(root as unknown as SVGSVGElement, doc);
+                    const f = walk(top as unknown as SVGSVGElement, doc);
                     return doc;
                 }
             })
@@ -342,17 +342,17 @@ export async function load_svg(
     try {
         const doc = await domspec.DOMParser.loadXML(src, { ...opt, type: "image/svg+xml" });
         const base = opt.base || src;
-        const root = (doc as unknown as XMLDocument).documentElement;
-        // console.info(`loadrd "${src}" ${root?.localName}`);
-        if (root.namespaceURI != NS_SVG) {
-            throw new Error(`not svg namespace ${root.namespaceURI}`);
+        const top = (doc as unknown as XMLDocument).documentElement;
+        // console.info(`loadrd "${src}" ${top?.localName}`);
+        if (top.namespaceURI != NS_SVG) {
+            throw new Error(`not svg namespace ${top.namespaceURI}`);
         }
-        if (parent instanceof Doc) {
-            if (root.localName != "svg") {
-                throw new Error(`not svg tag ${root.localName}`);
+        if (parent instanceof Root) {
+            if (top.localName != "svg") {
+                throw new Error(`not svg tag ${top.localName}`);
             }
         }
-        const f = walk(root as unknown as SVGSVGElement, parent);
+        const f = walk(top as unknown as SVGSVGElement, parent);
     } catch (err) {
         console.error(`Failed to load "${src}"`);
         throw err;

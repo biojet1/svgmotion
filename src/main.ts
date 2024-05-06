@@ -3,7 +3,7 @@ import * as lib from './lib.js';
 interface AnimMod {
     name: string;
     svg?: string;
-    animate: (mod: typeof lib) => lib.Doc;
+    animate: (mod: typeof lib) => lib.Root;
 }
 export async function main() {
     const path = await import('path');

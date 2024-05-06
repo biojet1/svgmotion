@@ -1,13 +1,7 @@
 "uses strict";
 import test from "tap";
 
-import {
-    NumberValue,
-    Rect
-} from "../dist/model/index.js";
-import {
-    Transform
-} from "../dist/model/properties.js";
+import { NumberValue, Rect, Transform } from "svgmotion";
 
 test.test("KeyframeEntry", (t) => {
     let x = new Rect();

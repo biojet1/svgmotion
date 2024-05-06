@@ -1,5 +1,5 @@
 import { Animatable, Value } from "../model/keyframes.js";
-import { Container, Doc, Item, PlainDoc, PlainNode, ViewPort } from "../model/node.js";
+import { Container, Root, Item, PlainRoot, PlainNode, ViewPort } from "../model/node.js";
 import { ValueSet } from "../model/valuesets.js";
 
 const TAGS: {
@@ -62,28 +62,27 @@ function from_json_walk(obj: PlainNode, parent: Container) {
 }
 
 declare module "../model/node" {
-
-    interface Doc {
-        from_json(src: PlainDoc): void;
+    interface Root {
+        from_json(src: PlainRoot): void;
     }
 }
 
-Doc.prototype.from_json = function (src: PlainDoc) {
-    const { version, root, defs } = src;
+Root.prototype.from_json = function (src: PlainRoot) {
+    const { version, view, defs } = src;
     if (!version) {
         throw new Error("No version {${Object.keys(src)}}");
     } else if (!/^\d+\.\d+\.\d+$/.test(version)) {
         throw new Error("Invalid version");
-    } else if (!root) {
-        throw new Error("No root");
+    } else if (!view) {
+        throw new Error("No view");
     }
-    const vp = from_json_walk(root, this);
+    const vp = from_json_walk(view, this);
     if (!(vp instanceof ViewPort)) {
         throw new Error("ViewPort expected");
     }
     this.version = version;
     this.defs = {};
-    this.set_viewport(vp);
+    this.set_view(vp);
     if (defs) {
         Object.entries(defs).map(([k, v]) => {
             this.defs[k] = from_json_walk(v, this);

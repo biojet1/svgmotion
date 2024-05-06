@@ -1,8 +1,8 @@
 
 
-import { Doc, Track, Step } from "svgmotion";
+import { Root, Track, Step } from "svgmotion";
 export async function animate(lib) {
-    const doc = new Doc();
+    const doc = new Root();
     const tr = new Track();
     await doc.load_svg("../../python/flottie/example/res/thank_you_tp.svg");
     console.log(doc);

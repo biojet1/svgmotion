@@ -1,10 +1,10 @@
 "uses strict";
 import test from "tap";
 import { SVGDocument, XMLSerializer } from "domspec";
-import { RGB, Doc, Track, Step } from "svgmotion";
+import { RGB, Root, Track, Step } from "svgmotion";
 test.test("Item", async (t) => {
 
-    const doc = new Doc();
+    const doc = new Root();
     const tr = new Track();
     await doc.load_svg("../../python/flottie/example/res/thank_you_tp.svg");
     // console.log("doc", doc);
