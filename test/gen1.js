@@ -1,5 +1,6 @@
-import { Root, Step, NVector } from "svgmotion";
+import { Root, Step, NVector, Easing } from "svgmotion";
 export async function animate(lib) {
+    const sigm = new Easing(1 / 3, 0, 1 - 1 / 3, 1);
     const anim = new Root();
     const tr = anim.track();
     await anim.load_svg("test/shapes.svg");
@@ -7,7 +8,7 @@ export async function animate(lib) {
     const maru1 = anim.get_circle("maru");
     const maru2 = anim.get_circle("maru2");
     const r2 = anim.get_rect("r2");
-
+    const e1 = anim.get_ellipse(0);
     delete maru1.cx;
     delete maru1.cy;
     maru1.r.value = 20;
@@ -37,11 +38,22 @@ export async function animate(lib) {
         )
     );
     console.log("TR", r2.transform);
+    delete e1.cy;
+    delete e1.cx;
     anim.track().feed(
-        Step([{ dur: 1, Y: 100, X: 100 }], {
+        Step([
+            { dur: 0.5, P: [100, 100], EY: 30, EX: 30 },
+            { dur: 0.5, Y: 100, X: 100, EY: 10, EX: 30, },
+            { dur: 0.5, P: [400, 100], EY: 30, EX: 30 },
+            { dur: 0.5, EX: 10 },
+            { dur: 0.5, P: [400, 400], EX: 30 },
+        ], {
             X: maru2.cx,
             Y: maru2.cy,
-        })
+            P: e1.transform.position,
+            EY: e1.ry,
+            EX: e1.rx,
+        }, { easing: Easing.inoutexpo })
     );
     return anim;
 }

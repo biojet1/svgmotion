@@ -73,6 +73,11 @@ export class StepA extends Action {
             // collect names, parse inputs
             const names: Array<string> = [];
             this._steps.map((e, i, a) => {
+                if (easing) {
+                    if (!e.ease) {
+                        e.ease = easing
+                    }
+                }
                 for (const [k, v] of Object.entries(e)) {
                     switch (k) {
                         case "dur":
@@ -80,10 +85,8 @@ export class StepA extends Action {
                             e[k] = parent.to_frame(v);
                             continue;
                         case "ease":
-                            v == undefined || (e[k] = easing);
+                            // v == undefined || (e[k] = easing);
                             continue;
-
-
 
                     }
                     if (vars[k]) {
@@ -238,21 +241,7 @@ function resolve_t(
 
     return entries;
 }
-// def resolve_bounce(steps: list[Entry]):
-//     t_max = 0
-//     for e in steps:
-//         t_max = max(t_max, e["t"])
-//     extra = []
-//     for e in steps:
-//         if e["t"] < t_max:
-//             t2 = t_max + (t_max - e["t"])
-//             e2 = {**e, "t": t2}
-//             if e.get("ease"):
-//                 e2["ease"] = e["ease"].reverse()
-//             extra.append(e2)
-//         else:
-//             assert e["t"] == t_max, f't:{e["t"]} t_max:{t_max}'
-//     return steps + extra
+
 function resolve_bounce(steps: Array<Entry>): Array<Entry> {
     let t_max = 0;
     for (const e of steps) {

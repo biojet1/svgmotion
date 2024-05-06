@@ -78,9 +78,11 @@ export class Animatable<V> {
     value_from_json(a: any): V {
         throw Error(`Not implemented by '${this.constructor.name}'`);
     }
+    // set_intial_value
     parse_value(a: string) {
         throw Error(`Not implemented by '${this.constructor.name}' ("${a}")`);
     }
+    // get_value_f()
     format_value(frame: number): string {
         throw Error(`Not implemented by '${this.constructor.name}' ("${frame}")`);
     }

@@ -51,6 +51,7 @@ function* enum1(all) {
 }
 if (1) {
     const col = [...enum1(all)];
+    col.sort((a, b) => a.name.localeCompare(b.name));
     for (const { name, kind, tag } of col) {
         console.log(`        get_${name}(x: number | string): ${kind};`);
     }
@@ -72,11 +73,11 @@ if (1) {
         console.log(`Container.prototype.add_${name} = function () {` +
             `const x = new ${kind}();this.append_child(x);return x;}`);
     }
-    // add_circle() {
-    //     const x = new Circle();
-    //     this.append_child(x);
-    //     return x;
-    // }
+    for (const { name, kind, tag } of col) {
+        console.log(`${tag} : function (parent: Container) {` +
+            `return parent.add_${name}();},`);
+    }
+
 }
 
 /*

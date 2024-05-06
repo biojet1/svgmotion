@@ -138,7 +138,31 @@ const TAG_DOM: {
         }
         return node;
     },
-
+    ellipse: function (e: SVGElement, parent: Container) {
+        let node = parent.add_ellipse();
+        // Properties
+        // console.info(`PATH`, e.getAttributeNames(), e.innerHTML);
+        for (const [name, value] of enum_attrs(e)) {
+            // console.info(`PATH ATTR _ ${name} ${value}`);
+            switch (name) {
+                case "rx":
+                    node.rx.parse_value(value);
+                    break;
+                case "ry":
+                    node.ry.parse_value(value);
+                    break;
+                case "cx":
+                    node.cx.parse_value(value);
+                    break;
+                case "cy":
+                    node.cy.parse_value(value);
+                    break;
+                default:
+                    set_common_attr(node, name, value, e);
+            }
+        }
+        return node;
+    },
 
 };
 

@@ -18,25 +18,26 @@ import { ValueSet } from "../model/valuesets.js";
 const TAGS: {
     [key: string]: (parent: Container) => Item | Container;
 } = {
-    svg: function (parent: Container) {
-        let node = parent.add_view();
-        return node;
+    circle: function (parent: Container) {
+        return parent.add_circle();
+    },
+    ellipse: function (parent: Container) {
+        return parent.add_ellipse();
     },
     g: function (parent: Container) {
-        let node = parent.add_group();
-        return node;
+        return parent.add_group();
     },
-    rect: function (parent: Container) {
-        let node = parent.add_rect();
-        return node;
+    line: function (parent: Container) {
+        return parent.add_line();
     },
     path: function (parent: Container) {
-        let node = parent.add_path();
-        return node;
+        return parent.add_path();
     },
-    circle: function (parent: Container) {
-        let node = parent.add_circle();
-        return node;
+    rect: function (parent: Container) {
+        return parent.add_rect();
+    },
+    svg: function (parent: Container) {
+        return parent.add_view();
     },
 };
 

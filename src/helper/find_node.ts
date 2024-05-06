@@ -89,7 +89,7 @@ function get_node<T>(
     if (n) {
         return n;
     }
-    throw new Error(`not found '${x}'`);
+    throw new Error(`not found ${K} '${x}'`);
 }
 
 function find_node<T>(
