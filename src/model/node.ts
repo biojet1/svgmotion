@@ -1,17 +1,10 @@
-import {
-    Animatable,
-    Keyframes,
-    NVector,
-    NumberValue,
-    PointsValue,
-    PositionValue,
-    TextValue,
-    Value,
-} from "./keyframes.js";
-import { Box, ValueSet, xset, xget } from "./valuesets.js";
-import { Node, Parent } from "./linked.js";
-import { BaseProps } from "./baseprops.js";
 import { Track } from "../track/track.js";
+import { BaseProps } from "./baseprops.js";
+import {
+    Animatable, Keyframes, NVector, NumberValue, PointsValue, PositionValue, TextValue, Value,
+} from "./keyframes.js";
+import { Node, Parent } from "./linked.js";
+import { Box, ValueSet, xget, xset } from "./valuesets.js";
 export interface PlainNode {
     tag: string;
     nodes: PlainNode[];
@@ -24,6 +17,7 @@ export interface PlainRoot {
     defs: { [key: string]: PlainNode };
     frame_rate: number;
 }
+
 export abstract class Item extends BaseProps(Node) {
     *enum_values(): Generator<Animatable<any>, void, unknown> {
         for (let v of Object.values(this)) {

@@ -1,10 +1,21 @@
-import { Animatable, NVectorValue, NumberValue, PointsValue, RGBValue, TextValue } from "../model/keyframes.js";
+import { Animatable, NVectorValue, NumberValue, PointsValue, RGBValue, TextValue, Value } from "../model/keyframes.js";
 import { Container, Root, Item } from "../model/node.js";
 import { Node } from "../model/linked.js";
 import { Transform, Fill, Box, ValueSet, Font, Stroke } from "../model/valuesets.js";
 
+const FILL_MAP: {
+    [key: string]: ((frame: number, node: SVGElement, prop: any) => void);
+} = {
+    opacity: function (frame: number, node: SVGElement, prop: NumberValue) {
+        node.setAttribute("fill-opacity", `${prop.get_value(frame)}`);
+    },
+    color: function (frame: number, node: SVGElement, prop: RGBValue) {
+        node.setAttribute("fill", prop.get_value_format_rgb(frame));
+    },
+};
+
 const PROP_MAP: {
-    [key: string]: any;
+    [key: string]: ((frame: number, node: any, prop: any) => void);
 } = {
     opacity: function (frame: number, node: SVGElement, prop: NumberValue) {
         const v = prop.get_value(frame);
@@ -73,14 +84,12 @@ const PROP_MAP: {
     },
     fill: function (frame: number, node: SVGSVGElement, prop: Fill) {
         for (let [n, v] of Object.entries(prop)) {
-            if (v) {
-                switch (n) {
-                    case "opacity":
-                        node.style.fillOpacity = (v as NumberValue).format_value(frame);
-                        break;
-                    case "color":
-                        node.style.fill = v.format_value(frame);
-                        break;
+            if (v instanceof Animatable) {
+                const f = FILL_MAP[n];
+                if (f) {
+                    f(frame, node, v);
+                } else {
+                    throw new Error(`Unexpected property ${n}`);
                 }
             }
         }
@@ -89,7 +98,7 @@ const PROP_MAP: {
         for (let [n, v] of Object.entries(prop)) {
             switch (n) {
                 case "color":
-                    node.style.stroke = v.format_value(frame);
+                    node.style.stroke = v.get_value_format_rgb(frame);
                     break;
                 case "opacity":
                     node.style.strokeOpacity = v.get_value(frame) + '';
@@ -106,9 +115,7 @@ const PROP_MAP: {
                 case "dash_offset":
                     node.style.strokeDashoffset = v.get_value(frame);
                     break;
-
             }
-
         }
     },
     font: function (frame: number, node: SVGSVGElement, prop: Font) {
@@ -182,6 +189,11 @@ declare module "../model/node" {
         to_dom(doc: typeof SVGElement.prototype.ownerDocument): SVGElement;
     }
 }
+declare module "../model/keyframes" {
+    interface RGBValue {
+        get_value_format_rgb(frame: number): string;
+    }
+}
 
 function set_svg(elem: SVGElement, node: Item | Container): SVGElement {
     const { id } = node;
@@ -228,4 +240,8 @@ Item.prototype.update_dom = function (frame: number) {
 
 Container.prototype.update_dom = function (frame: number) {
     update_dom(frame, this);
+}
+
+RGBValue.prototype.get_value_format_rgb = function (frame: number) {
+    return (this.value == null) ? 'none' : RGBValue.to_css_rgb(this.get_value(frame));
 }

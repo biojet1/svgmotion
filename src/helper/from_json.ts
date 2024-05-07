@@ -10,10 +10,7 @@ import {
     Path,
     Line,
     Group,
-    Ellipse,
-    Circle,
-    Polyline,
-    Polygon,
+    Ellipse, Circle, Polyline, Polygon,
 } from "../model/node.js";
 import { ValueSet } from "../model/valuesets.js";
 

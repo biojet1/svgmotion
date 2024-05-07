@@ -66,15 +66,19 @@ export class Keyframes<V> extends Array<KeyframeEntry<V>> {
 
 export class Animatable<V> {
     value!: Keyframes<V> | V | null;
+    // static
     lerp_value(ratio: number, a: V, b: V): V {
         throw Error(`Not implemented by '${this.constructor.name}'`);
     }
+    // static
     add_value(a: V, b: V): V {
         throw Error(`Not implemented by '${this.constructor.name}'`);
     }
+    // static
     value_to_json(a: V | null): any {
         throw Error(`Not implemented by '${this.constructor.name}'`);
     }
+    // static
     value_from_json(a: any): V {
         throw Error(`Not implemented by '${this.constructor.name}'`);
     }
@@ -86,6 +90,7 @@ export class Animatable<V> {
     format_value(frame: number): string {
         throw Error(`Not implemented by '${this.constructor.name}' ("${frame}")`);
     }
+    // get_frame_value
     get_value(frame: number) {
         const { value } = this;
         if (value instanceof Keyframes) {
@@ -124,6 +129,7 @@ export class Animatable<V> {
     }
     // set_at()
     // get_at() set()
+    // set_frame_value()
 
     set_value(
         frame: number,
@@ -406,15 +412,15 @@ export class RGBValue extends NVectorValue {
             (g * 255) % 256
         )}, ${Math.round((b * 255) % 256)})`;
     }
-    override format_value(frame: number): string {
-        if (this.value == null) {
-            return 'none';
-        }
-        const c = this.get_value(frame);
-        // console.log("format_value", c.constructor.name);
+    // override format_value(frame: number): string {
+    //     if (this.value == null) {
+    //         return 'none';
+    //     }
+    //     const c = this.get_value(frame);
+    //     // console.log("format_value", c.constructor.name);
 
-        return RGBValue.to_css_rgb(c);
-    }
+    //     return RGBValue.to_css_rgb(c);
+    // }
 
 
 }

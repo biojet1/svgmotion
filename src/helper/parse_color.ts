@@ -1,4 +1,4 @@
-import { RGB, RGBNone, RGBValue } from "../model/keyframes.js";
+import { NVector, RGB, RGBNone, RGBValue } from "../model/keyframes.js";
 
 declare module "../model/keyframes" {
     interface RGBValue {
@@ -12,12 +12,28 @@ RGBValue.prototype.parse_value = function (s: string) {
         this.value = null;
         return;
     }
-    const c = parseCSSColor(s);
+    const c = parse_css_color(s);
     if (c == null) {
         throw new Error(`Invalid color "${s}"`);
     }
     this.value = new RGB(c[0] / 255, c[1] / 255, c[2] / 255);
 };
+
+RGBValue.prototype.check_value = function (x: RGB) {
+    if (x instanceof RGB) {
+        return x;
+    } else if (typeof x == "string") {
+        const c = parse_css_color(x);
+        if (c == null) {
+            throw new Error(`Invalid color "${x}"`);
+        }
+        return new RGB(c[0] / 255, c[1] / 255, c[2] / 255);
+    } else {
+        return new RGB(...(x as number[]));
+    }
+};
+
+
 
 export type RGBA = [number, number, number, number];
 
@@ -236,7 +252,7 @@ function rotation_to_degrees(s: string): number {
     }
 }
 
-function parseCSSColor(css_str: string): RGBA | null {
+export function parse_css_color(css_str: string): RGBA | null {
     const str = css_str.trim().toLowerCase();
 
     // Color keywords (and transparent) lookup.

@@ -4,7 +4,6 @@ export async function animate(lib) {
     const anim = new Root();
     const tr = anim.track();
     await anim.load_svg("test/shapes.svg");
-
     const maru1 = anim.get_circle("maru");
     const maru2 = anim.get_circle("maru2");
     const r2 = anim.get_rect("r2");
@@ -16,15 +15,15 @@ export async function animate(lib) {
     tr.feed(
         Step(
             [
-                { t: 0, R: [400, 400], S: [1, 1], K: 0, A: 0 },
+                { t: 0, R: [400, 400], S: [1, 1], K: 0, A: 0, C: 'red', O: 1 },
                 { dur: 1, S: [2, 1], K: 30, A: 90 },
-                { dur: 1, R: [100, 400], S: [1, 1], K: 0, A: 90 },
+                { dur: 1, R: [100, 400], S: [1, 1], K: 0, A: 90, C: 'blue' },
                 { dur: 1, S: [1, 2], K: 30, A: 90 },
                 { dur: 1, R: [100, 100], S: [1, 1], K: 0, A: 0 },
                 { dur: 1, S: [2, 1] },
-                { dur: 1, R: [400, 100], S: [1, 1] },
-                { dur: 1, S: [1, 2] },
-                { dur: 1, R: [400, 400], S: [1, 1] },
+                { dur: 1, R: [400, 100], S: [1, 1], C: Step.last },
+                { dur: 1, S: [1, 2], C: Step.first },
+                { dur: 1, R: [400, 400], S: [1, 1], C: 'green' },
                 // { dur: 1, R: null, S: null },
             ],
             {
@@ -33,7 +32,9 @@ export async function animate(lib) {
                 S: r2.transform.scale,
                 R: r2.transform.position,
                 K: r2.transform.skew,
-                A: r2.transform.skew_axis
+                A: r2.transform.skew_axis,
+                C: r2.fill.color,
+                O: r2.fill.opacity
             }
         )
     );
@@ -49,7 +50,7 @@ export async function animate(lib) {
             { dur: 1, P: [100, 100] },
         ], {
             P: e1.transform.position,
-        }, { easing: Easing.inoutexpo })
+        }, { easing: Easing.inoutback })
     );
     anim.track().feed(
         Step([

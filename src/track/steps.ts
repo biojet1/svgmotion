@@ -34,7 +34,8 @@ interface Params {
     repeat?: number;
     max_dur?: number;
 }
-
+const FIRST = {};
+const LAST = {};
 export class StepA extends Action {
     _steps: Array<UserEntry>;
     _max_dur?: number;
@@ -87,7 +88,6 @@ export class StepA extends Action {
                         case "ease":
                             // v == undefined || (e[k] = easing);
                             continue;
-
                     }
                     if (vars[k]) {
                         names.push(k);
@@ -140,21 +140,32 @@ export class StepA extends Action {
         for (const [name, entries] of Object.entries(_kf_map!)) {
             for (const prop of enum_props(_vars, name)) {
                 let prev_t = _base_frame;
+                let prev_v = undefined;
                 for (const { t, value, ease } of entries) {
                     const frame = _start + t;
                     let v;
                     if (value == null) {
                         v = prop.get_value(_start);
+                    } else if (value === FIRST) {
+                        v = prop.get_value(_start);
+                    } else if (value === LAST) {
+                        if (prev_v == undefined) {
+                            throw new Error(`Unexpected`);
+                        }
+                        v = prev_v;
                     } else {
                         v = prop.check_value(value);
                     }
                     prop.set_value(frame, v, prev_t, ease);
                     prev_t = frame;
+                    prev_v = v;
                 }
             }
         }
 
     }
+    static last = LAST;
+    static first = FIRST;
 }
 
 function resolve_t(

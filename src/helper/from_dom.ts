@@ -1,7 +1,8 @@
 
 import { Item, Container, Root } from "../model/node.js";
-import { NVector } from "../model/keyframes.js";
+import { NVector, NumberValue, RGB, RGBValue } from "../model/keyframes.js";
 import { Node } from "../model/linked.js";
+import { parse_css_color } from "./parse_color.js";
 const BOTH_MATCH =
     /^\s*(([-+]?[0-9]+(\.[0-9]*)?|[-+]?\.[0-9]+)([eE][-+]?[0-9]+)?)\s*(in|pt|px|mm|cm|m|km|Q|pc|yd|ft||%|em|ex|ch|rem|vw|vh|vmin|vmax|deg|grad|rad|turn|s|ms|Hz|kHz|dpi|dpcm|dppx)\s*$/i;
 const CONVERSIONS: { [k: string]: number } = {
@@ -17,7 +18,7 @@ const CONVERSIONS: { [k: string]: number } = {
     yd: 3456.0,
     ft: 1152.0,
 };
-function parse_len(value: string, fail = false) {
+function parse_len(value: string) {
     const m = BOTH_MATCH.exec(value);
     if (m) {
         const num = parseFloat(m[1]);
@@ -72,22 +73,23 @@ const TAG_DOM: {
                 }
                     break;
                 case "preserveAspectRatio":
+                    // node.fit_view.constructor.name
                     node.fit_view.parse_value(value);
                     break;
                 case "zoomAndPan":
                     node.zoom_pan.parse_value(value);
                     break;
                 case "height":
-                    node.height.value = parse_len(value);
+                    node.height.set_value_parse_length(value);
                     break;
                 case "width":
-                    node.width.value = parse_len(value);
+                    node.width.set_value_parse_length(value);
                     break;
                 case "y":
-                    node.y.parse_value(value);
+                    node.y.set_value_parse_length(value);
                     break;
                 case "x":
-                    node.y.parse_value(value);
+                    node.y.set_value_parse_length(value);
                     break;
                 default:
                     set_common_attr(node, name, value, e);
@@ -101,22 +103,22 @@ const TAG_DOM: {
         for (const [name, value] of enum_attrs(e)) {
             switch (name) {
                 case "height":
-                    node.height.parse_value(value);
+                    node.height.set_value_parse_length(value);
                     break;
                 case "width":
-                    node.width.parse_value(value);
+                    node.width.set_value_parse_length(value);
                     break;
                 case "y":
-                    node.y.parse_value(value);
+                    node.y.set_value_parse_length(value);
                     break;
                 case "x":
-                    node.x.parse_value(value);
+                    node.x.set_value_parse_length(value);
                     break;
                 case "ry":
-                    node.ry.parse_value(value);
+                    node.ry.set_value_parse_length(value);
                     break;
                 case "rx":
-                    node.rx.parse_value(value);
+                    node.rx.set_value_parse_length(value);
                     break;
                 default:
                     set_common_attr(node, name, value, e);
@@ -157,13 +159,13 @@ const TAG_DOM: {
             // console.info(`PATH ATTR _ ${name} ${value}`);
             switch (name) {
                 case "r":
-                    node.r.parse_value(value);
+                    node.r.set_value_parse_length(value);
                     break;
                 case "cx":
-                    node.cx.parse_value(value);
+                    node.cx.set_value_parse_length(value);
                     break;
                 case "cy":
-                    node.cy.parse_value(value);
+                    node.cy.set_value_parse_length(value);
                     break;
                 default:
                     set_common_attr(node, name, value, e);
@@ -179,16 +181,16 @@ const TAG_DOM: {
             // console.info(`PATH ATTR _ ${name} ${value}`);
             switch (name) {
                 case "rx":
-                    node.rx.parse_value(value);
+                    node.rx.set_value_parse_length(value);
                     break;
                 case "ry":
-                    node.ry.parse_value(value);
+                    node.ry.set_value_parse_length(value);
                     break;
                 case "cx":
-                    node.cx.parse_value(value);
+                    node.cx.set_value_parse_length(value);
                     break;
                 case "cy":
-                    node.cy.parse_value(value);
+                    node.cy.set_value_parse_length(value);
                     break;
                 default:
                     set_common_attr(node, name, value, e);
@@ -291,32 +293,32 @@ function set_common_attr(
             break;
         case "fill":// 
             if (value) {
-                node.fill.color.parse_value(value);
+                node.fill.color.set_value_parse_rgb(value);
             }
             break;
         case "fill-opacity":// 
             if (value) {
-                node.fill.opacity.parse_value(value);
+                node.fill.opacity.set_value_parse_percentage(value);
             }
             break;
         case "stroke":// 
             if (value) {
-                node.stroke.color.parse_value(value);
+                node.stroke.color.set_value_parse_rgb(value);
             }
             break;
         case "stroke-opacity":// 
             if (value) {
-                node.stroke.opacity.parse_value(value);
+                node.stroke.opacity.set_value_parse_percentage(value);
             }
             break;
         case "stroke-width":// 
             if (value) {
-                node.stroke.width.parse_value(value);
+                node.stroke.width.set_value_parse_length(value);
             }
             break;
         case "stroke-miterlimit":// 
             if (value) {
-                node.stroke.miter_limit.parse_value(value);
+                node.stroke.miter_limit.set_value_parse_number(value);
             }
             break;
 
@@ -327,7 +329,7 @@ function set_common_attr(
             break;
         case "stroke-dashoffset":// 
             if (value) {
-                node.stroke.dash_offset.parse_value(value);
+                node.stroke.dash_offset.set_value_parse_length(value);
             }
             break;
         case "style":
@@ -421,7 +423,7 @@ export function parse_svg(
     });
 }
 
-export async function load_svg(
+async function load_svg(
     parent: Container,
     src: string | URL,
     opt: { xinclude?: boolean; base?: string | URL } = {}
@@ -453,8 +455,46 @@ declare module "../model/node" {
     }
 }
 
+declare module "../model/keyframes" {
+    interface NumberValue {
+        set_value_parse_length(s: string): void;
+        set_value_parse_number(s: string): void;
+        set_value_parse_percentage(s: string): void;
+    }
+    interface RGBValue {
+        set_value_parse_rgb(s: string): void;
+    }
+}
+
 Container.prototype.load_svg = async function (src: string | URL,
     opt: { xinclude?: boolean; base?: string | URL }) {
     return load_svg(this, src, opt);
 }
 
+NumberValue.prototype.set_value_parse_number = function (s: string) {
+    this.value = parseFloat(s);
+}
+
+NumberValue.prototype.set_value_parse_length = function (s: string) {
+    this.value = parse_len(s);
+}
+
+NumberValue.prototype.set_value_parse_percentage = function (s: string) {
+    if (s.endsWith('%')) {
+        this.value = parseFloat(s.replaceAll('%', '')) / 100;
+    } else {
+        this.value = parseFloat(s);
+    }
+}
+
+RGBValue.prototype.set_value_parse_rgb = function (s: string) {
+    if (s == "none") {
+        this.value = null;
+        return;
+    }
+    const c = parse_css_color(s);
+    if (c == null) {
+        throw new Error(`Invalid color "${s}"`);
+    }
+    this.value = new RGB(c[0] / 255, c[1] / 255, c[2] / 255);
+}
