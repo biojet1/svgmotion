@@ -1,6 +1,6 @@
 
 import { Item, Container, Root } from "../model/node.js";
-import { NVector, NumberValue, RGB, RGBValue } from "../model/keyframes.js";
+import { NVector, NVectorValue, NumberValue, PointsValue, RGB, RGBValue, TextValue } from "../model/keyframes.js";
 import { Node } from "../model/linked.js";
 import { parse_css_color } from "./parse_color.js";
 const BOTH_MATCH =
@@ -74,10 +74,10 @@ const TAG_DOM: {
                     break;
                 case "preserveAspectRatio":
                     // node.fit_view.constructor.name
-                    node.fit_view.parse_value(value);
+                    node.fit_view.set_value_parse_text(value);
                     break;
                 case "zoomAndPan":
-                    node.zoom_pan.parse_value(value);
+                    node.zoom_pan.set_value_parse_text(value);
                     break;
                 case "height":
                     node.height.set_value_parse_length(value);
@@ -203,7 +203,7 @@ const TAG_DOM: {
         for (const [name, value] of enum_attrs(e)) {
             switch (name) {
                 case "points":
-                    node.points.parse_value(value);
+                    node.points.set_value_parse_points(value);
                     break;
                 default:
                     set_common_attr(node, name, value, e);
@@ -216,7 +216,7 @@ const TAG_DOM: {
         for (const [name, value] of enum_attrs(e)) {
             switch (name) {
                 case "points":
-                    node.points.parse_value(value);
+                    node.points.set_value_parse_points(value);
                     break;
                 default:
                     set_common_attr(node, name, value, e);
@@ -263,32 +263,32 @@ function set_common_attr(
             break;
         case "font-weight":
             if (value) {
-                node.font.weight.parse_value(value);
+                node.font.weight.set_value_parse_text(value);
             }
             break;
         case "font-size":
             if (value) {
-                node.font.size.parse_value(value);
+                node.font.size.set_value_parse_text(value);
             }
             break;
         case "font-family":
             if (value) {
-                node.font.family.parse_value(value);
+                node.font.family.set_value_parse_text(value);
             }
             break;
         case "line-height":// .text?
             if (value) {
-                node.line_height.parse_value(value);
+                node.line_height.set_value_parse_line_height(value);
             }
             break;
         case "text-align":// .text?
             if (value) {
-                node.text_align.parse_value(value);
+                node.text_align.set_value_parse_text(value);
             }
             break;
         case "white-space":// .text?
             if (value) {
-                node.white_space.parse_value(value);
+                node.white_space.set_value_parse_text(value);
             }
             break;
         case "fill":// 
@@ -324,7 +324,7 @@ function set_common_attr(
 
         case "stroke-dasharray":// 
             if (value) {
-                node.stroke.dash_array.parse_value(value);
+                node.stroke.dash_array.set_value_parse_dashes(value);
             }
             break;
         case "stroke-dashoffset":// 
@@ -460,10 +460,22 @@ declare module "../model/keyframes" {
         set_value_parse_length(s: string): void;
         set_value_parse_number(s: string): void;
         set_value_parse_percentage(s: string): void;
+        set_value_parse_line_height(s: string): void;
     }
     interface RGBValue {
         set_value_parse_rgb(s: string): void;
     }
+    interface TextValue {
+        set_value_parse_text(s: string): void;
+    }
+    interface PointsValue {
+        set_value_parse_points(s: string): void;
+    }
+    interface NVectorValue {
+        set_value_parse_dashes(s: string): void;
+    }
+
+
 }
 
 Container.prototype.load_svg = async function (src: string | URL,
@@ -487,6 +499,17 @@ NumberValue.prototype.set_value_parse_percentage = function (s: string) {
     }
 }
 
+NumberValue.prototype.set_value_parse_line_height = function (s: string) {
+    if (s.endsWith('%')) {
+        this.value = parseFloat(s.replaceAll('%', '')) / 100;
+    } else if (s == 'normal') {
+        this.value = null;
+    } else {
+        this.value = parse_len(s);
+    }
+}
+
+
 RGBValue.prototype.set_value_parse_rgb = function (s: string) {
     if (s == "none") {
         this.value = null;
@@ -498,3 +521,26 @@ RGBValue.prototype.set_value_parse_rgb = function (s: string) {
     }
     this.value = new RGB(c[0] / 255, c[1] / 255, c[2] / 255);
 }
+
+TextValue.prototype.set_value_parse_text = function (s: string) {
+    this.value = s;
+}
+
+PointsValue.prototype.set_value_parse_points = function (s: string) {
+    const nums = s.split(/[\s,]+/).map(function (str) {
+        return parseFloat(str.trim());
+    });
+    const points: number[][] = [];
+    for (let n = nums.length - 1; n-- > 0; n--) {
+        points.push([nums.shift()!, nums.shift()!]);
+
+    }
+    this.value = points;
+}
+
+NVectorValue.prototype.set_value_parse_dashes = function (s: string) {
+    this.value = this.value_from_json(s.split(/[\s,]+/).map(function (str) {
+        return parseFloat(str.trim());
+    }));
+}
+

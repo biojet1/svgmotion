@@ -82,10 +82,6 @@ export class Animatable<V> {
     value_from_json(a: any): V {
         throw Error(`Not implemented by '${this.constructor.name}'`);
     }
-    // set_intial_value
-    parse_value(a: string) {
-        throw Error(`Not implemented by '${this.constructor.name}' ("${a}")`);
-    }
     // get_value_f()
     format_value(frame: number): string {
         throw Error(`Not implemented by '${this.constructor.name}' ("${frame}")`);
@@ -302,9 +298,6 @@ export class NumberValue extends Animatable<number> {
         const c = this.get_value(frame);
         return c + '';
     }
-    override parse_value(s: string) {
-        this.value = parseFloat(s);
-    }
     constructor(v: number | Keyframes<number> = 0) {
         super(v);
     }
@@ -323,9 +316,6 @@ export class NVector extends Float64Array {
         const b = that.map((v, i) => v * t);
         return new NVector(a.map((v, i) => v + b[i]));
     }
-    // static from(x: ArrayLike<number>) {
-    //     return new NVector(x);
-    // }
 }
 
 export class NVectorValue extends Animatable<NVector> {
@@ -353,22 +343,11 @@ export class NVectorValue extends Animatable<NVector> {
         return new NVector(a);
     }
 
-    override parse_value(s: string) {
-        this.value = this.value_from_json(s.split(/[\s,]+/).map(function (str) {
-            return parseFloat(str.trim());
-        }));
-
-    }
-
     constructor(v: NVector | Keyframes<NVector>) {
         super(v);
     }
 }
-// def Point(x, y):
-//     return NVector(x, y)
 
-// def Size(x, y):
-//     return NVector(x, y)
 export class Point extends NVector {
     constructor(x: number = 0, y: number = 0) {
         super([x, y]);
@@ -392,18 +371,12 @@ export class RGBNone extends RGB {
     }
 }
 
-// def Point3D(x, y, z):
-//     return NVector(x, y, z)
 export class PositionValue extends NVectorValue {
-    // constructor(x: number = 0, y: number = 0) {
-    //     super([x, y]);
-    // }
+
 }
 
 export class RGBValue extends NVectorValue {
-    // constructor(x: number = 0, y: number = 0) {
-    //     super([x, y]);
-    // }
+
     static to_css_rgb([r, g, b, a]: Iterable<number>) {
         if (a == 0) {
             return 'none';
@@ -412,25 +385,11 @@ export class RGBValue extends NVectorValue {
             (g * 255) % 256
         )}, ${Math.round((b * 255) % 256)})`;
     }
-    // override format_value(frame: number): string {
-    //     if (this.value == null) {
-    //         return 'none';
-    //     }
-    //     const c = this.get_value(frame);
-    //     // console.log("format_value", c.constructor.name);
-
-    //     return RGBValue.to_css_rgb(c);
-    // }
-
-
 }
 
 export class TextValue extends AnimatableD<string> {
     override add_value(a: string, b: string): string {
         return a + "" + b;
-    }
-    override parse_value(s: string) {
-        this.value = s;
     }
     override value_to_json(s: string) {
         return s;
@@ -446,16 +405,5 @@ export class PointsValue extends AnimatableD<number[][]> {
     }
     override value_from_json(a: any): number[][] {
         return a as number[][];
-    }
-    override parse_value(s: string) {
-        const nums = s.split(/[\s,]+/).map(function (str) {
-            return parseFloat(str.trim());
-        });
-        const points: number[][] = [];
-        for (let n = nums.length - 1; n-- > 0; n--) {
-            points.push([nums.shift()!, nums.shift()!]);
-
-        }
-        this.value = points;
     }
 }

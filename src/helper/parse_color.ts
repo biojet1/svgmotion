@@ -1,23 +1,5 @@
 import { NVector, RGB, RGBNone, RGBValue } from "../model/keyframes.js";
 
-declare module "../model/keyframes" {
-    interface RGBValue {
-        parse_value(s: string): void;
-    }
-}
-
-RGBValue.prototype.parse_value = function (s: string) {
-    if (s == "none") {
-        console.log("RGBValue.prototype.parse_value", s == "none", s, this.constructor.name);
-        this.value = null;
-        return;
-    }
-    const c = parse_css_color(s);
-    if (c == null) {
-        throw new Error(`Invalid color "${s}"`);
-    }
-    this.value = new RGB(c[0] / 255, c[1] / 255, c[2] / 255);
-};
 
 RGBValue.prototype.check_value = function (x: RGB) {
     if (x instanceof RGB) {
