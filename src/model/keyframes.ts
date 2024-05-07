@@ -161,6 +161,7 @@ export class Animatable<V> {
                 }
             }
         }
+        value = this.check_value(value);
         if (last) {
             if (easing != undefined) {
                 last.easing = easing;

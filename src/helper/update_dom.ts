@@ -7,10 +7,10 @@ const FILL_MAP: {
     [key: string]: ((frame: number, node: SVGElement, prop: any) => void);
 } = {
     opacity: function (frame: number, node: SVGElement, prop: NumberValue) {
-        node.setAttribute("fill-opacity", `${prop.get_value(frame)}`);
+        node.setAttribute("fill-opacity", prop.get_percentage_repr(frame));
     },
     color: function (frame: number, node: SVGElement, prop: RGBValue) {
-        node.setAttribute("fill", prop.get_value_format_rgb(frame));
+        node.setAttribute("fill", prop.get_rgb_repr(frame));
     },
 };
 
@@ -18,52 +18,45 @@ const PROP_MAP: {
     [key: string]: ((frame: number, node: any, prop: any) => void);
 } = {
     opacity: function (frame: number, node: SVGElement, prop: NumberValue) {
-        const v = prop.get_value(frame);
-        node.style.opacity = v + '';
+        node.setAttribute("opacity", prop.get_percentage_repr(frame));
     },
-    size: function (frame: number, node: SVGRectElement | SVGSVGElement, prop: NVectorValue) {
-        let [x, y] = prop.get_value(frame);
-        node.width.baseVal.value = x;
-        node.height.baseVal.value = y;
-    },
-    position: function (frame: number, node: SVGRectElement | SVGSVGElement, prop: NVectorValue) {
-        let x = prop.get_value(frame);
-        node.x.baseVal.value = x[0];
-        node.y.baseVal.value = x[1];
-    },
+    // size: function (frame: number, node: SVGRectElement | SVGSVGElement, prop: NVectorValue) {
+    //     let [x, y] = prop.get_value(frame);
+    //     node.width.baseVal.value = x;
+    //     node.height.baseVal.value = y;
+    // },
+    // position: function (frame: number, node: SVGRectElement | SVGSVGElement, prop: NVectorValue) {
+    //     let x = prop.get_value(frame);
+    //     node.x.baseVal.value = x[0];
+    //     node.y.baseVal.value = x[1];
+    // },
 
     x: function (frame: number, node: SVGRectElement | SVGSVGElement, prop: NumberValue) {
-        node.x.baseVal.value = prop.get_value(frame);
+        node.setAttribute("x", prop.get_length_repr(frame));
     },
     y: function (frame: number, node: SVGRectElement | SVGSVGElement, prop: NumberValue) {
-        node.y.baseVal.value = prop.get_value(frame);
+        node.setAttribute("y", prop.get_length_repr(frame));
     },
     cx: function (frame: number, node: SVGCircleElement | SVGEllipseElement, prop: NumberValue) {
-        node.cx.baseVal.value = prop.get_value(frame);
+        node.setAttribute("cx", prop.get_length_repr(frame));
     },
     cy: function (frame: number, node: SVGCircleElement | SVGEllipseElement, prop: NumberValue) {
-        node.cy.baseVal.value = prop.get_value(frame);
+        node.setAttribute("cy", prop.get_length_repr(frame));
     },
     r: function (frame: number, node: SVGCircleElement, prop: NumberValue) {
-        node.r.baseVal.value = prop.get_value(frame);
+        node.setAttribute("r", prop.get_length_repr(frame));
     },
     width: function (frame: number, node: SVGRectElement | SVGSVGElement, prop: NumberValue) {
-        let q = node.width.baseVal;
-        // console.log("/////", q);
-        q.convertToSpecifiedUnits(1);
-        q.value = prop.get_value(frame);
-
+        node.setAttribute("width", prop.get_length_repr(frame));
     },
     height: function (frame: number, node: SVGRectElement | SVGSVGElement, prop: NumberValue) {
-        let q = node.height.baseVal;
-        q.convertToSpecifiedUnits(1);
-        q.value = prop.get_value(frame);
+        node.setAttribute("height", prop.get_length_repr(frame));
     },
     rx: function (frame: number, node: SVGRectElement | SVGEllipseElement, prop: NumberValue) {
-        node.rx.baseVal.value = prop.get_value(frame);
+        node.setAttribute("rx", prop.get_length_repr(frame));
     },
     ry: function (frame: number, node: SVGRectElement | SVGEllipseElement, prop: NumberValue) {
-        node.ry.baseVal.value = prop.get_value(frame);
+        node.setAttribute("ry", prop.get_length_repr(frame));
     },
     view_box: function (frame: number, node: SVGRectElement | SVGSVGElement, prop: Box) {
         const s = prop.size.get_value(frame);
@@ -76,6 +69,7 @@ const PROP_MAP: {
     },
     fit_view: function (frame: number, node: SVGRectElement | SVGSVGElement, prop: TextValue) {
         const s = prop.get_value(frame);
+        // prop.format_par()
         node.setAttribute("preserveAspectRatio", s);
     },
     transform: function (frame: number, node: SVGElement, prop: Transform) {
@@ -98,13 +92,13 @@ const PROP_MAP: {
         for (let [n, v] of Object.entries(prop)) {
             switch (n) {
                 case "color":
-                    node.style.stroke = v.get_value_format_rgb(frame);
+                    node.setAttribute("stroke", v.get_rgb_repr(frame));
                     break;
                 case "opacity":
                     node.style.strokeOpacity = v.get_value(frame) + '';
                     break;
                 case "width":
-                    node.style.strokeWidth = v.get_value(frame);
+                    node.setAttribute("stroke-width", v.get_length_repr(frame));
                     break;
                 case "miter_limit":
                     node.style.strokeMiterlimit = v.get_value(frame);
@@ -146,8 +140,7 @@ const PROP_MAP: {
     },
 
     points: function (frame: number, node: SVGElement, prop: PointsValue) {
-        const v = prop.get_value(frame);
-        node.setAttribute("points", v.map(([a, b]) => `${a},${b}`).join(' '));
+        node.setAttribute("points", prop.get_points_repr(frame));
     },
 
 };
@@ -191,8 +184,17 @@ declare module "../model/node" {
 }
 declare module "../model/keyframes" {
     interface RGBValue {
-        get_value_format_rgb(frame: number): string;
+        get_rgb_repr(frame: number): string;
     }
+    interface PointsValue {
+        get_points_repr(frame: number): string;
+    }
+    interface NumberValue {
+        get_percentage_repr(frame: number): string;
+        get_length_repr(frame: number): string;
+    }
+
+
 }
 
 function set_svg(elem: SVGElement, node: Item | Container): SVGElement {
@@ -242,6 +244,17 @@ Container.prototype.update_dom = function (frame: number) {
     update_dom(frame, this);
 }
 
-RGBValue.prototype.get_value_format_rgb = function (frame: number) {
+RGBValue.prototype.get_rgb_repr = function (frame: number) {
     return (this.value == null) ? 'none' : RGBValue.to_css_rgb(this.get_value(frame));
 }
+PointsValue.prototype.get_points_repr = function (frame: number) {
+    return this.get_value(frame).map(([a, b]) => `${a},${b}`).join(' ')
+}
+
+NumberValue.prototype.get_percentage_repr = function (frame: number) {
+    return this.get_value(frame).toFixed(4).replace(/0$/, '');
+}
+NumberValue.prototype.get_length_repr = function (frame: number) {
+    return this.get_value(frame) + '';
+}
+// dump_rgb, get_rgb_rep, get_points_repr

@@ -191,6 +191,9 @@ export class Transform extends ValueSet {
                 case "scale":
                     s = [...this.scale.get_value(frame)];
                     break;
+                case "rotation":
+                    r = this.rotation.get_value(frame);
+                    break;
                 case "skew":
                     k = this.skew.get_value(frame);
                     break;
@@ -201,21 +204,35 @@ export class Transform extends ValueSet {
 
         }
         if (p) {
-            if (a) {
-                m = m.cat(Matrix.translate(p[0] - a[0], p[1] - a[1]));
-            } else {
-                m = m.cat(Matrix.translate(p[0], p[1]));
-            }
+            // if (a) {
+            //     m = m.cat(Matrix.translate(p[0] - a[0], p[1] - a[1]));
+            // } else {
+            m = m.cat(Matrix.translate(p[0], p[1]));
+            // }
         } else if (a) {
-            m = m.cat(Matrix.translate(-a[0], -a[1]));
+            // m = m.cat(Matrix.translate(-a[0], -a[1]));
         }
 
         if (s) {
-            m = m.cat(Matrix.scale(s[0], s[1]));
+            if (a) {
+                const x = Matrix.translate(a[0], a[1]).cat(Matrix.scale(s[0], s[1])).cat(Matrix.translate(-a[0], -a[1]))
+                m = m.cat(x);
+
+            } else {
+                m = m.cat(Matrix.scale(s[0], s[1]));
+            }
         }
-        // console.log("get_matrix before rotation", m);
+        // console.info("get_matrix before rotation", m);
         if (r) {
-            m = m.rotate(-r);
+            // m = m.rotate(-r);
+            if (a) {
+
+                m = m.cat(Matrix.rotate(-r, a[0], a[1]));
+            } else {
+
+                m = m.cat(Matrix.rotate(-r));
+            }
+
             // console.log("get_matrix after rotation", m, s, Matrix.rotate(-s));
         }
 
@@ -233,7 +250,9 @@ export class Transform extends ValueSet {
         //     // console.log(" position", x, y, Matrix.translate(x, y));
         //     m = m.cat(Matrix.translate(p[0], p[1]));
         // }
-
+        // if (a) {
+        //     m = m.cat(Matrix.translate(a[0], a[1]));
+        // }
         return m;
     }
     clear() {

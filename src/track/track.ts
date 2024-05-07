@@ -1,4 +1,5 @@
 import { IAction, Action } from "./action.js";
+import { PropMap, Step, UserEntry } from "./steps.js";
 
 
 export class Track {
@@ -16,6 +17,9 @@ export class Track {
         const d = feed(this, cur, this.frame, this.frame);
         this.frame += d;
         return this;
+    }
+    step(step: UserEntry[], vars: PropMap, params: any) {
+        return this.feed(Step(step, vars, params));
     }
     play(...args: Array<Action | Array<Action>>) {
         let I = this.frame;
