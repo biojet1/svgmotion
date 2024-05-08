@@ -18,9 +18,9 @@ export async function animate(lib) {
                 { t: 0, R: [400, 400], S: [1, 1], K: 0, A: 0, C: 'red', O: 1 },
                 { dur: 1, S: [2, 1], K: 30, A: 90 },
                 { dur: 1, R: [100, 400], S: [1, 1], K: 0, A: 90, C: 'blue' },
-                { dur: 1, S: [1, 2], K: 30, A: 90 },
+                { dur: 1, S: [1, 2], K: -30, A: 90 },
                 { dur: 1, R: [100, 100], S: [1, 1], K: 0, A: 0 },
-                { dur: 1, S: [2, 1] },
+                { dur: 1, S: [2, 1], ease: Easing.linear },
                 { dur: 1, R: [400, 100], S: [1, 1], C: Step.last },
                 { dur: 1, S: [1, 2], C: Step.first },
                 { dur: 1, R: [400, 400], S: [1, 1], C: 'green' },
@@ -31,11 +31,12 @@ export async function animate(lib) {
                 // B: r.position,
                 S: r2.transform.scale,
                 R: r2.transform.position,
-                K: r2.transform.skew,
-                A: r2.transform.skew_axis,
+                K: r2.transform.rotation,
+                // A: r2.transform.skew_axis,
                 C: r2.fill.color,
                 O: r2.fill.opacity
-            }
+            },
+            { easing: Easing.inoutexpo }
         )
     );
     console.log("TR", r2.transform);
@@ -65,7 +66,7 @@ export async function animate(lib) {
             EX: e1.rx,
         }, { easing: true })
     );
-    console.log(e1.ry.value);
+    console.log(r2.transform);
 
     return anim;
 }

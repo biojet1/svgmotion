@@ -61,6 +61,7 @@ const PROP_MAP: {
     view_box: function (frame: number, node: SVGRectElement | SVGSVGElement, prop: Box) {
         const s = prop.size.get_value(frame);
         const p = prop.position.get_value(frame);
+        // get_vbox_repr
         node.setAttribute("viewBox", `${p[0]} ${p[1]} ${s[0]} ${s[1]}`);
     },
     d: function (frame: number, node: SVGPathElement, prop: TextValue) {
