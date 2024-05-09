@@ -69,11 +69,11 @@ test.test("Item", async (t) => {
 
     const pg1 = anim.get_polygon(1);
     const c = anim.view.add_circle();
-    c.r.set_value(0, 10);
-    c.cx.set_value(0, 850);
-    c.cy.set_value(0, 200);
-    c.fill.color.set_value(0, "orange");
-    pg1.transform.anchor.set_value(0, [850, 200]);
+    c.r.key_value(0, 10);
+    c.cx.key_value(0, 850);
+    c.cy.key_value(0, 200);
+    c.fill.color.key_value(0, "orange");
+    pg1.transform.anchor.key_value(0, [850, 200]);
 
     tr.step(
         [

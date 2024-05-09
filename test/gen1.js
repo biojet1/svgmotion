@@ -1,4 +1,4 @@
-import { Root, Step, NVector, Easing } from "svgmotion";
+import { Root, Step, Par, NVector, Easing } from "svgmotion";
 export async function animate(lib) {
     const sigm = new Easing(1 / 3, 0, 1 - 1 / 3, 1);
     const anim = new Root();
@@ -11,34 +11,48 @@ export async function animate(lib) {
     delete maru1.cx;
     delete maru1.cy;
     maru1.r.value = 20;
+    r2.fill.opacity.value = 1;
     r2.transform.anchor.value = new NVector([30, 30]);
     tr.feed(
         Step(
             [
-                { t: 0, R: [400, 400], S: [1, 1], K: 0, A: 0, C: 'red', O: 1 },
-                { dur: 1, S: [2, 1], K: 30, A: 90 },
-                { dur: 1, R: [100, 400], S: [1, 1], K: 0, A: 90, C: 'blue' },
-                { dur: 1, S: [1, 2], K: -30, A: 90 },
-                { dur: 1, R: [100, 100], S: [1, 1], K: 0, A: 0 },
-                { dur: 1, S: [2, 1], ease: Easing.linear },
-                { dur: 1, R: [400, 100], S: [1, 1], C: Step.last },
-                { dur: 1, S: [1, 2], C: Step.first },
-                { dur: 1, R: [400, 400], S: [1, 1], C: 'green' },
-                // { dur: 1, R: null, S: null },
+                { t: 0, R: [400, 400], C: 'red' },
+                { t: 0.5, R: [250, 400], C: 'blue', ease: Easing.inexpo },
+                { t: 1, R: [100, 400], C: 'blue', ease: Easing.outexpo },
+                { t: 2, R: [100, 100], C: 'orange' },
+                { t: 3, R: [400, 100], C: 'pink' },
+                { t: 4, R: [400, 400], C: 'green' },
+
+                { t: 0.5, X: [2, 1], ease: Easing.inquart },
+                { t: 1, X: [1, 1], ease: Easing.outquart },
             ],
             {
-                // X: r.opacity,
-                // B: r.position,
-                S: r2.transform.scale,
-                R: r2.transform.position,
-                K: r2.transform.rotation,
-                // A: r2.transform.skew_axis,
-                C: r2.fill.color,
-                O: r2.fill.opacity
+                R: r2.transform.position, X: r2.transform.scale,
             },
-            { easing: Easing.inoutexpo }
+            // { easing: Easing.inoutquart }
         )
     );
+    // anim.track(0).feed(
+    //     Step(
+    //         [
+    //             { t: 0, X: [1, 1], ease: Easing.linear, C: 'red' },
+    //             { dur: 0.5, X: [2, 1], ease: Easing.linear, C: 'blue' },
+    //             { dur: 0.5, X: [1, 1], ease: Easing.linear, C: 'orange' },
+    //             { dur: 0.5, X: [1, 2], C: 'pink' },
+    //             { dur: 0.5, X: [1, 1], C: 'green' },
+    //             { dur: 0.5, X: [2, 1], ease: Easing.linear, C: 'wheat' },
+    //             { dur: 0.5, X: [1, 1], C: 'grey' },
+    //             { dur: 0.5, X: [1, 2], C: 'yellow' },
+    //             { dur: 0.5, X: [1, 1], C: Step.first },
+    //         ],
+    //         {
+    //             X: r2.transform.scale,
+    //             C: r2.fill.color
+    //         },
+    //         // { easing }
+    //     )
+    // );
+
     console.log("TR", r2.transform);
     delete e1.cy;
     delete e1.cx;

@@ -156,7 +156,7 @@ export class StepA extends Action {
                     } else {
                         v = prop.check_value(value);
                     }
-                    prop.set_value(frame, v, prev_t, ease);
+                    prop.key_value(frame, v, prev_t, ease);
                     prev_t = frame;
                     prev_v = v;
                 }

@@ -74,22 +74,22 @@ const TAG_DOM: {
                     break;
                 case "preserveAspectRatio":
                     // node.fit_view.constructor.name
-                    node.fit_view.set_value_parse_text(value);
+                    node.fit_view.set_parse_text(value);
                     break;
                 case "zoomAndPan":
-                    node.zoom_pan.set_value_parse_text(value);
+                    node.zoom_pan.set_parse_text(value);
                     break;
                 case "height":
-                    node.height.set_value_parse_length(value);
+                    node.height.set_parse_length(value);
                     break;
                 case "width":
-                    node.width.set_value_parse_length(value);
+                    node.width.set_parse_length(value);
                     break;
                 case "y":
-                    node.y.set_value_parse_length(value);
+                    node.y.set_parse_length(value);
                     break;
                 case "x":
-                    node.y.set_value_parse_length(value);
+                    node.y.set_parse_length(value);
                     break;
                 default:
                     set_common_attr(node, name, value, e);
@@ -103,22 +103,22 @@ const TAG_DOM: {
         for (const [name, value] of enum_attrs(e)) {
             switch (name) {
                 case "height":
-                    node.height.set_value_parse_length(value);
+                    node.height.set_parse_length(value);
                     break;
                 case "width":
-                    node.width.set_value_parse_length(value);
+                    node.width.set_parse_length(value);
                     break;
                 case "y":
-                    node.y.set_value_parse_length(value);
+                    node.y.set_parse_length(value);
                     break;
                 case "x":
-                    node.x.set_value_parse_length(value);
+                    node.x.set_parse_length(value);
                     break;
                 case "ry":
-                    node.ry.set_value_parse_length(value);
+                    node.ry.set_parse_length(value);
                     break;
                 case "rx":
-                    node.rx.set_value_parse_length(value);
+                    node.rx.set_parse_length(value);
                     break;
                 default:
                     set_common_attr(node, name, value, e);
@@ -159,13 +159,13 @@ const TAG_DOM: {
             // console.info(`PATH ATTR _ ${name} ${value}`);
             switch (name) {
                 case "r":
-                    node.r.set_value_parse_length(value);
+                    node.r.set_parse_length(value);
                     break;
                 case "cx":
-                    node.cx.set_value_parse_length(value);
+                    node.cx.set_parse_length(value);
                     break;
                 case "cy":
-                    node.cy.set_value_parse_length(value);
+                    node.cy.set_parse_length(value);
                     break;
                 default:
                     set_common_attr(node, name, value, e);
@@ -181,16 +181,16 @@ const TAG_DOM: {
             // console.info(`PATH ATTR _ ${name} ${value}`);
             switch (name) {
                 case "rx":
-                    node.rx.set_value_parse_length(value);
+                    node.rx.set_parse_length(value);
                     break;
                 case "ry":
-                    node.ry.set_value_parse_length(value);
+                    node.ry.set_parse_length(value);
                     break;
                 case "cx":
-                    node.cx.set_value_parse_length(value);
+                    node.cx.set_parse_length(value);
                     break;
                 case "cy":
-                    node.cy.set_value_parse_length(value);
+                    node.cy.set_parse_length(value);
                     break;
                 default:
                     set_common_attr(node, name, value, e);
@@ -203,7 +203,7 @@ const TAG_DOM: {
         for (const [name, value] of enum_attrs(e)) {
             switch (name) {
                 case "points":
-                    node.points.set_value_parse_points(value);
+                    node.points.set_parse_points(value);
                     break;
                 default:
                     set_common_attr(node, name, value, e);
@@ -216,7 +216,7 @@ const TAG_DOM: {
         for (const [name, value] of enum_attrs(e)) {
             switch (name) {
                 case "points":
-                    node.points.set_value_parse_points(value);
+                    node.points.set_parse_points(value);
                     break;
                 default:
                     set_common_attr(node, name, value, e);
@@ -263,73 +263,73 @@ function set_common_attr(
             break;
         case "font-weight":
             if (value) {
-                node.font.weight.set_value_parse_text(value);
+                node.font.weight.set_parse_text(value);
             }
             break;
         case "font-size":
             if (value) {
-                node.font.size.set_value_parse_text(value);
+                node.font.size.set_parse_text(value);
             }
             break;
         case "font-family":
             if (value) {
-                node.font.family.set_value_parse_text(value);
+                node.font.family.set_parse_text(value);
             }
             break;
         case "line-height":// .text?
             if (value) {
-                node.line_height.set_value_parse_line_height(value);
+                node.line_height.set_parse_line_height(value);
             }
             break;
         case "text-align":// .text?
             if (value) {
-                node.text_align.set_value_parse_text(value);
+                node.text_align.set_parse_text(value);
             }
             break;
         case "white-space":// .text?
             if (value) {
-                node.white_space.set_value_parse_text(value);
+                node.white_space.set_parse_text(value);
             }
             break;
         case "fill":// 
             if (value) {
-                node.fill.color.set_value_parse_rgb(value);
+                node.fill.color.set_parse_rgb(value);
             }
             break;
         case "fill-opacity":// 
             if (value) {
-                node.fill.opacity.set_value_parse_percentage(value);
+                node.fill.opacity.set_parse_percentage(value);
             }
             break;
         case "stroke":// 
             if (value) {
-                node.stroke.color.set_value_parse_rgb(value);
+                node.stroke.color.set_parse_rgb(value);
             }
             break;
         case "stroke-opacity":// 
             if (value) {
-                node.stroke.opacity.set_value_parse_percentage(value);
+                node.stroke.opacity.set_parse_percentage(value);
             }
             break;
         case "stroke-width":// 
             if (value) {
-                node.stroke.width.set_value_parse_length(value);
+                node.stroke.width.set_parse_length(value);
             }
             break;
         case "stroke-miterlimit":// 
             if (value) {
-                node.stroke.miter_limit.set_value_parse_number(value);
+                node.stroke.miter_limit.set_parse_number(value);
             }
             break;
 
         case "stroke-dasharray":// 
             if (value) {
-                node.stroke.dash_array.set_value_parse_dashes(value);
+                node.stroke.dash_array.set_parse_dashes(value);
             }
             break;
         case "stroke-dashoffset":// 
             if (value) {
-                node.stroke.dash_offset.set_value_parse_length(value);
+                node.stroke.dash_offset.set_parse_length(value);
             }
             break;
         case "style":
@@ -457,22 +457,22 @@ declare module "../model/node" {
 
 declare module "../model/keyframes" {
     interface NumberValue {
-        set_value_parse_length(s: string): void;
-        set_value_parse_number(s: string): void;
-        set_value_parse_percentage(s: string): void;
-        set_value_parse_line_height(s: string): void;
+        set_parse_length(s: string): void;
+        set_parse_number(s: string): void;
+        set_parse_percentage(s: string): void;
+        set_parse_line_height(s: string): void;
     }
     interface RGBValue {
-        set_value_parse_rgb(s: string): void;
+        set_parse_rgb(s: string): void;
     }
     interface TextValue {
-        set_value_parse_text(s: string): void;
+        set_parse_text(s: string): void;
     }
     interface PointsValue {
-        set_value_parse_points(s: string): void;
+        set_parse_points(s: string): void;
     }
     interface NVectorValue {
-        set_value_parse_dashes(s: string): void;
+        set_parse_dashes(s: string): void;
     }
 
 
@@ -483,15 +483,15 @@ Container.prototype.load_svg = async function (src: string | URL,
     return load_svg(this, src, opt);
 }
 
-NumberValue.prototype.set_value_parse_number = function (s: string) {
+NumberValue.prototype.set_parse_number = function (s: string) {
     this.value = parseFloat(s);
 }
 
-NumberValue.prototype.set_value_parse_length = function (s: string) {
+NumberValue.prototype.set_parse_length = function (s: string) {
     this.value = parse_len(s);
 }
 
-NumberValue.prototype.set_value_parse_percentage = function (s: string) {
+NumberValue.prototype.set_parse_percentage = function (s: string) {
     if (s.endsWith('%')) {
         this.value = parseFloat(s.replaceAll('%', '')) / 100;
     } else {
@@ -499,7 +499,7 @@ NumberValue.prototype.set_value_parse_percentage = function (s: string) {
     }
 }
 
-NumberValue.prototype.set_value_parse_line_height = function (s: string) {
+NumberValue.prototype.set_parse_line_height = function (s: string) {
     if (s.endsWith('%')) {
         this.value = parseFloat(s.replaceAll('%', '')) / 100;
     } else if (s == 'normal') {
@@ -510,7 +510,7 @@ NumberValue.prototype.set_value_parse_line_height = function (s: string) {
 }
 
 
-RGBValue.prototype.set_value_parse_rgb = function (s: string) {
+RGBValue.prototype.set_parse_rgb = function (s: string) {
     if (s == "none") {
         this.value = null;
         return;
@@ -522,11 +522,11 @@ RGBValue.prototype.set_value_parse_rgb = function (s: string) {
     this.value = new RGB(c[0] / 255, c[1] / 255, c[2] / 255);
 }
 
-TextValue.prototype.set_value_parse_text = function (s: string) {
+TextValue.prototype.set_parse_text = function (s: string) {
     this.value = s;
 }
 
-PointsValue.prototype.set_value_parse_points = function (s: string) {
+PointsValue.prototype.set_parse_points = function (s: string) {
     const nums = s.split(/[\s,]+/).map(function (str) {
         return parseFloat(str.trim());
     });
@@ -538,7 +538,7 @@ PointsValue.prototype.set_value_parse_points = function (s: string) {
     this.value = points;
 }
 
-NVectorValue.prototype.set_value_parse_dashes = function (s: string) {
+NVectorValue.prototype.set_parse_dashes = function (s: string) {
     this.value = this.value_from_json(s.split(/[\s,]+/).map(function (str) {
         return parseFloat(str.trim());
     }));

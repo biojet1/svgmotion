@@ -82,10 +82,6 @@ export class Animatable<V> {
     value_from_json(a: any): V {
         throw Error(`Not implemented by '${this.constructor.name}'`);
     }
-    // get_value_f()
-    format_value(frame: number): string {
-        throw Error(`Not implemented by '${this.constructor.name}' ("${frame}")`);
-    }
     // get_frame_value
     get_value(frame: number) {
         const { value } = this;
@@ -113,6 +109,7 @@ export class Animatable<V> {
                 p = k;
             }
             if (p) {
+                // todo repeat
                 return p.value;
             }
             throw new Error(`empty keyframe list`);
@@ -123,11 +120,10 @@ export class Animatable<V> {
             return value;
         }
     }
-    // set_at()
-    // get_at() set()
-    // set_frame_value()
-
-    set_value(
+    _set_value(value: V | any) {
+        this.value = this.check_value(value);
+    }
+    key_value(
         frame: number,
         value: V,
         start?: number,
@@ -236,7 +232,7 @@ export class AnimatableD<V> extends Animatable<V> {
             return value;
         }
     }
-    override set_value(
+    override key_value(
         frame: number,
         value: V,
         start?: number,
@@ -294,10 +290,6 @@ export class NumberValue extends Animatable<number> {
     }
     override value_from_json(a: any): number {
         return a as number;
-    }
-    override format_value(frame: number): string {
-        const c = this.get_value(frame);
-        return c + '';
     }
     constructor(v: number | Keyframes<number> = 0) {
         super(v);

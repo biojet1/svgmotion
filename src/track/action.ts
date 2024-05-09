@@ -1,6 +1,6 @@
 export interface IProperty<V> {
     get_value(time: number): V;
-    set_value(
+    key_value(
         time: number,
         value: V,
         start?: number,
@@ -191,7 +191,7 @@ export class ToA extends Action {
         this.run = function (): void {
             const { _start, _end } = this;
             for (const prop of props) {
-                prop.set_value(_end, value, _start);
+                prop.key_value(_end, value, _start);
             }
         };
     }

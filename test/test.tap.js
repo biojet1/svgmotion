@@ -21,8 +21,8 @@ test.test("Keyframes", (t) => {
 test.test("NumberValue", (t) => {
     let v = new NumberValue();
     t.equal(v.value, 0);
-    v.set_value(0, 9);
-    v.set_value(60, 10);
+    v.key_value(0, 9);
+    v.key_value(60, 10);
     t.equal(v.get_value(0), 9);
     t.equal(v.get_value(60), 10);
     v = new NumberValue(9);
@@ -59,8 +59,8 @@ test.test("NVectorValue", (t) => {
     }
     t.match(v.to_json(), { v: [3, 4, 5, 6] });
     // t.match(NVectorValue.from_json({ v: [3, 4, 5, 6] }), { v: [3, 4, 5, 6] });
-    v.set_value(0, new NVector([3, 4]));
-    v.set_value(60, new NVector([4, 5]));
+    v.key_value(0, new NVector([3, 4]));
+    v.key_value(60, new NVector([4, 5]));
     // console.log(new NVectorValue().value);
     t.throws(() => new NVectorValue());
 
@@ -77,10 +77,10 @@ test.test("ViewPort", (t) => {
     let r = vp.add_rect();
     // console.info(r.size);
     vp.view_box;
-    r.size.set_value(0, new Size(50, 50));
-    r.size.set_value(50, new Size(50, 100));
-    // v.set_value(0, new NVector([3, 4]));
-    // v.set_value(60, new NVector([4, 5]));
+    r.size.key_value(0, new Size(50, 50));
+    r.size.key_value(50, new Size(50, 100));
+    // v.key_value(0, new NVector([3, 4]));
+    // v.key_value(60, new NVector([4, 5]));
     // v[0].fun();
     // r.opacity = 
     const json = doc.to_json();
@@ -170,9 +170,9 @@ test.test("TextValue", (t) => {
     t.equal(x.get_value(0), "X");
     t.equal(x.get_value(10), "X");
     t.equal(x.get_value(20), "X");
-    x.set_value(0, "ONE");
-    x.set_value(10, "TWO");
-    x.set_value(20, "3");
+    x.key_value(0, "ONE");
+    x.key_value(10, "TWO");
+    x.key_value(20, "3");
     t.equal(x.get_value(0), "ONE");
     t.equal(x.get_value(10), "TWO");
     t.equal(x.get_value(20), "3");
