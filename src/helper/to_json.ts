@@ -1,5 +1,5 @@
-import { Animatable, Value } from "../model/keyframes.js";
-import { Container, Root, Item, PlainRoot, PlainNode, ViewPort } from "../model/node.js";
+import { Animatable } from "../model/keyframes.js";
+import { Container, Root, Item, PlainRoot, PlainNode } from "../model/node.js";
 import { ValueSet } from "../model/valuesets.js";
 
 
@@ -22,6 +22,10 @@ Container.prototype.to_json = function () {
             o[k] = v.to_json();
         }
     }
+    const { id } = this;
+    if (id) {
+        o.id = id;
+    }
 
     o.nodes = [...this.children<Container | Item>()].map((v) =>
         v.to_json()
@@ -35,6 +39,10 @@ Item.prototype.to_json = function (): PlainNode {
         if (v instanceof Animatable || v instanceof ValueSet) {
             o[k] = v.to_json();
         }
+    }
+    const { id } = this;
+    if (id) {
+        o.id = id;
     }
     return o;
 }

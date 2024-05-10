@@ -1,4 +1,5 @@
-import * as lib from './lib.js';
+import * as lib from "./lib.js";
+import { render_root } from "./render/render.js";
 
 interface AnimMod {
     name: string;
@@ -6,7 +7,7 @@ interface AnimMod {
     animate: (mod: typeof lib) => lib.Root;
 }
 export async function main() {
-    const path = await import('path');
+    const path = await import("path");
     const args = process.argv.slice(2);
     const yargs = await import("yargs");
     let cd = process.cwd();
@@ -19,44 +20,109 @@ export async function main() {
             (yargs) =>
                 yargs
                     .help()
-                    .alias("h", "help").positional("script", {})
+                    .alias("h", "help")
+                    .positional("script", {})
                     .options({
                         fps: {
                             describe: "frames per second",
                             type: "number",
                         },
                         output: {
-                            alias: 'o',
-                            describe: 'output file',
+                            alias: "o",
+                            describe: "output file",
                             type: "string",
                         },
                         verbose: {
-                            alias: 'v',
-                            describe: 'verbosity',
+                            alias: "v",
+                            describe: "verbosity",
                             count: true,
                         },
                     }),
             (args) => {
                 // console.log("gen", args);
                 const script = args.script as string;
-                (import(cd ? path.resolve(cd, script) : script) as Promise<AnimMod>).then(({ animate }) => {
-                    // console.log("import gen", animate);
-                    return animate(lib);
-                }).then((doc) => {
-                    if (args.output) {
-                        return doc.save_html(args.output);
-                    } else {
-                        console.error(`No ouput`);
-                    }
-                });
+                (
+                    import(
+                        cd ? path.resolve(cd, script) : script
+                    ) as Promise<AnimMod>
+                )
+                    .then(({ animate }) => {
+                        // console.log("import gen", animate);
+                        return animate(lib);
+                    })
+                    .then((doc) => {
+                        const { output } = args;
+                        if (!output) {
+                            console.error(`No ouput`);
+                        } else if (/\.html?$/i.test(output)) {
+                            return doc.save_html(output);
+                        } else {
+                            const blob = JSON.stringify(doc.to_json());
+                            return import("fs/promises")
+                                .then((fs) => {
+                                    if (output == '-') {
+                                        process.stdout.write(blob, 'utf-8');
+                                    } else {
+                                        return fs.open(output, "w").then((h) =>
+                                            h.write(blob).then(() => h.close())
+                                        );
+                                    }
+                                })
+                                ;
+                        }
+                    });
             }
         )
-        .command("render", "render animation file", {
-            jsinfile: {
-                alias: "u",
-                default: "http://yargs.js.org/",
-            },
-        })
+        .command(
+            "render <input> <output>",
+            "render animation file",
+            (yargs) =>
+                yargs
+                    .help()
+                    .alias("h", "help")
+                    .options({
+                        width: {
+                            describe: "set width",
+                            type: "number",
+                        },
+                        height: {
+                            describe: "set height",
+                            type: "number",
+                        },
+                        fps: {
+                            describe: "video frame rate",
+                            type: "number",
+                        },
+                        bgcolor: {
+                            describe: `set background color`,
+                            type: "string",
+                        },
+                    }),
+            (args) => {
+                const inp = args.input as string;
+
+                import("fs")
+                    .then((fs) => {
+                        if (inp == "-") {
+                            return fs.readFileSync(0, { encoding: "utf8" });
+                        } else {
+                            return fs.readFileSync(inp, { encoding: "utf8" });
+                        }
+                    })
+                    .then((blob) => {
+                        const root = new lib.Root();
+                        root.parse_json(blob);
+                        // return root;
+                        const { width, height, fps, bgcolor } = args;
+                        const output = args.output as string;
+                        render_root(root, {
+                            width,
+                            height,
+                            output, fps, bgcolor
+                        });
+                    });
+            }
+        )
         .command("html", "convert animation file to html", {
             jsinfile: {
                 alias: "u",

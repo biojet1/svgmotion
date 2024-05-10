@@ -23,9 +23,10 @@ Root.prototype.save_html = async function (file: string) {
     await h.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">`);
     await h.write(`<style>*{box-sizing:border-box;margin:0;padding:0}body{background:0 0;overflow:hidden}</style>`);
     await h.write(`<script>${await fs.readFile(fileURLToPath(import.meta.resolve("./svgmotion.web.js")))}</script>`);
-    await h.write(`<script type="module">const doc = new svgmotion.Root(); doc.from_json(`);
+    await h.write(`<script type="module">const root = svgmotion.load_json(`);
     await h.write(JSON.stringify(o));
-    await h.write(`); doc.animate({parent:document.body}); globalThis.doc = doc;</script>`);
+    await h.write(`); root.animate({parent:document.body}); globalThis.root = root;</script>`);
     await h.write(`</head><body></body></html>`);
     return h.close();
 }
+

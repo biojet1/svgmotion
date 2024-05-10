@@ -1,5 +1,5 @@
-import { Animatable, NumberValue, TextValue, Value } from "./keyframes.js";
-import { Fill, Transform, ValueSet, xset, xget, Font, Stroke } from "./valuesets.js";
+import { NumberValue, TextValue } from "./keyframes.js";
+import { Fill, Transform, xset, xget, Font, Stroke } from "./valuesets.js";
 import { Node, Parent } from "./linked.js";
 export type Constructor = (new (...args: any[]) => Parent) | (new (...args: any[]) => Node);
 export function BaseProps<TBase extends Constructor>(Base: TBase) {

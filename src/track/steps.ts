@@ -280,27 +280,6 @@ function resolve_bounce(steps: Array<Entry>): Array<Entry> {
     return steps.concat(extra);
 }
 
-// def resolve_repeat(steps, repeat: int):
-//     t_max = 0
-//     for e in steps:
-//         t_max = max(t_max, e["t"])
-//     n = repeat
-//     t_dur = t_max + 1
-//     t = t_dur
-//     extra = []
-//     while n > 0:
-//         n -= 1
-//         for i, e in enumerate(steps):
-//             e2 = {**e, "t": e["t"] + t}
-//             if i == 0:
-//                 e2["ease"] = True
-//                 pass
-//             # else:
-//             #     e2["t"] = e["t"] - steps[i - 1]["t"]
-//             extra.append(e2)
-//         t += t_dur
-//     return steps + extra
-
 function resolve_repeat(steps: Array<Entry>, repeat: number): Array<Entry> {
     let t_max = 0;
     for (const { t } of steps) {

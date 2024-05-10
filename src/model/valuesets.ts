@@ -211,14 +211,8 @@ export class Transform extends ValueSet {
         if (a) {
             m = m.cat(Matrix.translate(a[0], a[1]));
         }
-        // console.info("get_matrix before rotation", m);
-        if (r) {
-            m = m.cat(Matrix.rotate(r));
-            // console.log("get_matrix after rotation", m, s, Matrix.rotate(-s));
-        }
         if (s) {
             m = m.cat(Matrix.scale(s[0], s[1]));
-
         }
         if (k) {
             if (x) {
@@ -228,6 +222,11 @@ export class Transform extends ValueSet {
             } else {
                 m = m.multiply(Matrix.skewX(-k));
             }
+        }
+        // console.info("get_matrix before rotation", m);
+        if (r) {
+            m = m.cat(Matrix.rotate(r));
+            // console.log("get_matrix after rotation", m, s, Matrix.rotate(-s));
         }
         if (a) {
             m = m.cat(Matrix.translate(-a[0], -a[1]));

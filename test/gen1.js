@@ -10,9 +10,9 @@ export async function animate(lib) {
     const e1 = anim.get_ellipse(0);
     delete maru1.cx;
     delete maru1.cy;
-    maru1.r.value = 20;
-    r2.fill.opacity.value = 1;
-    r2.transform.anchor.value = new NVector([30, 30]);
+    maru1.r.set_value(20);
+    r2.fill.opacity.set_value(1);
+    r2.transform.anchor.set_value([30, 30]);
     tr.feed(
         Step(
             [

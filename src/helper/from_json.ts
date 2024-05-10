@@ -52,7 +52,13 @@ function props_from_json(that: any, props: { [key: string]: Value<any> }) {
         if (p instanceof Animatable || p instanceof ValueSet) {
             p.from_json(v);
         } else {
-            throw new Error(`Unexpected property "${k}" (${v})`);
+            switch (k) {
+                case 'id':
+                    that[k] = v;
+                    break;
+                default:
+                    throw new Error(`Unexpected property "${k}" (${v})`);
+            }
         }
     }
 }
@@ -81,7 +87,9 @@ function from_json_walk(obj: PlainNode, parent: Container) {
 declare module "../model/node" {
     interface Root {
         from_json(src: PlainRoot): void;
+        parse_json(src: string): void;
     }
+
     interface Container {
         add_circle(): Circle;
         add_ellipse(): Ellipse;
@@ -93,6 +101,12 @@ declare module "../model/node" {
         add_rect(): Rect;
         add_view(): ViewPort;
     }
+}
+
+export function from_json(src: PlainRoot) {
+    const root = new Root();
+    root.from_json(src);
+    return root;
 }
 
 Root.prototype.from_json = function (src: PlainRoot) {
@@ -118,12 +132,18 @@ Root.prototype.from_json = function (src: PlainRoot) {
             this.defs[k] = from_json_walk(v, this);
         });
     }
-};
+}
+
+Root.prototype.parse_json = function (src: string) {
+    return this.from_json(JSON.parse(src))
+}
+
 Container.prototype.add_circle = function () {
     const x = new Circle();
     this.append_child(x);
     return x;
 };
+
 Container.prototype.add_ellipse = function () {
     const x = new Ellipse();
     this.append_child(x);

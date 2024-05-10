@@ -8,6 +8,7 @@ export interface KFBase {
 
 export interface KFEntry<V> extends KFBase {
     v: V;
+    r?: number; // repeat
 }
 
 export type Value<V> = { k: KFEntry<V>[] } | { v: V };
@@ -48,7 +49,7 @@ export interface KeyframeEntry<V> {
 }
 
 export class Keyframes<V> extends Array<KeyframeEntry<V>> {
-    set_value(time: number, value: V): KeyframeEntry<V> {
+    push_value(time: number, value: V): KeyframeEntry<V> {
         let last = this[this.length - 1];
         if (last) {
             if (last.time == time) {
@@ -120,7 +121,7 @@ export class Animatable<V> {
             return value;
         }
     }
-    _set_value(value: V | any) {
+    set_value(value: V | any) {
         this.value = this.check_value(value);
     }
     key_value(
@@ -139,7 +140,7 @@ export class Animatable<V> {
                     // pass
                 } else if (start > last.time) {
                     last.easing = true;
-                    last = kfs.set_value(start, this.get_value(last.time));
+                    last = kfs.push_value(start, this.get_value(last.time));
                 } else {
                     if (start != last.time) {
                         throw new Error(
@@ -153,7 +154,7 @@ export class Animatable<V> {
             kfs = this.value = new Keyframes<V>();
             if (start != undefined) {
                 if (v != null) {
-                    last = kfs.set_value(start, v);
+                    last = kfs.push_value(start, v);
                 }
             }
         }
@@ -166,7 +167,7 @@ export class Animatable<V> {
                 value = this.add_value(last.value, value);
             }
         }
-        return kfs.set_value(frame, value);
+        return kfs.push_value(frame, value);
     }
     check_value(x: any): V {
         return x as V;
@@ -248,7 +249,7 @@ export class AnimatableD<V> extends Animatable<V> {
                     // pass
                 } else if (start > last.time) {
                     last.easing = true;
-                    last = kfs.set_value(start, this.get_value(last.time));
+                    last = kfs.push_value(start, this.get_value(last.time));
                 } else {
                     if (start != last.time) {
                         throw new Error(
@@ -262,7 +263,7 @@ export class AnimatableD<V> extends Animatable<V> {
             kfs = this.value = new Keyframes<V>();
             if (start != undefined) {
                 if (v != null) {
-                    last = kfs.set_value(start, v);
+                    last = kfs.push_value(start, v);
                 }
             }
         }
@@ -274,7 +275,7 @@ export class AnimatableD<V> extends Animatable<V> {
                 value = this.add_value(last.value, value);
             }
         }
-        return kfs.set_value(frame, value);
+        return kfs.push_value(frame, value);
     }
 }
 

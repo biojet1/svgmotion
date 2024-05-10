@@ -453,6 +453,10 @@ declare module "../model/node" {
     interface Container {
         load_svg(src: string | URL, opt: { xinclude?: boolean; base?: string | URL }): Promise<void>;
     }
+    interface Root {
+        load_json(src: string): void;
+    }
+
 }
 
 declare module "../model/keyframes" {
@@ -544,3 +548,9 @@ NVectorValue.prototype.set_parse_dashes = function (s: string) {
     }));
 }
 
+
+Root.prototype.load_json = function (src: string) {
+    return import('fs/promises').then((fs) => fs.readFile(src, { encoding: 'utf8' })).then((blob) =>
+        this.parse_json(blob)
+    );
+}

@@ -10,8 +10,8 @@ import {
 
 test.test("Keyframes", (t) => {
     let kfs = new Keyframes();
-    kfs.set_value(0, 9);
-    kfs.set_value(60, 10);
+    kfs.push_value(0, 9);
+    kfs.push_value(60, 10);
     // console.log(kfs);
 
     t.end();
