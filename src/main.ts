@@ -97,6 +97,10 @@ export async function main() {
                             describe: `set background color`,
                             type: "string",
                         },
+                        ffparams: {
+                            describe: `set ffmpeg parameters`,
+                            type: "string",
+                        },
                     }),
             (args) => {
                 const inp = args.input as string;
@@ -113,12 +117,13 @@ export async function main() {
                         const root = new lib.Root();
                         root.parse_json(blob);
                         // return root;
-                        const { width, height, fps, bgcolor } = args;
+                        const { width, height, fps, bgcolor, ffparams } = args;
                         const output = args.output as string;
+                        const video_params = ffparams ? parse_loose_json(ffparams) : undefined;
                         render_root(root, {
                             width,
                             height,
-                            output, fps, bgcolor
+                            output, fps, bgcolor, video_params
                         });
                     });
             }
@@ -140,4 +145,7 @@ export async function main() {
         .strictCommands()
         .demandCommand()
         .parse();
+}
+function parse_loose_json(obj: string) {
+    return Function(`"use strict";return (${obj})`)();
 }

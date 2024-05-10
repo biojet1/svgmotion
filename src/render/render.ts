@@ -3,7 +3,7 @@ import { Root } from "../model/node.js";
 import { fileURLToPath } from 'node:url';
 import { Writable } from 'stream';
 import fs from "node:fs/promises";
-import { ffcmd } from "./ffmpeg.js";
+import { ffcmd, VideoOutParams } from "./ffmpeg.js";
 import { spawn, StdioOptions } from 'child_process';
 
 interface RenderParams {
@@ -19,14 +19,7 @@ interface RenderParams {
     puppeteer_options?: BrowserLaunchArgumentOptions & LaunchOptions,
     browser?: Browser,
     bgcolor?: string,
-    video_params?: {
-        codec?: string,
-        suffix?: string,
-        pix_fmt?: string,
-        acodec?: string,
-        preset?: string,
-        crf?: number,
-    },
+    video_params?: VideoOutParams,
     sink?: Writable,
 }
 
@@ -106,7 +99,7 @@ export async function render_root(root: Root, {
 
         // SINK ////////////////
         if (!sink) {
-            let ffproc = await ffcmd(fps, [width, height], false, output, video_params).then((cmd) => {
+            let ffproc = await ffcmd(fps, [width, height], false, output, { lossless: true, ...video_params }).then((cmd) => {
                 let [bin, ...args] = cmd;
                 console.log(`${bin} `, ...args);
                 return spawn(bin, args, {
