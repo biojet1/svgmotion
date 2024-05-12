@@ -103,11 +103,11 @@ export async function main() {
                         },
                     }),
             (args) => {
-                const inp = args.input as string;
+                const inp = args.input as (string | true);
 
                 import("fs")
                     .then((fs) => {
-                        if (inp == "-") {
+                        if (inp == "-" || inp === true) {
                             return fs.readFileSync(0, { encoding: "utf8" });
                         } else {
                             return fs.readFileSync(inp, { encoding: "utf8" });
@@ -116,7 +116,6 @@ export async function main() {
                     .then((blob) => {
                         const root = new lib.Root();
                         root.parse_json(blob);
-                        // return root;
                         const { width, height, fps, bgcolor, ffparams } = args;
                         const output = args.output as string;
                         const video_params = ffparams ? parse_loose_json(ffparams) : undefined;

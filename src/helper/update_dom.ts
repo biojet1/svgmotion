@@ -74,8 +74,7 @@ const PROP_MAP: {
         node.setAttribute("preserveAspectRatio", s);
     },
     transform: function (frame: number, node: SVGElement, prop: Transform) {
-        const m = prop.get_matrix(frame);
-        node.setAttribute("transform", m.toString());
+        node.setAttribute("transform", prop.get_transform_repr(frame));
     },
     fill: function (frame: number, node: SVGSVGElement, prop: Fill) {
         for (let [n, v] of Object.entries(prop)) {
@@ -96,7 +95,7 @@ const PROP_MAP: {
                     node.setAttribute("stroke", v.get_rgb_repr(frame));
                     break;
                 case "opacity":
-                    node.style.strokeOpacity = v.get_value(frame) + '';
+                    node.style.strokeOpacity = v.get_percentage_repr(frame) + '';
                     break;
                 case "width":
                     node.setAttribute("stroke-width", v.get_length_repr(frame));

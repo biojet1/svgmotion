@@ -1,49 +1,27 @@
 import { Animatable, Value } from "../model/keyframes.js";
 import {
-    Container,
-    Root,
-    Item,
-    PlainRoot,
-    PlainNode,
-    ViewPort,
-    Rect,
-    Path,
-    Line,
-    Group,
-    Ellipse, Circle, Polyline, Polygon,
+    Container, Root, Item, PlainRoot, PlainNode,
+    ViewPort, Rect, Path, Line, Group,
+    Ellipse, Circle, Polyline, Polygon, Image, Symbol,
+    Use
 } from "../model/node.js";
 import { ValueSet } from "../model/valuesets.js";
 
 const TAGS: {
     [key: string]: (parent: Container) => Item | Container;
 } = {
-    circle: function (parent: Container) {
-        return parent.add_circle();
-    },
-    ellipse: function (parent: Container) {
-        return parent.add_ellipse();
-    },
-    g: function (parent: Container) {
-        return parent.add_group();
-    },
-    line: function (parent: Container) {
-        return parent.add_line();
-    },
-    path: function (parent: Container) {
-        return parent.add_path();
-    },
-    polygon: function (parent: Container) {
-        return parent.add_polygon();
-    },
-    polyline: function (parent: Container) {
-        return parent.add_polyline();
-    },
-    rect: function (parent: Container) {
-        return parent.add_rect();
-    },
-    svg: function (parent: Container) {
-        return parent.add_view();
-    },
+    circle: function (parent: Container) { return parent.add_circle(); },
+    ellipse: function (parent: Container) { return parent.add_ellipse(); },
+    g: function (parent: Container) { return parent.add_group(); },
+    image: function (parent: Container) { return parent.add_image(); },
+    line: function (parent: Container) { return parent.add_line(); },
+    path: function (parent: Container) { return parent.add_path(); },
+    polygon: function (parent: Container) { return parent.add_polygon(); },
+    polyline: function (parent: Container) { return parent.add_polyline(); },
+    rect: function (parent: Container) { return parent.add_rect(); },
+    symbol: function (parent: Container) { return parent.add_symbol(); },
+    use: function (parent: Container) { return parent.add_use(); },
+    svg: function (parent: Container) { return parent.add_view(); },
 };
 
 function props_from_json(that: any, props: { [key: string]: Value<any> }) {
@@ -94,11 +72,14 @@ declare module "../model/node" {
         add_circle(): Circle;
         add_ellipse(): Ellipse;
         add_group(): Group;
+        add_image(): Image;
         add_line(): Line;
         add_path(): Path;
         add_polygon(): Polygon;
         add_polyline(): Polyline;
         add_rect(): Rect;
+        add_symbol(): Symbol;
+        add_use(): Use;
         add_view(): ViewPort;
     }
 }
@@ -138,49 +119,15 @@ Root.prototype.parse_json = function (src: string) {
     return this.from_json(JSON.parse(src))
 }
 
-Container.prototype.add_circle = function () {
-    const x = new Circle();
-    this.append_child(x);
-    return x;
-};
-
-Container.prototype.add_ellipse = function () {
-    const x = new Ellipse();
-    this.append_child(x);
-    return x;
-};
-Container.prototype.add_group = function () {
-    const x = new Group();
-    this.append_child(x);
-    return x;
-};
-Container.prototype.add_line = function () {
-    const x = new Line();
-    this.append_child(x);
-    return x;
-};
-Container.prototype.add_path = function () {
-    const x = new Path();
-    this.append_child(x);
-    return x;
-};
-Container.prototype.add_polygon = function () {
-    const x = new Polygon();
-    this.append_child(x);
-    return x;
-};
-Container.prototype.add_polyline = function () {
-    const x = new Polyline();
-    this.append_child(x);
-    return x;
-};
-Container.prototype.add_rect = function () {
-    const x = new Rect();
-    this.append_child(x);
-    return x;
-};
-Container.prototype.add_view = function () {
-    const x = new ViewPort();
-    this.append_child(x);
-    return x;
-};
+Container.prototype.add_circle = function () { const x = new Circle(); this.append_child(x); return x; }
+Container.prototype.add_ellipse = function () { const x = new Ellipse(); this.append_child(x); return x; }
+Container.prototype.add_group = function () { const x = new Group(); this.append_child(x); return x; }
+Container.prototype.add_image = function () { const x = new Image(); this.append_child(x); return x; }
+Container.prototype.add_line = function () { const x = new Line(); this.append_child(x); return x; }
+Container.prototype.add_path = function () { const x = new Path(); this.append_child(x); return x; }
+Container.prototype.add_polygon = function () { const x = new Polygon(); this.append_child(x); return x; }
+Container.prototype.add_polyline = function () { const x = new Polyline(); this.append_child(x); return x; }
+Container.prototype.add_rect = function () { const x = new Rect(); this.append_child(x); return x; }
+Container.prototype.add_symbol = function () { const x = new Symbol(); this.append_child(x); return x; }
+Container.prototype.add_use = function () { const x = new Use(); this.append_child(x); return x; }
+Container.prototype.add_view = function () { const x = new ViewPort(); this.append_child(x); return x; }

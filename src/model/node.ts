@@ -138,7 +138,58 @@ export class ViewPort extends Container {
         xset(this, "zoom_pan", v);
     }
 }
-
+export class Symbol extends Container {
+    static tag = "symbol";
+    ///
+    get view_box() {
+        return xget(this, "view_box", new Box([0, 0], [100, 100]));
+    }
+    set view_box(v: Box) {
+        xset(this, "view_box", v);
+    }
+    ///
+    get width() {
+        return xget(this, "width", new NumberValue(100));
+    }
+    set width(v: NumberValue) {
+        xset(this, "width", v);
+    }
+    ///
+    get height() {
+        return xget(this, "height", new NumberValue(100));
+    }
+    set height(v: NumberValue) {
+        xset(this, "height", v);
+    }
+    ///
+    get x() {
+        return xget(this, "x", new NumberValue(0));
+    }
+    set x(v: NumberValue) {
+        xset(this, "x", v);
+    }
+    ///
+    get y() {
+        return xget(this, "y", new NumberValue(0));
+    }
+    set y(v: NumberValue) {
+        xset(this, "y", v);
+    }
+    ///
+    get refx() {
+        return xget(this, "refx", new NumberValue(0));
+    }
+    set refx(v: NumberValue) {
+        xset(this, "refx", v);
+    }
+    ///
+    get refy() {
+        return xget(this, "refy", new NumberValue(0));
+    }
+    set refy(v: NumberValue) {
+        xset(this, "refy", v);
+    }
+}
 export class Path extends Shape {
     static tag = "path";
     ///
@@ -304,6 +355,7 @@ export class Polyline extends Shape {
         xset(this, "points", v);
     }
 }
+
 export class Polygon extends Shape {
     static tag = "polygon";
     /// points
@@ -314,10 +366,51 @@ export class Polygon extends Shape {
         xset(this, "points", v);
     }
 }
-// export class Image extends Node {
-//     // href: string = "";
-//     // size: NVectorValue = new NVectorValue([100, 100]);
-// }
+
+export class Use extends Item {
+    static tag = "use";
+    /// href
+    get href() {
+        return xget(this, "href", new TextValue(''));
+    }
+    set href(v: TextValue) {
+        xset(this, "href", v);
+    }
+    ///
+    get width() {
+        return xget(this, "width", new NumberValue(100));
+    }
+    set width(v: NumberValue) {
+        xset(this, "width", v);
+    }
+    ///
+    get height() {
+        return xget(this, "height", new NumberValue(100));
+    }
+    set height(v: NumberValue) {
+        xset(this, "height", v);
+    }
+    ///
+    get x() {
+        return xget(this, "x", new NumberValue(0));
+    }
+    set x(v: NumberValue) {
+        xset(this, "x", v);
+    }
+    ///
+    get y() {
+        return xget(this, "y", new NumberValue(0));
+    }
+    set y(v: NumberValue) {
+        xset(this, "y", v);
+    }
+}
+
+
+export class Image extends Use {
+    static tag = "image";
+}
+
 
 export class Root extends Container {
     defs: { [key: string]: Item | Container } = {};
@@ -361,5 +454,3 @@ export class Root extends Container {
         return tr;
     }
 }
-
-

@@ -83,6 +83,7 @@ export async function render_root(root: Root, {
         await page.evaluate(`const root = svgmotion.from_json(${JSON.stringify(root.to_json())});`
             + `const svg = root.to_dom(document);`
             + `document.body.appendChild(svg);`
+            // + `svg.setAttribute('shape-rendering',"geometricPrecision");`
         );
 
         if (bgcolor) {
@@ -92,7 +93,7 @@ export async function render_root(root: Root, {
         await page.evaluate(`document.body.style.width = "${width}px"`);
 
 
-        const div = await page.mainFrame().$('body')
+        const div = await page.mainFrame().$('#root')
         if (!div) {
             return;
         }

@@ -31,9 +31,7 @@ export async function ffcmd(
                         codec = 'qtrle';
                     } else if (output_file.endsWith(".webm")) {
                         codec = 'libvpx-vp9';
-
                     }
-
                 }
 
                 if (!codec) {
@@ -84,7 +82,6 @@ export async function ffcmd(
 
                 if (pix_fmt) yield ['pix_fmt', pix_fmt];
                 // if (tune) yield ['tune', tune];
-
                 // if (bitrate) yield ['b', bitrate];
                 // if (threads) yield ['threads', threads];
             })()
@@ -110,6 +107,4 @@ export async function ffcmd(
             '-y'],
         output, input
     });
-
-
 }

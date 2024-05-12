@@ -373,6 +373,9 @@ function walk(elem: SVGElement, parent: Container) {
     const { localName: tag } = elem;
     switch (tag) {
         case "desc":
+        case "metadata":
+        case "title":
+
             return;
     }
     const make_node = TAG_DOM[tag];
@@ -389,7 +392,6 @@ function walk(elem: SVGElement, parent: Container) {
         }
         return node;
     } else {
-
         throw new Error(`No processor for "${tag}"`);
     }
 }
@@ -456,7 +458,6 @@ declare module "../model/node" {
     interface Root {
         load_json(src: string): void;
     }
-
 }
 
 declare module "../model/keyframes" {

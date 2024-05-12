@@ -171,7 +171,7 @@ export class Transform extends ValueSet {
 
 
     get_matrix(frame: number) {
-        let m = Matrix.identity();
+
         let p: number[] | undefined;
         let a: number[] | undefined;
         let s: number[] | undefined;
@@ -198,9 +198,14 @@ export class Transform extends ValueSet {
                 case "skew_axis":
                     x = this.skew_axis.get_value(frame);
                     break;
+                case "all":
+                    return col1(this.all, frame);
+
             }
 
         }
+
+        let m = Matrix.identity();
         if (p) {
             if (a) {
                 m = m.cat(Matrix.translate(p[0] - a[0], p[1] - a[1]));
@@ -242,6 +247,7 @@ export class Transform extends ValueSet {
         delete o['skew_axis'];
         delete o['skew'];
         delete o['position'];
+        delete o['all'];
     }
     parse(s: string) {
         const { rotation, scale, skew, skew_axis, translation } = Matrix.parse(s).take_apart();
@@ -304,7 +310,119 @@ export class Transform extends ValueSet {
         xset(this, "skew_axis", v);
     }
     ///
+    get_transform_repr(frame: number) {
+        return this.get_matrix(frame).toString();
+    }
+    ///
+    get all() {
+        return xget(this, "all", new Array<MT>());
+    }
+    add_translate(x: number = 0, y: number = 0) {
+        const q = new MTranslate(new NVector([x, y]));
+        this.all.push(q);
+        return q;
+    }
+    add_scale(x: number = 1, y: number = 1) {
+        const q = new MScale(new NVector([x, y]));
+        this.all.push(q);
+        return q;
+    }
+    add_rotate(deg: number, x: number = 0, y: number = 0) {
+        const q = new MRotate(new NVector([deg, x, y]));
+        this.all.push(q);
+        return q;
+    }
+    add_skewx(deg: number) {
+        const q = new MSkewX(deg);
+        this.all.push(q);
+        return q;
+    }
+    add_skewy(deg: number) {
+        const q = new MSkewY(deg);
+        this.all.push(q);
+        return q;
+    }
+    add_hexad(a: number = 1, b: number = 0, c: number = 0, d: number = 1, e: number = 0, f: number = 0) {
+        const q = new MHexad(new NVector([a, b, c, d, e, f]));
+        this.all.push(q);
+        return q;
+    }
+    ///
+    get_translate(x: number) {
+        return get1(this.all, x, MTranslate);
+    }
+}
+type MT = MTranslate | MScale | MRotate | MSkewX | MSkewY;
+
+function col1<T>(that: Array<MT>, frame: number) {
+    return that.map(x => x.get_transform_repr(frame)).join(' ')
 }
 
 
+function get1<T>(
+    that: Array<MT>,
+    x: number = 0,
+    K: { new(...args: any[]): T }
+): T {
+    const n = find1(that, x, K);
+    if (n) {
+        return n;
+    }
+    throw new Error(`not found ${K} '${x}'`);
+}
 
+function find1<T>(
+    that: Array<MT>,
+    x: number = 0,
+    K: { new(...args: any[]): T }
+): T | void {
+    for (const n of that) {
+        if (n instanceof K) {
+            if (!(x-- > 0)) {
+                return n;
+            }
+        }
+    }
+}
+import { Node, Parent } from "./linked.js";
+
+class MTranslate extends NVectorValue {
+    get_transform_repr(frame: number) {
+        const [x, y] = this.get_value(frame);
+        return `translate(${x} ${y})`;
+    }
+}
+class MScale extends NVectorValue {
+    get_transform_repr(frame: number) {
+        const [x, y] = this.get_value(frame);
+        return `scale(${x} ${y})`;
+    }
+}
+class MRotate extends NVectorValue {
+    get_transform_repr(frame: number) {
+        const [a, x, y] = this.get_value(frame);
+        return `rotate(${a} ${x} ${y})`;
+    }
+}
+
+class MSkewX extends NumberValue {
+    get_transform_repr(frame: number) {
+        const a = this.get_value(frame);
+        return `skewX(${a})`;
+    }
+}
+
+
+class MSkewY extends NumberValue {
+    get_transform_repr(frame: number) {
+        const a = this.get_value(frame);
+        return `skewY(${a})`;
+    }
+}
+
+class MHexad extends NVectorValue {
+    get_transform_repr(frame: number) {
+        const [a, b, c, d, e, f] = this.get_value(frame);
+        return `matrix(${a} ${b} ${c} ${d} ${e} )`;
+    }
+}
