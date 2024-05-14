@@ -2,10 +2,19 @@
 import test from "tap";
 
 import {
-    Keyframes, NumberValue, TextValue,
-    NVectorValue, Point, NVector, Fill,
-    ViewPort, Root, Size,
-    Step, Track
+    Keyframes,
+    NumberValue,
+    TextValue,
+    NVectorValue,
+    Point,
+    NVector,
+    Fill,
+    ViewPort,
+    Root,
+    Size,
+    Transform,
+    Step,
+    Track,
 } from "svgmotion";
 
 test.test("Keyframes", (t) => {
@@ -15,7 +24,6 @@ test.test("Keyframes", (t) => {
     // console.log(kfs);
 
     t.end();
-
 });
 
 test.test("NumberValue", (t) => {
@@ -29,7 +37,7 @@ test.test("NumberValue", (t) => {
     t.equal(v.value, 9);
     t.equal(v.add_value(-10, 10), 0);
 
-    for (const r of [0, .1, .5, .7, 1]) {
+    for (const r of [0, 0.1, 0.5, 0.7, 1]) {
         t.equal(v.lerp_value(r, 7, 7), 7);
     }
     t.end();
@@ -64,9 +72,7 @@ test.test("NVectorValue", (t) => {
     // console.log(new NVectorValue().value);
     t.throws(() => new NVectorValue());
 
-
     t.end();
-
 });
 
 test.test("ViewPort", (t) => {
@@ -82,11 +88,11 @@ test.test("ViewPort", (t) => {
     // v.key_value(0, new NVector([3, 4]));
     // v.key_value(60, new NVector([4, 5]));
     // v[0].fun();
-    // r.opacity = 
+    // r.opacity =
     const json = doc.to_json();
     console.log(JSON.stringify(json, null, 4));
-    console.log(vp.constructor['opacity']);
-    console.log(vp.constructor['zoom_pan']);
+    console.log(vp.constructor["opacity"]);
+    console.log(vp.constructor["zoom_pan"]);
     const { tag, nodes, ...props } = json.view;
     console.log(tag, nodes, props);
     t.equal(tag, "svg");
@@ -98,7 +104,6 @@ test.test("ViewPort", (t) => {
     // console.log(JSON.stringify(from_json(json).to_json(), null, 4));
 
     t.end();
-
 });
 
 test.test("Step", (t) => {
@@ -111,17 +116,19 @@ test.test("Step", (t) => {
     r.position = new NVectorValue([10, 30]);
     t.equal(r.position.value[0], 10);
     t.equal(r.position.value[1], 30);
-    t.equal(vp.constructor.tag, 'svg');
-
+    t.equal(vp.constructor.tag, "svg");
 
     {
-        t.equal(Object.getOwnPropertyDescriptor(r, 'opacity'), undefined);
+        t.equal(Object.getOwnPropertyDescriptor(r, "opacity"), undefined);
         t.equal(r.opacity.value, 1);
         // console.log(Object.entries(r));
         r.opacity.value = 0.5;
         t.equal(r.opacity.value, 0.5);
         r.opacity.value = 0.75;
-        t.equal(Object.getOwnPropertyDescriptor(r, 'opacity').value.value, 0.75);
+        t.equal(
+            Object.getOwnPropertyDescriptor(r, "opacity").value.value,
+            0.75
+        );
         r.opacity = new NumberValue(0.9);
         t.equal(r.opacity.value, 0.9);
     }
@@ -161,9 +168,7 @@ test.test("Step", (t) => {
     console.log("position", vp.position);
 
     t.end();
-
 });
-
 
 test.test("TextValue", (t) => {
     let x = new TextValue("X");
@@ -182,5 +187,33 @@ test.test("TextValue", (t) => {
     t.equal(x.get_value(15), "3");
     t.equal(x.get_value(25), "3");
     t.end();
+});
 
+test.test("Transform", (t) => {
+    let x = new Transform();
+    t.not('all' in x)
+    x.set_parse_transform(
+        "translate(4,5) rotate(30) skewX(-7) scale(3, .5) translate(-2 -3) skewY(99) scale(1 , 1) matrix(1 2 3 4 5 6) rotate(2 0 4)"
+    );
+    t.ok('all' in x)
+    console.log(x.to_json());
+
+    t.equal(
+        x.get_transform_repr(0),
+        "translate(4 5) rotate(30) skewX(-7) scale(3 0.5) translate(-2 -3) skewY(99) scale(1 1) matrix(1 2 3 4 5 6) rotate(2 0 4)"
+    );
+    t.same([...x.get_translate().get_value(0).values()], [4, 5]);
+    t.same([...x.get_rotate().get_value(0).values()], [30, 0, 0]);
+    t.same([...x.get_scale().get_value(0).values()], [3, 0.5]);
+    t.same([...x.get_translate(1).get_value(0).values()], [-2, -3]);
+    t.same([...x.get_scale(1).get_value(0).values()], [1, 1]);
+    t.same([...x.get_rotate(1).get_value(0).values()], [2, 0, 4]);
+    t.same([...x.get_hexad(0).get_value(0).values()], [1, 2, 3, 4, 5, 6]);
+    t.same(x.get_skewx().get_value(0), -7);
+    t.same(x.get_skewy().get_value(0), 99);
+    t.equal(x.get_translate(), x.get_translate(0));
+    t.throws(() => x.get_translate(5));
+    t.throws(() => x.get_translate(2));
+    t.throws(() => x.set_parse_transform("skewU(-7)"));
+    t.end();
 });

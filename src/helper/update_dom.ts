@@ -76,6 +76,9 @@ const PROP_MAP: {
     transform: function (frame: number, node: SVGElement, prop: Transform) {
         node.setAttribute("transform", prop.get_transform_repr(frame));
     },
+    // anchor: function (frame: number, node: SVGElement, prop: NVectorValue) {
+
+    // },
     fill: function (frame: number, node: SVGSVGElement, prop: Fill) {
         for (let [n, v] of Object.entries(prop)) {
             if (v instanceof Animatable) {

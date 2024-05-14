@@ -10,50 +10,57 @@ export async function animate(lib) {
     const e1 = anim.get_ellipse(0);
     delete maru1.cx;
     delete maru1.cy;
+
     maru1.r.set_value(20);
     r2.fill.opacity.set_value(1);
+    console.log("all in this 000", "all" in r2.transform, Object.hasOwn(r2.transform, "all"));
     r2.transform.anchor.set_value([30, 30]);
+    console.log("all in this 111", "all" in r2.transform, Object.hasOwn(r2.transform, "all"));
     tr.feed(
         Step(
             [
-                { t: 0, R: [400, 400], C: 'red' },
-                { t: 0.5, R: [250, 400], C: 'blue', ease: Easing.inexpo },
-                { t: 1, R: [100, 400], C: 'blue', ease: Easing.outexpo },
-                { t: 2, R: [100, 100], C: 'orange' },
-                { t: 3, R: [400, 100], C: 'pink' },
-                { t: 4, R: [400, 400], C: 'green' },
+                { t: 0, R: [400, 400], C: 'orange' },
+                { t: 1, R: [250, 400], C: 'grey', ease: Easing.inexpo },
+                { t: 2, R: [100, 400], C: 'red', ease: Easing.outexpo },
+                { t: 3, R: [100, 250], C: 'grey', ease: Easing.inexpo },
+                { t: 4, R: [100, 100], C: 'blue', ease: Easing.outexpo },
+                { t: 5, R: [250, 100], C: 'grey', ease: Easing.inexpo },
+                { t: 6, R: [400, 100], C: 'pink', ease: Easing.outexpo },
+                { t: 7, R: [400, 250], C: 'grey', ease: Easing.inexpo },
+                { t: 8, R: [400, 400], C: 'orange', ease: Easing.outexpo },
 
-                { t: 0.5, X: [2, 1], ease: Easing.inquart },
-                { t: 1, X: [1, 1], ease: Easing.outquart },
+                // { t: 0.5, X: [2, 1], ease: Easing.inquart },
+                // { t: 1, X: [1, 1], ease: Easing.outquart },
             ],
             {
-                R: r2.transform.position, X: r2.transform.scale,
+                R: r2.transform.position,
+                // X: r2.transform.scale,
             },
             // { easing: Easing.inoutquart }
         )
     );
-    // anim.track(0).feed(
-    //     Step(
-    //         [
-    //             { t: 0, X: [1, 1], ease: Easing.linear, C: 'red' },
-    //             { dur: 0.5, X: [2, 1], ease: Easing.linear, C: 'blue' },
-    //             { dur: 0.5, X: [1, 1], ease: Easing.linear, C: 'orange' },
-    //             { dur: 0.5, X: [1, 2], C: 'pink' },
-    //             { dur: 0.5, X: [1, 1], C: 'green' },
-    //             { dur: 0.5, X: [2, 1], ease: Easing.linear, C: 'wheat' },
-    //             { dur: 0.5, X: [1, 1], C: 'grey' },
-    //             { dur: 0.5, X: [1, 2], C: 'yellow' },
-    //             { dur: 0.5, X: [1, 1], C: Step.first },
-    //         ],
-    //         {
-    //             X: r2.transform.scale,
-    //             C: r2.fill.color
-    //         },
-    //         // { easing }
-    //     )
-    // );
-
-    console.log("TR", r2.transform);
+    anim.track(0).feed(
+        Step(
+            [
+                { t: 0, X: [1, 1], ease: Easing.linear, C: 'blue' },
+                { dur: 1, X: [2, 1], ease: Easing.inexpo, C: 'grey' },
+                { dur: 1, X: [1, 1], ease: Easing.outexpo, C: 'green' },
+                { dur: 1, X: [1, 2], C: 'grey', ease: Easing.inexpo },
+                { dur: 1, X: [1, 1], C: 'red', ease: Easing.outexpo },
+                { dur: 1, X: [2, 1], ease: Easing.inexpo, C: 'grey' },
+                { dur: 1, X: [1, 1], C: 'violet', ease: Easing.outexpo },
+                { dur: 1, X: [1, 2], C: 'grey', ease: Easing.inexpo },
+                { dur: 1, X: [1, 1], C: Step.first, ease: Easing.outexpo },
+            ],
+            {
+                X: r2.transform.scale,
+                C: r2.fill.color
+            },
+            // { easing }
+        )
+    );
+    console.log("all in this", "all" in r2.transform, Object.hasOwn(r2.transform, "all"));
+    console.log("TR", r2.transform, r2.transform.to_json());
     delete e1.cy;
     delete e1.cx;
     anim.track().feed(
@@ -80,7 +87,20 @@ export async function animate(lib) {
             EX: e1.rx,
         }, { easing: true })
     );
-    console.log(r2.transform);
+
+    anim.track().feed(
+        Step([
+            { t: 0, S: [.5, .5] },
+            { dur: 1, S: [2, 1] },
+            { dur: 1, S: [.25, 0] },
+            { dur: 1, S: [4, 3] },
+            { dur: 1, S: [1, 1] },
+        ], {
+            S: maru1.transform.add_scale(3),
+        })
+    );
+    console.log(r2.transform.to_json());
+    console.log(r2.transform.get_transform_repr());
 
     return anim;
 }

@@ -1,4 +1,13 @@
-import { Animatable, NVector, NVectorValue, NumberValue, PositionValue, RGBValue, TextValue, Value } from "./keyframes.js";
+import {
+    Animatable,
+    NVector,
+    NVectorValue,
+    NumberValue,
+    PositionValue,
+    RGBValue,
+    TextValue,
+    Value,
+} from "./keyframes.js";
 import { Matrix } from "./matrix.js";
 
 export function xget<T>(that: any, name: string, value: T): T {
@@ -140,38 +149,34 @@ export class Fill extends ValueSet {
     set color(v: RGBValue) {
         xset(this, "color", v);
     }
-    // 
+    //
 }
 export class Font extends ValueSet {
     /// weight
     get weight() {
-        return xget(this, "weight", new TextValue('normal'));
+        return xget(this, "weight", new TextValue("normal"));
     }
     set weight(v: TextValue) {
         xset(this, "weight", v);
     }
     /// size
     get size() {
-        return xget(this, "size", new TextValue('normal'));
+        return xget(this, "size", new TextValue("normal"));
     }
     set size(v: TextValue) {
         xset(this, "size", v);
     }
     /// font-family
     get family() {
-        return xget(this, "family", new TextValue('monospace'));
+        return xget(this, "family", new TextValue("monospace"));
     }
     set family(v: TextValue) {
         xset(this, "family", v);
     }
 }
 
-
 export class Transform extends ValueSet {
-
-
     get_matrix(frame: number) {
-
         let p: number[] | undefined;
         let a: number[] | undefined;
         let s: number[] | undefined;
@@ -200,9 +205,7 @@ export class Transform extends ValueSet {
                     break;
                 case "all":
                     return col1(this.all, frame);
-
             }
-
         }
 
         let m = Matrix.identity();
@@ -241,19 +244,23 @@ export class Transform extends ValueSet {
     }
     clear() {
         const o: any = this;
-        delete o['anchor'];
-        delete o['scale'];
-        delete o['rotation'];
-        delete o['skew_axis'];
-        delete o['skew'];
-        delete o['position'];
-        delete o['all'];
+        delete o["anchor"];
+        delete o["scale"];
+        delete o["rotation"];
+        delete o["skew_axis"];
+        delete o["skew"];
+        delete o["position"];
+        delete o["all"];
     }
     parse(s: string) {
-        const { rotation, scale, skew, skew_axis, translation } = Matrix.parse(s).take_apart();
+        const { rotation, scale, skew, skew_axis, translation } =
+            Matrix.parse(s).take_apart();
         this.clear();
+
         if (translation[0] !== 0 || translation[1] !== 0) {
-            this.anchor = new PositionValue(new NVector([-translation[0], -translation[1]]));
+            this.anchor = new PositionValue(
+                new NVector([-translation[0], -translation[1]])
+            );
         }
         if (scale[0] !== 1 || scale[1] !== 1) {
             this.scale = new PositionValue(new NVector(scale));
@@ -265,8 +272,47 @@ export class Transform extends ValueSet {
             this.skew_axis.value = skew_axis;
             this.skew.value = -skew;
         }
-        // Sc * Ro * Sk * T = 
+        // Sc * Ro * Sk * T =
     }
+    public set_parse_transform(d: string) {
+        this.clear();
+        for (const str of d.split(/\)\s*,?\s*/).slice(0, -1)) {
+            const kv = str.trim().split("(");
+            const name = kv[0].trim();
+            const args = kv[1].split(/[\s,]+/).map(function (str) {
+                return parseFloat(str);
+            });
+            switch (name) {
+                case "matrix":
+                    this.add_hexad(...args);
+                    break;
+                case "translate":
+                    this.add_translate(args[0], args[1]);
+                    break;
+                case "translateX":
+                    this.add_translate(args[0], 0);
+                    break;
+                case "translateY":
+                    this.add_translate(0, args[0]);
+                    break;
+                case "scale":
+                    this.add_scale(args[0], args[1]);
+                    break;
+                case "rotate":
+                    this.add_rotate(...args);
+                    break;
+                case "skewX":
+                    this.add_skewx(args[0]);
+                    break;
+                case "skewY":
+                    this.add_skewy(args[0]);
+                    break;
+                default:
+                    throw new Error(`Unexpected transform '${name}'`);
+            }
+        }
+    }
+
     /// anchor
     get anchor() {
         return xget(this, "anchor", new PositionValue(new NVector([0, 0])));
@@ -317,6 +363,10 @@ export class Transform extends ValueSet {
     get all() {
         return xget(this, "all", new Array<MT>());
     }
+    set all(v: Array<MT>) {
+        xset(this, "all", v);
+    }
+    ///
     add_translate(x: number = 0, y: number = 0) {
         const q = new MTranslate(new NVector([x, y]));
         this.all.push(q);
@@ -327,41 +377,111 @@ export class Transform extends ValueSet {
         this.all.push(q);
         return q;
     }
-    add_rotate(deg: number, x: number = 0, y: number = 0) {
+    add_rotate(deg: number = 0, x: number = 0, y: number = 0) {
         const q = new MRotate(new NVector([deg, x, y]));
         this.all.push(q);
         return q;
     }
-    add_skewx(deg: number) {
+    add_skewx(deg: number = 0) {
         const q = new MSkewX(deg);
         this.all.push(q);
         return q;
     }
-    add_skewy(deg: number) {
+    add_skewy(deg: number = 0) {
         const q = new MSkewY(deg);
         this.all.push(q);
         return q;
     }
-    add_hexad(a: number = 1, b: number = 0, c: number = 0, d: number = 1, e: number = 0, f: number = 0) {
+    add_hexad(
+        a: number = 1,
+        b: number = 0,
+        c: number = 0,
+        d: number = 1,
+        e: number = 0,
+        f: number = 0
+    ) {
         const q = new MHexad(new NVector([a, b, c, d, e, f]));
         this.all.push(q);
         return q;
     }
     ///
-    get_translate(x: number) {
+    get_translate(x: number = 0) {
         return get1(this.all, x, MTranslate);
     }
+    get_scale(x: number = 0) {
+        return get1(this.all, x, MScale);
+    }
+    get_rotate(x: number = 0) {
+        return get1(this.all, x, MRotate);
+    }
+    get_skewx(x: number = 0) {
+        return get1(this.all, x, MSkewX);
+    }
+    get_skewy(x: number = 0) {
+        return get1(this.all, x, MSkewY);
+    }
+    get_hexad(x: number = 0) {
+        return get1(this.all, x, MHexad);
+    }
+    //
+    override to_json() {
+        // if ("all" in this) {
+        if (Object.hasOwn(this, "all")) {
+            return this.all.map((x) => x.to_json());
+        } else {
+            return super.to_json();
+        }
+    }
+    override from_json(u: Value<any>) {
+        this.clear();
+        if (Array.isArray(u)) {
+            u.forEach((v) => {
+                switch (v._) {
+                    case "t":
+                        this.add_translate().from_json(v);
+                        break;
+
+                    case "s":
+                        this.add_scale().from_json(v);
+                        break;
+
+                    case "r":
+                        this.add_rotate().from_json(v);
+                        break;
+
+                    case "h":
+                        this.add_hexad().from_json(v);
+                        break;
+
+                    case "x":
+                        this.add_skewx().from_json(v);
+                        break;
+
+                    case "y":
+                        this.add_skewy().from_json(v);
+                        break;
+
+                    default:
+                        throw new Error(`Unexpected transform ${v._}`);
+                }
+            });
+        } else {
+            return super.from_json(u);
+        }
+    }
 }
+
 type MT = MTranslate | MScale | MRotate | MSkewX | MSkewY;
 
-function col1<T>(that: Array<MT>, frame: number) {
-    return that.map(x => x.get_transform_repr(frame)).join(' ')
-}
+class MCom extends Array<MT> { }
 
+function col1<T>(that: Array<MT>, frame: number) {
+    return that.map((x) => x.get_transform_repr(frame)).join(" ");
+}
 
 function get1<T>(
     that: Array<MT>,
-    x: number = 0,
+    x: number,
     K: { new(...args: any[]): T }
 ): T {
     const n = find1(that, x, K);
@@ -391,17 +511,36 @@ class MTranslate extends NVectorValue {
         const [x, y] = this.get_value(frame);
         return `translate(${x} ${y})`;
     }
+    override to_json() {
+        const o = super.to_json();
+        o._ = "t";
+        return o;
+    }
 }
 class MScale extends NVectorValue {
     get_transform_repr(frame: number) {
         const [x, y] = this.get_value(frame);
         return `scale(${x} ${y})`;
     }
+    override to_json() {
+        const o = super.to_json();
+        o._ = "s";
+        return o;
+    }
 }
+
 class MRotate extends NVectorValue {
     get_transform_repr(frame: number) {
         const [a, x, y] = this.get_value(frame);
-        return `rotate(${a} ${x} ${y})`;
+        if (x || y) {
+            return `rotate(${a} ${x} ${y})`;
+        }
+        return `rotate(${a})`;
+    }
+    override to_json() {
+        const o = super.to_json();
+        o._ = "r";
+        return o;
     }
 }
 
@@ -410,19 +549,33 @@ class MSkewX extends NumberValue {
         const a = this.get_value(frame);
         return `skewX(${a})`;
     }
+    override to_json() {
+        const o = super.to_json();
+        o._ = "x";
+        return o;
+    }
 }
-
 
 class MSkewY extends NumberValue {
     get_transform_repr(frame: number) {
         const a = this.get_value(frame);
         return `skewY(${a})`;
     }
+    override to_json() {
+        const o = super.to_json();
+        o._ = "y";
+        return o;
+    }
 }
 
 class MHexad extends NVectorValue {
     get_transform_repr(frame: number) {
         const [a, b, c, d, e, f] = this.get_value(frame);
-        return `matrix(${a} ${b} ${c} ${d} ${e} )`;
+        return `matrix(${a} ${b} ${c} ${d} ${e} ${f})`;
+    }
+    override to_json() {
+        const o = super.to_json();
+        o._ = "h";
+        return o;
     }
 }

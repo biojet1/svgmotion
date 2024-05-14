@@ -9,9 +9,10 @@ export interface KFBase {
 export interface KFEntry<V> extends KFBase {
     v: V;
     r?: number; // repeat
+
 }
 
-export type Value<V> = { k: KFEntry<V>[] } | { v: V };
+export type Value<V> = { k: KFEntry<V>[]; _?: string } | { v: V; _?: string };
 export type ValueP<V> = { k?: KFEntry<V>[], v?: V };
 
 function ratio_at(a: Iterable<number>, t: number) {
