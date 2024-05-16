@@ -310,7 +310,6 @@ export class Ellipse extends Shape {
     set ry(v: NumberValue) {
         xset(this, "ry", v);
     }
-    // name:rx, kind:NumberValue, args:0, 
 }
 
 export class Line extends Shape {
@@ -411,6 +410,27 @@ export class Image extends Use {
     static tag = "image";
 }
 
+export class Text extends Container {
+    static tag = "text";
+    /// text
+    get text() {
+        return xget(this, "text", new TextValue(''));
+    }
+    set text(v: TextValue) {
+        xset(this, "text", v);
+    }
+    /// tail
+    get tail() {
+        return xget(this, "tail", new TextValue(''));
+    }
+    set tail(v: TextValue) {
+        xset(this, "tail", v);
+    }
+}
+
+export class TSpan extends Text {
+    static tag = "tspan";
+}
 
 export class Root extends Container {
     defs: { [key: string]: Item | Container } = {};

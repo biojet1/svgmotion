@@ -1,4 +1,4 @@
-import { NumberValue, TextValue } from "./keyframes.js";
+import { NumberValue, PositionValue, TextValue } from "./keyframes.js";
 import { Fill, Transform, xset, xget, Font, Stroke } from "./valuesets.js";
 import { Node, Parent } from "./linked.js";
 export type Constructor = (new (...args: any[]) => Parent) | (new (...args: any[]) => Node);
@@ -71,7 +71,15 @@ export function BaseProps<TBase extends Constructor>(Base: TBase) {
         set white_space(v: TextValue) {
             xset(this, "white_space", v);
         }
+        /// anchor
+        get anchor() {
+            return xget(this, "anchor", new TextValue(''));
+        }
+        set anchor(v: TextValue | PositionValue) {
+            xset(this, "anchor", v);
+        }
         //
+
     };
 }
 

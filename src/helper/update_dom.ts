@@ -15,7 +15,7 @@ const FILL_MAP: {
 };
 
 const PROP_MAP: {
-    [key: string]: ((frame: number, node: any, prop: any) => void);
+    [key: string]: ((frame: number, elem: any, prop: any, node: Container | Item) => void);
 } = {
     opacity: function (frame: number, node: SVGElement, prop: NumberValue) {
         node.setAttribute("opacity", prop.get_percentage_repr(frame));
@@ -158,7 +158,7 @@ function update_dom(frame: number, target: Item | Container) {
                 if (v instanceof ValueSet || v instanceof Animatable) {
                     const f = PROP_MAP[n];
                     if (f) {
-                        f(frame, elem, v);
+                        f(frame, elem, v, target);
                     } else {
                         throw new Error(`Unexpected property ${n}`);
                     }

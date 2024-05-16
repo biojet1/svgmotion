@@ -66,7 +66,17 @@ export class Keyframes<V> extends Array<KeyframeEntry<V>> {
     }
 }
 
-export class Animatable<V> {
+export class Convertible {
+    to_json(): any {
+        throw Error(`Not implemented by '${this.constructor.name}'`);
+    }
+
+    from_json(x: any) {
+        throw Error(`Not implemented by '${this.constructor.name}'`);
+    }
+}
+
+export class Animatable<V> extends Convertible {
     value!: Keyframes<V> | V | null;
     // static
     lerp_value(ratio: number, a: V, b: V): V {
@@ -174,13 +184,14 @@ export class Animatable<V> {
         return x as V;
     }
     constructor(v: Keyframes<V> | V) {
+        super();
         if (v == null) {
             throw new Error(`unexpected value=${v}`);
         } else {
             this.value = v;
         }
     }
-    to_json(): Value<V> {
+    override  to_json(): Value<V> {
         const { value } = this;
         if (value instanceof Keyframes) {
             return {
@@ -193,7 +204,7 @@ export class Animatable<V> {
         }
     }
 
-    from_json(x: ValueP<any>) {
+    override  from_json(x: ValueP<any>) {
         const { k, v } = x;
         if (k != undefined) {
             const kfs = new Keyframes<V>();

@@ -6,7 +6,7 @@ import {
     PositionValue,
     RGBValue,
     TextValue,
-    Value,
+    Value, Convertible
 } from "./keyframes.js";
 import { Matrix } from "./matrix.js";
 
@@ -29,7 +29,7 @@ export function xset<T>(that: any, name: string, value: T) {
     });
 }
 
-export class ValueSet {
+export class ValueSet extends Convertible {
     // [key: string]: Animatable;
     *enum_values(): Generator<Animatable<any>, void, unknown> {
         for (const sub of Object.values(this)) {
@@ -42,7 +42,7 @@ export class ValueSet {
             }
         }
     }
-    to_json() {
+    override to_json() {
         let u: any = {};
         for (let [k, v] of Object.entries(this)) {
             if (v instanceof Animatable) {
@@ -51,7 +51,7 @@ export class ValueSet {
         }
         return u;
     }
-    from_json(u: Value<any>) {
+    override from_json(u: Value<any>) {
         for (let [k, v] of Object.entries(u)) {
             const p = (this as any)[k];
             if (p instanceof Animatable) {

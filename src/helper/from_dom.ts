@@ -339,6 +339,10 @@ function set_common_attr(
                 set_common_attr(node, sname, value.toString(), elem, true);
             }
             break;
+        case "transform-origin":
+            if (value) {
+                // node.anchor.set_parse_length(value);
+            }
         case "shape-inside":
         case "paint-order":
             break;
