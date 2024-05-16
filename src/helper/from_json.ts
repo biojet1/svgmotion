@@ -1,11 +1,10 @@
-import { Animatable, Value } from "../model/keyframes.js";
+import { Convertible, Value } from "../model/keyframes.js";
 import {
     Container, Root, Item, PlainRoot, PlainNode,
     ViewPort, Rect, Path, Line, Group,
     Ellipse, Circle, Polyline, Polygon, Image, Symbol,
     Use
 } from "../model/node.js";
-import { ValueSet } from "../model/valuesets.js";
 
 const TAGS: {
     [key: string]: (parent: Container) => Item | Container;
@@ -27,7 +26,7 @@ const TAGS: {
 function props_from_json(that: any, props: { [key: string]: Value<any> }) {
     for (let [k, v] of Object.entries(props)) {
         const p = that[k];
-        if (p instanceof Animatable || p instanceof ValueSet) {
+        if (p instanceof Convertible) {
             p.from_json(v);
         } else {
             switch (k) {

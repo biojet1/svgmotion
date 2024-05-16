@@ -1,6 +1,5 @@
-import { Animatable } from "../model/keyframes.js";
+import { Convertible } from "../model/keyframes.js";
 import { Container, Root, Item, PlainRoot, PlainNode } from "../model/node.js";
-import { ValueSet } from "../model/valuesets.js";
 
 
 declare module "../model/node" {
@@ -18,7 +17,7 @@ declare module "../model/node" {
 Container.prototype.to_json = function () {
     const o: any = { tag: (<typeof Container>this.constructor).tag };
     for (let [k, v] of Object.entries(this)) {
-        if (v instanceof Animatable || v instanceof ValueSet) {
+        if (v instanceof Convertible) {
             o[k] = v.to_json();
         }
     }
@@ -36,7 +35,7 @@ Container.prototype.to_json = function () {
 Item.prototype.to_json = function (): PlainNode {
     const o: any = { tag: (<typeof Container>this.constructor).tag };
     for (let [k, v] of Object.entries(this)) {
-        if (v instanceof Animatable || v instanceof ValueSet) {
+        if (v instanceof Convertible) {
             o[k] = v.to_json();
         }
     }
