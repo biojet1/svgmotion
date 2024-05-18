@@ -6,7 +6,7 @@ import {
     PositionValue,
     RGBValue,
     TextValue,
-    Value, Convertible
+    Value, ValueBase
 } from "./keyframes.js";
 import { Matrix } from "./matrix.js";
 
@@ -29,15 +29,11 @@ export function xset<T>(that: any, name: string, value: T) {
     });
 }
 
-export class ValueSet extends Convertible {
+export class ValueSet extends ValueBase {
     // [key: string]: Animatable;
     *enum_values(): Generator<Animatable<any>, void, unknown> {
         for (const sub of Object.values(this)) {
             if (sub instanceof Animatable) {
-                // let { value } = sub;
-                // if (value instanceof Keyframes) {
-                //     yield value;
-                // }
                 yield sub;
             }
         }
@@ -175,104 +171,10 @@ export class Font extends ValueSet {
     }
 }
 
-export class Transform extends ValueSet {
-    get_matrix(frame: number) {
-        let p: number[] | undefined;
-        let a: number[] | undefined;
-        let s: number[] | undefined;
-        let r: number | undefined;
-        let k: number | undefined;
-        let x: number | undefined;
-        for (const n of Object.keys(this)) {
-            switch (n) {
-                case "position":
-                    p = [...this.position.get_value(frame)];
-                    break;
-                case "anchor":
-                    a = [...this.anchor.get_value(frame)];
-                    break;
-                case "scale":
-                    s = [...this.scale.get_value(frame)];
-                    break;
-                case "rotation":
-                    r = this.rotation.get_value(frame);
-                    break;
-                case "skew":
-                    k = this.skew.get_value(frame);
-                    break;
-                case "skew_axis":
-                    x = this.skew_axis.get_value(frame);
-                    break;
-                case "all":
-                    return col1(this.all, frame);
-            }
-        }
-
-        let m = Matrix.identity();
-        if (p) {
-            if (a) {
-                m = m.cat(Matrix.translate(p[0] - a[0], p[1] - a[1]));
-            } else {
-                m = m.cat(Matrix.translate(p[0], p[1]));
-            }
-        }
-        if (a) {
-            m = m.cat(Matrix.translate(a[0], a[1]));
-        }
-        if (s) {
-            m = m.cat(Matrix.scale(s[0], s[1]));
-        }
-        if (k) {
-            if (x) {
-                m = m.multiply(Matrix.rotate(-x));
-                m = m.multiply(Matrix.skewX(-k));
-                m = m.multiply(Matrix.rotate(x));
-            } else {
-                m = m.multiply(Matrix.skewX(-k));
-            }
-        }
-        // console.info("get_matrix before rotation", m);
-        if (r) {
-            m = m.cat(Matrix.rotate(r));
-            // console.log("get_matrix after rotation", m, s, Matrix.rotate(-s));
-        }
-        if (a) {
-            m = m.cat(Matrix.translate(-a[0], -a[1]));
-        }
-
-        return m;
-    }
+export class Transform extends ValueBase {
     clear() {
         const o: any = this;
-        delete o["anchor"];
-        delete o["scale"];
-        delete o["rotation"];
-        delete o["skew_axis"];
-        delete o["skew"];
-        delete o["position"];
         delete o["all"];
-    }
-    parse(s: string) {
-        const { rotation, scale, skew, skew_axis, translation } =
-            Matrix.parse(s).take_apart();
-        this.clear();
-
-        if (translation[0] !== 0 || translation[1] !== 0) {
-            this.anchor = new PositionValue(
-                new NVector([-translation[0], -translation[1]])
-            );
-        }
-        if (scale[0] !== 1 || scale[1] !== 1) {
-            this.scale = new PositionValue(new NVector(scale));
-        }
-        if (rotation !== 0) {
-            this.rotation.value = -rotation;
-        }
-        if (skew !== 0) {
-            this.skew_axis.value = skew_axis;
-            this.skew.value = -skew;
-        }
-        // Sc * Ro * Sk * T =
     }
     public set_parse_transform(d: string) {
         this.clear();
@@ -312,52 +214,12 @@ export class Transform extends ValueSet {
             }
         }
     }
-
-    /// anchor
-    get anchor() {
-        return xget(this, "anchor", new PositionValue(new NVector([0, 0])));
-    }
-    set anchor(v: PositionValue) {
-        xset(this, "anchor", v);
-    }
-    /// position
-    get position() {
-        return xget(this, "position", new PositionValue(new NVector([0, 0])));
-    }
-    set position(v: PositionValue) {
-        xset(this, "position", v);
-    }
-    /// scale
-    get scale() {
-        return xget(this, "scale", new NVectorValue(new NVector([1, 1])));
-    }
-    set scale(v: NVectorValue) {
-        xset(this, "scale", v);
-    }
-    /// rotation
-    get rotation() {
-        return xget(this, "rotation", new NumberValue(0));
-    }
-    set rotation(v: NumberValue) {
-        xset(this, "rotation", v);
-    }
-    /// skew
-    get skew() {
-        return xget(this, "skew", new NumberValue(0));
-    }
-    set skew(v: NumberValue) {
-        xset(this, "skew", v);
-    }
-    /// skew_axis
-    get skew_axis() {
-        return xget(this, "skew_axis", new NumberValue(0));
-    }
-    set skew_axis(v: NumberValue) {
-        xset(this, "skew_axis", v);
-    }
     ///
     get_transform_repr(frame: number) {
-        return this.get_matrix(frame).toString();
+        if ('all' in this) {
+            return col1(this.all, frame);
+        }
+        return '';
     }
     ///
     get all() {
@@ -377,10 +239,18 @@ export class Transform extends ValueSet {
         this.all.push(q);
         return q;
     }
-    add_rotate(deg: number = 0, x: number = 0, y: number = 0) {
-        const q = new MRotate(new NVector([deg, x, y]));
+    add_rotate(deg: number = 0, x?: number, y?: number) {
+        if (x != undefined) {
+            if (y != undefined) {
+                const q = new MRotateAt(new NVector([deg, x, y]));
+                this.all.push(q);
+                return q;
+            }
+        }
+        const q = new MRotation(deg);
         this.all.push(q);
         return q;
+
     }
     add_skewx(deg: number = 0) {
         const q = new MSkewX(deg);
@@ -412,7 +282,10 @@ export class Transform extends ValueSet {
         return get1(this.all, x, MScale);
     }
     get_rotate(x: number = 0) {
-        return get1(this.all, x, MRotate);
+        return get1(this.all, x, MRotation);
+    }
+    get_rotate_at(x: number = 0) {
+        return get1(this.all, x, MRotateAt);
     }
     get_skewx(x: number = 0) {
         return get1(this.all, x, MSkewX);
@@ -429,7 +302,7 @@ export class Transform extends ValueSet {
         if (Object.hasOwn(this, "all")) {
             return this.all.map((x) => x.to_json());
         } else {
-            return super.to_json();
+            return [];
         }
     }
     override from_json(u: Value<any>) {
@@ -446,7 +319,19 @@ export class Transform extends ValueSet {
                         break;
 
                     case "r":
-                        this.add_rotate().from_json(v);
+                        {
+                            const q = new MRotation(0);
+                            q.from_json(v);
+                            this.all.push(q);
+                        }
+                        break;
+
+                    case "R":
+                        {
+                            const q = new MRotateAt(new NVector([0, 0, 0]));
+                            q.from_json(v);
+                            this.all.push(q);
+                        }
                         break;
 
                     case "h":
@@ -466,12 +351,21 @@ export class Transform extends ValueSet {
                 }
             });
         } else {
-            return super.from_json(u);
+            throw new Error(`Expected array not ${JSON.stringify(u)} ('${this.constructor.name}')`)
+        }
+    }
+    ///
+    *enum_values(): Generator<Animatable<any>, void, unknown> {
+        if ('all' in this) {
+            for (const sub of this.all) {
+                yield sub;
+
+            }
         }
     }
 }
 
-type MT = MTranslate | MScale | MRotate | MSkewX | MSkewY;
+type MT = MTranslate | MScale | MRotateAt | MSkewX | MSkewY;
 
 class MCom extends Array<MT> { }
 
@@ -529,12 +423,24 @@ class MScale extends NVectorValue {
     }
 }
 
-class MRotate extends NVectorValue {
+class MRotateAt extends NVectorValue {
     get_transform_repr(frame: number) {
         const [a, x, y] = this.get_value(frame);
         if (x || y) {
             return `rotate(${a} ${x} ${y})`;
         }
+        return `rotate(${a})`;
+    }
+    override to_json() {
+        const o = super.to_json();
+        o._ = "R";
+        return o;
+    }
+}
+
+class MRotation extends NumberValue {
+    get_transform_repr(frame: number) {
+        const a = this.get_value(frame);
         return `rotate(${a})`;
     }
     override to_json() {

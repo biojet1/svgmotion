@@ -1,10 +1,10 @@
 import { Track } from "../track/track.js";
 import { BaseProps } from "./baseprops.js";
 import {
-    Animatable, Keyframes, NVector, NumberValue, PointsValue, PositionValue, TextValue, Value,
+    Animatable, ValueBase, Keyframes, NVector, NumberValue, PointsValue, PositionValue, TextValue, Value,
 } from "./keyframes.js";
 import { Node, Parent } from "./linked.js";
-import { Box, ValueSet, xget, xset } from "./valuesets.js";
+import { Box, xget, xset } from "./valuesets.js";
 export interface PlainNode {
     tag: string;
     nodes: PlainNode[];
@@ -23,9 +23,21 @@ export abstract class Item extends BaseProps(Node) {
         for (let v of Object.values(this)) {
             if (v instanceof Animatable) {
                 yield v;
-            } else if (v instanceof ValueSet) {
+            } else if (v instanceof ValueBase) {
                 yield* v.enum_values();
             }
+        }
+    }
+    g_wrap() {
+        const p = this.parent();
+        if (p) {
+            const g = new Group();
+            this.place_after(g);
+            g.append_child(this);
+            return g;
+        } else {
+            throw new Error(`No parent`);
+
         }
     }
 }
@@ -37,7 +49,7 @@ export class Container extends BaseProps(Parent) {
         for (let v of Object.values(this)) {
             if (v instanceof Animatable) {
                 yield v;
-            } else if (v instanceof ValueSet) {
+            } else if (v instanceof ValueBase) {
                 yield* v.enum_values();
             }
         }

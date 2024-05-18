@@ -1,4 +1,4 @@
-import { Convertible, Value } from "../model/keyframes.js";
+import { ValueBase, Value } from "../model/keyframes.js";
 import {
     Container, Root, Item, PlainRoot, PlainNode,
     ViewPort, Rect, Path, Line, Group,
@@ -26,7 +26,7 @@ const TAGS: {
 function props_from_json(that: any, props: { [key: string]: Value<any> }) {
     for (let [k, v] of Object.entries(props)) {
         const p = that[k];
-        if (p instanceof Convertible) {
+        if (p instanceof ValueBase) {
             p.from_json(v);
         } else {
             switch (k) {

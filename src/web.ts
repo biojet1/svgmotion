@@ -15,7 +15,9 @@ export function animate(anim: Root, fps: number) {
         function render(currentTime: DOMHighResTimeStamp) {
             const t = performance.now();
             {
-                // console.info(`${frame} t=${t} frames=${frames} ${start}-${end}`);
+                if ((frame + 1) == frames) {
+                    console.info(`${frame} t=${t} frames=${frames} ${start}-${end}`);
+                }
                 anim.update_dom(frame);
             }
             frame = (frame + 1) % frames;

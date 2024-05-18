@@ -73,8 +73,11 @@ test.test("Item", async (t) => {
     c.cx.key_value(0, 850);
     c.cy.key_value(0, 200);
     c.fill.color.key_value(0, "orange");
-    pg1.transform.anchor.key_value(0, [850, 200]);
-
+    // pg1.anchor.key_value(0, [850, 200]);
+    pg1.transform.add_translate(850, 200);
+    const R = pg1.transform.add_rotate();
+    const S = pg1.transform.add_scale();
+    pg1.transform.add_translate(-850, -200);
     tr.step(
         [
             { R: 10 },
@@ -85,9 +88,10 @@ test.test("Item", async (t) => {
         ],
 
         {
-            R: pg1.transform.rotation,
-            //P: pg1.transform.position,
-            S: pg1.transform.scale
+            R, S
+            // R: pg1.transform.add_rotate(),
+            // //P: pg1.transform.position,
+            // S: pg1.transform.add_scale()
         }
     );
     console.log(anim.save_html("/tmp/polygon01.html"));
@@ -95,7 +99,16 @@ test.test("Item", async (t) => {
     const nod = anim.to_dom(new SVGDocument());
     anim.update_dom(0);
     const ser = new XMLSerializer();
-    console.log(ser.serializeToString(nod));
+    const xml = ser.serializeToString(nod);
+    // console.log(ser.serializeToString(nod));
+
+
+    {
+        const fs = await import('fs/promises');
+        const h = await fs.open('/tmp/polygon01.svg', 'w');
+        await h.write(xml);
+        await h.close();
+    }
 
     t.end();
 });

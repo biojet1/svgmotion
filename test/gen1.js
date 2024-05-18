@@ -10,11 +10,13 @@ export async function animate(lib) {
     const e1 = anim.get_ellipse(0);
     delete maru1.cx;
     delete maru1.cy;
-
+    delete r2.y;
+    delete r2.x;
     maru1.r.set_value(20);
     r2.fill.opacity.set_value(1);
     console.log("all in this 000", "all" in r2.transform, Object.hasOwn(r2.transform, "all"));
-    r2.transform.anchor.set_value([30, 30]);
+    const g2 = r2.g_wrap();
+    r2.anchor.set_value([-30, -30]);
     console.log("all in this 111", "all" in r2.transform, Object.hasOwn(r2.transform, "all"));
     tr.feed(
         Step(
@@ -33,7 +35,7 @@ export async function animate(lib) {
                 // { t: 1, X: [1, 1], ease: Easing.outquart },
             ],
             {
-                R: r2.transform.position,
+                R: g2.transform.add_translate(),
                 // X: r2.transform.scale,
             },
             // { easing: Easing.inoutquart }
@@ -53,7 +55,7 @@ export async function animate(lib) {
                 { dur: 1, X: [1, 1], C: Step.first, ease: Easing.outexpo },
             ],
             {
-                X: r2.transform.scale,
+                X: r2.transform.add_scale(),
                 C: r2.fill.color
             },
             // { easing }
@@ -71,7 +73,7 @@ export async function animate(lib) {
             { dur: 1, P: [100, 400] },
             { dur: 1, P: [100, 100] },
         ], {
-            P: e1.transform.position,
+            P: e1.transform.add_translate(),
         }, { easing: Easing.inoutback })
     );
     anim.track().feed(

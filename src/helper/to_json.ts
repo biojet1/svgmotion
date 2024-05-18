@@ -1,4 +1,4 @@
-import { Convertible } from "../model/keyframes.js";
+import { ValueBase } from "../model/keyframes.js";
 import { Container, Root, Item, PlainRoot, PlainNode } from "../model/node.js";
 
 
@@ -17,7 +17,7 @@ declare module "../model/node" {
 Container.prototype.to_json = function () {
     const o: any = { tag: (<typeof Container>this.constructor).tag };
     for (let [k, v] of Object.entries(this)) {
-        if (v instanceof Convertible) {
+        if (v instanceof ValueBase) {
             o[k] = v.to_json();
         }
     }
@@ -35,7 +35,7 @@ Container.prototype.to_json = function () {
 Item.prototype.to_json = function (): PlainNode {
     const o: any = { tag: (<typeof Container>this.constructor).tag };
     for (let [k, v] of Object.entries(this)) {
-        if (v instanceof Convertible) {
+        if (v instanceof ValueBase) {
             o[k] = v.to_json();
         }
     }

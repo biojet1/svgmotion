@@ -258,7 +258,7 @@ function set_common_attr(
 
         case "transform":
             if (value) {
-                node.transform.parse(value);
+                node.transform.set_parse_transform(value);
             }
             break;
         case "font-weight":
@@ -341,7 +341,7 @@ function set_common_attr(
             break;
         case "transform-origin":
             if (value) {
-                // node.anchor.set_parse_length(value);
+                // node.anchor.set_parse_anchor(value);
             }
         case "shape-inside":
         case "paint-order":
@@ -482,6 +482,7 @@ declare module "../model/keyframes" {
     }
     interface NVectorValue {
         set_parse_dashes(s: string): void;
+        set_parse_anchor(s: string): void;
     }
 
 
@@ -553,6 +554,11 @@ NVectorValue.prototype.set_parse_dashes = function (s: string) {
     }));
 }
 
+NVectorValue.prototype.set_parse_anchor = function (s: string) {
+    this.value = this.value_from_json(s.split(/[\s,]+/).map(function (str) {
+        return parseFloat(str.trim());
+    }));
+}
 
 Root.prototype.load_json = function (src: string) {
     return import('fs/promises').then((fs) => fs.readFile(src, { encoding: 'utf8' })).then((blob) =>

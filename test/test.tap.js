@@ -203,11 +203,11 @@ test.test("Transform", (t) => {
         "translate(4 5) rotate(30) skewX(-7) scale(3 0.5) translate(-2 -3) skewY(99) scale(1 1) matrix(1 2 3 4 5 6) rotate(2 0 4)"
     );
     t.same([...x.get_translate().get_value(0).values()], [4, 5]);
-    t.same([...x.get_rotate().get_value(0).values()], [30, 0, 0]);
+    t.same(x.get_rotate().get_value(0), 30);
     t.same([...x.get_scale().get_value(0).values()], [3, 0.5]);
     t.same([...x.get_translate(1).get_value(0).values()], [-2, -3]);
     t.same([...x.get_scale(1).get_value(0).values()], [1, 1]);
-    t.same([...x.get_rotate(1).get_value(0).values()], [2, 0, 4]);
+    t.same([...x.get_rotate_at(0).get_value(0).values()], [2, 0, 4]);
     t.same([...x.get_hexad(0).get_value(0).values()], [1, 2, 3, 4, 5, 6]);
     t.same(x.get_skewx().get_value(0), -7);
     t.same(x.get_skewy().get_value(0), 99);

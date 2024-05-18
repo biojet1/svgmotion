@@ -66,7 +66,7 @@ export class Keyframes<V> extends Array<KeyframeEntry<V>> {
     }
 }
 
-export class Convertible {
+export class ValueBase {
     to_json(): any {
         throw Error(`Not implemented by '${this.constructor.name}'`);
     }
@@ -74,9 +74,14 @@ export class Convertible {
     from_json(x: any) {
         throw Error(`Not implemented by '${this.constructor.name}'`);
     }
+
+    *enum_values(): Generator<Animatable<any>, void, unknown> {
+        throw Error(`Not implemented by '${this.constructor.name}'`);
+    }
+
 }
 
-export class Animatable<V> extends Convertible {
+export class Animatable<V> extends ValueBase {
     value!: Keyframes<V> | V | null;
     // static
     lerp_value(ratio: number, a: V, b: V): V {
