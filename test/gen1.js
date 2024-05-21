@@ -61,10 +61,11 @@ export async function animate(lib) {
             // { easing }
         )
     );
-    console.log("all in this", "all" in r2.transform, Object.hasOwn(r2.transform, "all"));
-    console.log("TR", r2.transform, r2.transform.to_json());
+    // console.log("all in this", "all" in r2.transform, Object.hasOwn(r2.transform, "all"));
+    // console.log("TR", r2.transform, r2.transform.to_json());
     delete e1.cy;
     delete e1.cx;
+    const mov = e1.transform.add_translate();
     anim.track().feed(
         Step([
             { P: [100, 100] },
@@ -73,9 +74,12 @@ export async function animate(lib) {
             { dur: 1, P: [100, 400] },
             { dur: 1, P: [100, 100] },
         ], {
-            P: e1.transform.add_translate(),
+            P: mov,
         }, { easing: Easing.inoutback })
     );
+    // mov.repeat_count = 66666666666;
+    mov.bounce = true;
+    // console.log(mov.to_json());
     anim.track().feed(
         Step([
             { t: 0, EX: 40, EY: 40, ease: Easing.linear },
@@ -90,19 +94,39 @@ export async function animate(lib) {
         }, { easing: true })
     );
 
-    anim.track().feed(
-        Step([
-            { t: 0, S: [.5, .5] },
-            { dur: 1, S: [2, 1] },
-            { dur: 1, S: [.25, 0] },
-            { dur: 1, S: [4, 3] },
-            { dur: 1, S: [1, 1] },
-        ], {
-            S: maru1.transform.add_scale(3),
-        })
-    );
-    console.log(r2.transform.to_json());
-    console.log(r2.transform.get_transform_repr());
+    {
+        const S = maru1.transform.add_translate();
+        anim.track(60).feed(
+            Step([
+                { t: 0, S: [0, 0] },
+                { dur: 0.5, S: [100, 100] },
+                { dur: 0.5, S: [200, 200] },
+                // { dur: 0.5, S: [300, 300] },
+                // { dur: 0.5, S: [400, 400] },
+            ], {
+                S,
+            })
+        );
+        S.repeat_count = 1.5;
+        // S.bounce = true;
+    }
+    {
+        const CO = maru2.fill.color
+        anim.track(0).feed(
+            Step([
+                { t: 0, CO: 'yellow' },
+                { dur: 1, CO: 'blue' },
+                { dur: 1, CO: 'red' },
+            ], {
+                CO
+            })
+        );
+        CO.repeat_count = 66666666666;
+        CO.bounce = true;
+    }
+
+    // console.log(r2.transform.to_json());
+    // console.log(r2.transform.get_transform_repr());
 
     return anim;
 }

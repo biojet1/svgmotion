@@ -8,12 +8,12 @@ export interface KFBase {
 
 export interface KFEntry<V> extends KFBase {
     v: V;
-    r?: number; // repeat
-
+    r?: number; // repeat_count
+    b?: boolean; // bounce   
 }
 
-export type Value<V> = { k: KFEntry<V>[]; _?: string } | { v: V; _?: string };
-export type ValueP<V> = { k?: KFEntry<V>[], v?: V };
+export type Value<V> = { k: KFEntry<V>[]; _?: string; r?: number; b?: boolean } | { v: V; _?: string };
+export type ValueP<V> = { k?: KFEntry<V>[]; v?: V; r?: number; b?: boolean };
 
 function ratio_at(a: Iterable<number>, t: number) {
     const [ox, oy, ix, iy] = a;
@@ -31,6 +31,7 @@ export function kfe_from_json<V>(x: KFBase, value: V): KeyframeEntry<V> {
     }
     return { time, value };
 }
+
 function kfe_to_json<V>(kfe: KeyframeEntry<V>, value: any): KFEntry<V> {
     const { time: t, easing } = kfe;
     if (!easing) {
@@ -78,11 +79,12 @@ export class ValueBase {
     *enum_values(): Generator<Animatable<any>, void, unknown> {
         throw Error(`Not implemented by '${this.constructor.name}'`);
     }
-
 }
 
 export class Animatable<V> extends ValueBase {
     value!: Keyframes<V> | V | null;
+    repeat_count?: number;
+    bounce?: boolean;
     // static
     lerp_value(ratio: number, a: V, b: V): V {
         throw Error(`Not implemented by '${this.constructor.name}'`);
@@ -100,7 +102,7 @@ export class Animatable<V> extends ValueBase {
         throw Error(`Not implemented by '${this.constructor.name}'`);
     }
     // get_frame_value
-    get_value(frame: number) {
+    get_value(frame: number): V {
         const { value } = this;
         if (value instanceof Keyframes) {
             let p = undefined; // previous KeyframeEntry<V>
@@ -126,7 +128,31 @@ export class Animatable<V> extends ValueBase {
                 p = k;
             }
             if (p) {
-                // todo repeat
+                const { repeat_count = 0 } = this;
+                if (repeat_count) {
+                    const S = value[0].time; // start
+                    const E = p.time; // end
+                    const f = (frame - S);
+                    const d = (E - S);
+                    let o, A, I;
+                    if (this.bounce) {
+                        I = (d + 1) * 2 - 1; // iter duration
+                        const p = (I - 1);
+                        const h = p / 2;
+                        A = Math.floor(p * repeat_count) + 1; // active duration
+                        o = h - Math.abs((f % p) - h);
+                    } else {
+                        I = d + 1; // iter duration
+                        A = Math.floor(repeat_count * d); // active duration
+                        o = (f % I);
+                    }
+                    // console.log(`${this.constructor.name} A:${A} I:${I} o:${o} frame:${frame}`);
+                    if (frame <= (S + A)) {
+                        return this.get_value(S + o);
+                    } else {
+                        return this.get_value(S + A);
+                    }
+                }
                 return p.value;
             }
             throw new Error(`empty keyframe list`);
@@ -196,27 +222,37 @@ export class Animatable<V> extends ValueBase {
             this.value = v;
         }
     }
-    override  to_json(): Value<V> {
+    override to_json(): Value<V> {
         const { value } = this;
         if (value instanceof Keyframes) {
-            return {
+            const o: Value<V> = {
                 k: value.map((v) =>
                     kfe_to_json(v, this.value_to_json(v.value))
                 ),
             };
+            if (this.repeat_count) {
+                o.r = this.repeat_count;
+            }
+            if (this.bounce) {
+                o.b = this.bounce;
+            }
+            return o;
         } else {
             return { v: this.value_to_json(value) };
         }
     }
 
-    override  from_json(x: ValueP<any>) {
+    override from_json(x: ValueP<any>) {
         const { k, v } = x;
         if (k != undefined) {
-            const kfs = new Keyframes<V>();
-            kfs.push(
-                ...k.map((x) => kfe_from_json(x, this.value_from_json(x.v)))
-            );
-            this.value = kfs;
+            const { r, b } = x;
+            this.value = new Keyframes<V>(...k.map((x) => kfe_from_json(x, this.value_from_json(x.v))));
+            if (r != null) {
+                this.repeat_count = r;
+            }
+            if (b != null) {
+                this.bounce = b;
+            }
         } else if (v != undefined) {
             this.value = this.value_from_json(x.v);
         } else if (v === null) {
@@ -382,15 +418,12 @@ export class RGBNone extends RGB {
     }
 }
 
-export class PositionValue extends NVectorValue {
-
-}
+export class PositionValue extends NVectorValue { }
 
 export class RGBValue extends NVectorValue {
-
     static to_css_rgb([r, g, b, a]: Iterable<number>) {
         if (a == 0) {
-            return 'none';
+            return "none";
         }
         return `rgb(${Math.round((r * 255) % 256)}, ${Math.round(
             (g * 255) % 256
@@ -406,7 +439,7 @@ export class TextValue extends AnimatableD<string> {
         return s;
     }
     override value_from_json(a: any): string {
-        return a + '';
+        return a + "";
     }
 }
 
