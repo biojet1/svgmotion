@@ -107,8 +107,11 @@ export async function animate(lib) {
                 S,
             })
         );
-        S.repeat_count = 1.5;
-        // S.bounce = true;
+        S.repeat_count = -1;
+        S.bounce = true;
+        S.get_value(1000);
+        console.log(S);
+
     }
     {
         const CO = maru2.fill.color
@@ -123,6 +126,7 @@ export async function animate(lib) {
         );
         CO.repeat_count = 66666666666;
         CO.bounce = true;
+
     }
 
     // console.log(r2.transform.to_json());

@@ -85,6 +85,8 @@ export class Animatable<V> extends ValueBase {
     value!: Keyframes<V> | V | null;
     repeat_count?: number;
     bounce?: boolean;
+    iter_dur?: number;
+    active_dur?: number;
     // static
     lerp_value(ratio: number, a: V, b: V): V {
         throw Error(`Not implemented by '${this.constructor.name}'`);
@@ -128,29 +130,34 @@ export class Animatable<V> extends ValueBase {
                 p = k;
             }
             if (p) {
-                const { repeat_count = 0 } = this;
+                let { repeat_count = 0 } = this;
                 if (repeat_count) {
                     const S = value[0].time; // start
                     const E = p.time; // end
-                    const f = (frame - S);
-                    const d = (E - S);
-                    let o, A, I;
+                    const f = (frame - S); // frame offset
+                    const d = (E - S); // duration
+                    let o, a, i;
+                    if (repeat_count < 0) {
+                        repeat_count = Infinity;
+                    }
                     if (this.bounce) {
-                        I = (d + 1) * 2 - 1; // iter duration
-                        const p = (I - 1);
+                        i = (d + 1) * 2 - 1; // iter duration
+                        const p = (i - 1);
                         const h = p / 2;
-                        A = Math.floor(p * repeat_count) + 1; // active duration
+                        a = Math.floor(p * repeat_count) + 1; // active duration
                         o = h - Math.abs((f % p) - h);
                     } else {
-                        I = d + 1; // iter duration
-                        A = Math.floor(repeat_count * d); // active duration
-                        o = (f % I);
+                        i = d + 1; // iter duration
+                        a = Math.floor(repeat_count * i); // active duration
+                        o = (f % i);
                     }
+                    this.iter_dur = i;
+                    this.active_dur = a;
                     // console.log(`${this.constructor.name} A:${A} I:${I} o:${o} frame:${frame}`);
-                    if (frame <= (S + A)) {
+                    if (f < a) {
                         return this.get_value(S + o);
                     } else {
-                        return this.get_value(S + A);
+                        return this.get_value(S + a - 1);
                     }
                 }
                 return p.value;
@@ -163,6 +170,42 @@ export class Animatable<V> extends ValueBase {
             return value;
         }
     }
+    // static
+    get_value_off(frame: number): V {
+        throw Error(`Not implemented by '${this.constructor.name}'`);
+    }
+    _off_fun(first: KeyframeEntry<V>, last: KeyframeEntry<V>) {
+
+        let { repeat_count = 0 } = this;
+        if (repeat_count) {
+            const S = first.time; // start
+            const E = last.time; // end
+            const d = (E - S); // duration
+            if (repeat_count < 0) {
+                repeat_count = Infinity;
+            }
+            if (this.bounce) {
+                const i = (d + 1) * 2 - 1; // iter duration
+                const p = (i - 1);
+                const h = p / 2;
+                const a = Math.floor(p * repeat_count) + 1; // active duration
+                this.iter_dur = i;
+                this.active_dur = a;
+                this.get_value_off = function (frame: number) {
+                    return this.get_value(h - Math.abs(((frame - S) % p) - h));
+                }
+            } else {
+                const i = d + 1; // iter duration
+                const a = Math.floor(repeat_count * i); // active duration
+                this.iter_dur = i;
+                this.active_dur = a;
+                this.get_value_off = function (frame: number) {
+                    return this.get_value(S + (frame - S) % i);
+                }
+            }
+        }
+    }
+
     set_value(value: V | any) {
         this.value = this.check_value(value);
     }

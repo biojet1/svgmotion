@@ -22,7 +22,6 @@ test.test("Keyframes", (t) => {
     kfs.push_value(0, 9);
     kfs.push_value(60, 10);
     // console.log(kfs);
-
     t.end();
 });
 
@@ -36,7 +35,6 @@ test.test("NumberValue", (t) => {
     v = new NumberValue(9);
     t.equal(v.value, 9);
     t.equal(v.add_value(-10, 10), 0);
-
     for (const r of [0, 0.1, 0.5, 0.7, 1]) {
         t.equal(v.lerp_value(r, 7, 7), 7);
     }
@@ -44,7 +42,6 @@ test.test("NumberValue", (t) => {
 });
 
 test.test("Point", (t) => {
-    let v = new Point(4, 5, 6, 7);
     // console.log(v);
     t.end();
 });
@@ -165,7 +162,7 @@ test.test("Step", (t) => {
 
     // console.log(r.prop5);
     r.prop5.value += 20;
-    console.log("position", vp.position);
+    // console.log("position", vp.position);
 
     t.end();
 });
@@ -196,7 +193,7 @@ test.test("Transform", (t) => {
         "translate(4,5) rotate(30) skewX(-7) scale(3, .5) translate(-2 -3) skewY(99) scale(1 , 1) matrix(1 2 3 4 5 6) rotate(2 0 4)"
     );
     t.ok('all' in x)
-    console.log(x.to_json());
+    // console.log(x.to_json());
 
     t.equal(
         x.get_transform_repr(0),
@@ -215,5 +212,110 @@ test.test("Transform", (t) => {
     t.throws(() => x.get_translate(5));
     t.throws(() => x.get_translate(2));
     t.throws(() => x.set_parse_transform("skewU(-7)"));
+    t.end();
+});
+
+
+test.test("Repeat", (t) => {
+    let v = new NumberValue();
+    v.key_value(1, 5);
+    v.key_value(7, 13);
+    v.key_value(9, 7);
+    v.repeat_count = 2;
+    t.same(v.get_value(0), 5);
+    t.same(v.get_value(9), 7);
+    t.same(v.get_value(10), 5);
+    t.same(v.get_value(16), 13);
+    t.same(v.get_value(18), 7);
+    t.same(v.get_value(19), 7);
+    t.same(v.get_value(20), 7);
+
+    t.end();
+});
+
+test.test("Repeat Infinite", (t) => {
+    let v = new NumberValue();
+    v.key_value(1, 7);
+    v.key_value(7, 13);
+    v.key_value(9, 15);
+    v.repeat_count = -1;
+    let o = 0;
+    for (const x of '7 8 9 10 11 12 13 14 15 7 8 9 10 11 12 13 14 15 7 8 9 10 11 12 13 14 15 7 8 9 10 11 12 13 14 15'.split(' ')) {
+        o++;
+        t.same(v.get_value(o), parseInt(x));
+    }
+    t.end();
+});
+
+test.test("Repeat fraction", (t) => {
+    let v = new NumberValue();
+    v.key_value(1, 7);
+    v.key_value(7, 13);
+    v.key_value(9, 15);
+    v.repeat_count = 3.3333333333333;
+    let o = 0;
+    v.get_value(50);
+    // console.log(v);
+    for (const x of '7 8 9 10 11 12 13 14 15 7 8 9 10 11 12 13 14 15 7 8 9 10 11 12 13 14 15 7 8 8 8 8 8 8'
+        .split(' ')) {
+        o++;
+        t.same(v.get_value(o), parseInt(x), `o:${o} x:${x}`);
+    }
+    t.end();
+});
+
+test.test("Bounce once", (t) => {
+    let v = new NumberValue();
+    v.key_value(1, 7);
+    v.key_value(7, 13);
+    v.key_value(9, 15);
+    v.repeat_count = 1;
+    v.bounce = true;
+    let o = 0;
+    for (const x of (`7 8 9 10 11 12 13 14 15 14 13 12 11 10 9 8 7`
+        + ` 7 7 7`).split(/s+/)) {
+        o++;
+        t.same(v.get_value(o), parseInt(x), `o:${o} x:${x}`);
+    }
+    t.end();
+});
+
+test.test("Bounce twice", (t) => {
+    let v = new NumberValue();
+    v.key_value(1, 7);
+    v.key_value(7, 13);
+    v.key_value(9, 15);
+    v.repeat_count = 2;
+    v.bounce = true;
+    let o = 0 - 3;
+    for (const x of (`7 7 7 7 8 9 10 11 12 13 14 15 14 13 12 11 10 9 8 7`
+        + ` 8 9 10 11 12 13 14 15 14 13 12 11 10 9 8 7 7 7 7 7 7 7`).split(' ')) {
+        o++;
+        if (!t.same(v.get_value(o), parseInt(x), `o:${o} x:${x}`)) {
+            break;
+        }
+    }
+    t.end();
+});
+
+test.test("Bounce 2.5x", (t) => {
+    let v = new NumberValue();
+    v.key_value(1, 7);
+    v.key_value(7, 13);
+    v.key_value(9, 15);
+    v.repeat_count = 2.5;
+    v.bounce = true;
+    let o = 0 - 2;
+    for (const x of (`7 7 7 8 9 10 11 12 13 14 15 14 13 12 11 10 9 8 7`
+        + ` 8 9 10 11 12 13 14 15 14 13 12 11 10 9 8 7 8 9 10 11 12 13 14 15 15 15 15 15`).split(' ')) {
+        o++;
+        // console.log(`o:${o} x:${x}`);
+        if (!t.same(v.get_value(o), parseInt(x), `o:${o} x:${x}`)) {
+            break;
+        }
+    }
+    let j = v.to_json();
+    t.same(j.r, 2.5);
+    t.same(j.b, true);
     t.end();
 });
