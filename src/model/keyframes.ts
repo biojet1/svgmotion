@@ -81,6 +81,51 @@ export class ValueBase {
     }
 }
 
+function _off_fun(repeat_count: number, S: number, E: number, bounce: boolean = false) {
+    if (S < E) {
+        if (repeat_count < 0) {
+            repeat_count = Infinity;
+        } else if (repeat_count == 0) {
+            throw Error(`Unexpected`);
+        }
+        const d = (E - S); // duration
+        if (bounce) {
+            const i = (d + 1) * 2 - 1; // iter duration
+            const p = (i - 1);
+            const h = p / 2;
+            const a = Math.floor(p * repeat_count) + 1; // active duration
+            const Z = S + a; // past end frame
+            return function fn(frame: number) {
+                if (frame < S) {
+                    return S;
+                } else if (frame < Z) {
+                    return S + (h - Math.abs(((frame - S) % p) - h));
+                } else {
+                    return Z - 1;
+                }
+            }
+        } else {
+            const i = d + 1; // iter duration
+            const a = Math.floor(repeat_count * i); // active duration
+            const Z = S + a; // pass end frame
+            return function fn(frame: number) {
+                if (frame < S) {
+                    return S;
+                } else if (frame < Z) {
+                    return S + (frame - S) % i;
+                } else {
+                    return Z - 1;
+                }
+            }
+        }
+    } else if (S === E) {
+        return function fn(frame: number) {
+            return S;
+        }
+    } else {
+        throw Error(`Unexpected`);
+    }
+}
 export class Animatable<V> extends ValueBase {
     value!: Keyframes<V> | V | null;
     repeat_count?: number;
@@ -124,43 +169,54 @@ export class Animatable<V> extends ValueBase {
                         }
                         return this.lerp_value(r, p.value, k.value);
                     } else {
-                        return k.value;
+                        // return k.value;
+                        if (frame < k.time) {
+                            return this.get_value_off(frame);
+                        } else {
+                            return k.value;
+                        }
                     }
                 }
                 p = k;
             }
             if (p) {
-                let { repeat_count = 0 } = this;
-                if (repeat_count) {
-                    const S = value[0].time; // start
-                    const E = p.time; // end
-                    const f = (frame - S); // frame offset
-                    const d = (E - S); // duration
-                    let o, a, i;
-                    if (repeat_count < 0) {
-                        repeat_count = Infinity;
-                    }
-                    if (this.bounce) {
-                        i = (d + 1) * 2 - 1; // iter duration
-                        const p = (i - 1);
-                        const h = p / 2;
-                        a = Math.floor(p * repeat_count) + 1; // active duration
-                        o = h - Math.abs((f % p) - h);
-                    } else {
-                        i = d + 1; // iter duration
-                        a = Math.floor(repeat_count * i); // active duration
-                        o = (f % i);
-                    }
-                    this.iter_dur = i;
-                    this.active_dur = a;
-                    // console.log(`${this.constructor.name} A:${A} I:${I} o:${o} frame:${frame}`);
-                    if (f < a) {
-                        return this.get_value(S + o);
-                    } else {
-                        return this.get_value(S + a - 1);
-                    }
-                }
-                return p.value;
+                return this.get_value_off(frame);
+
+                // let { repeat_count = 1 } = this;
+                // const fn = _off_fun(repeat_count, value[0].time, p.time, this.bounce);
+                // return this.get_value(fn(frame));
+
+                // if (repeat_count) {
+                //     ;
+                //     const S = value[0].time; // start
+                //     const E = p.time; // end
+                //     const f = (frame - S); // frame offset
+                //     const d = (E - S); // duration
+                //     let o, a, i;
+                //     if (repeat_count < 0) {
+                //         repeat_count = Infinity;
+                //     }
+                //     if (this.bounce) {
+                //         i = (d + 1) * 2 - 1; // iter duration
+                //         const p = (i - 1);
+                //         const h = p / 2;
+                //         a = Math.floor(p * repeat_count) + 1; // active duration
+                //         o = h - Math.abs((f % p) - h);
+                //     } else {
+                //         i = d + 1; // iter duration
+                //         a = Math.floor(repeat_count * i); // active duration
+                //         o = (f % i);
+                //     }
+                //     this.iter_dur = i;
+                //     this.active_dur = a;
+                //     // console.log(`${this.constructor.name} A:${A} I:${I} o:${o} frame:${frame}`);
+                //     if (f < a) {
+                //         return this.get_value(S + o);
+                //     } else {
+                //         return this.get_value(S + a - 1);
+                //     }
+                // }
+                // return p.value;
             }
             throw new Error(`empty keyframe list`);
         } else {
@@ -172,39 +228,26 @@ export class Animatable<V> extends ValueBase {
     }
     // static
     get_value_off(frame: number): V {
-        throw Error(`Not implemented by '${this.constructor.name}'`);
-    }
-    _off_fun(first: KeyframeEntry<V>, last: KeyframeEntry<V>) {
-
-        let { repeat_count = 0 } = this;
-        if (repeat_count) {
-            const S = first.time; // start
-            const E = last.time; // end
-            const d = (E - S); // duration
-            if (repeat_count < 0) {
-                repeat_count = Infinity;
-            }
-            if (this.bounce) {
-                const i = (d + 1) * 2 - 1; // iter duration
-                const p = (i - 1);
-                const h = p / 2;
-                const a = Math.floor(p * repeat_count) + 1; // active duration
-                this.iter_dur = i;
-                this.active_dur = a;
+        const { value } = this;
+        if (!(value instanceof Keyframes)) {
+            throw Error(`Unexpected by '${this.constructor.name}'`);
+        }
+        const first = value.at(0);
+        if (first) {
+            const last = value.at(-1);
+            if (last) {
+                let { repeat_count = 1, bounce } = this;
+                const fn = _off_fun(repeat_count, first.time, last.time, bounce);
                 this.get_value_off = function (frame: number) {
-                    return this.get_value(h - Math.abs(((frame - S) % p) - h));
+                    return this.get_value(fn(frame));
                 }
-            } else {
-                const i = d + 1; // iter duration
-                const a = Math.floor(repeat_count * i); // active duration
-                this.iter_dur = i;
-                this.active_dur = a;
-                this.get_value_off = function (frame: number) {
-                    return this.get_value(S + (frame - S) % i);
-                }
+                return this.get_value_off(frame);
             }
         }
+        throw Error(`Unexpected by '${this.constructor.name}'`);
     }
+
+
 
     set_value(value: V | any) {
         this.value = this.check_value(value);

@@ -29,6 +29,8 @@ test.test("NumberValue", (t) => {
     let v = new NumberValue();
     t.equal(v.value, 0);
     v.key_value(0, 9);
+    t.equal(v.get_value(0), 9);
+    t.equal(v.get_value(60), 9);
     v.key_value(60, 10);
     t.equal(v.get_value(0), 9);
     t.equal(v.get_value(60), 10);
@@ -38,6 +40,7 @@ test.test("NumberValue", (t) => {
     for (const r of [0, 0.1, 0.5, 0.7, 1]) {
         t.equal(v.lerp_value(r, 7, 7), 7);
     }
+
     t.end();
 });
 
