@@ -1,14 +1,17 @@
-import { IAction, Action } from "./action.js";
+import { IAction, Action, IProperty } from "./action.js";
 import { PropMap, Step, UserEntry } from "./steps.js";
-
 
 export class Track {
     frame: number = 0;
     frame_rate: number = 60;
-    _hint_dur: number = 60; // 1s * frame_rate
-    _easing?: Iterable<number> | boolean;
-    sec(n: number) {
-        return this.frame_rate * n;
+    hint_dur: number = 60; // 1s * frame_rate
+    easing?: Iterable<number> | boolean;
+    prop_set?: Set<IProperty<any>>;
+    // sec(n: number) {
+    //     return this.frame_rate * n;
+    // }
+    add_prop(prop: IProperty<any>) {
+        this.prop_set?.add(prop);
     }
     to_frame(sec: number) {
         return Math.round(this.frame_rate * sec);
@@ -19,12 +22,12 @@ export class Track {
         return this;
     }
     step(step: UserEntry[], vars: PropMap, params: any) {
-        return this.feed(Step(step, vars, params));
+        return this.run(Step(step, vars, params));
     }
-    play(...args: Array<Action | Array<Action>>) {
+    run(...args: Array<Action | Array<Action>>) {
         let I = this.frame;
         let B = this.frame;
-        for (const [i, act] of args.entries()) {
+        for (const act of args) {
             let D = 0;
             if (Array.isArray(act)) {
                 for (const a of act) {
@@ -42,12 +45,11 @@ export class Track {
 
 function feed(track: Track, cur: IAction, frame: number, base_frame: number) {
     cur.ready(track);
-    cur.resolve(frame, base_frame, track._hint_dur);
+    cur.resolve(frame, base_frame, track.hint_dur);
     const d = cur.get_active_dur();
-    if (d >= 0) {
-        cur.run();
-    } else {
+    if (d < 0) {
         throw new Error(`Unexpected`);
     }
+    cur.run();
     return d;
 }

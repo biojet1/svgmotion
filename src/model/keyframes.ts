@@ -1,4 +1,6 @@
-import { cubic_bezier_y_of_x } from "./bezier.js";
+import { KeyframeEntry, Keyframes, _off_fun, offset_fun, ratio_at } from "./kfhelper.js";
+export { Keyframes } from "./kfhelper.js";
+///////////
 export interface KFBase {
     t: number;
     h?: boolean;
@@ -15,10 +17,7 @@ export interface KFEntry<V> extends KFBase {
 export type Value<V> = { k: KFEntry<V>[]; _?: string; r?: number; b?: boolean } | { v: V; _?: string };
 export type ValueP<V> = { k?: KFEntry<V>[]; v?: V; r?: number; b?: boolean };
 
-function ratio_at(a: Iterable<number>, t: number) {
-    const [ox, oy, ix, iy] = a;
-    return cubic_bezier_y_of_x([0, 0], [ox, oy], [ix, iy], [1, 1])(t);
-}
+
 
 export function kfe_from_json<V>(x: KFBase, value: V): KeyframeEntry<V> {
     const { t: time, h, o, i } = x;
@@ -44,28 +43,7 @@ function kfe_to_json<V>(kfe: KeyframeEntry<V>, value: any): KFEntry<V> {
     }
 }
 
-export interface KeyframeEntry<V> {
-    time: number;
-    value: V;
-    easing?: Iterable<number> | boolean;
-}
 
-export class Keyframes<V> extends Array<KeyframeEntry<V>> {
-    push_value(time: number, value: V): KeyframeEntry<V> {
-        let last = this[this.length - 1];
-        if (last) {
-            if (last.time == time) {
-                last.value = value;
-                return last;
-            } else if (time < last.time) {
-                throw new Error(`keyframe is incremental`);
-            }
-        }
-        const kf = { time, value };
-        this.push({ time, value });
-        return kf;
-    }
-}
 
 export class ValueBase {
     to_json(): any {
@@ -81,57 +59,11 @@ export class ValueBase {
     }
 }
 
-function _off_fun(repeat_count: number, S: number, E: number, bounce: boolean = false) {
-    if (S < E) {
-        if (repeat_count < 0) {
-            repeat_count = Infinity;
-        } else if (repeat_count == 0) {
-            throw Error(`Unexpected`);
-        }
-        const d = (E - S); // duration
-        if (bounce) {
-            const i = (d + 1) * 2 - 1; // iter duration
-            const p = (i - 1);
-            const h = p / 2;
-            const a = Math.floor(p * repeat_count) + 1; // active duration
-            const Z = S + a; // past end frame
-            return function fn(frame: number) {
-                if (frame < S) {
-                    return S;
-                } else if (frame < Z) {
-                    return S + (h - Math.abs(((frame - S) % p) - h));
-                } else {
-                    return Z - 1;
-                }
-            }
-        } else {
-            const i = d + 1; // iter duration
-            const a = Math.floor(repeat_count * i); // active duration
-            const Z = S + a; // pass end frame
-            return function fn(frame: number) {
-                if (frame < S) {
-                    return S;
-                } else if (frame < Z) {
-                    return S + (frame - S) % i;
-                } else {
-                    return Z - 1;
-                }
-            }
-        }
-    } else if (S === E) {
-        return function fn(frame: number) {
-            return S;
-        }
-    } else {
-        throw Error(`Unexpected`);
-    }
-}
+
 export class Animatable<V> extends ValueBase {
     value!: Keyframes<V> | V | null;
     repeat_count?: number;
     bounce?: boolean;
-    iter_dur?: number;
-    active_dur?: number;
     // static
     lerp_value(ratio: number, a: V, b: V): V {
         throw Error(`Not implemented by '${this.constructor.name}'`);
@@ -168,55 +100,16 @@ export class Animatable<V> extends ValueBase {
                             r = ratio_at(p.easing, r);
                         }
                         return this.lerp_value(r, p.value, k.value);
+                    } else if (frame < k.time) {
+                        return this.get_value_off(frame);
                     } else {
-                        // return k.value;
-                        if (frame < k.time) {
-                            return this.get_value_off(frame);
-                        } else {
-                            return k.value;
-                        }
+                        return k.value;
                     }
                 }
                 p = k;
             }
             if (p) {
                 return this.get_value_off(frame);
-
-                // let { repeat_count = 1 } = this;
-                // const fn = _off_fun(repeat_count, value[0].time, p.time, this.bounce);
-                // return this.get_value(fn(frame));
-
-                // if (repeat_count) {
-                //     ;
-                //     const S = value[0].time; // start
-                //     const E = p.time; // end
-                //     const f = (frame - S); // frame offset
-                //     const d = (E - S); // duration
-                //     let o, a, i;
-                //     if (repeat_count < 0) {
-                //         repeat_count = Infinity;
-                //     }
-                //     if (this.bounce) {
-                //         i = (d + 1) * 2 - 1; // iter duration
-                //         const p = (i - 1);
-                //         const h = p / 2;
-                //         a = Math.floor(p * repeat_count) + 1; // active duration
-                //         o = h - Math.abs((f % p) - h);
-                //     } else {
-                //         i = d + 1; // iter duration
-                //         a = Math.floor(repeat_count * i); // active duration
-                //         o = (f % i);
-                //     }
-                //     this.iter_dur = i;
-                //     this.active_dur = a;
-                //     // console.log(`${this.constructor.name} A:${A} I:${I} o:${o} frame:${frame}`);
-                //     if (f < a) {
-                //         return this.get_value(S + o);
-                //     } else {
-                //         return this.get_value(S + a - 1);
-                //     }
-                // }
-                // return p.value;
             }
             throw new Error(`empty keyframe list`);
         } else {
@@ -237,11 +130,10 @@ export class Animatable<V> extends ValueBase {
             const last = value.at(-1);
             if (last) {
                 let { repeat_count = 1, bounce } = this;
-                const fn = _off_fun(repeat_count, first.time, last.time, bounce);
-                this.get_value_off = function (frame: number) {
+                const fn = offset_fun(repeat_count, first.time, last.time, bounce, this);
+                return (this.get_value_off = function (frame: number) {
                     return this.get_value(fn(frame));
-                }
-                return this.get_value_off(frame);
+                }).call(this, frame);
             }
         }
         throw Error(`Unexpected by '${this.constructor.name}'`);

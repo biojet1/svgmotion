@@ -481,7 +481,7 @@ export class Root extends Container {
     track(frame: number = 0) {
         const tr = new Track();
         tr.frame_rate = this.frame_rate;
-        tr._hint_dur = 1 * this.frame_rate;
+        tr.hint_dur = 1 * this.frame_rate;
         tr.frame = frame;
         return tr;
     }
