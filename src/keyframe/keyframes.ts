@@ -43,24 +43,7 @@ function kfe_to_json<V>(kfe: KeyframeEntry<V>, value: any): KFEntry<V> {
     }
 }
 
-
-
-export class AnimBase {
-    // to_json(): any {
-    //     throw Error(`Not implemented by '${this.constructor.name}'`);
-    // }
-
-    // from_json(x: any) {
-    //     throw Error(`Not implemented by '${this.constructor.name}'`);
-    // }
-
-    // *enum_values(): Generator<Animatable<any>, void, unknown> {
-    //     throw Error(`Not implemented by '${this.constructor.name}'`);
-    // }
-}
-
-
-export class Animatable<V> extends AnimBase {
+export class Animatable<V> {
     value: V | null;
     kfs: Keyframes<V> = new Keyframes<V>();
     repeat_count?: number;
@@ -195,7 +178,6 @@ export class Animatable<V> extends AnimBase {
     }
 
     constructor(v: V) {
-        super();
         if (v == null) {
             throw new Error(`unexpected value=${v}`);
         } else {
@@ -308,17 +290,17 @@ export class AnimatableD<V> extends Animatable<V> {
         return kfs.push_value(frame, value);
     }
 }
-declare module "." {
-    interface AnimBase {
-        from_json(x: any): void;
-        to_json(): any;
-    }
-}
+// declare module "." {
+//     interface AnimBase {
+//         from_json(x: any): void;
+//         to_json(): any;
+//     }
+// }
 
-AnimBase.prototype.from_json = function (_x: any) {
-    throw Error(`Not implemented by '${this.constructor.name}'`);
-}
+// AnimBase.prototype.from_json = function (_x: any) {
+//     throw Error(`Not implemented by '${this.constructor.name}'`);
+// }
 
-AnimBase.prototype.to_json = function () {
-    throw Error(`Not implemented by '${this.constructor.name}'`);
-}
+// AnimBase.prototype.to_json = function () {
+//     throw Error(`Not implemented by '${this.constructor.name}'`);
+// }

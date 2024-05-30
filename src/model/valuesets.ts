@@ -1,18 +1,12 @@
 import {
-
     NVector,
     NVectorValue,
     NumberValue,
     PositionValue,
     RGBValue,
     TextValue,
-
 } from "../keyframe/value.js";
-import {
-    Animatable,
-
-    ValueT, AnimBase
-} from "../keyframe/keyframes.js";
+import { Animatable, ValueT } from "../keyframe/keyframes.js";
 
 export function xget<T>(that: any, name: string, value: T): T {
     // console.log(`_GETX ${name}`);
@@ -33,8 +27,8 @@ export function xset<T>(that: any, name: string, value: T) {
     });
 }
 
-export class ValueSet extends AnimBase {
-    // [key: string]: Animatable;
+export class ValueSet {
+
     *enum_values(): Generator<Animatable<any>, void, unknown> {
         for (const sub of Object.values(this)) {
             if (sub instanceof Animatable) {

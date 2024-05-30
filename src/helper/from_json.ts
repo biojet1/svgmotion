@@ -1,4 +1,5 @@
-import { AnimBase, ValueT } from "../keyframe/keyframes.js";
+import { Animatable, ValueT } from "../keyframe/keyframes.js";
+import { ValueSet } from "../model/valuesets.js";
 import {
     Container, Root, Item, PlainRoot, PlainNode,
     ViewPort, Rect, Path, Line, Group,
@@ -26,7 +27,7 @@ const TAGS: {
 function props_from_json(that: any, props: { [key: string]: ValueT<any> }) {
     for (let [k, v] of Object.entries(props)) {
         const p = that[k];
-        if (p instanceof AnimBase) {
+        if (p instanceof ValueSet || p instanceof Animatable) {
             p.from_json(v);
         } else {
             switch (k) {

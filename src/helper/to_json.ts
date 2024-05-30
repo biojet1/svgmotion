@@ -1,5 +1,6 @@
-import { AnimBase } from "../keyframe/keyframes.js";
+import { Animatable } from "../keyframe/keyframes.js";
 import { Container, Root, Item, PlainRoot, PlainNode } from "../model/node.js";
+import { ValueSet } from "../model/valuesets.js";
 
 
 declare module "../model/node" {
@@ -17,7 +18,7 @@ declare module "../model/node" {
 Container.prototype.to_json = function () {
     const o: any = { tag: (<typeof Container>this.constructor).tag };
     for (let [k, v] of Object.entries(this)) {
-        if (v instanceof AnimBase) {
+        if (v instanceof ValueSet || v instanceof Animatable) {
             o[k] = v.to_json();
         }
     }
@@ -35,7 +36,7 @@ Container.prototype.to_json = function () {
 Item.prototype.to_json = function (): PlainNode {
     const o: any = { tag: (<typeof Container>this.constructor).tag };
     for (let [k, v] of Object.entries(this)) {
-        if (v instanceof AnimBase) {
+        if (v instanceof ValueSet || v instanceof Animatable) {
             o[k] = v.to_json();
         }
     }

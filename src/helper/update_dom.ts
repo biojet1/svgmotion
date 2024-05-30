@@ -1,8 +1,8 @@
 import { NVectorValue, NumberValue, PointsValue, RGBValue, TextValue } from "../keyframe/value.js";
-import { Animatable, AnimBase } from "../keyframe/keyframes.js";
+import { Animatable } from "../keyframe/keyframes.js";
 import { Container, Root, Item } from "../model/node.js";
 import { Node } from "../model/linked.js";
-import { Transform, Fill, Box, Font, Stroke } from "../model/valuesets.js";
+import { Transform, Fill, Box, Font, Stroke, ValueSet } from "../model/valuesets.js";
 
 const FILL_MAP: {
     [key: string]: ((frame: number, node: SVGElement, prop: any) => void);
@@ -147,7 +147,7 @@ function update_dom(frame: number, target: Item | Container) {
         const elem = (cur as any)._element;
         if (elem) {
             for (let [n, v] of Object.entries(cur)) {
-                if (v instanceof AnimBase) {
+                if (v instanceof ValueSet || v instanceof Animatable) {
                     const f = PROP_MAP[n];
                     if (f) {
                         f(frame, elem, v, target);
