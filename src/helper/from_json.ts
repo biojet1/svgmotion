@@ -1,4 +1,4 @@
-import { ValueBase, Value } from "../model/keyframes.js";
+import { ValueBase, Value } from "../keyframe/keyframes.js";
 import {
     Container, Root, Item, PlainRoot, PlainNode,
     ViewPort, Rect, Path, Line, Group,

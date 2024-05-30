@@ -34,8 +34,76 @@ interface Params {
     repeat?: number;
     max_dur?: number;
 }
-const FIRST = {};
+// const FIRST = {};
 const LAST = {};
+
+class Stepper {
+    do<V>(
+        step: StepA,
+        prop: IProperty<V>,
+        frame: number,
+        easing?: Iterable<number> | boolean
+    ): V {
+        throw new Error(`Unexpected by '${this.constructor.name}'`);
+    }
+}
+
+class Add extends Stepper {
+    value: any;
+    constructor(value: any) {
+        super();
+        this.value = value;
+    }
+    do<V>(
+        step: StepA,
+        prop: IProperty<V>,
+        frame: number,
+        easing?: Iterable<number> | boolean
+    ): V {
+        const v = prop.check_value(this.value);
+        const p = prop.get_value(step._prev_frame ?? NaN);
+        return prop.add_value(p, v);
+    }
+}
+
+class Inital extends Stepper {
+    do<V>(
+        step: StepA,
+        prop: IProperty<V>,
+        frame: number,
+        easing?: Iterable<number> | boolean
+    ): V {
+        return prop.initial_value();
+    }
+}
+class First extends Stepper {
+    do<V>(
+        step: StepA,
+        prop: IProperty<V>,
+        frame: number,
+        easing?: Iterable<number> | boolean
+    ): V {
+        return prop.get_value(step._start);
+    }
+}
+class Last extends Stepper {
+    do<V>(
+        step: StepA,
+        prop: IProperty<V>,
+        frame: number,
+        easing?: Iterable<number> | boolean
+    ): V {
+        const { _prev_value } = step;
+        if (_prev_value == undefined) {
+            throw new Error(`Unexpected`);
+        }
+        return _prev_value;
+    }
+}
+class Hold extends Stepper {
+}
+
+
 export class StepA extends Action {
     _steps: Array<UserEntry>;
     _max_dur?: number;
@@ -48,28 +116,23 @@ export class StepA extends Action {
     constructor(
         steps: Array<UserEntry>,
         vars: PropMap,
-        {
-            dur,
-            easing,
-            bounce,
-            repeat,
-            max_dur,
-        }: Params
+        { dur, easing, bounce, repeat, max_dur }: Params
     ) {
         super();
         this._steps = steps;
         this._vars = vars;
         this._base_frame = Infinity;
         this.ready = function (parent: IParent): void {
-            this._dur = (dur == undefined) ? undefined : parent.to_frame(dur);
-            this._max_dur = (max_dur == undefined) ? undefined : parent.to_frame(max_dur);
+            this._dur = dur == undefined ? undefined : parent.to_frame(dur);
+            this._max_dur =
+                max_dur == undefined ? undefined : parent.to_frame(max_dur);
             if (repeat) {
                 this._repeat = repeat;
             }
             if (bounce) {
                 this._bounce = bounce;
             }
-            easing = this._easing ?? easing;
+            easing = this._easing ?? easing ?? parent.easing;
 
             // collect names, parse inputs
             const names: Array<string> = [];
@@ -94,7 +157,6 @@ export class StepA extends Action {
                     } else {
                         delete e[k];
                     }
-
                 }
             });
             // drop property not present
@@ -115,7 +177,13 @@ export class StepA extends Action {
         };
     }
     resolve(frame: number, base_frame: number, hint_dur: number): void {
-        const { _steps: steps, _kf_map, _dur = hint_dur, _max_dur = hint_dur, _vars } = this;
+        const {
+            _steps: steps,
+            _kf_map,
+            _dur = hint_dur,
+            _max_dur = hint_dur,
+            _vars,
+        } = this;
         if (_kf_map != undefined) {
             if (this._start != frame) {
                 const d = this._end - this._start;
@@ -142,38 +210,33 @@ export class StepA extends Action {
         this._end = frame + t_max;
         this._base_frame = base_frame;
     }
-
+    _prev_frame?: number;
+    _prev_value?: any;
     run(): void {
         const { _start, _vars, _kf_map, _base_frame } = this;
         for (const [name, entries] of Object.entries(_kf_map!)) {
             for (const prop of enum_props(_vars, name)) {
-                let prev_t = _base_frame;
-                let prev_v = undefined;
+                this._prev_frame = _base_frame;
+                this._prev_value = undefined;
                 for (const { t, value, ease } of entries) {
                     const frame = _start + t;
                     let v;
-                    if (value == null) {
-                        v = prop.get_value(_start);
-                    } else if (value === FIRST) {
-                        v = prop.get_value(_start);
-                    } else if (value === LAST) {
-                        if (prev_v == undefined) {
-                            throw new Error(`Unexpected`);
+
+                    if (value instanceof Stepper) {
+                        v = value.do(this, prop, frame);
+                        if (value instanceof Hold) {
+
                         }
-                        v = prev_v;
                     } else {
                         v = prop.check_value(value);
                     }
-                    prop.key_value(frame, v, prev_t, ease);
-                    prev_t = frame;
-                    prev_v = v;
+                    prop.key_value(frame, v, this._prev_frame, ease);
+                    this._prev_frame = frame;
+                    this._prev_value = v;
                 }
             }
         }
-
     }
-    static last = LAST;
-    static first = FIRST;
 }
 
 function resolve_t(
@@ -201,15 +264,17 @@ function resolve_t(
                     e.t = prev.t + hint_dur;
                 }
             } else if (i > 0) {
-                if (!(dur >= 0)) {
+                if (dur >= 0) {
+                    e.t = dur + steps[i - 1].t!;
+                } else {
                     throw new Error(`Unexpected`);
                 }
-                e.t = dur + steps[i - 1].t!;
             } else {
-                if (!(i === 0 || dur >= 0)) {
+                if (i === 0 || dur >= 0) {
+                    e.t = dur;
+                } else {
                     throw new Error(`Unexpected`);
                 }
-                e.t = dur;
             }
         }
         if (e.t < 0) {
@@ -234,12 +299,10 @@ function resolve_t(
                 // first item is not t=0
                 const first: Entry = { t: 0 };
                 for (const [n, _] of Object.entries(vars)) {
-                    first[n] = null;
+                    first[n] = Step.first;
                 }
                 entries.push(first);
-
             }
-
         } else {
             if (!(i === 0 && t == 0)) {
                 throw new Error(`Unexpected`);
@@ -250,7 +313,7 @@ function resolve_t(
                         throw new Error(`Unexpected`);
                     }
                 } else {
-                    e[k] = null;
+                    e[k] = Step.first;
                 }
             }
         }
@@ -270,18 +333,22 @@ function resolve_bounce(steps: Array<Entry>): Array<Entry> {
     for (const { t, ease, ...vars } of steps) {
         if (t < t_max) {
             const e: Entry = { ...vars, t: t_max + (t_max - t) };
-            if (ease != undefined) {
-                if (ease && ease !== true) {
-                    const [ox, oy, ix, iy] = ease;
-                    e.ease = [1 - ix, 1 - iy, 1 - ox, 1 - oy];
-                } else {
-                    e.ease = ease;
-                }
-            }
             extra.push(e);
         } else {
             if (t != t_max) {
                 throw new Error(`e.t=${t}, t_max=${t_max}`);
+            }
+        }
+    }
+    for (let n = extra.length, j = 0; n-- > 0;) {
+        const e = extra[n];
+        const { ease } = steps[j++];
+        if (ease != undefined) {
+            if (ease && ease !== true) {
+                const [ox, oy, ix, iy] = ease;
+                e.ease = [1 - ix, 1 - iy, 1 - ox, 1 - oy];
+            } else {
+                e.ease = ease;
             }
         }
     }
@@ -338,7 +405,7 @@ function map_keyframes(steps: Array<Entry>): KFMap {
             })
             .sort((a, b) => a.t - b.t);
         if (x[0].t != 0) {
-            console.log(name, entries);
+            // console.log(name, entries);
             throw new Error(`No t=0 t:${x[0].t} t:${x[0].value}`);
         }
         kf_map[name] = x;
@@ -364,3 +431,9 @@ export function Step(
 ) {
     return new StepA(steps, vars, params);
 }
+
+Step.add = (value: any) => new Add(value);
+Step.initial = new Inital();
+Step.first = new First();
+Step.last = new Last();
+// Step.first = FIRST;

@@ -1,4 +1,4 @@
-import { NVector, NumberValue, PositionValue, TextValue } from "./keyframes.js";
+import { NVector, NumberValue, PositionValue, TextValue } from "../keyframe/value.js";
 import { Fill, Transform, xset, xget, Font, Stroke } from "./valuesets.js";
 import { Node, Parent } from "./linked.js";
 export type Constructor = (new (...args: any[]) => Parent) | (new (...args: any[]) => Node);

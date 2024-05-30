@@ -1,8 +1,12 @@
 import { Track } from "../track/track.js";
 import { BaseProps } from "./baseprops.js";
 import {
-    Animatable, ValueBase, Keyframes, NVector, NumberValue, PointsValue, PositionValue, TextValue, Value,
-} from "./keyframes.js";
+    Animatable, ValueBase, Keyframes, Value,
+} from "../keyframe/keyframes.js";
+import {
+    NVector, NumberValue, PointsValue, PositionValue, TextValue,
+} from "../keyframe/value.js";
+
 import { Node, Parent } from "./linked.js";
 import { Box, xget, xset } from "./valuesets.js";
 export interface PlainNode {

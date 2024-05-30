@@ -1,4 +1,5 @@
-import { Animatable, ValueBase, NVectorValue, NumberValue, PointsValue, RGBValue, TextValue } from "../model/keyframes.js";
+import { NVectorValue, NumberValue, PointsValue, RGBValue, TextValue } from "../keyframe/value.js";
+import { Animatable, ValueBase } from "../keyframe/keyframes.js";
 import { Container, Root, Item } from "../model/node.js";
 import { Node } from "../model/linked.js";
 import { Transform, Fill, Box, Font, Stroke } from "../model/valuesets.js";
@@ -177,7 +178,7 @@ declare module "../model/node" {
     }
 }
 
-declare module "../model/keyframes" {
+declare module "../keyframe/value" {
     interface RGBValue {
         get_rgb_repr(frame: number): string;
     }

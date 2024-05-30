@@ -1,5 +1,6 @@
 export * from "./model/index.js";
 export * from "./track/index.js";
+export * from "./keyframe/index.js";
 export * from "./helper/from_dom.js";
 export * from "./helper/to_json.js";
 export * from "./helper/from_json.js";

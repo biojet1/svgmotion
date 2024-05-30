@@ -1,4 +1,4 @@
-import { NVector, RGB, RGBNone, RGBValue } from "../model/keyframes.js";
+import { RGB, RGBValue } from "../keyframe/value.js";
 
 
 RGBValue.prototype.check_value = function (x: RGB) {

@@ -1,14 +1,18 @@
 import {
-    Animatable,
+
     NVector,
     NVectorValue,
     NumberValue,
     PositionValue,
     RGBValue,
     TextValue,
+
+} from "../keyframe/value.js";
+import {
+    Animatable,
+
     Value, ValueBase
-} from "./keyframes.js";
-import { Matrix } from "./matrix.js";
+} from "../keyframe/keyframes.js";
 
 export function xget<T>(that: any, name: string, value: T): T {
     // console.log(`_GETX ${name}`);
@@ -367,9 +371,8 @@ export class Transform extends ValueBase {
 
 type MT = MTranslate | MScale | MRotateAt | MSkewX | MSkewY;
 
-class MCom extends Array<MT> { }
 
-function col1<T>(that: Array<MT>, frame: number) {
+function col1(that: Array<MT>, frame: number) {
     return that.map((x) => x.get_transform_repr(frame)).join(" ");
 }
 
@@ -398,7 +401,6 @@ function find1<T>(
         }
     }
 }
-import { Node, Parent } from "./linked.js";
 
 class MTranslate extends NVectorValue {
     get_transform_repr(frame: number) {

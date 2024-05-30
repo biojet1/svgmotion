@@ -1,20 +1,18 @@
 "uses strict";
 import test from "tap";
-
+import * as svgmotion from 'svgmotion';
 import {
     Keyframes,
     NumberValue,
     TextValue,
-    NVectorValue,
-    Point,
-    NVector,
+    NVectorValue, NVector,
     Fill,
     ViewPort,
     Root,
     Size,
     Transform,
     Step,
-    Track,
+    Track, To
 } from "svgmotion";
 
 test.test("Keyframes", (t) => {
@@ -148,7 +146,7 @@ test.test("Step", (t) => {
             { A: 0.25, t: 0, B: [50, 50] },
             { A: 0.9, dur: 1, B: NVector.from([0, 50]) },
             { A: 0.25, dur: 1, B: [0, 0] },
-            { A: 0.9, dur: 1, B: null },
+            { A: 0.9, dur: 1, B: Step.first },
         ],
         { A: r.opacity, B: r.position }
     );
@@ -320,5 +318,70 @@ test.test("Bounce 2.5x", (t) => {
     let j = v.to_json();
     t.same(j.r, 2.5);
     t.same(j.b, true);
+    t.end();
+});
+
+test.test("Seq", (t) => {
+    const { Seq, Track, To } = svgmotion;
+    let a = new NumberValue(1);
+    let b = new NumberValue(2);
+    let c = new NumberValue(3);
+    let tr = new Track();
+    tr.run(Seq(
+        To([a], 9),
+        To([b], 8),
+        To([c], 7),
+    ));
+    t.same(a.to_json(), { k: [{ t: 0, v: 1 }, { t: 60, v: 9 }] });
+    t.same(b.to_json(), { k: [{ t: 60, v: 2 }, { t: 120, v: 8 }] });
+    t.same(c.to_json(), { k: [{ t: 120, v: 3 }, { t: 180, v: 7 }] });
+    t.end();
+});
+test.test("Par", (t) => {
+    const { Par, Track, To } = svgmotion;
+    let a = new NumberValue(1);
+    let b = new NumberValue(2);
+    let c = new NumberValue(3);
+    let tr = new Track();
+    tr.run(Par(
+        To([a], 9),
+        To([b], 8),
+        To([c], 7),
+    ));
+    t.same(a.to_json(), { k: [{ t: 0, v: 1 }, { t: 60, v: 9 }] });
+    t.same(b.to_json(), { k: [{ t: 0, v: 2 }, { t: 60, v: 8 }] });
+    t.same(c.to_json(), { k: [{ t: 0, v: 3 }, { t: 60, v: 7 }] });
+    t.end();
+});
+test.test("Seq then Par", (t) => {
+    const { Seq, Par, Track, To } = svgmotion;
+    let a = new NumberValue(1);
+    let b = new NumberValue(2);
+    let c = new NumberValue(3);
+    let tr = new Track();
+    tr.frame_rate = 5;
+    tr.hint_dur = 5;
+    tr.run(Seq(
+        To([a], 9),
+        To([b], 8),
+        To([c], 7),
+    ));
+    // console.log(tr)
+    t.same(a.to_json(), { k: [{ t: 0, v: 1 }, { t: 5, v: 9 }] });
+    t.same(b.to_json(), { k: [{ t: 5, v: 2 }, { t: 10, v: 8 }] });
+    t.same(c.to_json(), { k: [{ t: 10, v: 3 }, { t: 15, v: 7 }] });
+
+    tr.run(Par(
+        To([a], 1),
+        To([b], 1),
+        To([c], 1),
+    ));
+
+
+
+    t.same(a.to_json(), { k: [{ t: 0, v: 1 }, { t: 5, h: true, v: 9 }, { t: 15, v: 9 }, { t: 20, v: 1 }] });
+    t.same(b.to_json(), { k: [{ t: 5, v: 2 }, { t: 10, h: true, v: 8 }, { t: 15, v: 8 }, { t: 20, v: 1 }] });
+    t.same(c.to_json(), { k: [{ t: 10, v: 3 }, { t: 15, v: 7 }, { t: 20, v: 1 }] });
+
     t.end();
 });

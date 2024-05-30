@@ -8,6 +8,9 @@ export interface IProperty<V> {
         add?: boolean
     ): any;
     check_value(x: any): V;
+    add_value(a: V, b: V): V;
+    initial_value(): V;
+    hold_last_value(frame: number): any;
 }
 
 export interface IAction {
@@ -30,16 +33,21 @@ export class Action implements IAction {
     _start: number = -Infinity;
     _end: number = -Infinity;
     _dur?: number;
+    /* c8 ignore start */
     ready(parent: IParent): void {
         throw new Error("Not implemented");
     }
     run(): void {
         throw new Error("Not implemented");
     }
+    /* c8 ignore stop */
     resolve(frame: number, base_frame: number, hint_dur: number): void {
-        const dur = this._dur ?? hint_dur;
+        let { _dur } = this;
+        if (_dur == undefined) {
+            _dur = this._dur = hint_dur;
+        }
         this._start = frame;
-        this._end = frame + dur;
+        this._end = frame + _dur;
     }
     get_active_dur() {
         return this._end - this._start;
@@ -49,42 +57,47 @@ export class Action implements IAction {
 export abstract class Actions extends Array<Action | Actions> implements IAction {
     _start: number = -Infinity;
     _end: number = -Infinity;
-    // frame_rate = -Infinity;
     _hint_dur?: number;
     _easing?: Iterable<number> | boolean;
+    _params: {
+        easing?: Iterable<number> | boolean;
+        hint_dur?: number;
+    } = {};
     ready(parent: IParent): void {
         this._easing = this._easing ?? parent.easing;
-        // this.frame_rate = parent.frame_rate;
         if (this._hint_dur != undefined) {
             this._hint_dur = parent.to_frame(this._hint_dur);
         }
     }
     run() {
         for (const act of this) {
+            /* c8 ignore start */
             if (act._start < 0 || act._start > act._end) {
                 throw new Error(`Unexpected _start=${act._start} _end=${act._end}`);
             }
+            /* c8 ignore stop */
             act.run();
         }
     }
     get_active_dur() {
         return this._end - this._start;
     }
-    // to_frame(sec: number) {
-    //     return Math.round(this.frame_rate * sec);
-    // }
     abstract resolve(frame: number, base_frame: number, hint_dur: number): void;
 }
 
 export class SeqA extends Actions {
     _delay?: number;
     _stagger?: number;
+    _delay_sec?: number;
+    _stagger_sec?: number;
+
+    _params: Actions['_params'] & { delay?: number; stagger?: number } = {};
 
     ready(parent: IParent): void {
         super.ready(parent);
-        const { _delay, _stagger } = this;
-        _delay && (this._delay = parent.to_frame(_delay));
-        _stagger && (this._stagger = parent.to_frame(_stagger));
+        const { _delay_sec, _stagger_sec } = this;
+        _delay_sec && (this._delay = parent.to_frame(_delay_sec));
+        _stagger_sec && (this._stagger = parent.to_frame(_stagger_sec));
         for (const act of this) {
             act.ready(parent);
         }
@@ -117,11 +130,15 @@ export class SeqA extends Actions {
         this._end = e;
     }
     delay(sec: number) {
-        this._delay = sec;
+        this._delay_sec = sec;
         return this;
     }
     stagger(sec: number) {
-        this._stagger = sec;
+        this._stagger_sec = sec;
+        return this;
+    }
+    params(x: this['params']) {
+        this._params = x;
         return this;
     }
 }
@@ -159,24 +176,29 @@ export class ParA extends Actions {
                 if (act._end != end) {
                     act.resolve(end - act.get_active_dur(), base_frame, _hint_dur);
                 }
+                /* c8 ignore start */
                 if (act._end != end) {
                     throw new Error(`Unexpected act._end=${act._end} end=${end}`);
                 }
+                /* c8 ignore stop */
             }
         }
         this._start = frame;
         this._end = end;
     }
 }
+
 export function Par(...items: Array<Action | Actions>) {
     const x = new ParA(...items);
     return x;
 }
+
 export function ParE(...items: Array<Action | Actions>) {
     const x = new ParA(...items);
     x._tail = true;
     return x;
 }
+
 export class ToA extends Action {
     _easing?: Iterable<number> | boolean;
     constructor(props: IProperty<any>[], value: any, dur?: number) {
@@ -192,16 +214,63 @@ export class ToA extends Action {
             }
         };
         this.run = function (): void {
-            const { _start, _end } = this;
+            const { _start, _end, _easing } = this;
             for (const prop of props) {
-                prop.key_value(_end, value, _start);
+                prop.key_value(_end, value, _start, _easing);
             }
         };
     }
 }
 
-export function To(props: IProperty<any>[], value: any, dur: number = 1) {
-    return new ToA(props, value, dur);
+export class PassA extends Action {
+    constructor(dur?: number) {
+        super();
+        this.ready = function (parent: IParent): void {
+            this._dur = (dur == undefined) ? undefined : parent.to_frame(dur);
+            this.run = function (): void { };
+        };
+    }
 }
 
+export class AddA extends Action {
+    _easing?: Iterable<number> | boolean;
+    constructor(props: IProperty<any>[], value: any, dur?: number) {
+        super();
+        this.ready = function (parent: IParent): void {
+            const { _easing } = this;
+            this._dur = (dur == undefined) ? undefined : parent.to_frame(dur);
+            if (!_easing) {
+                this._easing = parent.easing;
+            }
+            for (const prop of props) {
+                parent.add_prop(prop);
+            }
+        };
+        this.run = function (): void {
+            const { _start, _end, _easing } = this;
+            for (const prop of props) {
+                prop.key_value(_end, value, _start, _easing, true);
+            }
+        };
+    }
+}
 
+function list_props(x: IProperty<any>[] | IProperty<any>) {
+    if (Array.isArray(x)) {
+        return x;
+    } else {
+        return [x];
+    }
+}
+
+export function To(props: IProperty<any>[] | IProperty<any>, value: any, dur?: number) {
+    return new ToA(list_props(props), value, dur);
+}
+
+export function Add(props: IProperty<any>[] | IProperty<any>, value: any, dur?: number) {
+    return new AddA(list_props(props), value, dur);
+}
+
+export function Pass(dur?: number) {
+    return new PassA(dur);
+}
