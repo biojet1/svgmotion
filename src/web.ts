@@ -6,7 +6,7 @@ export * from "./helper/from_json.js";
 
 export function animate(anim: Root, fps: number) {
     const [start, end] = anim.calc_time_range();
-    if (end >= start) {
+    if (start < end) {
 
         const mspf = 1000 / fps; // miliseconds per frame
         const frames = end - start + 1;

@@ -11,7 +11,7 @@ import {
 import {
     Animatable,
 
-    Value, ValueBase
+    ValueT, AnimBase
 } from "../keyframe/keyframes.js";
 
 export function xget<T>(that: any, name: string, value: T): T {
@@ -33,7 +33,7 @@ export function xset<T>(that: any, name: string, value: T) {
     });
 }
 
-export class ValueSet extends ValueBase {
+export class ValueSet extends AnimBase {
     // [key: string]: Animatable;
     *enum_values(): Generator<Animatable<any>, void, unknown> {
         for (const sub of Object.values(this)) {
@@ -51,7 +51,7 @@ export class ValueSet extends ValueBase {
         }
         return u;
     }
-    from_json(u: Value<any>) {
+    from_json(u: ValueT<any>) {
         for (let [k, v] of Object.entries(u)) {
             const p = (this as any)[k];
             if (p instanceof Animatable) {
@@ -309,7 +309,7 @@ export class Transform extends ValueSet {
             return [];
         }
     }
-    override from_json(u: Value<any>) {
+    override from_json(u: ValueT<any>) {
         this.clear();
         if (Array.isArray(u)) {
             u.forEach((v) => {

@@ -1,18 +1,15 @@
 import { Track } from "../track/track.js";
 import { BaseProps } from "./baseprops.js";
-import {
-    Animatable, ValueBase, Keyframes, Value,
-} from "../keyframe/keyframes.js";
-import {
-    NVector, NumberValue, PointsValue, PositionValue, TextValue,
-} from "../keyframe/value.js";
-
+import { Keyframes } from "../keyframe/kfhelper.js";
+import { Animatable, ValueT, } from "../keyframe/keyframes.js";
+import { NVector, NumberValue, PointsValue, PositionValue, TextValue, } from "../keyframe/value.js";
 import { Node, Parent } from "./linked.js";
 import { Box, ValueSet, xget, xset } from "./valuesets.js";
+
 export interface PlainNode {
     tag: string;
     nodes: PlainNode[];
-    opacity?: Value<any>;
+    opacity?: ValueT<any>;
 }
 
 export interface PlainRoot {
@@ -63,10 +60,8 @@ export class Container extends BaseProps(Parent) {
     }
 
     *enum_keyframes(): Generator<Keyframes<any>, void, unknown> {
-        for (let { value } of this.enum_values()) {
-            if (value instanceof Keyframes) {
-                yield value;
-            }
+        for (let { kfs } of this.enum_values()) {
+            yield kfs;
         }
     }
     calc_time_range() {

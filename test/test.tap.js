@@ -88,11 +88,11 @@ test.test("ViewPort", (t) => {
     // v[0].fun();
     // r.opacity =
     const json = doc.to_json();
-    console.log(JSON.stringify(json, null, 4));
-    console.log(vp.constructor["opacity"]);
-    console.log(vp.constructor["zoom_pan"]);
+    // console.log(JSON.stringify(json, null, 4));
+    // console.log(vp.constructor["opacity"]);
+    // console.log(vp.constructor["zoom_pan"]);
     const { tag, nodes, ...props } = json.view;
-    console.log(tag, nodes, props);
+    // console.log(tag, nodes, props);
     t.equal(tag, "svg");
     t.equal(nodes[0].tag, "rect");
     t.same([...props.view_box.size.v], [100, 100]);
@@ -156,7 +156,7 @@ test.test("Step", (t) => {
     s.run();
 
     {
-        const q = r.position.value;
+        const q = r.position.kfs;
         // console.log(q[3]);
         t.same(Array.from(q[3].value), [50, 50]);
     }
@@ -332,9 +332,9 @@ test.test("Seq", (t) => {
         To([b], 8),
         To([c], 7),
     ));
-    t.same(a.to_json(), { k: [{ t: 0, v: 1 }, { t: 60, v: 9 }] });
-    t.same(b.to_json(), { k: [{ t: 60, v: 2 }, { t: 120, v: 8 }] });
-    t.same(c.to_json(), { k: [{ t: 120, v: 3 }, { t: 180, v: 7 }] });
+    t.same(a.to_json(), { k: [{ t: 0, v: 1 }, { t: 60, v: 9 }], v: 1 });
+    t.same(b.to_json(), { k: [{ t: 60, v: 2 }, { t: 120, v: 8 }], v: 2 });
+    t.same(c.to_json(), { k: [{ t: 120, v: 3 }, { t: 180, v: 7 }], v: 3 });
     t.end();
 });
 test.test("Par", (t) => {
@@ -348,9 +348,9 @@ test.test("Par", (t) => {
         To([b], 8),
         To([c], 7),
     ));
-    t.same(a.to_json(), { k: [{ t: 0, v: 1 }, { t: 60, v: 9 }] });
-    t.same(b.to_json(), { k: [{ t: 0, v: 2 }, { t: 60, v: 8 }] });
-    t.same(c.to_json(), { k: [{ t: 0, v: 3 }, { t: 60, v: 7 }] });
+    t.same(a.to_json(), { k: [{ t: 0, v: 1 }, { t: 60, v: 9 }], v: 1 });
+    t.same(b.to_json(), { k: [{ t: 0, v: 2 }, { t: 60, v: 8 }], v: 2 });
+    t.same(c.to_json(), { k: [{ t: 0, v: 3 }, { t: 60, v: 7 }], v: 3 });
     t.end();
 });
 test.test("Seq then Par", (t) => {
@@ -367,9 +367,9 @@ test.test("Seq then Par", (t) => {
         To([c], 7),
     ));
     // console.log(tr)
-    t.same(a.to_json(), { k: [{ t: 0, v: 1 }, { t: 5, v: 9 }] });
-    t.same(b.to_json(), { k: [{ t: 5, v: 2 }, { t: 10, v: 8 }] });
-    t.same(c.to_json(), { k: [{ t: 10, v: 3 }, { t: 15, v: 7 }] });
+    t.same(a.to_json(), { k: [{ t: 0, v: 1 }, { t: 5, v: 9 }], v: 1 });
+    t.same(b.to_json(), { k: [{ t: 5, v: 2 }, { t: 10, v: 8 }], v: 2 });
+    t.same(c.to_json(), { k: [{ t: 10, v: 3 }, { t: 15, v: 7 }], v: 3 });
 
     tr.run(Par(
         To([a], 1),
@@ -377,11 +377,9 @@ test.test("Seq then Par", (t) => {
         To([c], 1),
     ));
 
-
-
-    t.same(a.to_json(), { k: [{ t: 0, v: 1 }, { t: 5, h: true, v: 9 }, { t: 15, v: 9 }, { t: 20, v: 1 }] });
-    t.same(b.to_json(), { k: [{ t: 5, v: 2 }, { t: 10, h: true, v: 8 }, { t: 15, v: 8 }, { t: 20, v: 1 }] });
-    t.same(c.to_json(), { k: [{ t: 10, v: 3 }, { t: 15, v: 7 }, { t: 20, v: 1 }] });
+    t.same(a.to_json(), { k: [{ t: 0, v: 1 }, { t: 5, h: true, v: 9 }, { t: 15, v: 9 }, { t: 20, v: 1 }], v: 1 });
+    t.same(b.to_json(), { k: [{ t: 5, v: 2 }, { t: 10, h: true, v: 8 }, { t: 15, v: 8 }, { t: 20, v: 1 }], v: 2 });
+    t.same(c.to_json(), { k: [{ t: 10, v: 3 }, { t: 15, v: 7 }, { t: 20, v: 1 }], v: 3 });
 
     t.end();
 });

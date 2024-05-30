@@ -1,4 +1,4 @@
-import { ValueBase, Value } from "../keyframe/keyframes.js";
+import { AnimBase, ValueT } from "../keyframe/keyframes.js";
 import {
     Container, Root, Item, PlainRoot, PlainNode,
     ViewPort, Rect, Path, Line, Group,
@@ -23,10 +23,10 @@ const TAGS: {
     svg: function (parent: Container) { return parent.add_view(); },
 };
 
-function props_from_json(that: any, props: { [key: string]: Value<any> }) {
+function props_from_json(that: any, props: { [key: string]: ValueT<any> }) {
     for (let [k, v] of Object.entries(props)) {
         const p = that[k];
-        if (p instanceof ValueBase) {
+        if (p instanceof AnimBase) {
             p.from_json(v);
         } else {
             switch (k) {

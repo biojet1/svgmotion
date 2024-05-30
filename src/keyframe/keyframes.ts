@@ -1,5 +1,5 @@
 import { KeyframeEntry, Keyframes, offset_fun, ratio_at } from "./kfhelper.js";
-export { Keyframes } from "./kfhelper.js";
+
 ///////////
 export interface KFBase {
     t: number;
@@ -14,8 +14,8 @@ export interface KFEntry<V> extends KFBase {
     b?: boolean; // bounce   
 }
 
-export type Value<V> = { k: KFEntry<V>[]; _?: string; r?: number; b?: boolean } | { v: V; _?: string };
-export type ValueP<V> = { k?: KFEntry<V>[]; v?: V; r?: number; b?: boolean };
+export type ValueT<V> = { v: V; k?: KFEntry<V>[]; r?: number; b?: boolean; _?: string };
+export type ValueF<V> = { v: V; k?: KFEntry<V>[]; r?: number; b?: boolean };
 
 
 
@@ -45,7 +45,7 @@ function kfe_to_json<V>(kfe: KeyframeEntry<V>, value: any): KFEntry<V> {
 
 
 
-export class ValueBase {
+export class AnimBase {
     // to_json(): any {
     //     throw Error(`Not implemented by '${this.constructor.name}'`);
     // }
@@ -60,34 +60,35 @@ export class ValueBase {
 }
 
 
-export class Animatable<V> extends ValueBase {
-    value!: Keyframes<V> | V | null;
+export class Animatable<V> extends AnimBase {
+    value: V | null;
+    kfs: Keyframes<V> = new Keyframes<V>();
     repeat_count?: number;
     bounce?: boolean;
     _end?: number;
     _start?: number;
     // static
-    lerp_value(ratio: number, a: V, b: V): V {
+    lerp_value(_ratio: number, _a: V, _b: V): V {
         throw Error(`Not implemented by '${this.constructor.name}'`);
     }
     // static
-    add_value(a: V, b: V): V {
+    add_value(_a: V, _b: V): V {
         throw Error(`Not implemented by '${this.constructor.name}'`);
     }
     // static
-    value_to_json(a: V | null): any {
+    value_to_json(_a: V | null): any {
         throw Error(`Not implemented by '${this.constructor.name}'`);
     }
     // static
-    value_from_json(a: any): V {
+    value_from_json(_a: any): V {
         throw Error(`Not implemented by '${this.constructor.name}'`);
     }
     // get_frame_value
-    get_value(frame: number): V {
-        const { value } = this;
-        if (value instanceof Keyframes) {
+    get_value(frame: number | undefined = undefined): V {
+        const { kfs } = this;
+        if (frame !== undefined) {
             let p = undefined; // previous KeyframeEntry<V>
-            for (const k of value) {
+            for (const k of kfs) {
                 if (frame <= k.time) {
                     if (p) {
                         if (p.easing === true) {
@@ -113,23 +114,21 @@ export class Animatable<V> extends ValueBase {
             if (p) {
                 return this.get_value_off!(frame);
             }
-            throw new Error(`empty keyframe list`);
-        } else {
-            if (value == null) {
-                throw new Error(`value cant be null`);
-            }
-            return value;
+            // throw new Error(`empty keyframe list`);
         }
+        const { value } = this;
+        if (value == null) {
+            throw new Error(`value cant be null`);
+        }
+        return value;
+
     }
     // static
     get_value_off?(frame: number): V {
-        const { value } = this;
-        if (!(value instanceof Keyframes)) {
-            throw Error(`Unexpected by '${this.constructor.name}'`);
-        }
-        const first = value.at(0);
+        const { kfs } = this;
+        const first = kfs.at(0);
         if (first) {
-            const last = value.at(-1);
+            const last = kfs.at(-1);
             if (last) {
                 let { repeat_count = 1, bounce } = this;
                 const fo = offset_fun(first.time, last.time, repeat_count, bounce, this);
@@ -158,33 +157,29 @@ export class Animatable<V> extends ValueBase {
         easing?: Iterable<number> | boolean,
         add?: boolean
     ) {
-        let { value: kfs } = this;
-        let last;
-        if (kfs instanceof Keyframes) {
-            last = kfs[kfs.length - 1];
-            if (last) {
-                if (start == undefined) {
-                    // pass
-                } else if (start > last.time) {
-                    last.easing = true;
-                    last = kfs.push_value(start, last.value);
-                } else {
-                    if (start != last.time) {
-                        throw new Error(
-                            `unexpected start=${start} last.time=${last.time} time=${frame} value=${value}`
-                        );
-                    }
+        let { kfs } = this;
+        let last = kfs[kfs.length - 1];
+        if (last) {
+            if (start == undefined) {
+                // pass
+            } else if (start > last.time) {
+                last.easing = true;
+                last = kfs.push_value(start, last.value);
+            } else {
+                if (start != last.time) {
+                    throw new Error(
+                        `unexpected start=${start} last.time=${last.time} time=${frame} value=${value}`
+                    );
                 }
             }
         } else {
-            const v = kfs;
-            kfs = this.value = new Keyframes<V>();
             if (start != undefined) {
-                if (v != null) {
-                    last = kfs.push_value(start, v);
+                if (this.value != null) {
+                    last = kfs.push_value(start, this.value);
                 }
             }
         }
+
         value = this.check_value(value);
         if (last) {
             if (easing != undefined) {
@@ -211,69 +206,65 @@ export class Animatable<V> extends ValueBase {
         this.value = this.check_value(value);
     }
 
-    to_json(): Value<V> {
-        const { value } = this;
-        if (value instanceof Keyframes) {
-            const o: Value<V> = {
-                k: [...value.map((v) =>
-                    kfe_to_json(v, this.value_to_json(v.value))
-                )],
-            };
-            if (this.repeat_count) {
-                o.r = this.repeat_count;
-            }
-            if (this.bounce) {
-                o.b = this.bounce;
-            }
-            return o;
-        } else {
-            return { v: this.value_to_json(value) };
+    to_json(): ValueT<V> {
+        const { value, kfs } = this;
+        const o: ValueT<V> = { v: this.value_to_json(value) };
+        if (kfs && kfs.length > 0) {
+            o.k = [...kfs.map((v) =>
+                kfe_to_json(v, this.value_to_json(v.value))
+            )];
         }
+        if (this.repeat_count) {
+            o.r = this.repeat_count;
+        }
+        if (this.bounce) {
+            o.b = this.bounce;
+        }
+        return o;
     }
 
-    from_json(x: ValueP<any>) {
+    from_json(x: ValueF<any>) {
         const { k, v } = x;
         if (k != undefined) {
             const { r, b } = x;
-            this.value = new Keyframes<V>(...k.map((x) => kfe_from_json(x, this.value_from_json(x.v))));
+            this.kfs = new Keyframes<V>(...k.map((x) => kfe_from_json(x, this.value_from_json(x.v))));
             if (r != null) {
                 this.repeat_count = r;
             }
             if (b != null) {
                 this.bounce = b;
             }
-        } else if (v != undefined) {
+        }
+        if (v != undefined) {
             this.value = this.value_from_json(x.v);
-        } else if (v === null) {
+        }
+
+        if (v === null) {
             this.value = null;
-        } else {
-            // console.error(x);
-            throw Error(`No k, v (${Object.entries(x)})`);
         }
     }
 }
 
 export class AnimatableD<V> extends Animatable<V> {
     override get_value(frame: number) {
-        const { value } = this;
-        if (value instanceof Keyframes) {
-            let p = undefined; // previous KeyframeEntry<V>
-            for (const k of value) {
-                if (k.time >= frame) {
-                    return k.value;
-                }
-                p = k;
+        const { kfs } = this;
+        let p = undefined; // previous KeyframeEntry<V>
+        for (const k of kfs) {
+            if (k.time >= frame) {
+                return k.value;
             }
-            if (p) {
-                return p.value;
-            }
-            throw new Error(`empty keyframe list`);
-        } else {
-            if (value == null) {
-                throw new Error(`value cant be null`);
-            }
-            return value;
+            p = k;
         }
+        if (p) {
+            return p.value;
+        }
+        // throw new Error(`empty keyframe list`);
+        const { value } = this;
+        if (value == null) {
+            throw new Error(`value cant be null`);
+        }
+        return value;
+
     }
     override key_value(
         frame: number,
@@ -282,31 +273,27 @@ export class AnimatableD<V> extends Animatable<V> {
         easing?: Iterable<number> | boolean,
         add?: boolean
     ) {
-        let { value: kfs } = this;
+        let { kfs } = this;
         let last;
-        if (kfs instanceof Keyframes) {
-            // last = kfs[kfs.length - 1];
-            last = kfs.at(-1);
-            if (last) {
-                if (start == undefined) {
-                    // pass
-                } else if (start > last.time) {
-                    last.easing = true;
-                    last = kfs.push_value(start, last.value);
-                } else {
-                    if (start != last.time) {
-                        throw new Error(
-                            `unexpected start=${start} last.time=${last.time} time=${frame}`
-                        );
-                    }
+
+        last = kfs.at(-1);
+        if (last) {
+            if (start == undefined) {
+                // pass
+            } else if (start > last.time) {
+                last.easing = true;
+                last = kfs.push_value(start, last.value);
+            } else {
+                if (start != last.time) {
+                    throw new Error(
+                        `unexpected start=${start} last.time=${last.time} time=${frame}`
+                    );
                 }
             }
         } else {
-            const v = kfs;
-            kfs = this.value = new Keyframes<V>();
             if (start != undefined) {
-                if (v != null) {
-                    last = kfs.push_value(start, v);
+                if (this.value != null) {
+                    last = kfs.push_value(start, this.value);
                 }
             }
         }
@@ -322,16 +309,16 @@ export class AnimatableD<V> extends Animatable<V> {
     }
 }
 declare module "." {
-    interface ValueBase {
+    interface AnimBase {
         from_json(x: any): void;
         to_json(): any;
     }
 }
 
-ValueBase.prototype.from_json = function (x: any) {
+AnimBase.prototype.from_json = function (_x: any) {
     throw Error(`Not implemented by '${this.constructor.name}'`);
 }
 
-ValueBase.prototype.to_json = function () {
+AnimBase.prototype.to_json = function () {
     throw Error(`Not implemented by '${this.constructor.name}'`);
 }
