@@ -1,4 +1,4 @@
-import { Animatable, AnimatableD, Keyframes } from "./keyframes.js";
+import { Animatable, AnimatableD } from "./keyframes.js";
 
 export class NVectorValue extends Animatable<NVector> {
     override lerp_value(r: number, a: NVector, b: NVector): NVector {
@@ -25,7 +25,7 @@ export class NVectorValue extends Animatable<NVector> {
         return new NVector(a);
     }
 
-    constructor(v: NVector | Keyframes<NVector>) {
+    constructor(v: NVector) {
         super(v);
     }
 }
@@ -76,7 +76,7 @@ export class NumberValue extends Animatable<number> {
     override value_from_json(a: any): number {
         return a as number;
     }
-    constructor(v: number | Keyframes<number> = 0) {
+    constructor(v: number = 0) {
         super(v);
     }
 }

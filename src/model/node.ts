@@ -8,7 +8,7 @@ import {
 } from "../keyframe/value.js";
 
 import { Node, Parent } from "./linked.js";
-import { Box, xget, xset } from "./valuesets.js";
+import { Box, ValueSet, xget, xset } from "./valuesets.js";
 export interface PlainNode {
     tag: string;
     nodes: PlainNode[];
@@ -27,7 +27,7 @@ export abstract class Item extends BaseProps(Node) {
         for (let v of Object.values(this)) {
             if (v instanceof Animatable) {
                 yield v;
-            } else if (v instanceof ValueBase) {
+            } else if (v instanceof ValueSet) {
                 yield* v.enum_values();
             }
         }
@@ -53,7 +53,7 @@ export class Container extends BaseProps(Parent) {
         for (let v of Object.values(this)) {
             if (v instanceof Animatable) {
                 yield v;
-            } else if (v instanceof ValueBase) {
+            } else if (v instanceof ValueSet) {
                 yield* v.enum_values();
             }
         }

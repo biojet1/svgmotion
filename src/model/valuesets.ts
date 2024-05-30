@@ -42,7 +42,7 @@ export class ValueSet extends ValueBase {
             }
         }
     }
-    override to_json() {
+    to_json() {
         let u: any = {};
         for (let [k, v] of Object.entries(this)) {
             if (v instanceof Animatable) {
@@ -51,7 +51,7 @@ export class ValueSet extends ValueBase {
         }
         return u;
     }
-    override from_json(u: Value<any>) {
+    from_json(u: Value<any>) {
         for (let [k, v] of Object.entries(u)) {
             const p = (this as any)[k];
             if (p instanceof Animatable) {
@@ -175,7 +175,7 @@ export class Font extends ValueSet {
     }
 }
 
-export class Transform extends ValueBase {
+export class Transform extends ValueSet {
     clear() {
         const o: any = this;
         delete o["all"];
@@ -359,11 +359,10 @@ export class Transform extends ValueBase {
         }
     }
     ///
-    *enum_values(): Generator<Animatable<any>, void, unknown> {
+    override *enum_values(): Generator<Animatable<any>, void, unknown> {
         if ('all' in this) {
             for (const sub of this.all) {
                 yield sub;
-
             }
         }
     }

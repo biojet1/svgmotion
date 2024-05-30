@@ -46,17 +46,17 @@ function kfe_to_json<V>(kfe: KeyframeEntry<V>, value: any): KFEntry<V> {
 
 
 export class ValueBase {
-    to_json(): any {
-        throw Error(`Not implemented by '${this.constructor.name}'`);
-    }
+    // to_json(): any {
+    //     throw Error(`Not implemented by '${this.constructor.name}'`);
+    // }
 
-    from_json(x: any) {
-        throw Error(`Not implemented by '${this.constructor.name}'`);
-    }
+    // from_json(x: any) {
+    //     throw Error(`Not implemented by '${this.constructor.name}'`);
+    // }
 
-    *enum_values(): Generator<Animatable<any>, void, unknown> {
-        throw Error(`Not implemented by '${this.constructor.name}'`);
-    }
+    // *enum_values(): Generator<Animatable<any>, void, unknown> {
+    //     throw Error(`Not implemented by '${this.constructor.name}'`);
+    // }
 }
 
 
@@ -146,11 +146,11 @@ export class Animatable<V> extends ValueBase {
         throw Error(`Unexpected by '${this.constructor.name}'`);
     }
 
-
-
-    set_value(value: V | any) {
-        this.value = this.check_value(value);
+    check_value(x: any): V {
+        return x as V;
     }
+
+
     key_value(
         frame: number,
         value: V,
@@ -198,10 +198,8 @@ export class Animatable<V> extends ValueBase {
         delete this['_end'];
         return kfs.push_value(frame, value);
     }
-    check_value(x: any): V {
-        return x as V;
-    }
-    constructor(v: Keyframes<V> | V) {
+
+    constructor(v: V) {
         super();
         if (v == null) {
             throw new Error(`unexpected value=${v}`);
@@ -209,7 +207,11 @@ export class Animatable<V> extends ValueBase {
             this.value = v;
         }
     }
-    override to_json(): Value<V> {
+    set_value(value: V | any) {
+        this.value = this.check_value(value);
+    }
+
+    to_json(): Value<V> {
         const { value } = this;
         if (value instanceof Keyframes) {
             const o: Value<V> = {
@@ -229,7 +231,7 @@ export class Animatable<V> extends ValueBase {
         }
     }
 
-    override from_json(x: ValueP<any>) {
+    from_json(x: ValueP<any>) {
         const { k, v } = x;
         if (k != undefined) {
             const { r, b } = x;
@@ -319,5 +321,17 @@ export class AnimatableD<V> extends Animatable<V> {
         return kfs.push_value(frame, value);
     }
 }
+declare module "." {
+    interface ValueBase {
+        from_json(x: any): void;
+        to_json(): any;
+    }
+}
 
+ValueBase.prototype.from_json = function (x: any) {
+    throw Error(`Not implemented by '${this.constructor.name}'`);
+}
 
+ValueBase.prototype.to_json = function () {
+    throw Error(`Not implemented by '${this.constructor.name}'`);
+}
