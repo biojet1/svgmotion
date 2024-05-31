@@ -15,6 +15,16 @@ import {
     Track, To
 } from "svgmotion";
 
+export function* getr(p, start, end) {
+    for (let i = start; i < end; ++i) {
+        yield p.get_value(i);
+    }
+}
+
+export function cata(p, start, end) {
+    return [...getr(p, start, end)];
+}
+
 test.test("Keyframes", (t) => {
     let kfs = new Keyframes();
     kfs.push_value(0, 9);
@@ -230,7 +240,9 @@ test.test("Repeat", (t) => {
     t.same(v.get_value(18), 7);
     t.same(v.get_value(19), 7);
     t.same(v.get_value(20), 7);
-
+    // t.same(cata(v, 0, 15),[]);    
+    // ;
+    // console.log(cata(v, 0, 15))
     t.end();
 });
 
@@ -334,6 +346,7 @@ test.test("Seq", (t) => {
     t.same(c.to_json(), { k: [{ t: 120, v: 3 }, { t: 180, v: 7 }], v: 3 });
     t.end();
 });
+
 test.test("Par", (t) => {
     const { Par, Track, To } = svgmotion;
     let a = new NumberValue(1);
@@ -350,6 +363,7 @@ test.test("Par", (t) => {
     t.same(c.to_json(), { k: [{ t: 0, v: 3 }, { t: 60, v: 7 }], v: 3 });
     t.end();
 });
+
 test.test("Seq then Par", (t) => {
     const { Seq, Par, Track, To } = svgmotion;
     let a = new NumberValue(1);
@@ -369,9 +383,9 @@ test.test("Seq then Par", (t) => {
     t.same(c.to_json(), { k: [{ t: 10, v: 3 }, { t: 15, v: 7 }], v: 3 });
 
     tr.run(Par(
-        To([a], 1),
-        To([b], 1),
-        To([c], 1),
+        To(a, 1),
+        To(b, 1),
+        To(c, 1),
     ));
 
     t.same(a.to_json(), { k: [{ t: 0, v: 1 }, { t: 5, h: true, v: 9 }, { t: 15, v: 9 }, { t: 20, v: 1 }], v: 1 });
@@ -380,3 +394,4 @@ test.test("Seq then Par", (t) => {
 
     t.end();
 });
+

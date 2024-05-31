@@ -41,7 +41,7 @@ export async function animate(lib) {
             // { easing: Easing.inoutquart }
         )
     );
-    anim.track(0).feed(
+    anim.track().feed(
         Step(
             [
                 { t: 0, X: [1, 1], ease: Easing.linear, C: 'blue' },
@@ -78,7 +78,7 @@ export async function animate(lib) {
         }, { easing: Easing.inoutback })
     );
     // mov.repeat_count = 66666666666;
-    mov.bounce = true;
+    mov.repeat(1, true);
     // console.log(mov.to_json());
     anim.track().feed(
         Step([
@@ -96,27 +96,27 @@ export async function animate(lib) {
 
     {
         const S = maru1.transform.add_translate();
-        anim.track(60).feed(
+        anim.track(1).feed(
             Step([
                 { t: 0, S: [0, 0] },
                 { dur: 0.5, S: [100, 100] },
                 { dur: 0.5, S: [200, 200] },
-                // { dur: 0.5, S: [300, 300] },
-                // { dur: 0.5, S: [400, 400] },
+                { dur: 0.5, S: [300, 300] },
+                { dur: 0.5, S: [400, 400] },
             ], {
                 S,
             })
         );
         S.repeat(-1, true);
         // S.get_value(1000);
-        console.log(S.to_json());
-        S.from_json(S.to_json())
-        console.log(S.to_json());
+        // console.log(S.to_json());
+        // S.from_json(S.to_json())
+        // console.log(S.to_json());
 
     }
     {
         const CO = maru2.fill.color
-        anim.track(0).feed(
+        anim.track().feed(
             Step([
                 { t: 0, CO: 'yellow' },
                 { dur: 1, CO: 'blue' },

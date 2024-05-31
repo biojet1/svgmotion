@@ -16,8 +16,6 @@ export interface KFEntry<V> extends KFBase {
 export type ValueT<V> = { v: V; k?: KFEntry<V>[]; r?: number; b?: boolean; _?: string; };
 export type ValueF<V> = { v: V; k?: KFEntry<V>[]; r?: number; b?: boolean; };
 
-
-
 export function kfe_from_json<V>(x: KFBase, value: V): KeyframeEntry<V> {
     const { t: time, h, o, i } = x;
     if (h) {

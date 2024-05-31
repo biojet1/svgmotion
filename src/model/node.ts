@@ -478,11 +478,11 @@ export class Root extends Container {
     }
 
     // new_view, new_rect
-    track(frame: number = 0) {
+    track(offset: number = 0) {
         const tr = new Track();
         tr.frame_rate = this.frame_rate;
         tr.hint_dur = 1 * this.frame_rate;
-        tr.frame = frame;
+        tr.frame = tr.to_frame(offset);
         return tr;
     }
 }

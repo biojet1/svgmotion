@@ -49,3 +49,10 @@ tasks:
         deps: [compile, webpack]
         cmds:
             - npx tap -t600 --disable-coverage --reporter=terse {{.CLI_ARGS}}
+
+    c8html1:
+        method: none
+        deps: [webpack]
+        cmds:
+            - c8 npx tap -t600 --disable-coverage --reporter=terse {{.CLI_ARGS}}
+            - c8 report -r html
