@@ -49,31 +49,34 @@ export class Animated<V> {
     _end?: number;
     _start?: number;
     // static
-    lerp_value(_ratio: number, _a: V, _b: V): V {
+    /* c8 ignore start */
+    // should be static
+    lerp_value(ratio: number, a: V, b: V): V {
         throw Error(`Not implemented by '${this.constructor.name}'`);
     }
-    // static
-    add_value(_a: V, _b: V): V {
+    // should be static
+    add_value(a: V, b: V): V {
         throw Error(`Not implemented by '${this.constructor.name}'`);
     }
-    // static
+    // should be static
     value_to_json(_a: V | null): any {
         throw Error(`Not implemented by '${this.constructor.name}'`);
     }
-    // static
+    // should be static
     value_from_json(_a: any): V {
         throw Error(`Not implemented by '${this.constructor.name}'`);
     }
     initial_value(): V {
         throw Error(`Not implemented by '${this.constructor.name}'`);
     }
+    /* c8 ignore stop */
     check_value(x: any): V {
         return x as V;
     }
-    //
-    get_value(frame: number | undefined = undefined): V {
+    // get_frame_value
+    get_value(frame: number): V {
         const { kfs } = this;
-        if (frame !== undefined) {
+        if (kfs instanceof Keyframes) {
             let p = undefined; // previous KeyframeEntry<V>
             for (const k of kfs) {
                 if (frame <= k.time) {
@@ -92,6 +95,7 @@ export class Animated<V> {
                         return this.lerp_value(r, p.value, k.value);
                     } else if (frame < k.time) {
                         return this.get_value_off!(frame);
+                        // return k.value;
                     } else {
                         return k.value;
                     }
@@ -100,27 +104,28 @@ export class Animated<V> {
             }
             if (p) {
                 return this.get_value_off!(frame);
+                // return p.value;
             }
+            const last = kfs.push_value(frame, this.initial_value());
+            return last.value;
             // throw new Error(`empty keyframe list`);
         }
-        const value = this.initial_value();
-        if (value == null) {
-            throw new Error(`value cant be null`);
-        }
-        return value;
+        /* c8 ignore start */
+        throw new Error(`unexpected`);
+        /* c8 ignore stop */
     }
-
+    // static
     get_value_off?(frame: number): V {
         const { kfs } = this;
         const first = kfs.at(0);
         if (first) {
             const last = kfs.at(-1);
             if (last) {
-                let { _repeat_count = 1, _bounce } = this;
+                let { _repeat_count, _bounce } = this;
                 const fo = offset_fun(first.time, last.time, _repeat_count, _bounce, this);
                 const fg = (this.get_value_off = function (frame: number) {
                     return this.get_value(fo(frame));
-                });
+                })
                 if (Number.isNaN(frame)) {
                     throw new TypeError();
                 } else {
@@ -128,9 +133,10 @@ export class Animated<V> {
                 }
             }
         }
+        /* c8 ignore start */
         throw Error(`Unexpected by '${this.constructor.name}'`);
+        /* c8 ignore stop */
     }
-
     key_value(
         frame: number,
         value: V,
@@ -138,8 +144,13 @@ export class Animated<V> {
         easing?: Iterable<number> | boolean,
         add?: boolean
     ) {
-        let { kfs } = this;
-        let last = kfs[kfs.length - 1];
+        const { kfs } = this;
+        /* c8 ignore start */
+        if (!(kfs instanceof Keyframes)) {
+            throw new Error(`unexpected`);
+        }
+        /* c8 ignore stop */
+        let last = kfs.at(-1);
         if (last) {
             if (start == undefined) {
                 // pass
@@ -149,16 +160,15 @@ export class Animated<V> {
             } else {
                 if (start != last.time) {
                     throw new Error(
-                        `unexpected start=${start} last.time=${last.time} time=${frame} value=${value}`
+                        `unexpected start=${start} last.time=${last.time} time=${frame} value=${value} by '${this.constructor.name}'`
                     );
                 }
             }
         } else {
-            if (start != undefined) {
-                const v = this.initial_value();
-                if (v != null) {
-                    last = kfs.push_value(start, v);
-                }
+            if (start == undefined) {
+                // pass
+            } else {
+                last = kfs.push_value(start, this.initial_value());
             }
         }
 
@@ -174,6 +184,46 @@ export class Animated<V> {
         delete this['get_value_off'];
         delete this['_end'];
         return kfs.push_value(frame, value);
+    }
+
+    hold_last_value(frame: number) {
+        const { kfs } = this;
+        let last = kfs.at(-1);
+        if (last) {
+            if (frame > last.time) {
+                last.easing = true;
+                last = kfs.push_value(frame, last.value);
+            } else {
+                if (frame != last.time) {
+                    throw new Error(
+                        `unexpected frame=${frame} last.time=${last.time} time=${frame} by '${this.constructor.name}'`
+                    );
+                }
+            }
+        } else {
+            last = kfs.push_value(frame, this.initial_value());
+        }
+        return last;
+    }
+
+    frame_range(): [number, number] {
+        {
+            const { _end } = this;
+            if (_end == undefined) {
+                try {
+                    this.get_value_off?.(NaN);
+                } catch (e) {
+
+                }
+            }
+        }
+        const { _start, _end } = this;
+        /* c8 ignore start */
+        if (_end == undefined || _start == undefined) {
+            throw Error(`Unexpected by '${this.constructor.name}'`);
+        }
+        /* c8 ignore stop */
+        return [_start, _end];
     }
     repeat(count: number = 2, bounce: boolean = false) {
         this._repeat_count = count;
