@@ -191,4 +191,3 @@ export class Animated<V> {
         return this;
     }
 }
-

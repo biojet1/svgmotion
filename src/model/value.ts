@@ -1,4 +1,4 @@
-import { Animated } from "../keyframe/keyframes.js";
+import { Animated } from "../keyframe/keyframe.js";
 import { KeyframeEntry, Keyframes } from "../keyframe/kfhelper.js";
 export interface KFBase {
     t: number;
