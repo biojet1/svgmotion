@@ -1,6 +1,6 @@
 
 import { Item, Container, Root } from "../model/node.js";
-import { NVector, NVectorValue, NumberValue, PointsValue, RGB, RGBValue, TextValue } from "../keyframe/value.js";
+import { NVector, NVectorValue, NumberValue, PointsValue, RGB, RGBValue, TextValue } from "../model/value.js";
 import { Node } from "../model/linked.js";
 import { parse_css_color } from "./parse_color.js";
 const BOTH_MATCH =
@@ -464,7 +464,7 @@ declare module "../model/node" {
     }
 }
 
-declare module "../keyframe/value" {
+declare module "../model/value" {
     interface NumberValue {
         set_parse_length(s: string): void;
         set_parse_number(s: string): void;

@@ -1,4 +1,4 @@
-import { RGB, RGBValue } from "../keyframe/value.js";
+import { RGB, RGBValue } from "../model/value.js";
 
 
 RGBValue.prototype.check_value = function (x: RGB) {

@@ -5,9 +5,9 @@ import {
     PositionValue,
     RGBValue,
     TextValue,
-} from "../keyframe/value.js";
-import { ValueT } from "../keyframe/value.js";
-import { Animatable } from "../keyframe/value.js";
+} from "./value.js";
+import { ValueT } from "./value.js";
+import { Animatable } from "./value.js";
 
 export function xget<T>(that: any, name: string, value: T): T {
     // console.log(`_GETX ${name}`);

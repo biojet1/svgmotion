@@ -1,5 +1,5 @@
-import { Animated } from "./keyframes.js";
-import { KeyframeEntry, Keyframes } from "./kfhelper.js";
+import { Animated } from "../keyframe/keyframes.js";
+import { KeyframeEntry, Keyframes } from "../keyframe/kfhelper.js";
 export interface KFBase {
     t: number;
     h?: boolean;
