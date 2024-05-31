@@ -222,7 +222,7 @@ test.test("Repeat", (t) => {
     v.key_value(1, 5);
     v.key_value(7, 13);
     v.key_value(9, 7);
-    v.repeat_count = 2;
+    v.repeat(2);
     t.same(v.get_value(0), 5);
     t.same(v.get_value(9), 7);
     t.same(v.get_value(10), 5);
@@ -239,7 +239,7 @@ test.test("Repeat Infinite", (t) => {
     v.key_value(1, 7);
     v.key_value(7, 13);
     v.key_value(9, 15);
-    v.repeat_count = -1;
+    v.repeat(-1);
     let o = 0;
     for (const x of '7 8 9 10 11 12 13 14 15 7 8 9 10 11 12 13 14 15 7 8 9 10 11 12 13 14 15 7 8 9 10 11 12 13 14 15'.split(' ')) {
         o++;
@@ -253,7 +253,7 @@ test.test("Repeat fraction", (t) => {
     v.key_value(1, 7);
     v.key_value(7, 13);
     v.key_value(9, 15);
-    v.repeat_count = 3.3333333333333;
+    v.repeat(3.3333333333333);
     let o = 0;
     v.get_value(50);
     // console.log(v);
@@ -270,8 +270,7 @@ test.test("Bounce once", (t) => {
     v.key_value(1, 7);
     v.key_value(7, 13);
     v.key_value(9, 15);
-    v.repeat_count = 1;
-    v.bounce = true;
+    v.repeat(1, true);
     let o = 0;
     for (const x of (`7 8 9 10 11 12 13 14 15 14 13 12 11 10 9 8 7`
         + ` 7 7 7`).split(/s+/)) {
@@ -286,8 +285,7 @@ test.test("Bounce twice", (t) => {
     v.key_value(1, 7);
     v.key_value(7, 13);
     v.key_value(9, 15);
-    v.repeat_count = 2;
-    v.bounce = true;
+    v.repeat(2, true);
     let o = 0 - 3;
     for (const x of (`7 7 7 7 8 9 10 11 12 13 14 15 14 13 12 11 10 9 8 7`
         + ` 8 9 10 11 12 13 14 15 14 13 12 11 10 9 8 7 7 7 7 7 7 7`).split(' ')) {
@@ -304,8 +302,7 @@ test.test("Bounce 2.5x", (t) => {
     v.key_value(1, 7);
     v.key_value(7, 13);
     v.key_value(9, 15);
-    v.repeat_count = 2.5;
-    v.bounce = true;
+    v.repeat(2.5, true);
     let o = 0 - 2;
     for (const x of (`7 7 7 8 9 10 11 12 13 14 15 14 13 12 11 10 9 8 7`
         + ` 8 9 10 11 12 13 14 15 14 13 12 11 10 9 8 7 8 9 10 11 12 13 14 15 15 15 15 15`).split(' ')) {

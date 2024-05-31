@@ -42,12 +42,10 @@ function kfe_to_json<V>(kfe: KeyframeEntry<V>, value: any): KFEntry<V> {
         return { t, o: [ox, oy], i: [ix, iy], v: value };
     }
 }
-
-export class Animatable<V> {
-    value: V | null;
+export class Animated<V> {
     kfs: Keyframes<V> = new Keyframes<V>();
-    repeat_count?: number;
-    bounce?: boolean;
+    _repeat_count?: number;
+    _bounce?: boolean;
     _end?: number;
     _start?: number;
     // static
@@ -66,7 +64,13 @@ export class Animatable<V> {
     value_from_json(_a: any): V {
         throw Error(`Not implemented by '${this.constructor.name}'`);
     }
-    // get_frame_value
+    initial_value(): V {
+        throw Error(`Not implemented by '${this.constructor.name}'`);
+    }
+    check_value(x: any): V {
+        return x as V;
+    }
+    //
     get_value(frame: number | undefined = undefined): V {
         const { kfs } = this;
         if (frame !== undefined) {
@@ -99,22 +103,21 @@ export class Animatable<V> {
             }
             // throw new Error(`empty keyframe list`);
         }
-        const { value } = this;
+        const value = this.initial_value();
         if (value == null) {
             throw new Error(`value cant be null`);
         }
         return value;
-
     }
-    // static
+
     get_value_off?(frame: number): V {
         const { kfs } = this;
         const first = kfs.at(0);
         if (first) {
             const last = kfs.at(-1);
             if (last) {
-                let { repeat_count = 1, bounce } = this;
-                const fo = offset_fun(first.time, last.time, repeat_count, bounce, this);
+                let { _repeat_count = 1, _bounce } = this;
+                const fo = offset_fun(first.time, last.time, _repeat_count, _bounce, this);
                 const fg = (this.get_value_off = function (frame: number) {
                     return this.get_value(fo(frame));
                 });
@@ -127,11 +130,6 @@ export class Animatable<V> {
         }
         throw Error(`Unexpected by '${this.constructor.name}'`);
     }
-
-    check_value(x: any): V {
-        return x as V;
-    }
-
 
     key_value(
         frame: number,
@@ -157,8 +155,9 @@ export class Animatable<V> {
             }
         } else {
             if (start != undefined) {
-                if (this.value != null) {
-                    last = kfs.push_value(start, this.value);
+                const v = this.initial_value();
+                if (v != null) {
+                    last = kfs.push_value(start, v);
                 }
             }
         }
@@ -176,14 +175,27 @@ export class Animatable<V> {
         delete this['_end'];
         return kfs.push_value(frame, value);
     }
-
-    constructor(v: V) {
-        if (v == null) {
-            throw new Error(`unexpected value=${v}`);
-        } else {
-            this.value = v;
-        }
+    repeat(count: number = 2, bounce: boolean = false) {
+        this._repeat_count = count;
+        this._bounce = bounce;
+        delete this['get_value_off'];
+        delete this['_end'];
+        return this;
     }
+}
+
+export class Animatable<V> extends Animated<V> {
+    value: V | null;
+
+    // static
+    override initial_value(): V {
+        const { value } = this;
+        if (value == null) {
+            throw new Error(`value cant be null`);
+        }
+        return value;
+    }
+
     set_value(value: V | any) {
         this.value = this.check_value(value);
     }
@@ -196,11 +208,11 @@ export class Animatable<V> {
                 kfe_to_json(v, this.value_to_json(v.value))
             )];
         }
-        if (this.repeat_count) {
-            o.r = this.repeat_count;
+        if (this._repeat_count) {
+            o.r = this._repeat_count;
         }
-        if (this.bounce) {
-            o.b = this.bounce;
+        if (this._bounce) {
+            o.b = this._bounce;
         }
         return o;
     }
@@ -211,18 +223,26 @@ export class Animatable<V> {
             const { r, b } = x;
             this.kfs = new Keyframes<V>(...k.map((x) => kfe_from_json(x, this.value_from_json(x.v))));
             if (r != null) {
-                this.repeat_count = r;
+                this._repeat_count = r;
             }
             if (b != null) {
-                this.bounce = b;
+                this._bounce = b;
             }
         }
         if (v != undefined) {
             this.value = this.value_from_json(x.v);
         }
-
         if (v === null) {
             this.value = null;
+        }
+    }
+
+    constructor(v: V) {
+        super();
+        if (v == null) {
+            throw new Error(`unexpected value=${v}`);
+        } else {
+            this.value = v;
         }
     }
 }
@@ -290,17 +310,3 @@ export class AnimatableD<V> extends Animatable<V> {
         return kfs.push_value(frame, value);
     }
 }
-// declare module "." {
-//     interface AnimBase {
-//         from_json(x: any): void;
-//         to_json(): any;
-//     }
-// }
-
-// AnimBase.prototype.from_json = function (_x: any) {
-//     throw Error(`Not implemented by '${this.constructor.name}'`);
-// }
-
-// AnimBase.prototype.to_json = function () {
-//     throw Error(`Not implemented by '${this.constructor.name}'`);
-// }

@@ -107,10 +107,11 @@ export async function animate(lib) {
                 S,
             })
         );
-        S.repeat_count = -1;
-        S.bounce = true;
-        S.get_value(1000);
-        console.log(S);
+        S.repeat(-1, true);
+        // S.get_value(1000);
+        console.log(S.to_json());
+        S.from_json(S.to_json())
+        console.log(S.to_json());
 
     }
     {
@@ -124,8 +125,7 @@ export async function animate(lib) {
                 CO
             })
         );
-        CO.repeat_count = 66666666666;
-        CO.bounce = true;
+        CO.repeat(66666666666, true);
 
     }
 
