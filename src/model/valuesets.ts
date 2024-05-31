@@ -6,7 +6,8 @@ import {
     RGBValue,
     TextValue,
 } from "../keyframe/value.js";
-import { Animatable, ValueT } from "../keyframe/keyframes.js";
+import { ValueT } from "../keyframe/value.js";
+import { Animatable } from "../keyframe/value.js";
 
 export function xget<T>(that: any, name: string, value: T): T {
     // console.log(`_GETX ${name}`);

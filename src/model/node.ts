@@ -1,7 +1,8 @@
 import { Track } from "../track/track.js";
 import { BaseProps } from "./baseprops.js";
 import { Keyframes } from "../keyframe/kfhelper.js";
-import { Animatable, ValueT, } from "../keyframe/keyframes.js";
+import { ValueT } from "../keyframe/value.js";
+import { Animatable } from "../keyframe/value.js";
 import { NVector, NumberValue, PointsValue, PositionValue, TextValue, } from "../keyframe/value.js";
 import { Node, Parent } from "./linked.js";
 import { Box, ValueSet, xget, xset } from "./valuesets.js";

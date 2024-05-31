@@ -1,5 +1,5 @@
 import { NVectorValue, NumberValue, PointsValue, RGBValue, TextValue } from "../keyframe/value.js";
-import { Animatable } from "../keyframe/keyframes.js";
+import { Animatable } from "../keyframe/value.js";
 import { Container, Root, Item } from "../model/node.js";
 import { Node } from "../model/linked.js";
 import { Transform, Fill, Box, Font, Stroke, ValueSet } from "../model/valuesets.js";

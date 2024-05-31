@@ -1,4 +1,5 @@
-import { Animatable, ValueT } from "../keyframe/keyframes.js";
+import { ValueT } from "../keyframe/value.js";
+import { Animatable } from "../keyframe/value.js";
 import { ValueSet } from "../model/valuesets.js";
 import {
     Container, Root, Item, PlainRoot, PlainNode,
