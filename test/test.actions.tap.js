@@ -1,13 +1,8 @@
 import test from "tap";
 import * as svgmotion from "svgmotion";
-export function* getr(p, start, end) {
-    for (let i = start; i < end; ++i) {
-        yield p.get_value(i);
-    }
-}
 
 export function cata(p, start, end) {
-    return [...getr(p, start, end)];
+    return [...p.enum_values(start, end)];
 }
 
 test.test("Par 2", (t) => {

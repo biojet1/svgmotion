@@ -1,4 +1,4 @@
-import { Keyframes, offset_fun, ratio_at } from "./kfhelper.js";
+import { Keyframes, iter_frame_fun, ratio_at } from "./kfhelper.js";
 
 export class Animated<V> {
     kfs: Keyframes<V> = new Keyframes<V>();
@@ -34,43 +34,35 @@ export class Animated<V> {
     // get_frame_value
     get_value(frame: number): V {
         const { kfs } = this;
-        if (kfs instanceof Keyframes) {
-            let p = undefined; // previous KeyframeEntry<V>
-            for (const k of kfs) {
-                if (frame <= k.time) {
-                    if (p) {
-                        if (p.easing === true) {
-                            return k.value;
-                        }
-                        let r = (frame - p.time) / (k.time - p.time);
-                        if (r == 0) {
-                            return p.value;
-                        } else if (r == 1) {
-                            return k.value;
-                        } else if (p.easing) {
-                            r = ratio_at(p.easing, r);
-                        }
-                        return this.lerp_value(r, p.value, k.value);
-                    } else if (frame < k.time) {
-                        return this.get_value_off!(frame);
-                        // return k.value;
-                    } else {
+
+        let p = undefined; // previous KeyframeEntry<V>
+        for (const k of kfs) {
+            if (frame <= k.time) {
+                if (p) {
+                    if (p.easing === true) {
                         return k.value;
                     }
+                    let r = (frame - p.time) / (k.time - p.time);
+                    if (r == 0) {
+                        return p.value;
+                    } else if (r == 1) {
+                        return k.value;
+                    } else if (p.easing) {
+                        r = ratio_at(p.easing, r);
+                    }
+                    return this.lerp_value(r, p.value, k.value);
+                    // } else if (frame < k.time) {
+                    //     return this.get_value_off!(frame);
+                } else {
+                    return k.value;
                 }
-                p = k;
             }
-            if (p) {
-                return this.get_value_off!(frame);
-                // return p.value;
-            }
-            const last = kfs.push_value(frame, this.initial_value());
-            return last.value;
-            // throw new Error(`empty keyframe list`);
+            p = k;
         }
-        /* c8 ignore start */
-        throw new Error(`unexpected`);
-        /* c8 ignore stop */
+        if (p) {
+            return this.get_value_off!(frame);
+        }
+        return this.initial_value()
     }
     // static
     get_value_off?(frame: number): V {
@@ -80,7 +72,7 @@ export class Animated<V> {
             const last = kfs.at(-1);
             if (last) {
                 let { _repeat_count, _bounce } = this;
-                const fo = offset_fun(first.time, last.time, _repeat_count, _bounce, this);
+                const fo = iter_frame_fun(first.time, last.time, _repeat_count, _bounce, this);
                 const fg = (this.get_value_off = function (frame: number) {
                     return this.get_value(fo(frame));
                 })
@@ -163,6 +155,12 @@ export class Animated<V> {
         }
         return last;
     }
+    *enum_values(start: number, end: number) {
+        while (start < end) {
+            yield this.get_value(start++);
+        }
+    }
+
 
     frame_range(): [number, number] {
 

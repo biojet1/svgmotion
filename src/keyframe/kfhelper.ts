@@ -28,7 +28,7 @@ export function ratio_at(a: Iterable<number>, t: number) {
     return cubic_bezier_y_of_x([0, 0], [ox, oy], [ix, iy], [1, 1])(t);
 }
 
-export function offset_fun(S: number, E: number, repeat_count: number = 1, bounce: boolean = false, that: {
+export function iter_frame_fun(S: number, E: number, repeat_count: number = 1, bounce: boolean = false, that: {
     _start?: number;
     _end?: number;
     _iter_dur?: number;
