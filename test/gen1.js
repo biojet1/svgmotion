@@ -110,7 +110,7 @@ export async function animate(lib) {
         S.repeat(-1, true);
         // S.get_value(1000);
         // console.log(S.dump());
-        // S.from_json(S.dump())
+        // S.load(S.dump())
         // console.log(S.dump());
 
     }

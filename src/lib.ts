@@ -3,7 +3,7 @@ export * from "./track/index.js";
 export * from "./keyframe/index.js";
 export * from "./helper/from_dom.js";
 export * from "./helper/dump.js";
-export * from "./helper/from_json.js";
+export * from "./helper/load.js";
 export * from "./helper/parse_color.js";
 export * from "./helper/find_node.js";
 export * from "./helper/update_dom.js";

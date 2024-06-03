@@ -70,7 +70,7 @@ export class Animatable<V> extends Animated<V> {
         return o;
     }
 
-    from_json(x: ValueF<any>) {
+    load(x: ValueF<any>) {
         const { k, v } = x;
         if (k != undefined) {
             const { r, b } = x;

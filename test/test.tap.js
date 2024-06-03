@@ -60,7 +60,7 @@ test.test("NVectorValue", (t) => {
         t.equal(u[4], undefined);
     }
     t.match(v.dump(), { v: [3, 4, 5, 6] });
-    // t.match(NVectorValue.from_json({ v: [3, 4, 5, 6] }), { v: [3, 4, 5, 6] });
+    // t.match(NVectorValue.load({ v: [3, 4, 5, 6] }), { v: [3, 4, 5, 6] });
     v.key_value(0, new NVector([3, 4]));
     v.key_value(60, new NVector([4, 5]));
     // console.log(new NVectorValue().value);
@@ -93,9 +93,9 @@ test.test("ViewPort", (t) => {
     t.equal(nodes[0].tag, "rect");
     t.same([...props.view_box.size.v], [100, 100]);
     let head2 = new Root();
-    head2.from_json(json);
+    head2.load(json);
     t.same(head2.dump(), json);
-    // console.log(JSON.stringify(from_json(json).dump(), null, 4));
+    // console.log(JSON.stringify(load(json).dump(), null, 4));
 
     t.end();
 });

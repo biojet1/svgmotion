@@ -46,11 +46,11 @@ export class ValueSet {
         }
         return u;
     }
-    from_json(u: ValueT<any>) {
+    load(u: ValueT<any>) {
         for (let [k, v] of Object.entries(u)) {
             const p = (this as any)[k];
             if (p instanceof Animatable) {
-                p.from_json(v);
+                p.load(v);
             } else {
                 throw new Error(`Unexpected property "${k}" (${v})`);
             }
@@ -304,23 +304,23 @@ export class Transform extends ValueSet {
             return [];
         }
     }
-    override from_json(u: ValueT<any>) {
+    override load(u: ValueT<any>) {
         this.clear();
         if (Array.isArray(u)) {
             u.forEach((v) => {
                 switch (v._) {
                     case "t":
-                        this.add_translate().from_json(v);
+                        this.add_translate().load(v);
                         break;
 
                     case "s":
-                        this.add_scale().from_json(v);
+                        this.add_scale().load(v);
                         break;
 
                     case "r":
                         {
                             const q = new MRotation(0);
-                            q.from_json(v);
+                            q.load(v);
                             this.all.push(q);
                         }
                         break;
@@ -328,21 +328,21 @@ export class Transform extends ValueSet {
                     case "R":
                         {
                             const q = new MRotateAt(new NVector([0, 0, 0]));
-                            q.from_json(v);
+                            q.load(v);
                             this.all.push(q);
                         }
                         break;
 
                     case "h":
-                        this.add_hexad().from_json(v);
+                        this.add_hexad().load(v);
                         break;
 
                     case "x":
-                        this.add_skewx().from_json(v);
+                        this.add_skewx().load(v);
                         break;
 
                     case "y":
-                        this.add_skewy().from_json(v);
+                        this.add_skewy().load(v);
                         break;
 
                     default:

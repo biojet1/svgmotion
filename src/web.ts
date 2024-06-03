@@ -2,7 +2,7 @@ import { Root } from "./model/node.js";
 
 export * from "./model/index.js";
 export * from "./helper/update_dom.js";
-export * from "./helper/from_json.js";
+export * from "./helper/load.js";
 
 export function animate(anim: Root, fps: number) {
     const [start, end] = anim.calc_time_range();

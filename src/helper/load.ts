@@ -25,11 +25,11 @@ const TAGS: {
     svg: function (parent: Container) { return parent.add_view(); },
 };
 
-function props_from_json(that: any, props: { [key: string]: ValueT<any> }) {
+function load_properties(that: any, props: { [key: string]: ValueT<any> }) {
     for (let [k, v] of Object.entries(props)) {
         const p = that[k];
         if (p instanceof ValueSet || p instanceof Animatable) {
-            p.from_json(v);
+            p.load(v);
         } else {
             switch (k) {
                 case 'id':
@@ -42,16 +42,16 @@ function props_from_json(that: any, props: { [key: string]: ValueT<any> }) {
     }
 }
 
-function from_json_walk(obj: PlainNode, parent: Container) {
+function load_container(obj: PlainNode, parent: Container) {
     const { tag, nodes, ...props } = obj;
     const make_node = TAGS[tag];
     if (make_node) {
         const node = make_node(parent);
-        props_from_json(node, props);
+        load_properties(node, props);
         if (node instanceof Container) {
             if (nodes) {
                 for (const child of nodes) {
-                    from_json_walk(child, node);
+                    load_container(child, node);
                 }
             }
         } else if (nodes != undefined) {
@@ -65,7 +65,7 @@ function from_json_walk(obj: PlainNode, parent: Container) {
 
 declare module "../model/node" {
     interface Root {
-        from_json(src: PlainRoot): void;
+        load(src: PlainRoot): void;
         parse_json(src: string): void;
     }
 
@@ -87,11 +87,11 @@ declare module "../model/node" {
 
 export function from_json(src: PlainRoot) {
     const root = new Root();
-    root.from_json(src);
+    root.load(src);
     return root;
 }
 
-Root.prototype.from_json = function (src: PlainRoot) {
+Root.prototype.load = function (src: PlainRoot) {
     const { version, view, defs, frame_rate } = src;
     if (!version) {
         throw new Error("No version {${Object.keys(src)}}");
@@ -102,7 +102,7 @@ Root.prototype.from_json = function (src: PlainRoot) {
     } else if (!frame_rate) {
         throw new Error("No frame_rate");
     }
-    const vp = from_json_walk(view, this);
+    const vp = load_container(view, this);
     if (!(vp instanceof ViewPort)) {
         throw new Error("ViewPort expected");
     }
@@ -111,13 +111,13 @@ Root.prototype.from_json = function (src: PlainRoot) {
     this.set_view(vp);
     if (defs) {
         Object.entries(defs).map(([k, v]) => {
-            this.defs[k] = from_json_walk(v, this);
+            this.defs[k] = load_container(v, this);
         });
     }
 }
 
 Root.prototype.parse_json = function (src: string) {
-    return this.from_json(JSON.parse(src))
+    return this.load(JSON.parse(src))
 }
 
 Container.prototype.add_circle = function () { const x = new Circle(); this.append_child(x); return x; }
