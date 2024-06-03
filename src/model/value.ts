@@ -16,29 +16,9 @@ export interface KFEntry<V> extends KFBase {
 export type ValueT<V> = { v: V; k?: KFEntry<V>[]; r?: number; b?: boolean; _?: string; };
 export type ValueF<V> = { v: V; k?: KFEntry<V>[]; r?: number; b?: boolean; };
 
-export function load_kfe<V>(x: KFBase, value: V): KeyframeEntry<V> {
-    const { t: time, h, o, i } = x;
-    if (h) {
-        return { time, easing: true, value };
-    } else if (o && i) {
-        const [ox, oy] = o;
-        const [ix, iy] = o;
-        return { time, easing: [ox, oy, ix, iy], value };
-    }
-    return { time, value };
-}
 
-export function dump_kfe<V>(kfe: KeyframeEntry<V>, value: any): KFEntry<V> {
-    const { time: t, easing } = kfe;
-    if (!easing) {
-        return { t, v: value };
-    } else if (easing === true) {
-        return { t, h: true, v: value };
-    } else {
-        const [ox, oy, ix, iy] = easing;
-        return { t, o: [ox, oy], i: [ix, iy], v: value };
-    }
-}
+
+
 export class Animatable<V> extends Animated<V> {
     value: V | null;
 
@@ -54,12 +34,22 @@ export class Animatable<V> extends Animated<V> {
     set_value(value: V | any) {
         this.value = this.check_value(value);
     }
-
+    dump_kfe(kfe: KeyframeEntry<V>, value: any): KFEntry<V> {
+        const { time: t, easing } = kfe;
+        if (!easing) {
+            return { t, v: value };
+        } else if (easing === true) {
+            return { t, h: true, v: value };
+        } else {
+            const [ox, oy, ix, iy] = easing;
+            return { t, o: [ox, oy], i: [ix, iy], v: value };
+        }
+    }
     dump(): ValueT<V> {
         const { value, kfs } = this;
         const o: ValueT<V> = { v: this.dump_value(value) };
         if (kfs && kfs.length > 0) {
-            o.k = kfs.map((v) => dump_kfe(v, this.dump_value(v.value)));
+            o.k = kfs.map((v) => this.dump_kfe(v, this.dump_value(v.value)));
         }
         if (this._repeat_count) {
             o.r = this._repeat_count;
@@ -69,12 +59,22 @@ export class Animatable<V> extends Animated<V> {
         }
         return o;
     }
-
+    load_kfe(x: KFBase, value: V): KeyframeEntry<V> {
+        const { t: time, h, o, i } = x;
+        if (h) {
+            return { time, easing: true, value };
+        } else if (o && i) {
+            const [ox, oy] = o;
+            const [ix, iy] = o;
+            return { time, easing: [ox, oy, ix, iy], value };
+        }
+        return { time, value };
+    }
     load(x: ValueF<any>) {
         const { k, v } = x;
         if (k != undefined) {
             const { r, b } = x;
-            this.kfs = k.map((x) => load_kfe(x, this.load_value(x.v)));
+            this.kfs = k.map((x) => this.load_kfe(x, this.load_value(x.v)));
             if (r != null) {
                 this._repeat_count = r;
             }
