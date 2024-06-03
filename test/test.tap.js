@@ -11,7 +11,7 @@ import {
     Size,
     Transform,
     Step,
-    Track
+    Track, Easing
 } from "svgmotion";
 
 
@@ -381,3 +381,25 @@ test.test("Seq then Par", (t) => {
     t.end();
 });
 
+
+
+test.test("Easing", (t) => {
+    let n = '9999,9812,9306,8559,7653,6666,5679,4773,4026,3520,3333,2391,1693,1216,930,796,775,823,901,971,1000,1000,1000,1000,1000,1000,1000,1000,1000,1000,5000,4700,4400,4100,3800,3500,3200,2900,2600,2300,2000'.split(',').map(v => parseFloat(v))
+
+
+    let v = new NumberValue(6);
+    v.key_value(0, 9999);
+    v.key_value(10, 3333, undefined, Easing.sigmoid);
+    v.key_value(20, 1000, undefined, Easing.outback);
+    v.key_value(30, 5000, undefined, true);
+    v.key_value(40, 2000, undefined);
+    const d = v.dump();
+    // console.log(d)
+    let u = new NumberValue(9);
+    u.load(d);
+
+    t.same([...v.enum_values(0, 41)].map(v => Math.round(v)), n);
+    t.same([...u.enum_values(0, 41)].map(v => Math.round(v)), n);
+
+    t.end();
+});

@@ -37,25 +37,24 @@ export class Animated<V> {
 
         let p = undefined; // previous KeyframeEntry<V>
         for (const k of kfs) {
-            if (frame <= k.time) {
+            if (frame < k.time) {
                 if (p) {
-                    if (p.easing === true) {
-                        return k.value;
+                    const { easing, value, time } = p;
+                    if (easing === true) {
+                        return value;
                     }
-                    let r = (frame - p.time) / (k.time - p.time);
-                    if (r == 0) {
-                        return p.value;
-                    } else if (r == 1) {
-                        return k.value;
-                    } else if (p.easing) {
-                        r = ratio_at(p.easing, r);
+                    let r = (frame - time) / (k.time - time);
+                    if (easing) {
+                        r = ratio_at(easing, r);
                     }
-                    return this.lerp_value(r, p.value, k.value);
+                    return this.lerp_value(r, value, k.value);
                     // } else if (frame < k.time) {
                     //     return this.get_value_off!(frame);
                 } else {
                     return k.value;
                 }
+            } else if (frame == k.time) {
+                return k.value;
             }
             p = k;
         }

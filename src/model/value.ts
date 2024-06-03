@@ -65,7 +65,7 @@ export class Animatable<V> extends Animated<V> {
             return { time, easing: true, value };
         } else if (o && i) {
             const [ox, oy] = o;
-            const [ix, iy] = o;
+            const [ix, iy] = i;
             return { time, easing: [ox, oy, ix, iy], value };
         }
         return { time, value };
