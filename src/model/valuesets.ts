@@ -37,11 +37,11 @@ export class ValueSet {
             }
         }
     }
-    to_json() {
+    dump() {
         let u: any = {};
         for (let [k, v] of Object.entries(this)) {
             if (v instanceof Animatable) {
-                u[k] = v.to_json();
+                u[k] = v.dump();
             }
         }
         return u;
@@ -296,10 +296,10 @@ export class Transform extends ValueSet {
         return get1(this.all, x, MHexad);
     }
     //
-    override to_json() {
+    override dump() {
         // if ("all" in this) {
         if (Object.hasOwn(this, "all")) {
-            return this.all.map((x) => x.to_json());
+            return this.all.map((x) => x.dump());
         } else {
             return [];
         }
@@ -401,8 +401,8 @@ class MTranslate extends NVectorValue {
         const [x, y] = this.get_value(frame);
         return `translate(${x} ${y})`;
     }
-    override to_json() {
-        const o = super.to_json();
+    override dump() {
+        const o = super.dump();
         o._ = "t";
         return o;
     }
@@ -412,8 +412,8 @@ class MScale extends NVectorValue {
         const [x, y] = this.get_value(frame);
         return `scale(${x} ${y})`;
     }
-    override to_json() {
-        const o = super.to_json();
+    override dump() {
+        const o = super.dump();
         o._ = "s";
         return o;
     }
@@ -427,8 +427,8 @@ class MRotateAt extends NVectorValue {
         }
         return `rotate(${a})`;
     }
-    override to_json() {
-        const o = super.to_json();
+    override dump() {
+        const o = super.dump();
         o._ = "R";
         return o;
     }
@@ -439,8 +439,8 @@ class MRotation extends NumberValue {
         const a = this.get_value(frame);
         return `rotate(${a})`;
     }
-    override to_json() {
-        const o = super.to_json();
+    override dump() {
+        const o = super.dump();
         o._ = "r";
         return o;
     }
@@ -451,8 +451,8 @@ class MSkewX extends NumberValue {
         const a = this.get_value(frame);
         return `skewX(${a})`;
     }
-    override to_json() {
-        const o = super.to_json();
+    override dump() {
+        const o = super.dump();
         o._ = "x";
         return o;
     }
@@ -463,8 +463,8 @@ class MSkewY extends NumberValue {
         const a = this.get_value(frame);
         return `skewY(${a})`;
     }
-    override to_json() {
-        const o = super.to_json();
+    override dump() {
+        const o = super.dump();
         o._ = "y";
         return o;
     }
@@ -475,8 +475,8 @@ class MHexad extends NVectorValue {
         const [a, b, c, d, e, f] = this.get_value(frame);
         return `matrix(${a} ${b} ${c} ${d} ${e} ${f})`;
     }
-    override to_json() {
-        const o = super.to_json();
+    override dump() {
+        const o = super.dump();
         o._ = "h";
         return o;
     }

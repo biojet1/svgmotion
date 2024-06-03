@@ -62,7 +62,7 @@ export async function animate(lib) {
         )
     );
     // console.log("all in this", "all" in r2.transform, Object.hasOwn(r2.transform, "all"));
-    // console.log("TR", r2.transform, r2.transform.to_json());
+    // console.log("TR", r2.transform, r2.transform.dump());
     delete e1.cy;
     delete e1.cx;
     const mov = e1.transform.add_translate();
@@ -79,7 +79,7 @@ export async function animate(lib) {
     );
     // mov.repeat_count = 66666666666;
     mov.repeat(1, true);
-    // console.log(mov.to_json());
+    // console.log(mov.dump());
     anim.track().feed(
         Step([
             { t: 0, EX: 40, EY: 40, ease: Easing.linear },
@@ -109,9 +109,9 @@ export async function animate(lib) {
         );
         S.repeat(-1, true);
         // S.get_value(1000);
-        // console.log(S.to_json());
-        // S.from_json(S.to_json())
-        // console.log(S.to_json());
+        // console.log(S.dump());
+        // S.from_json(S.dump())
+        // console.log(S.dump());
 
     }
     {
@@ -129,7 +129,7 @@ export async function animate(lib) {
 
     }
 
-    // console.log(r2.transform.to_json());
+    // console.log(r2.transform.dump());
     // console.log(r2.transform.get_transform_repr());
 
     return anim;

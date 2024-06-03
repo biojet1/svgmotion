@@ -80,7 +80,7 @@ export async function render_root(root: Root, {
             + `<script>${await fs.readFile(fileURLToPath(import.meta.resolve("../svgmotion.web.js")))}</script>`
             + `</head><body></body></html>`);
 
-        await page.evaluate(`const root = svgmotion.from_json(${JSON.stringify(root.to_json())});`
+        await page.evaluate(`const root = svgmotion.from_json(${JSON.stringify(root.dump())});`
             + `const svg = root.to_dom(document);`
             + `document.body.appendChild(svg);`
             // + `svg.setAttribute('shape-rendering',"geometricPrecision");`

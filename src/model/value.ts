@@ -1,5 +1,5 @@
 import { Animated } from "../keyframe/keyframe.js";
-import { KeyframeEntry, Keyframes } from "../keyframe/kfhelper.js";
+import { KeyframeEntry, push_kfe } from "../keyframe/kfhelper.js";
 export interface KFBase {
     t: number;
     h?: boolean;
@@ -16,7 +16,7 @@ export interface KFEntry<V> extends KFBase {
 export type ValueT<V> = { v: V; k?: KFEntry<V>[]; r?: number; b?: boolean; _?: string; };
 export type ValueF<V> = { v: V; k?: KFEntry<V>[]; r?: number; b?: boolean; };
 
-export function kfe_from_json<V>(x: KFBase, value: V): KeyframeEntry<V> {
+export function load_kfe<V>(x: KFBase, value: V): KeyframeEntry<V> {
     const { t: time, h, o, i } = x;
     if (h) {
         return { time, easing: true, value };
@@ -28,7 +28,7 @@ export function kfe_from_json<V>(x: KFBase, value: V): KeyframeEntry<V> {
     return { time, value };
 }
 
-export function kfe_to_json<V>(kfe: KeyframeEntry<V>, value: any): KFEntry<V> {
+export function dump_kfe<V>(kfe: KeyframeEntry<V>, value: any): KFEntry<V> {
     const { time: t, easing } = kfe;
     if (!easing) {
         return { t, v: value };
@@ -55,12 +55,11 @@ export class Animatable<V> extends Animated<V> {
         this.value = this.check_value(value);
     }
 
-    to_json(): ValueT<V> {
+    dump(): ValueT<V> {
         const { value, kfs } = this;
-        const o: ValueT<V> = { v: this.value_to_json(value) };
+        const o: ValueT<V> = { v: this.dump_value(value) };
         if (kfs && kfs.length > 0) {
-            o.k = [...kfs.map((v) => kfe_to_json(v, this.value_to_json(v.value))
-            )];
+            o.k = kfs.map((v) => dump_kfe(v, this.dump_value(v.value)));
         }
         if (this._repeat_count) {
             o.r = this._repeat_count;
@@ -75,7 +74,7 @@ export class Animatable<V> extends Animated<V> {
         const { k, v } = x;
         if (k != undefined) {
             const { r, b } = x;
-            this.kfs = new Keyframes<V>(...k.map((x) => kfe_from_json(x, this.value_from_json(x.v))));
+            this.kfs = k.map((x) => load_kfe(x, this.load_value(x.v)));
             if (r != null) {
                 this._repeat_count = r;
             }
@@ -84,7 +83,7 @@ export class Animatable<V> extends Animated<V> {
             }
         }
         if (v != undefined) {
-            this.value = this.value_from_json(x.v);
+            this.value = this.load_value(x.v);
         }
         if (v === null) {
             this.value = null;
@@ -138,7 +137,7 @@ export class AnimatableD<V> extends Animatable<V> {
                 // pass
             } else if (start > last.time) {
                 last.easing = true;
-                last = kfs.push_value(start, last.value);
+                last = push_kfe(kfs, start, last.value);
             } else {
                 if (start != last.time) {
                     throw new Error(
@@ -149,7 +148,7 @@ export class AnimatableD<V> extends Animatable<V> {
         } else {
             if (start != undefined) {
                 if (this.value != null) {
-                    last = kfs.push_value(start, this.value);
+                    last = push_kfe(kfs, start, this.value);
                 }
             }
         }
@@ -161,7 +160,7 @@ export class AnimatableD<V> extends Animatable<V> {
                 value = this.add_value(last.value, value);
             }
         }
-        return kfs.push_value(frame, value);
+        return push_kfe(kfs, frame, value);
     }
 }
 
@@ -179,14 +178,14 @@ export class NVectorValue extends Animatable<NVector> {
             return new NVector(x);
         }
     }
-    override value_to_json(a: NVector): any {
+    override dump_value(a: NVector): any {
         if (a == null) {
             return null;
         }
         return Array.from(a); // NaN -> null
     }
 
-    override value_from_json(a: any): NVector {
+    override load_value(a: any): NVector {
         return new NVector(a);
     }
 
@@ -196,10 +195,10 @@ export class NVectorValue extends Animatable<NVector> {
 }
 
 export class PointsValue extends AnimatableD<number[][]> {
-    override value_to_json(s: number[][]) {
+    override dump_value(s: number[][]) {
         return s;
     }
-    override value_from_json(a: any): number[][] {
+    override load_value(a: any): number[][] {
         return a as number[][];
     }
 }
@@ -207,10 +206,10 @@ export class TextValue extends AnimatableD<string> {
     override add_value(a: string, b: string): string {
         return a + "" + b;
     }
-    override value_to_json(s: string) {
+    override dump_value(s: string) {
         return s;
     }
-    override value_from_json(a: any): string {
+    override load_value(a: any): string {
         return a + "";
     }
 }
@@ -235,10 +234,10 @@ export class NumberValue extends Animatable<number> {
     override add_value(a: number, b: number): number {
         return a + b;
     }
-    override value_to_json(v: number): any {
+    override dump_value(v: number): any {
         return v;
     }
-    override value_from_json(a: any): number {
+    override load_value(a: any): number {
         return a as number;
     }
     constructor(v: number = 0) {
@@ -284,6 +283,7 @@ export class RGBNone extends RGB {
         super(NaN, NaN, NaN);
     }
 }
+
 
 ///////////
 

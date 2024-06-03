@@ -1,7 +1,7 @@
-import { Keyframes, iter_frame_fun, ratio_at } from "./kfhelper.js";
+import { KeyframeEntry, iter_frame_fun, push_kfe, ratio_at } from "./kfhelper.js";
 
 export class Animated<V> {
-    kfs: Keyframes<V> = new Keyframes<V>();
+    kfs: Array<KeyframeEntry<V>> = [];
     _repeat_count?: number;
     _bounce?: boolean;
     _end?: number;
@@ -17,11 +17,11 @@ export class Animated<V> {
         throw Error(`Not implemented by '${this.constructor.name}'`);
     }
     // should be static
-    value_to_json(_a: V | null): any {
+    dump_value(_a: V | null): any {
         throw Error(`Not implemented by '${this.constructor.name}'`);
     }
     // should be static
-    value_from_json(_a: any): V {
+    load_value(_a: any): V {
         throw Error(`Not implemented by '${this.constructor.name}'`);
     }
     initial_value(): V {
@@ -95,18 +95,13 @@ export class Animated<V> {
         add?: boolean
     ) {
         const { kfs } = this;
-        /* c8 ignore start */
-        if (!(kfs instanceof Keyframes)) {
-            throw new Error(`unexpected`);
-        }
-        /* c8 ignore stop */
         let last = kfs.at(-1);
         if (last) {
             if (start == undefined) {
                 // pass
             } else if (start > last.time) {
                 last.easing = true;
-                last = kfs.push_value(start, last.value);
+                last = push_kfe(kfs, start, last.value);
             } else {
                 if (start != last.time) {
                     throw new Error(
@@ -118,7 +113,7 @@ export class Animated<V> {
             if (start == undefined) {
                 // pass
             } else {
-                last = kfs.push_value(start, this.initial_value());
+                last = push_kfe(kfs, start, this.initial_value());
             }
         }
 
@@ -133,7 +128,7 @@ export class Animated<V> {
         }
         delete this['get_value_off'];
         delete this['_end'];
-        return kfs.push_value(frame, value);
+        return push_kfe(kfs, frame, value);
     }
 
     hold_last_value(frame: number) {
@@ -142,7 +137,7 @@ export class Animated<V> {
         if (last) {
             if (frame > last.time) {
                 last.easing = true;
-                last = kfs.push_value(frame, last.value);
+                last = push_kfe(kfs, frame, last.value);
             } else {
                 if (frame != last.time) {
                     throw new Error(
@@ -151,7 +146,7 @@ export class Animated<V> {
                 }
             }
         } else {
-            last = kfs.push_value(frame, this.initial_value());
+            last = push_kfe(kfs, frame, this.initial_value());
         }
         return last;
     }

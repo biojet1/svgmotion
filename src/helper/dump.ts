@@ -5,21 +5,21 @@ import { ValueSet } from "../model/valuesets.js";
 
 declare module "../model/node" {
     interface Container {
-        to_json(): any;
+        dump(): any;
     }
     interface Item {
-        to_json(): any;
+        dump(): any;
     }
     interface Root {
-        to_json(): any;
+        dump(): any;
     }
 }
 
-Container.prototype.to_json = function () {
+Container.prototype.dump = function () {
     const o: any = { tag: (<typeof Container>this.constructor).tag };
     for (let [k, v] of Object.entries(this)) {
         if (v instanceof ValueSet || v instanceof Animatable) {
-            o[k] = v.to_json();
+            o[k] = v.dump();
         }
     }
     const { id } = this;
@@ -28,16 +28,16 @@ Container.prototype.to_json = function () {
     }
 
     o.nodes = [...this.children<Container | Item>()].map((v) =>
-        v.to_json()
+        v.dump()
     );
     return o;
 }
 
-Item.prototype.to_json = function (): PlainNode {
+Item.prototype.dump = function (): PlainNode {
     const o: any = { tag: (<typeof Container>this.constructor).tag };
     for (let [k, v] of Object.entries(this)) {
         if (v instanceof ValueSet || v instanceof Animatable) {
-            o[k] = v.to_json();
+            o[k] = v.dump();
         }
     }
     const { id } = this;
@@ -47,13 +47,13 @@ Item.prototype.to_json = function (): PlainNode {
     return o;
 }
 
-Root.prototype.to_json = function (): PlainRoot {
+Root.prototype.dump = function (): PlainRoot {
     const { version, view, defs, frame_rate } = this;
     return {
         version, frame_rate,
-        view: view.to_json(),
+        view: view.dump(),
         defs: Object.fromEntries(
-            Object.entries(defs).map(([k, v]) => [k, v.to_json()])
+            Object.entries(defs).map(([k, v]) => [k, v.dump()])
         ),
     };
 }

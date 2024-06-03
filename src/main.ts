@@ -57,7 +57,7 @@ export async function main() {
                         } else if (/\.html?$/i.test(output)) {
                             return doc.save_html(output);
                         } else {
-                            const blob = JSON.stringify(doc.to_json());
+                            const blob = JSON.stringify(doc.dump());
                             return import("fs/promises")
                                 .then((fs) => {
                                     if (output == '-') {

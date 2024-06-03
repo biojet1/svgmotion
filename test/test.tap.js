@@ -2,7 +2,6 @@
 import test from "tap";
 import * as svgmotion from 'svgmotion';
 import {
-    Keyframes,
     NumberValue,
     TextValue,
     NVectorValue, NVector,
@@ -12,21 +11,13 @@ import {
     Size,
     Transform,
     Step,
-    Track, To
+    Track
 } from "svgmotion";
 
 
 export function cata(p, start, end) {
     return [...p.enum_values(start, end)];
 }
-
-test.test("Keyframes", (t) => {
-    let kfs = new Keyframes();
-    kfs.push_value(0, 9);
-    kfs.push_value(60, 10);
-    // console.log(kfs);
-    t.end();
-});
 
 test.test("NumberValue", (t) => {
     let v = new NumberValue();
@@ -68,7 +59,7 @@ test.test("NVectorValue", (t) => {
         t.equal(u[3], 6);
         t.equal(u[4], undefined);
     }
-    t.match(v.to_json(), { v: [3, 4, 5, 6] });
+    t.match(v.dump(), { v: [3, 4, 5, 6] });
     // t.match(NVectorValue.from_json({ v: [3, 4, 5, 6] }), { v: [3, 4, 5, 6] });
     v.key_value(0, new NVector([3, 4]));
     v.key_value(60, new NVector([4, 5]));
@@ -92,7 +83,7 @@ test.test("ViewPort", (t) => {
     // v.key_value(60, new NVector([4, 5]));
     // v[0].fun();
     // r.opacity =
-    const json = doc.to_json();
+    const json = doc.dump();
     // console.log(JSON.stringify(json, null, 4));
     // console.log(vp.constructor["opacity"]);
     // console.log(vp.constructor["zoom_pan"]);
@@ -103,8 +94,8 @@ test.test("ViewPort", (t) => {
     t.same([...props.view_box.size.v], [100, 100]);
     let head2 = new Root();
     head2.from_json(json);
-    t.same(head2.to_json(), json);
-    // console.log(JSON.stringify(from_json(json).to_json(), null, 4));
+    t.same(head2.dump(), json);
+    // console.log(JSON.stringify(from_json(json).dump(), null, 4));
 
     t.end();
 });
@@ -199,7 +190,7 @@ test.test("Transform", (t) => {
         "translate(4,5) rotate(30) skewX(-7) scale(3, .5) translate(-2 -3) skewY(99) scale(1 , 1) matrix(1 2 3 4 5 6) rotate(2 0 4)"
     );
     t.ok('all' in x)
-    // console.log(x.to_json());
+    // console.log(x.dump());
 
     t.equal(
         x.get_transform_repr(0),
@@ -319,7 +310,7 @@ test.test("Bounce 2.5x", (t) => {
             break;
         }
     }
-    let j = v.to_json();
+    let j = v.dump();
     t.same(j.r, 2.5);
     t.same(j.b, true);
     t.end();
@@ -336,9 +327,9 @@ test.test("Seq", (t) => {
         To([b], 8),
         To([c], 7),
     ));
-    t.same(a.to_json(), { k: [{ t: 0, v: 1 }, { t: 60, v: 9 }], v: 1 });
-    t.same(b.to_json(), { k: [{ t: 60, v: 2 }, { t: 120, v: 8 }], v: 2 });
-    t.same(c.to_json(), { k: [{ t: 120, v: 3 }, { t: 180, v: 7 }], v: 3 });
+    t.same(a.dump(), { k: [{ t: 0, v: 1 }, { t: 60, v: 9 }], v: 1 });
+    t.same(b.dump(), { k: [{ t: 60, v: 2 }, { t: 120, v: 8 }], v: 2 });
+    t.same(c.dump(), { k: [{ t: 120, v: 3 }, { t: 180, v: 7 }], v: 3 });
     t.end();
 });
 
@@ -353,9 +344,9 @@ test.test("Par", (t) => {
         To([b], 8),
         To([c], 7),
     ));
-    t.same(a.to_json(), { k: [{ t: 0, v: 1 }, { t: 60, v: 9 }], v: 1 });
-    t.same(b.to_json(), { k: [{ t: 0, v: 2 }, { t: 60, v: 8 }], v: 2 });
-    t.same(c.to_json(), { k: [{ t: 0, v: 3 }, { t: 60, v: 7 }], v: 3 });
+    t.same(a.dump(), { k: [{ t: 0, v: 1 }, { t: 60, v: 9 }], v: 1 });
+    t.same(b.dump(), { k: [{ t: 0, v: 2 }, { t: 60, v: 8 }], v: 2 });
+    t.same(c.dump(), { k: [{ t: 0, v: 3 }, { t: 60, v: 7 }], v: 3 });
     t.end();
 });
 
@@ -373,9 +364,9 @@ test.test("Seq then Par", (t) => {
         To([c], 7),
     ));
     // console.log(tr)
-    t.same(a.to_json(), { k: [{ t: 0, v: 1 }, { t: 5, v: 9 }], v: 1 });
-    t.same(b.to_json(), { k: [{ t: 5, v: 2 }, { t: 10, v: 8 }], v: 2 });
-    t.same(c.to_json(), { k: [{ t: 10, v: 3 }, { t: 15, v: 7 }], v: 3 });
+    t.same(a.dump(), { k: [{ t: 0, v: 1 }, { t: 5, v: 9 }], v: 1 });
+    t.same(b.dump(), { k: [{ t: 5, v: 2 }, { t: 10, v: 8 }], v: 2 });
+    t.same(c.dump(), { k: [{ t: 10, v: 3 }, { t: 15, v: 7 }], v: 3 });
 
     tr.run(Par(
         To(a, 1),
@@ -383,9 +374,9 @@ test.test("Seq then Par", (t) => {
         To(c, 1),
     ));
 
-    t.same(a.to_json(), { k: [{ t: 0, v: 1 }, { t: 5, h: true, v: 9 }, { t: 15, v: 9 }, { t: 20, v: 1 }], v: 1 });
-    t.same(b.to_json(), { k: [{ t: 5, v: 2 }, { t: 10, h: true, v: 8 }, { t: 15, v: 8 }, { t: 20, v: 1 }], v: 2 });
-    t.same(c.to_json(), { k: [{ t: 10, v: 3 }, { t: 15, v: 7 }, { t: 20, v: 1 }], v: 3 });
+    t.same(a.dump(), { k: [{ t: 0, v: 1 }, { t: 5, h: true, v: 9 }, { t: 15, v: 9 }, { t: 20, v: 1 }], v: 1 });
+    t.same(b.dump(), { k: [{ t: 5, v: 2 }, { t: 10, h: true, v: 8 }, { t: 15, v: 8 }, { t: 20, v: 1 }], v: 2 });
+    t.same(c.dump(), { k: [{ t: 10, v: 3 }, { t: 15, v: 7 }, { t: 20, v: 1 }], v: 3 });
 
     t.end();
 });

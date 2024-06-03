@@ -6,21 +6,19 @@ export interface KeyframeEntry<V> {
     easing?: Iterable<number> | boolean;
 }
 
-export class Keyframes<V> extends Array<KeyframeEntry<V>> {
-    push_value(time: number, value: V): KeyframeEntry<V> {
-        let last = this[this.length - 1];
-        if (last) {
-            if (last.time == time) {
-                last.value = value;
-                return last;
-            } else if (time < last.time) {
-                throw new Error(`keyframe is incremental`);
-            }
+export function push_kfe<V>(kfs: Array<KeyframeEntry<V>>, time: number, value: V): KeyframeEntry<V> {
+    let last = kfs.at(-1);
+    if (last) {
+        if (last.time == time) {
+            last.value = value;
+            return last;
+        } else if (time < last.time) {
+            throw new Error(`keyframe is incremental`);
         }
-        const kf = { time, value };
-        this.push(kf);
-        return kf;
     }
+    const kf = { time, value };
+    kfs.push(kf);
+    return kf;
 }
 
 export function ratio_at(a: Iterable<number>, t: number) {

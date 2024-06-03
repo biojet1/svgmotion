@@ -549,13 +549,13 @@ PointsValue.prototype.set_parse_points = function (s: string) {
 }
 
 NVectorValue.prototype.set_parse_dashes = function (s: string) {
-    this.value = this.value_from_json(s.split(/[\s,]+/).map(function (str) {
+    this.value = this.load_value(s.split(/[\s,]+/).map(function (str) {
         return parseFloat(str.trim());
     }));
 }
 
 NVectorValue.prototype.set_parse_anchor = function (s: string) {
-    this.value = this.value_from_json(s.split(/[\s,]+/).map(function (str) {
+    this.value = this.load_value(s.split(/[\s,]+/).map(function (str) {
         return parseFloat(str.trim());
     }));
 }

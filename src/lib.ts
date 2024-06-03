@@ -2,7 +2,7 @@ export * from "./model/index.js";
 export * from "./track/index.js";
 export * from "./keyframe/index.js";
 export * from "./helper/from_dom.js";
-export * from "./helper/to_json.js";
+export * from "./helper/dump.js";
 export * from "./helper/from_json.js";
 export * from "./helper/parse_color.js";
 export * from "./helper/find_node.js";
@@ -15,7 +15,7 @@ declare module "./model/node" {
 }
 
 Root.prototype.save_html = async function (file: string) {
-    const o = this.to_json();
+    const o = this.dump();
     // console.log("IMP", import.meta);
     // console.log("IMP", import.meta.resolve("./svgmotion.web.js"));
     const fs = await import('fs/promises');

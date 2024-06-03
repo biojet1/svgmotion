@@ -1,11 +1,11 @@
 import { Track } from "../track/track.js";
 import { BaseProps } from "./baseprops.js";
-import { Keyframes } from "../keyframe/kfhelper.js";
 import { ValueT } from "./value.js";
 import { Animatable } from "./value.js";
 import { NVector, NumberValue, PointsValue, PositionValue, TextValue, } from "./value.js";
 import { Node, Parent } from "./linked.js";
 import { Box, ValueSet, xget, xset } from "./valuesets.js";
+import { KeyframeEntry } from "../keyframe/kfhelper.js";
 
 export interface PlainNode {
     tag: string;
@@ -60,7 +60,7 @@ export class Container extends BaseProps(Parent) {
         }
     }
 
-    *enum_keyframes(): Generator<Keyframes<any>, void, unknown> {
+    *enum_keyframes(): Generator<Array<KeyframeEntry<any>>, void, unknown> {
         for (let { kfs } of this.enum_values()) {
             yield kfs;
         }
