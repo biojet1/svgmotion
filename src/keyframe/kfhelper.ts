@@ -3,22 +3,7 @@ import { cubic_bezier_y_of_x } from "./bezier.js";
 export interface KeyframeEntry<V> {
     time: number;
     value: V;
-    easing?: Iterable<number> | boolean;
-}
-
-export function push_kfe<V>(kfs: Array<KeyframeEntry<V>>, time: number, value: V): KeyframeEntry<V> {
-    let last = kfs.at(-1);
-    if (last) {
-        if (last.time == time) {
-            last.value = value;
-            return last;
-        } else if (time < last.time) {
-            throw new Error(`keyframe is incremental`);
-        }
-    }
-    const kf = { time, value };
-    kfs.push(kf);
-    return kf;
+    easing?: Iterable<number> | true;
 }
 
 export function ratio_at(a: Iterable<number>, t: number) {

@@ -1,5 +1,6 @@
+import { cubic_point_at } from "../keyframe/bezier.js";
 import { Animated } from "../keyframe/keyframe.js";
-import { KeyframeEntry, push_kfe } from "../keyframe/kfhelper.js";
+import { KeyframeEntry } from "../keyframe/kfhelper.js";
 export interface KFBase {
     t: number;
     h?: boolean;
@@ -10,14 +11,17 @@ export interface KFBase {
 export interface KFEntry<V> extends KFBase {
     v: V;
     r?: number; // repeat_count
-    b?: boolean; // bounce   
+    b?: boolean; // bounce
 }
 
-export type ValueT<V> = { v: V; k?: KFEntry<V>[]; r?: number; b?: boolean; _?: string; };
-export type ValueF<V> = { v: V; k?: KFEntry<V>[]; r?: number; b?: boolean; };
-
-
-
+export type ValueT<V> = {
+    v: V;
+    k?: KFEntry<V>[];
+    r?: number;
+    b?: boolean;
+    _?: string;
+};
+export type ValueF<V> = { v: V; k?: KFEntry<V>[]; r?: number; b?: boolean };
 
 export class Animatable<V> extends Animated<V> {
     value: V | null;
@@ -119,7 +123,6 @@ export class AnimatableD<V> extends Animatable<V> {
             throw new Error(`value cant be null`);
         }
         return value;
-
     }
     override key_value(
         frame: number,
@@ -137,7 +140,7 @@ export class AnimatableD<V> extends Animatable<V> {
                 // pass
             } else if (start > last.time) {
                 last.easing = true;
-                last = push_kfe(kfs, start, last.value);
+                last = this.add_keyframe(start, last.value);
             } else {
                 if (start != last.time) {
                     throw new Error(
@@ -148,7 +151,7 @@ export class AnimatableD<V> extends Animatable<V> {
         } else {
             if (start != undefined) {
                 if (this.value != null) {
-                    last = push_kfe(kfs, start, this.value);
+                    last = this.add_keyframe(start, this.value);
                 }
             }
         }
@@ -160,7 +163,7 @@ export class AnimatableD<V> extends Animatable<V> {
                 value = this.add_value(last.value, value);
             }
         }
-        return push_kfe(kfs, frame, value);
+        return this.add_keyframe(frame, value);
     }
 }
 
@@ -225,7 +228,49 @@ export class RGBValue extends NVectorValue {
     }
 }
 
-export class PositionValue extends NVectorValue { }
+export interface PositionKeyframe<V> extends KeyframeEntry<V> {
+    in_tan?: Iterable<number>;
+    out_tan?: Iterable<number>;
+}
+
+export class PositionValue extends NVectorValue {
+    override new_keyframe(
+        time: number,
+        value: NVector,
+        easing?: Iterable<number> | true
+    ) {
+        const kf: PositionKeyframe<NVector> = { time, value };
+        if (easing) {
+            kf.easing = easing;
+        }
+        return kf;
+    }
+    override lerp_keyframes(
+        t: number,
+        a: PositionKeyframe<NVector>,
+        b: PositionKeyframe<NVector>
+    ) {
+        const ti = a.in_tan;
+        if (ti) {
+            const to = a.out_tan;
+            if (to) {
+                const [ix, iy] = ti;
+                const [ox, oy] = to;
+                const [ax, ay] = a.value;
+                const [bx, by] = b.value;
+                const [x, y] = cubic_point_at(
+                    t,
+                    [ax, ay],
+                    [ax + ox, ay + oy],
+                    [bx + ix, by + iy],
+                    [bx, by]
+                );
+                return new NVector([x, y]);
+            }
+        }
+        return super.lerp_keyframes(t, a, b);
+    }
+}
 
 export class NumberValue extends Animatable<number> {
     override lerp_value(r: number, a: number, b: number): number {
@@ -260,7 +305,6 @@ export class NVector extends Float64Array {
     }
 }
 
-
 export class Point extends NVector {
     constructor(x: number = 0, y: number = 0) {
         super([x, y]);
@@ -283,9 +327,3 @@ export class RGBNone extends RGB {
         super(NaN, NaN, NaN);
     }
 }
-
-
-///////////
-
-
-

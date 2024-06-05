@@ -1,4 +1,9 @@
-export function cubic_bezier_y_of_x(p1: Iterable<number>, p2: Iterable<number>, p3: Iterable<number>, p4: Iterable<number>) {
+export function cubic_bezier_y_of_x(
+    p1: Iterable<number>,
+    p2: Iterable<number>,
+    p3: Iterable<number>,
+    p4: Iterable<number>
+) {
     // Return the bezier parameter size"""
     // ((bx0, by0), (bx1, by1), (bx2, by2), (bx3, by3)) = bez
     // # parametric bezier
@@ -68,4 +73,45 @@ export function cubic_bezier_y_of_x(p1: Iterable<number>, p2: Iterable<number>, 
     return function cubicBezierYOfX(t: number) {
         return sampleCurveY(solveCurveX(t));
     };
+}
+
+export function cubic_point_at_orig(
+    t: number,
+    [sx, sy]: [number, number],
+    [x1, y1]: [number, number],
+    [x2, y2]: [number, number],
+    [ex, ey]: [number, number]
+) {
+    const F = 1 - t;
+    return [
+        F * F * F * sx +
+        3 * F * F * t * x1 +
+        3 * F * t * t * x2 +
+        t * t * t * ex,
+        F * F * F * sy +
+        3 * F * F * t * y1 +
+        3 * F * t * t * y2 +
+        t * t * t * ey,
+    ];
+}
+export function cubic_point_at(
+    t: number,
+    [sx, sy]: [number, number],
+    [x1, y1]: [number, number],
+    [x2, y2]: [number, number],
+    [ex, ey]: [number, number]
+): [number, number] {
+    const F = 1 - t;
+    const F2 = F * F;
+    const F3 = F2 * F;
+    const t2 = t * t;
+    const t3 = t2 * t;
+    const Ft = F * t;
+    const F2t = F2 * t;
+    const Ft2 = Ft * t;
+
+    return [
+        F3 * sx + 3 * F2t * x1 + 3 * Ft2 * x2 + t3 * ex,
+        F3 * sy + 3 * F2t * y1 + 3 * Ft2 * y2 + t3 * ey,
+    ];
 }
