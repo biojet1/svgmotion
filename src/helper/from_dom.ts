@@ -1,6 +1,6 @@
 
 import { Item, Container, Root } from "../model/node.js";
-import { NVector, NVectorValue, NumberValue, PointsValue, RGB, RGBValue, TextValue } from "../model/value.js";
+import { Vector, VectorValue, ScalarValue, PointsValue, RGB, RGBValue, TextValue } from "../model/value.js";
 import { Node } from "../model/linked.js";
 import { parse_css_color } from "./parse_color.js";
 const BOTH_MATCH =
@@ -68,8 +68,8 @@ const TAG_DOM: {
                 case "viewBox": {
                     const v = value.split(/[\s,]+/).map(parseFloat);
                     const u = node.view_box;
-                    u.position.value = new NVector([v[0], v[1]]);
-                    u.size.value = new NVector([v[2], v[3]]);
+                    u.position.value = new Vector([v[0], v[1]]);
+                    u.size.value = new Vector([v[2], v[3]]);
                 }
                     break;
                 case "preserveAspectRatio":
@@ -465,7 +465,7 @@ declare module "../model/node" {
 }
 
 declare module "../model/value" {
-    interface NumberValue {
+    interface ScalarValue {
         set_parse_length(s: string): void;
         set_parse_number(s: string): void;
         set_parse_percentage(s: string): void;
@@ -480,7 +480,7 @@ declare module "../model/value" {
     interface PointsValue {
         set_parse_points(s: string): void;
     }
-    interface NVectorValue {
+    interface VectorValue {
         set_parse_dashes(s: string): void;
         set_parse_anchor(s: string): void;
     }
@@ -493,15 +493,15 @@ Container.prototype.load_svg = async function (src: string | URL,
     return load_svg(this, src, opt);
 }
 
-NumberValue.prototype.set_parse_number = function (s: string) {
+ScalarValue.prototype.set_parse_number = function (s: string) {
     this.value = parseFloat(s);
 }
 
-NumberValue.prototype.set_parse_length = function (s: string) {
+ScalarValue.prototype.set_parse_length = function (s: string) {
     this.value = parse_len(s);
 }
 
-NumberValue.prototype.set_parse_percentage = function (s: string) {
+ScalarValue.prototype.set_parse_percentage = function (s: string) {
     if (s.endsWith('%')) {
         this.value = parseFloat(s.replaceAll('%', '')) / 100;
     } else {
@@ -509,7 +509,7 @@ NumberValue.prototype.set_parse_percentage = function (s: string) {
     }
 }
 
-NumberValue.prototype.set_parse_line_height = function (s: string) {
+ScalarValue.prototype.set_parse_line_height = function (s: string) {
     if (s.endsWith('%')) {
         this.value = parseFloat(s.replaceAll('%', '')) / 100;
     } else if (s == 'normal') {
@@ -548,13 +548,13 @@ PointsValue.prototype.set_parse_points = function (s: string) {
     this.value = points;
 }
 
-NVectorValue.prototype.set_parse_dashes = function (s: string) {
+VectorValue.prototype.set_parse_dashes = function (s: string) {
     this.value = this.load_value(s.split(/[\s,]+/).map(function (str) {
         return parseFloat(str.trim());
     }));
 }
 
-NVectorValue.prototype.set_parse_anchor = function (s: string) {
+VectorValue.prototype.set_parse_anchor = function (s: string) {
     this.value = this.load_value(s.split(/[\s,]+/).map(function (str) {
         return parseFloat(str.trim());
     }));

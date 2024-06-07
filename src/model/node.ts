@@ -2,10 +2,10 @@ import { Track } from "../track/track.js";
 import { BaseProps } from "./baseprops.js";
 import { ValueT } from "./value.js";
 import { Animatable } from "./value.js";
-import { NVector, NumberValue, PointsValue, PositionValue, TextValue, } from "./value.js";
+import { Vector, ScalarValue, PointsValue, PositionValue, TextValue, } from "./value.js";
 import { Node, Parent } from "./linked.js";
 import { Box, ValueSet, xget, xset } from "./valuesets.js";
-import { KeyframeEntry } from "../keyframe/kfhelper.js";
+import { Keyframe } from "../keyframe/kfhelper.js";
 
 export interface PlainNode {
     tag: string;
@@ -60,7 +60,7 @@ export class Container extends BaseProps(Parent) {
         }
     }
 
-    *enum_keyframes(): Generator<Array<KeyframeEntry<any>>, void, unknown> {
+    *enum_keyframes(): Generator<Array<Keyframe<any>>, void, unknown> {
         for (let { kfs } of this.enum_values()) {
             yield kfs;
         }
@@ -109,30 +109,30 @@ export class ViewPort extends Container {
     }
     ///
     get width() {
-        return xget(this, "width", new NumberValue(100));
+        return xget(this, "width", new ScalarValue(100));
     }
-    set width(v: NumberValue) {
+    set width(v: ScalarValue) {
         xset(this, "width", v);
     }
     ///
     get height() {
-        return xget(this, "height", new NumberValue(100));
+        return xget(this, "height", new ScalarValue(100));
     }
-    set height(v: NumberValue) {
+    set height(v: ScalarValue) {
         xset(this, "height", v);
     }
     ///
     get x() {
-        return xget(this, "x", new NumberValue(0));
+        return xget(this, "x", new ScalarValue(0));
     }
-    set x(v: NumberValue) {
+    set x(v: ScalarValue) {
         xset(this, "x", v);
     }
     ///
     get y() {
-        return xget(this, "y", new NumberValue(0));
+        return xget(this, "y", new ScalarValue(0));
     }
-    set y(v: NumberValue) {
+    set y(v: ScalarValue) {
         xset(this, "y", v);
     }
     ///
@@ -161,44 +161,44 @@ export class Symbol extends Container {
     }
     ///
     get width() {
-        return xget(this, "width", new NumberValue(100));
+        return xget(this, "width", new ScalarValue(100));
     }
-    set width(v: NumberValue) {
+    set width(v: ScalarValue) {
         xset(this, "width", v);
     }
     ///
     get height() {
-        return xget(this, "height", new NumberValue(100));
+        return xget(this, "height", new ScalarValue(100));
     }
-    set height(v: NumberValue) {
+    set height(v: ScalarValue) {
         xset(this, "height", v);
     }
     ///
     get x() {
-        return xget(this, "x", new NumberValue(0));
+        return xget(this, "x", new ScalarValue(0));
     }
-    set x(v: NumberValue) {
+    set x(v: ScalarValue) {
         xset(this, "x", v);
     }
     ///
     get y() {
-        return xget(this, "y", new NumberValue(0));
+        return xget(this, "y", new ScalarValue(0));
     }
-    set y(v: NumberValue) {
+    set y(v: ScalarValue) {
         xset(this, "y", v);
     }
     ///
     get refx() {
-        return xget(this, "refx", new NumberValue(0));
+        return xget(this, "refx", new ScalarValue(0));
     }
-    set refx(v: NumberValue) {
+    set refx(v: ScalarValue) {
         xset(this, "refx", v);
     }
     ///
     get refy() {
-        return xget(this, "refy", new NumberValue(0));
+        return xget(this, "refy", new ScalarValue(0));
     }
-    set refy(v: NumberValue) {
+    set refy(v: ScalarValue) {
         xset(this, "refy", v);
     }
 }
@@ -217,49 +217,49 @@ export class Rect extends Shape {
     static tag = "rect";
     ///
     get width() {
-        return xget(this, "width", new NumberValue(100));
+        return xget(this, "width", new ScalarValue(100));
     }
-    set width(v: NumberValue) {
+    set width(v: ScalarValue) {
         xset(this, "width", v);
     }
     ///
     get height() {
-        return xget(this, "height", new NumberValue(100));
+        return xget(this, "height", new ScalarValue(100));
     }
-    set height(v: NumberValue) {
+    set height(v: ScalarValue) {
         xset(this, "height", v);
     }
     ///
     get x() {
-        return xget(this, "x", new NumberValue(0));
+        return xget(this, "x", new ScalarValue(0));
     }
-    set x(v: NumberValue) {
+    set x(v: ScalarValue) {
         xset(this, "x", v);
     }
     ///
     get y() {
-        return xget(this, "y", new NumberValue(0));
+        return xget(this, "y", new ScalarValue(0));
     }
-    set y(v: NumberValue) {
+    set y(v: ScalarValue) {
         xset(this, "y", v);
     }
     ///
     get rx() {
-        return xget(this, "rx", new NumberValue(0));
+        return xget(this, "rx", new ScalarValue(0));
     }
-    set rx(v: NumberValue) {
+    set rx(v: ScalarValue) {
         xset(this, "rx", v);
     }
     ///
     get ry() {
-        return xget(this, "ry", new NumberValue(0));
+        return xget(this, "ry", new ScalarValue(0));
     }
-    set ry(v: NumberValue) {
+    set ry(v: ScalarValue) {
         xset(this, "ry", v);
     }
     ///
     get size() {
-        return xget(this, "size", new PositionValue(new NVector([100, 100])));
+        return xget(this, "size", new PositionValue(new Vector([100, 100])));
     }
     set size(v: PositionValue) {
         xset(this, "size", v);
@@ -271,23 +271,23 @@ export class Circle extends Shape {
     static tag = "circle";
     ///
     get cx() {
-        return xget(this, "cx", new NumberValue(0));
+        return xget(this, "cx", new ScalarValue(0));
     }
-    set cx(v: NumberValue) {
+    set cx(v: ScalarValue) {
         xset(this, "cx", v);
     }
     ///
     get cy() {
-        return xget(this, "cy", new NumberValue(0));
+        return xget(this, "cy", new ScalarValue(0));
     }
-    set cy(v: NumberValue) {
+    set cy(v: ScalarValue) {
         xset(this, "cy", v);
     }
     ///
     get r() {
-        return xget(this, "r", new NumberValue(0));
+        return xget(this, "r", new ScalarValue(0));
     }
-    set r(v: NumberValue) {
+    set r(v: ScalarValue) {
         xset(this, "r", v);
     }
 }
@@ -296,30 +296,30 @@ export class Ellipse extends Shape {
     static tag = "ellipse";
     /// cx
     get cx() {
-        return xget(this, "cx", new NumberValue(0));
+        return xget(this, "cx", new ScalarValue(0));
     }
-    set cx(v: NumberValue) {
+    set cx(v: ScalarValue) {
         xset(this, "cx", v);
     }
     /// cy
     get cy() {
-        return xget(this, "cy", new NumberValue(0));
+        return xget(this, "cy", new ScalarValue(0));
     }
-    set cy(v: NumberValue) {
+    set cy(v: ScalarValue) {
         xset(this, "cy", v);
     }
     /// rx
     get rx() {
-        return xget(this, "rx", new NumberValue(0));
+        return xget(this, "rx", new ScalarValue(0));
     }
-    set rx(v: NumberValue) {
+    set rx(v: ScalarValue) {
         xset(this, "rx", v);
     }
     /// ry
     get ry() {
-        return xget(this, "ry", new NumberValue(0));
+        return xget(this, "ry", new ScalarValue(0));
     }
-    set ry(v: NumberValue) {
+    set ry(v: ScalarValue) {
         xset(this, "ry", v);
     }
 }
@@ -328,30 +328,30 @@ export class Line extends Shape {
     static tag = "line";
     /// x1
     get x1() {
-        return xget(this, "x1", new NumberValue(0));
+        return xget(this, "x1", new ScalarValue(0));
     }
-    set x1(v: NumberValue) {
+    set x1(v: ScalarValue) {
         xset(this, "x1", v);
     }
     /// y1
     get y1() {
-        return xget(this, "y1", new NumberValue(0));
+        return xget(this, "y1", new ScalarValue(0));
     }
-    set y1(v: NumberValue) {
+    set y1(v: ScalarValue) {
         xset(this, "y1", v);
     }
     /// x2
     get x2() {
-        return xget(this, "x2", new NumberValue(0));
+        return xget(this, "x2", new ScalarValue(0));
     }
-    set x2(v: NumberValue) {
+    set x2(v: ScalarValue) {
         xset(this, "x2", v);
     }
     /// y2
     get y2() {
-        return xget(this, "y2", new NumberValue(0));
+        return xget(this, "y2", new ScalarValue(0));
     }
-    set y2(v: NumberValue) {
+    set y2(v: ScalarValue) {
         xset(this, "y2", v);
     }
 }
@@ -389,30 +389,30 @@ export class Use extends Item {
     }
     ///
     get width() {
-        return xget(this, "width", new NumberValue(100));
+        return xget(this, "width", new ScalarValue(100));
     }
-    set width(v: NumberValue) {
+    set width(v: ScalarValue) {
         xset(this, "width", v);
     }
     ///
     get height() {
-        return xget(this, "height", new NumberValue(100));
+        return xget(this, "height", new ScalarValue(100));
     }
-    set height(v: NumberValue) {
+    set height(v: ScalarValue) {
         xset(this, "height", v);
     }
     ///
     get x() {
-        return xget(this, "x", new NumberValue(0));
+        return xget(this, "x", new ScalarValue(0));
     }
-    set x(v: NumberValue) {
+    set x(v: ScalarValue) {
         xset(this, "x", v);
     }
     ///
     get y() {
-        return xget(this, "y", new NumberValue(0));
+        return xget(this, "y", new ScalarValue(0));
     }
-    set y(v: NumberValue) {
+    set y(v: ScalarValue) {
         xset(this, "y", v);
     }
 }

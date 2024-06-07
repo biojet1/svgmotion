@@ -1,4 +1,4 @@
-import { NVectorValue, NumberValue, PointsValue, RGBValue, TextValue } from "../model/value.js";
+import { VectorValue, ScalarValue, PointsValue, RGBValue, TextValue } from "../model/value.js";
 import { Animatable } from "../model/value.js";
 import { Container, Root, Item } from "../model/node.js";
 import { Node } from "../model/linked.js";
@@ -7,7 +7,7 @@ import { Transform, Fill, Box, Font, Stroke, ValueSet } from "../model/valuesets
 const FILL_MAP: {
     [key: string]: ((frame: number, node: SVGElement, prop: any) => void);
 } = {
-    opacity: function (frame: number, node: SVGElement, prop: NumberValue) {
+    opacity: function (frame: number, node: SVGElement, prop: ScalarValue) {
         node.setAttribute("fill-opacity", prop.get_percentage_repr(frame));
     },
     color: function (frame: number, node: SVGElement, prop: RGBValue) {
@@ -18,34 +18,34 @@ const FILL_MAP: {
 const PROP_MAP: {
     [key: string]: ((frame: number, elem: any, prop: any, node: Container | Item) => void);
 } = {
-    opacity: function (frame: number, node: SVGElement, prop: NumberValue) {
+    opacity: function (frame: number, node: SVGElement, prop: ScalarValue) {
         node.setAttribute("opacity", prop.get_percentage_repr(frame));
     },
-    x: function (frame: number, node: SVGRectElement | SVGSVGElement, prop: NumberValue) {
+    x: function (frame: number, node: SVGRectElement | SVGSVGElement, prop: ScalarValue) {
         node.setAttribute("x", prop.get_length_repr(frame));
     },
-    y: function (frame: number, node: SVGRectElement | SVGSVGElement, prop: NumberValue) {
+    y: function (frame: number, node: SVGRectElement | SVGSVGElement, prop: ScalarValue) {
         node.setAttribute("y", prop.get_length_repr(frame));
     },
-    cx: function (frame: number, node: SVGCircleElement | SVGEllipseElement, prop: NumberValue) {
+    cx: function (frame: number, node: SVGCircleElement | SVGEllipseElement, prop: ScalarValue) {
         node.setAttribute("cx", prop.get_length_repr(frame));
     },
-    cy: function (frame: number, node: SVGCircleElement | SVGEllipseElement, prop: NumberValue) {
+    cy: function (frame: number, node: SVGCircleElement | SVGEllipseElement, prop: ScalarValue) {
         node.setAttribute("cy", prop.get_length_repr(frame));
     },
-    r: function (frame: number, node: SVGCircleElement, prop: NumberValue) {
+    r: function (frame: number, node: SVGCircleElement, prop: ScalarValue) {
         node.setAttribute("r", prop.get_length_repr(frame));
     },
-    width: function (frame: number, node: SVGRectElement | SVGSVGElement, prop: NumberValue) {
+    width: function (frame: number, node: SVGRectElement | SVGSVGElement, prop: ScalarValue) {
         node.setAttribute("width", prop.get_length_repr(frame));
     },
-    height: function (frame: number, node: SVGRectElement | SVGSVGElement, prop: NumberValue) {
+    height: function (frame: number, node: SVGRectElement | SVGSVGElement, prop: ScalarValue) {
         node.setAttribute("height", prop.get_length_repr(frame));
     },
-    rx: function (frame: number, node: SVGRectElement | SVGEllipseElement, prop: NumberValue) {
+    rx: function (frame: number, node: SVGRectElement | SVGEllipseElement, prop: ScalarValue) {
         node.setAttribute("rx", prop.get_length_repr(frame));
     },
-    ry: function (frame: number, node: SVGRectElement | SVGEllipseElement, prop: NumberValue) {
+    ry: function (frame: number, node: SVGRectElement | SVGEllipseElement, prop: ScalarValue) {
         node.setAttribute("ry", prop.get_length_repr(frame));
     },
     view_box: function (frame: number, node: SVGRectElement | SVGSVGElement, prop: Box) {
@@ -66,7 +66,7 @@ const PROP_MAP: {
     transform: function (frame: number, node: SVGElement, prop: Transform) {
         node.setAttribute("transform", prop.get_transform_repr(frame));
     },
-    anchor: function (frame: number, node: SVGElement, prop: NVectorValue) {
+    anchor: function (frame: number, node: SVGElement, prop: VectorValue) {
         // node.style.transformOrigin = prop.get_anchor_repr(frame);
         node.setAttribute("transform-origin", prop.get_anchor_repr(frame));
 
@@ -124,7 +124,7 @@ const PROP_MAP: {
         }
     },
 
-    line_height: function (frame: number, node: SVGElement, prop: NumberValue) {
+    line_height: function (frame: number, node: SVGElement, prop: ScalarValue) {
         node.style.lineHeight = prop.get_value(frame) + '';
     },
     text_align: function (frame: number, node: SVGElement, prop: TextValue) {
@@ -185,11 +185,11 @@ declare module "../model/value" {
     interface PointsValue {
         get_points_repr(frame: number): string;
     }
-    interface NumberValue {
+    interface ScalarValue {
         get_percentage_repr(frame: number): string;
         get_length_repr(frame: number): string;
     }
-    interface NVectorValue {
+    interface VectorValue {
         get_anchor_repr(frame: number): string;
     }
 }
@@ -254,15 +254,15 @@ PointsValue.prototype.get_points_repr = function (frame: number) {
     return this.get_value(frame).map(([a, b]) => `${a},${b}`).join(' ')
 }
 
-NumberValue.prototype.get_percentage_repr = function (frame: number) {
+ScalarValue.prototype.get_percentage_repr = function (frame: number) {
     return this.get_value(frame).toFixed(4).replace(/0$/, '');
 }
 
-NumberValue.prototype.get_length_repr = function (frame: number) {
+ScalarValue.prototype.get_length_repr = function (frame: number) {
     return this.get_value(frame) + '';
 }
 
-NVectorValue.prototype.get_anchor_repr = function (frame: number) {
+VectorValue.prototype.get_anchor_repr = function (frame: number) {
     const [x, y] = this.get_value(frame);
     return `${x}px, ${y}px`;
 }

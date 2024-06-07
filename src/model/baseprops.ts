@@ -1,4 +1,4 @@
-import { NVector, NumberValue, PositionValue, TextValue } from "./value.js";
+import { Vector, ScalarValue, PositionValue, TextValue } from "./value.js";
 import { Fill, Transform, xset, xget, Font, Stroke } from "./valuesets.js";
 import { Node, Parent } from "./linked.js";
 export type Constructor = (new (...args: any[]) => Parent) | (new (...args: any[]) => Node);
@@ -9,9 +9,9 @@ export function BaseProps<TBase extends Constructor>(Base: TBase) {
         static tag = '?';
         ///
         get prop5() {
-            return xget(this, "prop5", new NumberValue(45));
+            return xget(this, "prop5", new ScalarValue(45));
         }
-        set prop5(v: NumberValue) {
+        set prop5(v: ScalarValue) {
             xset(this, "prop5", v);
         }
         /// fill
@@ -31,9 +31,9 @@ export function BaseProps<TBase extends Constructor>(Base: TBase) {
 
         /// opacity
         get opacity() {
-            return xget(this, "opacity", new NumberValue(1));
+            return xget(this, "opacity", new ScalarValue(1));
         }
-        set opacity(v: NumberValue) {
+        set opacity(v: ScalarValue) {
             xset(this, "opacity", v);
         }
         /// Font
@@ -52,9 +52,9 @@ export function BaseProps<TBase extends Constructor>(Base: TBase) {
         }
         // line_height
         get line_height() {
-            return xget(this, "line_height", new NumberValue(1));
+            return xget(this, "line_height", new ScalarValue(1));
         }
-        set line_height(v: NumberValue) {
+        set line_height(v: ScalarValue) {
             xset(this, "line_height", v);
         }
         /// text-align
@@ -73,7 +73,7 @@ export function BaseProps<TBase extends Constructor>(Base: TBase) {
         }
         /// anchor
         get anchor() {
-            return xget(this, "anchor", new PositionValue(new NVector([0, 0])));
+            return xget(this, "anchor", new PositionValue(new Vector([0, 0])));
         }
         set anchor(v: TextValue | PositionValue) {
             xset(this, "anchor", v);

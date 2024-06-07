@@ -1,7 +1,7 @@
 "uses strict";
 import test from "tap";
 import { SVGDocument, XMLSerializer } from "domspec";
-import { NVector, RGB, Root, Step } from "svgmotion";
+import { Vector, RGB, Root, Step } from "svgmotion";
 test.test("Item", async (t) => {
     const anim = new Root();
     const tr = anim.track();

@@ -1,7 +1,7 @@
 import {
-    NVector,
-    NVectorValue,
-    NumberValue,
+    Vector,
+    VectorValue,
+    ScalarValue,
     PositionValue,
     RGBValue,
     TextValue,
@@ -62,22 +62,22 @@ export class Box extends ValueSet {
     constructor(position: Iterable<number>, size: Iterable<number>) {
         super();
         if (size) {
-            this.size = new PositionValue(new NVector(size));
+            this.size = new PositionValue(new Vector(size));
         }
         if (position) {
-            this.position = new PositionValue(new NVector(position));
+            this.position = new PositionValue(new Vector(position));
         }
     }
     /// size
     get size() {
-        return xget(this, "size", new PositionValue(new NVector([100, 100])));
+        return xget(this, "size", new PositionValue(new Vector([100, 100])));
     }
     set size(v: PositionValue) {
         xset(this, "size", v);
     }
     /// position
     get position() {
-        return xget(this, "position", new PositionValue(new NVector([0, 0])));
+        return xget(this, "position", new PositionValue(new Vector([0, 0])));
     }
     set position(v: PositionValue) {
         xset(this, "position", v);
@@ -87,44 +87,44 @@ export class Box extends ValueSet {
 export class Stroke extends ValueSet {
     /// width
     get width() {
-        return xget(this, "width", new NumberValue(1));
+        return xget(this, "width", new ScalarValue(1));
     }
-    set width(v: NumberValue) {
+    set width(v: ScalarValue) {
         xset(this, "width", v);
     }
     /// opacity
     get opacity() {
-        return xget(this, "opacity", new NumberValue(1));
+        return xget(this, "opacity", new ScalarValue(1));
     }
-    set opacity(v: NumberValue) {
+    set opacity(v: ScalarValue) {
         xset(this, "opacity", v);
     }
     /// color
     get color() {
-        return xget(this, "color", new RGBValue(new NVector([0, 0, 0])));
+        return xget(this, "color", new RGBValue(new Vector([0, 0, 0])));
     }
     set color(v: RGBValue) {
         xset(this, "color", v);
     }
     /// stroke-miterlimit
     get miter_limit() {
-        return xget(this, "miter_limit", new NumberValue(4));
+        return xget(this, "miter_limit", new ScalarValue(4));
     }
-    set miter_limit(v: NumberValue) {
+    set miter_limit(v: ScalarValue) {
         xset(this, "miter_limit", v);
     }
     // stroke-dashoffset
     get dash_offset() {
-        return xget(this, "dash_offset", new NumberValue(1));
+        return xget(this, "dash_offset", new ScalarValue(1));
     }
-    set dash_offset(v: NumberValue) {
+    set dash_offset(v: ScalarValue) {
         xset(this, "dash_offset", v);
     }
     // stroke-array
     get dash_array() {
-        return xget(this, "dash_array", new NVectorValue(new NVector([1, 1])));
+        return xget(this, "dash_array", new VectorValue(new Vector([1, 1])));
     }
-    set dash_array(v: NVectorValue) {
+    set dash_array(v: VectorValue) {
         xset(this, "dash_array", v);
     }
 }
@@ -132,14 +132,14 @@ export class Stroke extends ValueSet {
 export class Fill extends ValueSet {
     /// opacity
     get opacity() {
-        return xget(this, "opacity", new NumberValue(1));
+        return xget(this, "opacity", new ScalarValue(1));
     }
-    set opacity(v: NumberValue) {
+    set opacity(v: ScalarValue) {
         xset(this, "opacity", v);
     }
     /// color
     get color() {
-        return xget(this, "color", new RGBValue(new NVector([0, 0, 0])));
+        return xget(this, "color", new RGBValue(new Vector([0, 0, 0])));
     }
     set color(v: RGBValue) {
         xset(this, "color", v);
@@ -229,19 +229,19 @@ export class Transform extends ValueSet {
     }
     ///
     add_translate(x: number = 0, y: number = 0) {
-        const q = new MTranslate(new NVector([x, y]));
+        const q = new MTranslate(new Vector([x, y]));
         this.all.push(q);
         return q;
     }
     add_scale(x: number = 1, y: number = 1) {
-        const q = new MScale(new NVector([x, y]));
+        const q = new MScale(new Vector([x, y]));
         this.all.push(q);
         return q;
     }
     add_rotate(deg: number = 0, x?: number, y?: number) {
         if (x != undefined) {
             if (y != undefined) {
-                const q = new MRotateAt(new NVector([deg, x, y]));
+                const q = new MRotateAt(new Vector([deg, x, y]));
                 this.all.push(q);
                 return q;
             }
@@ -269,7 +269,7 @@ export class Transform extends ValueSet {
         e: number = 0,
         f: number = 0
     ) {
-        const q = new MHexad(new NVector([a, b, c, d, e, f]));
+        const q = new MHexad(new Vector([a, b, c, d, e, f]));
         this.all.push(q);
         return q;
     }
@@ -327,7 +327,7 @@ export class Transform extends ValueSet {
 
                     case "R":
                         {
-                            const q = new MRotateAt(new NVector([0, 0, 0]));
+                            const q = new MRotateAt(new Vector([0, 0, 0]));
                             q.load(v);
                             this.all.push(q);
                         }
@@ -396,7 +396,7 @@ function find1<T>(
     }
 }
 
-class MTranslate extends NVectorValue {
+class MTranslate extends PositionValue {
     get_transform_repr(frame: number) {
         const [x, y] = this.get_value(frame);
         return `translate(${x} ${y})`;
@@ -407,7 +407,7 @@ class MTranslate extends NVectorValue {
         return o;
     }
 }
-class MScale extends NVectorValue {
+class MScale extends VectorValue {
     get_transform_repr(frame: number) {
         const [x, y] = this.get_value(frame);
         return `scale(${x} ${y})`;
@@ -419,7 +419,7 @@ class MScale extends NVectorValue {
     }
 }
 
-class MRotateAt extends NVectorValue {
+class MRotateAt extends VectorValue {
     get_transform_repr(frame: number) {
         const [a, x, y] = this.get_value(frame);
         if (x || y) {
@@ -434,7 +434,7 @@ class MRotateAt extends NVectorValue {
     }
 }
 
-class MRotation extends NumberValue {
+class MRotation extends ScalarValue {
     get_transform_repr(frame: number) {
         const a = this.get_value(frame);
         return `rotate(${a})`;
@@ -446,7 +446,7 @@ class MRotation extends NumberValue {
     }
 }
 
-class MSkewX extends NumberValue {
+class MSkewX extends ScalarValue {
     get_transform_repr(frame: number) {
         const a = this.get_value(frame);
         return `skewX(${a})`;
@@ -458,7 +458,7 @@ class MSkewX extends NumberValue {
     }
 }
 
-class MSkewY extends NumberValue {
+class MSkewY extends ScalarValue {
     get_transform_repr(frame: number) {
         const a = this.get_value(frame);
         return `skewY(${a})`;
@@ -470,7 +470,7 @@ class MSkewY extends NumberValue {
     }
 }
 
-class MHexad extends NVectorValue {
+class MHexad extends VectorValue {
     get_transform_repr(frame: number) {
         const [a, b, c, d, e, f] = this.get_value(frame);
         return `matrix(${a} ${b} ${c} ${d} ${e} ${f})`;

@@ -115,3 +115,26 @@ export function cubic_point_at(
         F3 * sy + 3 * F2t * y1 + 3 * Ft2 * y2 + t3 * ey,
     ];
 }
+
+
+export function cubic_point3d_at(
+    t: number,
+    [x0, y0, z0]: [number, number, number],
+    [x1, y1, z1]: [number, number, number],
+    [x2, y2, z2]: [number, number, number],
+    [x3, y3, z3]: [number, number, number]
+): [number, number, number] {
+    const F = 1 - t;
+    const F2 = F * F;
+    const F3 = F2 * F;
+    const t2 = t * t;
+    const t3 = t2 * t;
+    const F2t = F2 * t;
+    const Ft2 = F * t2;
+
+    const x = F3 * x0 + 3 * F2t * x1 + 3 * Ft2 * x2 + t3 * x3;
+    const y = F3 * y0 + 3 * F2t * y1 + 3 * Ft2 * y2 + t3 * y3;
+    const z = F3 * z0 + 3 * F2t * z1 + 3 * Ft2 * z2 + t3 * z3;
+
+    return [x, y, z];
+}

@@ -1,6 +1,6 @@
 import { cubic_point_at } from "../keyframe/bezier.js";
 import { Animated } from "../keyframe/keyframe.js";
-import { KeyframeEntry } from "../keyframe/kfhelper.js";
+import { Keyframe } from "../keyframe/kfhelper.js";
 export interface KFBase {
     t: number;
     h?: boolean;
@@ -8,7 +8,7 @@ export interface KFBase {
     i?: Iterable<number>;
 }
 
-export interface KFEntry<V> extends KFBase {
+export interface KFData<V> extends KFBase {
     v: V;
     r?: number; // repeat_count
     b?: boolean; // bounce
@@ -16,14 +16,14 @@ export interface KFEntry<V> extends KFBase {
 
 export type ValueT<V> = {
     v: V;
-    k?: KFEntry<V>[];
+    k?: KFData<V>[];
     r?: number;
     b?: boolean;
     _?: string;
 };
-export type ValueF<V> = { v: V; k?: KFEntry<V>[]; r?: number; b?: boolean };
+export type ValueF<V> = { v: V; k?: KFData<V>[]; r?: number; b?: boolean };
 
-export class Animatable<V> extends Animated<V> {
+export class Animatable<V, K extends Keyframe<V> = Keyframe<V>> extends Animated<V, K> {
     value: V | null;
 
     // static
@@ -38,7 +38,7 @@ export class Animatable<V> extends Animated<V> {
     set_value(value: V | any) {
         this.value = this.check_value(value);
     }
-    dump_kfe(kfe: KeyframeEntry<V>, value: any): KFEntry<V> {
+    dump_kfe(kfe: K, value: any): KFData<V> {
         const { time: t, easing } = kfe;
         if (!easing) {
             return { t, v: value };
@@ -63,16 +63,16 @@ export class Animatable<V> extends Animated<V> {
         }
         return o;
     }
-    load_kfe(x: KFBase, value: V): KeyframeEntry<V> {
+    load_kfe(x: KFBase, value: V): K {
         const { t: time, h, o, i } = x;
         if (h) {
-            return { time, easing: true, value };
+            return { time, easing: true, value } as K;
         } else if (o && i) {
             const [ox, oy] = o;
             const [ix, iy] = i;
-            return { time, easing: [ox, oy, ix, iy], value };
+            return { time, easing: [ox, oy, ix, iy], value } as K;
         }
-        return { time, value };
+        return { time, value } as K;
     }
     load(x: ValueF<any>) {
         const { k, v } = x;
@@ -107,7 +107,7 @@ export class Animatable<V> extends Animated<V> {
 export class AnimatableD<V> extends Animatable<V> {
     override get_value(frame: number) {
         const { kfs } = this;
-        let p = undefined; // previous KeyframeEntry<V>
+        let p = undefined; // previous Keyframe<V>
         for (const k of kfs) {
             if (k.time >= frame) {
                 return k.value;
@@ -167,32 +167,32 @@ export class AnimatableD<V> extends Animatable<V> {
     }
 }
 
-export class NVectorValue extends Animatable<NVector> {
-    override lerp_value(r: number, a: NVector, b: NVector): NVector {
+export class VectorValue<K extends Keyframe<Vector> = Keyframe<Vector>> extends Animatable<Vector, K> {
+    override lerp_value(r: number, a: Vector, b: Vector): Vector {
         return a.lerp(b, r);
     }
-    override add_value(a: NVector, b: NVector): NVector {
+    override add_value(a: Vector, b: Vector): Vector {
         return a.add(b);
     }
-    override check_value(x: any): NVector {
-        if (x instanceof NVector) {
+    override check_value(x: any): Vector {
+        if (x instanceof Vector) {
             return x;
         } else {
-            return new NVector(x);
+            return new Vector(x);
         }
     }
-    override dump_value(a: NVector): any {
+    override dump_value(a: Vector): any {
         if (a == null) {
             return null;
         }
         return Array.from(a); // NaN -> null
     }
 
-    override load_value(a: any): NVector {
-        return new NVector(a);
+    override load_value(a: any): Vector {
+        return new Vector(a);
     }
 
-    constructor(v: NVector) {
+    constructor(v: Vector) {
         super(v);
     }
 }
@@ -217,7 +217,7 @@ export class TextValue extends AnimatableD<string> {
     }
 }
 
-export class RGBValue extends NVectorValue {
+export class RGBValue extends VectorValue {
     static to_css_rgb([r, g, b, a]: Iterable<number>) {
         if (a == 0) {
             return "none";
@@ -228,27 +228,21 @@ export class RGBValue extends NVectorValue {
     }
 }
 
-export interface PositionKeyframe<V> extends KeyframeEntry<V> {
+export interface PositionKeyframe<V> extends Keyframe<V> {
     in_tan?: Iterable<number>;
     out_tan?: Iterable<number>;
 }
 
-export class PositionValue extends NVectorValue {
-    override new_keyframe(
-        time: number,
-        value: NVector,
-        easing?: Iterable<number> | true
-    ) {
-        const kf: PositionKeyframe<NVector> = { time, value };
-        if (easing) {
-            kf.easing = easing;
-        }
-        return kf;
-    }
+export interface PositionKFData<V> extends KFData<V> {
+    ti?: Iterable<number>;
+    to?: Iterable<number>;
+}
+
+export class PositionValue extends VectorValue<PositionKeyframe<Vector>> {
     override lerp_keyframes(
         t: number,
-        a: PositionKeyframe<NVector>,
-        b: PositionKeyframe<NVector>
+        a: PositionKeyframe<Vector>,
+        b: PositionKeyframe<Vector>
     ) {
         const ti = a.in_tan;
         if (ti) {
@@ -265,14 +259,30 @@ export class PositionValue extends NVectorValue {
                     [bx + ix, by + iy],
                     [bx, by]
                 );
-                return new NVector([x, y]);
+                return new Vector([x, y]);
             }
         }
         return super.lerp_keyframes(t, a, b);
     }
+
+    override dump_kfe(
+        kfe: PositionKeyframe<Vector>,
+        value: any
+    ): PositionKFData<Vector> {
+        const d: PositionKFData<Vector> = super.dump_kfe(kfe, value);
+        const ti = kfe.in_tan;
+        if (ti) {
+            const to = kfe.out_tan;
+            if (to) {
+                d.ti = ti;
+                d.to = to;
+            }
+        }
+        return d;
+    }
 }
 
-export class NumberValue extends Animatable<number> {
+export class ScalarValue extends Animatable<number> {
     override lerp_value(r: number, a: number, b: number): number {
         return a * (1 - r) + b * r;
     }
@@ -290,34 +300,34 @@ export class NumberValue extends Animatable<number> {
     }
 }
 
-export class NVector extends Float64Array {
-    add(that: NVector) {
-        return new NVector(this.map((v, i) => v + that[i]));
+export class Vector extends Float64Array {
+    add(that: Vector) {
+        return new Vector(this.map((v, i) => v + that[i]));
     }
-    mul(that: NVector) {
-        return new NVector(this.map((v, i) => v * that[i]));
+    mul(that: Vector) {
+        return new Vector(this.map((v, i) => v * that[i]));
     }
-    lerp(that: NVector, t: number) {
+    lerp(that: Vector, t: number) {
         const u = 1 - t;
         const a = this.map((v, i) => v * u);
         const b = that.map((v, i) => v * t);
-        return new NVector(a.map((v, i) => v + b[i]));
+        return new Vector(a.map((v, i) => v + b[i]));
     }
 }
 
-export class Point extends NVector {
+export class Point extends Vector {
     constructor(x: number = 0, y: number = 0) {
         super([x, y]);
     }
 }
 
-export class Size extends NVector {
+export class Size extends Vector {
     constructor(w: number = 0, h: number = 0) {
         super([w, h]);
     }
 }
 
-export class RGB extends NVector {
+export class RGB extends Vector {
     constructor(r: number = 0, g: number = 0, b: number = 0) {
         super([r, g, b]);
     }
