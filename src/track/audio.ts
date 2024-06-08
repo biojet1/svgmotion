@@ -21,8 +21,8 @@ export abstract class AudioActionBase extends Action {
 
     }
     override ready(parent: IParent): void {
-        const { dur } = this._params ?? {};
-        this._dur = (dur == undefined) ? undefined : parent.to_frame(dur);
+        // const { dur } = this._params ?? {};
+        // this._dur = (dur == undefined) ? undefined : parent.to_frame(dur);
 
     }
 }

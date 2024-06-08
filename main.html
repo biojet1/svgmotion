@@ -36,12 +36,12 @@
             r.position = new VectorValue([10, 10]);
             let tr = new Track();
             tr.feed(
-                Par(
-                    Seq(
+                Par([
+                    Seq([
                         To([r.size], new Size(50, 50)),
                         To([r.size], new Size(100, 100)),
-                        To([r.size], new Size(10, 10))
-                    ),
+                        To([r.size], new Size(10, 10)),
+                    ]),
                     Step(
                         [
                             {
@@ -74,8 +74,8 @@
                             C: r.fill.color,
                             R: r.transform.rotation,
                         }
-                    )
-                )
+                    ),
+                ])
             );
             console.log(doc);
 

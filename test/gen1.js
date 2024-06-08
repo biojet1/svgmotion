@@ -151,7 +151,7 @@ export async function animate(lib) {
 
         const tr = anim.track();
         tr.run(
-            Seq(
+            Seq([
                 To(pos, [-200, -100], {
                     curve: [
                         [100, -200],
@@ -176,7 +176,7 @@ export async function animate(lib) {
                     ],
 
                     { pos }
-                )
+                )]
             )
         );
 

@@ -16,12 +16,12 @@ test.test("Par 2", (t) => {
     tr.frame_rate = 5;
     tr.hint_dur = 5;
     tr.run(
-        ParE(
-            x = To(a, 11, { easing: Easing.linear, dur: 2 }),
+        ParE([
+            (x = To(a, 11, { easing: Easing.linear, dur: 2 })),
             Add(b, -10),
             Add(d, 15, { dur: 3, easing: Easing.linear }),
             To(c, 18),
-        )
+        ])
     );
     console.log(x);
 
@@ -37,7 +37,10 @@ test.test("Par 2", (t) => {
         cata(a, 0, 15 + 1).map((v) => Math.round(v)),
         [1, 1, 1, 1, 1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
     );
-    t.same(cata(b, 0, 15 + 1).map((v) => Math.round(v)), [11, 11, 11, 11, 11, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1]);
+    t.same(
+        cata(b, 0, 15 + 1).map((v) => Math.round(v)),
+        [11, 11, 11, 11, 11, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
+    );
     t.end();
 });
 
@@ -47,14 +50,28 @@ test.test("Seq", (t) => {
     let b = new ScalarValue(2);
     let c = new ScalarValue(3);
     let tr = new Track();
-    tr.run(Seq(
-        To([a], 9),
-        To([b], 8),
-        To([c], 7),
-    ));
-    t.same(a.dump(), { k: [{ t: 0, v: 1 }, { t: 60, v: 9 }], v: 1 });
-    t.same(b.dump(), { k: [{ t: 60, v: 2 }, { t: 120, v: 8 }], v: 2 });
-    t.same(c.dump(), { k: [{ t: 120, v: 3 }, { t: 180, v: 7 }], v: 3 });
+    tr.run(Seq([To([a], 9), To([b], 8), To([c], 7)]));
+    t.same(a.dump(), {
+        k: [
+            { t: 0, v: 1 },
+            { t: 60, v: 9 },
+        ],
+        v: 1,
+    });
+    t.same(b.dump(), {
+        k: [
+            { t: 60, v: 2 },
+            { t: 120, v: 8 },
+        ],
+        v: 2,
+    });
+    t.same(c.dump(), {
+        k: [
+            { t: 120, v: 3 },
+            { t: 180, v: 7 },
+        ],
+        v: 3,
+    });
     t.end();
 });
 
@@ -64,14 +81,28 @@ test.test("Par", (t) => {
     let b = new ScalarValue(2);
     let c = new ScalarValue(3);
     let tr = new Track();
-    tr.run(Par(
-        To([a], 9),
-        To([b], 8),
-        To([c], 7),
-    ));
-    t.same(a.dump(), { k: [{ t: 0, v: 1 }, { t: 60, v: 9 }], v: 1 });
-    t.same(b.dump(), { k: [{ t: 0, v: 2 }, { t: 60, v: 8 }], v: 2 });
-    t.same(c.dump(), { k: [{ t: 0, v: 3 }, { t: 60, v: 7 }], v: 3 });
+    tr.run(Par([To([a], 9), To([b], 8), To([c], 7)]));
+    t.same(a.dump(), {
+        k: [
+            { t: 0, v: 1 },
+            { t: 60, v: 9 },
+        ],
+        v: 1,
+    });
+    t.same(b.dump(), {
+        k: [
+            { t: 0, v: 2 },
+            { t: 60, v: 8 },
+        ],
+        v: 2,
+    });
+    t.same(c.dump(), {
+        k: [
+            { t: 0, v: 3 },
+            { t: 60, v: 7 },
+        ],
+        v: 3,
+    });
     t.end();
 });
 
@@ -83,31 +114,73 @@ test.test("Seq then Par", (t) => {
     let tr = new Track();
     tr.frame_rate = 5;
     tr.hint_dur = 5;
-    tr.run(Seq(
-        To([a], 9),
-        To([b], 8),
-        To([c], 7),
-    ));
+    tr.run(Seq([To([a], 9), To([b], 8), To([c], 7)]));
     // console.log(tr)
-    t.same(a.dump(), { k: [{ t: 0, v: 1 }, { t: 5, v: 9 }], v: 1 });
-    t.same(b.dump(), { k: [{ t: 5, v: 2 }, { t: 10, v: 8 }], v: 2 });
-    t.same(c.dump(), { k: [{ t: 10, v: 3 }, { t: 15, v: 7 }], v: 3 });
+    t.same(a.dump(), {
+        k: [
+            { t: 0, v: 1 },
+            { t: 5, v: 9 },
+        ],
+        v: 1,
+    });
+    t.same(b.dump(), {
+        k: [
+            { t: 5, v: 2 },
+            { t: 10, v: 8 },
+        ],
+        v: 2,
+    });
+    t.same(c.dump(), {
+        k: [
+            { t: 10, v: 3 },
+            { t: 15, v: 7 },
+        ],
+        v: 3,
+    });
 
-    tr.run(Par(
-        To(a, 1),
-        To(b, 1),
-        To(c, 1),
-    ));
+    tr.run(Par([To(a, 1), To(b, 1), To(c, 1)]));
 
-    t.same(a.dump(), { k: [{ t: 0, v: 1 }, { t: 5, h: true, v: 9 }, { t: 15, v: 9 }, { t: 20, v: 1 }], v: 1 });
-    t.same(b.dump(), { k: [{ t: 5, v: 2 }, { t: 10, h: true, v: 8 }, { t: 15, v: 8 }, { t: 20, v: 1 }], v: 2 });
-    t.same(c.dump(), { k: [{ t: 10, v: 3 }, { t: 15, v: 7 }, { t: 20, v: 1 }], v: 3 });
+    t.same(a.dump(), {
+        k: [
+            { t: 0, v: 1 },
+            { t: 5, h: true, v: 9 },
+            { t: 15, v: 9 },
+            { t: 20, v: 1 },
+        ],
+        v: 1,
+    });
+    t.same(b.dump(), {
+        k: [
+            { t: 5, v: 2 },
+            { t: 10, h: true, v: 8 },
+            { t: 15, v: 8 },
+            { t: 20, v: 1 },
+        ],
+        v: 2,
+    });
+    t.same(c.dump(), {
+        k: [
+            { t: 10, v: 3 },
+            { t: 15, v: 7 },
+            { t: 20, v: 1 },
+        ],
+        v: 3,
+    });
 
     t.end();
 });
 
 test.test("Step", (t) => {
-    const { VectorValue, Root, Track, ViewPort, ScalarValue, Fill, Step, Vector } = svgmotion;
+    const {
+        VectorValue,
+        Root,
+        Track,
+        ViewPort,
+        ScalarValue,
+        Fill,
+        Step,
+        Vector,
+    } = svgmotion;
     let tr = new Track();
     let head = new Root();
     let view = head.view;
@@ -176,7 +249,14 @@ test.test("Curve", (t) => {
     let pos = new PositionValue([4, 5]);
     let tr = new Track();
     let a;
-    tr.run(a = To(pos, [-200, -100], { curve: [[10, 10], [20, 20]] }));
+    tr.run(
+        (a = To(pos, [-200, -100], {
+            curve: [
+                [10, 10],
+                [20, 20],
+            ],
+        }))
+    );
     t.same(Array.from(pos.get_value(0)), [4, 5]);
     t.same(Array.from(pos.get_value(60)), [-200, -100]);
     // console.log(a);
@@ -185,5 +265,3 @@ test.test("Curve", (t) => {
     t.same(pos.dump(), d);
     t.end();
 });
-
-
