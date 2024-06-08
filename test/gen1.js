@@ -152,13 +152,13 @@ export async function animate(lib) {
         const tr = anim.track();
         tr.run(
             Seq(
-                To(pos, [-200, -100]).set({
+                To(pos, [-200, -100], {
                     curve: [
                         [100, -200],
                         [30, 40],
                     ],
                 }),
-                To(pos, [-0, -0]).set({
+                To(pos, [-0, -0], {
                     curve: [
                         [30, -30],
                         [-30, 30],

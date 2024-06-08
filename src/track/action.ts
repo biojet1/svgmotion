@@ -1,3 +1,4 @@
+type EasingT = Iterable<number> | true;
 export interface IProperty<V> {
     get_value(time: number): V;
     key_value(
@@ -5,7 +6,7 @@ export interface IProperty<V> {
         value: V,
         extra?: {
             start?: number,
-            easing?: Iterable<number> | true,
+            easing?: EasingT,
             add?: boolean
             curve?: Iterable<number[]>
         }
@@ -26,7 +27,7 @@ export interface IAction {
 }
 
 export interface IParent {
-    easing?: Iterable<number> | true;
+    easing?: EasingT;
     frame_rate: number;
     to_frame(sec: number): number;
     add_prop(prop: IProperty<any>): void;
@@ -37,7 +38,7 @@ export class Action implements IAction {
     _end: number = -Infinity;
     _dur?: number;
     _params?: {
-        easing?: Iterable<number> | true;
+        easing?: EasingT;
         dur?: number;
         curve?: Iterable<number[]>
     };
@@ -60,19 +61,15 @@ export class Action implements IAction {
     get_active_dur() {
         return this._end - this._start;
     }
-    set(x: this['_params']) {
-        Object.assign(this._params ?? (this._params = {}), x);
-        return this;
-    }
 }
 
 export abstract class Actions extends Array<Action | Actions> implements IAction {
     _start: number = -Infinity;
     _end: number = -Infinity;
     _hint_dur?: number;
-    _easing?: Iterable<number> | true;
+    _easing?: EasingT;
     _params: {
-        easing?: Iterable<number> | true;
+        easing?: EasingT;
         hint_dur?: number;
     } = {};
     ready(parent: IParent): void {
@@ -201,11 +198,11 @@ export function ParE(...items: Array<Action | Actions>) {
 }
 
 export class ToA extends Action {
-    _easing?: Iterable<number> | true;
+    _easing?: EasingT;
 
-    constructor(props: IProperty<any>[], value: any) {
+    constructor(props: IProperty<any>[], value: any, params: Action['_params']) {
         super();
-        // this._params = params;
+        this._params = params;
         this.ready = function (parent: IParent): void {
             const { dur, easing } = this._params ?? {};
             this._dur = (dur == undefined) ? undefined : parent.to_frame(dur);
@@ -239,9 +236,10 @@ export class PassA extends Action {
 }
 
 export class AddA extends Action {
-    _easing?: Iterable<number> | true;
-    constructor(props: IProperty<any>[], value: any) {
+    _easing?: EasingT;
+    constructor(props: IProperty<any>[], value: any, params: Action['_params']) {
         super();
+        this._params = params;
         this.ready = function (parent: IParent): void {
             const { dur, easing } = this._params ?? {};
             this._dur = (dur == undefined) ? undefined : parent.to_frame(dur);
@@ -273,12 +271,12 @@ function list_props(x: IProperty<any>[] | IProperty<any>) {
     }
 }
 
-export function To(props: IProperty<any>[] | IProperty<any>, value: any, dur?: number, easing?: Iterable<number> | true) {
-    return (new ToA(list_props(props), value)).set({ dur, easing });
+export function To(props: IProperty<any>[] | IProperty<any>, value: any, params?: Action['_params']) {
+    return new ToA(list_props(props), value, params);
 }
 
-export function Add(props: IProperty<any>[] | IProperty<any>, value: any, dur?: number, easing?: Iterable<number> | true) {
-    return (new AddA(list_props(props), value)).set({ dur, easing });
+export function Add(props: IProperty<any>[] | IProperty<any>, value: any, params?: Action['_params']) {
+    return new AddA(list_props(props), value, params);
 }
 
 export function Pass(dur?: number) {

@@ -12,16 +12,19 @@ test.test("Par 2", (t) => {
     let c = new ScalarValue(3);
     let d = new ScalarValue(3);
     let tr = new Track();
+    let x;
     tr.frame_rate = 5;
     tr.hint_dur = 5;
     tr.run(
         ParE(
-            To(a, 11, 2).set({ easing: Easing.linear }),
+            x = To(a, 11, { easing: Easing.linear, dur: 2 }),
             Add(b, -10),
-            Add(d, 15, 3, Easing.linear),
+            Add(d, 15, { dur: 3, easing: Easing.linear }),
             To(c, 18),
         )
     );
+    console.log(x);
+
     t.same(
         cata(c, 0, 15 + 1),
         [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
@@ -173,7 +176,7 @@ test.test("Curve", (t) => {
     let pos = new PositionValue([4, 5]);
     let tr = new Track();
     let a;
-    tr.run(a = To(pos, [-200, -100]).set({ curve: [[10, 10], [20, 20]] }));
+    tr.run(a = To(pos, [-200, -100], { curve: [[10, 10], [20, 20]] }));
     t.same(Array.from(pos.get_value(0)), [4, 5]);
     t.same(Array.from(pos.get_value(60)), [-200, -100]);
     // console.log(a);
@@ -182,3 +185,5 @@ test.test("Curve", (t) => {
     t.same(pos.dump(), d);
     t.end();
 });
+
+
