@@ -93,10 +93,6 @@ export abstract class Actions
     get_active_dur() {
         return this._end - this._start;
     }
-    // set(x: this["_params"]) {
-    //     Object.assign(this._params ?? (this._params = {}), x);
-    //     return this;
-    // }
 
     abstract resolve(frame: number, base_frame: number, hint_dur: number): void;
 }

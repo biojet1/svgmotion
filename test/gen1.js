@@ -30,17 +30,17 @@ export async function animate(lib) {
         Step(
             [
                 { t: 0, R: [400, 400], C: "orange" },
-                { t: 1, R: [250, 400], C: "grey", ease: Easing.inexpo },
-                { t: 2, R: [100, 400], C: "red", ease: Easing.outexpo },
-                { t: 3, R: [100, 250], C: "grey", ease: Easing.inexpo },
-                { t: 4, R: [100, 100], C: "blue", ease: Easing.outexpo },
-                { t: 5, R: [250, 100], C: "grey", ease: Easing.inexpo },
-                { t: 6, R: [400, 100], C: "pink", ease: Easing.outexpo },
-                { t: 7, R: [400, 250], C: "grey", ease: Easing.inexpo },
-                { t: 8, R: [400, 400], C: "orange", ease: Easing.outexpo },
+                { t: 1, R: [250, 400], C: "grey", easing: Easing.inexpo },
+                { t: 2, R: [100, 400], C: "red", easing: Easing.outexpo },
+                { t: 3, R: [100, 250], C: "grey", easing: Easing.inexpo },
+                { t: 4, R: [100, 100], C: "blue", easing: Easing.outexpo },
+                { t: 5, R: [250, 100], C: "grey", easing: Easing.inexpo },
+                { t: 6, R: [400, 100], C: "pink", easing: Easing.outexpo },
+                { t: 7, R: [400, 250], C: "grey", easing: Easing.inexpo },
+                { t: 8, R: [400, 400], C: "orange", easing: Easing.outexpo },
 
-                // { t: 0.5, X: [2, 1], ease: Easing.inquart },
-                // { t: 1, X: [1, 1], ease: Easing.outquart },
+                // { t: 0.5, X: [2, 1], easing: Easing.inquart },
+                // { t: 1, X: [1, 1], easing: Easing.outquart },
             ],
             {
                 R: g2.transform.add_translate(),
@@ -52,15 +52,15 @@ export async function animate(lib) {
     anim.track().feed(
         Step(
             [
-                { t: 0, X: [1, 1], ease: Easing.linear, C: "blue" },
-                { dur: 1, X: [2, 1], ease: Easing.inexpo, C: "grey" },
-                { dur: 1, X: [1, 1], ease: Easing.outexpo, C: "green" },
-                { dur: 1, X: [1, 2], C: "grey", ease: Easing.inexpo },
-                { dur: 1, X: [1, 1], C: "red", ease: Easing.outexpo },
-                { dur: 1, X: [2, 1], ease: Easing.inexpo, C: "grey" },
-                { dur: 1, X: [1, 1], C: "violet", ease: Easing.outexpo },
-                { dur: 1, X: [1, 2], C: "grey", ease: Easing.inexpo },
-                { dur: 1, X: [1, 1], C: Step.first, ease: Easing.outexpo },
+                { t: 0, X: [1, 1], easing: Easing.linear, C: "blue" },
+                { dur: 1, X: [2, 1], easing: Easing.inexpo, C: "grey" },
+                { dur: 1, X: [1, 1], easing: Easing.outexpo, C: "green" },
+                { dur: 1, X: [1, 2], C: "grey", easing: Easing.inexpo },
+                { dur: 1, X: [1, 1], C: "red", easing: Easing.outexpo },
+                { dur: 1, X: [2, 1], easing: Easing.inexpo, C: "grey" },
+                { dur: 1, X: [1, 1], C: "violet", easing: Easing.outexpo },
+                { dur: 1, X: [1, 2], C: "grey", easing: Easing.inexpo },
+                { dur: 1, X: [1, 1], C: Step.first, easing: Easing.outexpo },
             ],
             {
                 X: r2.transform.add_scale(),
@@ -95,9 +95,9 @@ export async function animate(lib) {
     anim.track().feed(
         Step(
             [
-                { t: 0, EX: 40, EY: 40, ease: Easing.linear },
-                { dur: 1, EY: 10, ease: Easing.linear },
-                { dur: 1, EX: 40, EY: 40, ease: Easing.linear },
+                { t: 0, EX: 40, EY: 40, easing: Easing.linear },
+                { dur: 1, EY: 10, easing: Easing.linear },
+                { dur: 1, EX: 40, EY: 40, easing: Easing.linear },
                 { dur: 1, EX: 10, EY: 10 },
                 { dur: 1, EX: 40, EY: 40 },
                 // { dur: 1, EX: 40, EY: 40 },

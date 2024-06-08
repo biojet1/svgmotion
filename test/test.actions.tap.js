@@ -207,16 +207,6 @@ test.test("Step", (t) => {
         t.equal(r.opacity.value, 0.9);
     }
 
-    {
-        // console.log('r.fill', r.fill);
-        r.fill = new Fill();
-        // console.log('r.fill', r.fill);
-        r.fill = new Fill();
-        // console.log('r.fill', r.fill);
-        r.fill = new Fill();
-        // console.log('r.fill', r.fill);
-    }
-
     let s = Step(
         [
             { A: 0.25, t: 0, B: [50, 50] },
@@ -228,7 +218,7 @@ test.test("Step", (t) => {
     );
 
     s.ready(tr);
-    s.resolve(0, 0, tr._hint_dur);
+    s.resolve(0, 0, tr.hint_dur);
     s.run();
 
     {

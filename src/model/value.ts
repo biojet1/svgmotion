@@ -22,7 +22,10 @@ export type PlainValue<V> = {
     _?: string;
 };
 
-export class Animatable<V, K extends Keyframe<V> = Keyframe<V>> extends Animated<V, K> {
+export class Animatable<
+    V,
+    K extends Keyframe<V> = Keyframe<V>
+> extends Animated<V, K> {
     value: V | null;
 
     // static
@@ -123,11 +126,7 @@ export class AnimatableD<V> extends Animatable<V> {
         }
         return value;
     }
-    override key_value(
-        frame: number,
-        value: V,
-        extra?: KeyExtra
-    ) {
+    override key_value(frame: number, value: V, extra?: KeyExtra) {
         const { start, easing, add } = extra ?? {};
         let { kfs } = this;
         let last;
@@ -165,7 +164,9 @@ export class AnimatableD<V> extends Animatable<V> {
     }
 }
 
-export class VectorValue<K extends Keyframe<Vector> = Keyframe<Vector>> extends Animatable<Vector, K> {
+export class VectorValue<
+    K extends Keyframe<Vector> = Keyframe<Vector>
+> extends Animatable<Vector, K> {
     override lerp_value(r: number, a: Vector, b: Vector): Vector {
         return a.lerp(b, r);
     }
@@ -278,7 +279,10 @@ export class PositionValue extends VectorValue<PositionKeyframe<Vector>> {
         }
         return d;
     }
-    override load_kfe(x: PositionKFData<Vector>, value: Vector): PositionKeyframe<Vector> {
+    override load_kfe(
+        x: PositionKFData<Vector>,
+        value: Vector
+    ): PositionKeyframe<Vector> {
         const kf: PositionKeyframe<Vector> = super.load_kfe(x, value);
         const { ti, to } = x;
         if (ti && to) {
@@ -288,12 +292,7 @@ export class PositionValue extends VectorValue<PositionKeyframe<Vector>> {
         return kf;
     }
 
-    override key_value(
-        frame: number,
-        value: Vector,
-        extra?: KeyExtra
-    ) {
-
+    override key_value(frame: number, value: Vector, extra?: KeyExtra) {
         let kf = super.key_value(frame, value, extra);
         let last = this.kfs.at(-2);
         if (last && extra) {
@@ -309,9 +308,7 @@ export class PositionValue extends VectorValue<PositionKeyframe<Vector>> {
         }
 
         return kf;
-
     }
-
 }
 
 export class ScalarValue extends Animatable<number> {
