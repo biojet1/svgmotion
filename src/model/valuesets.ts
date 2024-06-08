@@ -6,7 +6,7 @@ import {
     RGBValue,
     TextValue,
 } from "./value.js";
-import { ValueT } from "./value.js";
+import { PlainValue } from "./value.js";
 import { Animatable } from "./value.js";
 
 export function xget<T>(that: any, name: string, value: T): T {
@@ -46,7 +46,7 @@ export class ValueSet {
         }
         return u;
     }
-    load(u: ValueT<any>) {
+    load(u: PlainValue<any>) {
         for (let [k, v] of Object.entries(u)) {
             const p = (this as any)[k];
             if (p instanceof Animatable) {
@@ -304,7 +304,7 @@ export class Transform extends ValueSet {
             return [];
         }
     }
-    override load(u: ValueT<any>) {
+    override load(u: PlainValue<any>) {
         this.clear();
         if (Array.isArray(u)) {
             u.forEach((v) => {

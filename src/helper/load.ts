@@ -1,4 +1,4 @@
-import { ValueT } from "../model/value.js";
+import { PlainValue } from "../model/value.js";
 import { Animatable } from "../model/value.js";
 import { ValueSet } from "../model/valuesets.js";
 import {
@@ -25,7 +25,7 @@ const TAGS: {
     svg: function (parent: Container) { return parent.add_view(); },
 };
 
-function load_properties(that: any, props: { [key: string]: ValueT<any> }) {
+function load_properties(that: any, props: { [key: string]: PlainValue<any> }) {
     for (let [k, v] of Object.entries(props)) {
         const p = that[k];
         if (p instanceof ValueSet || p instanceof Animatable) {

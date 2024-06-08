@@ -1,27 +1,26 @@
 import { cubic_point_at } from "../keyframe/bezier.js";
-import { Animated } from "../keyframe/keyframe.js";
+import { Animated, KeyExtra } from "../keyframe/keyframe.js";
 import { Keyframe } from "../keyframe/kfhelper.js";
-export interface KFBase {
+export interface PlainKeyframe {
     t: number;
     h?: boolean;
     o?: Iterable<number>;
     i?: Iterable<number>;
 }
 
-export interface KFData<V> extends KFBase {
+export interface PlainKeyframeV<V> extends PlainKeyframe {
     v: V;
     r?: number; // repeat_count
     b?: boolean; // bounce
 }
 
-export type ValueT<V> = {
+export type PlainValue<V> = {
     v: V;
-    k?: KFData<V>[];
+    k?: PlainKeyframeV<V>[];
     r?: number;
     b?: boolean;
     _?: string;
 };
-export type ValueF<V> = { v: V; k?: KFData<V>[]; r?: number; b?: boolean };
 
 export class Animatable<V, K extends Keyframe<V> = Keyframe<V>> extends Animated<V, K> {
     value: V | null;
@@ -38,7 +37,7 @@ export class Animatable<V, K extends Keyframe<V> = Keyframe<V>> extends Animated
     set_value(value: V | any) {
         this.value = this.check_value(value);
     }
-    dump_kfe(kfe: K, value: any): KFData<V> {
+    dump_kfe(kfe: K, value: any): PlainKeyframeV<V> {
         const { time: t, easing } = kfe;
         if (!easing) {
             return { t, v: value };
@@ -49,9 +48,9 @@ export class Animatable<V, K extends Keyframe<V> = Keyframe<V>> extends Animated
             return { t, o: [ox, oy], i: [ix, iy], v: value };
         }
     }
-    dump(): ValueT<V> {
+    dump(): PlainValue<V> {
         const { value, kfs } = this;
-        const o: ValueT<V> = { v: this.dump_value(value) };
+        const o: PlainValue<V> = { v: this.dump_value(value) };
         if (kfs && kfs.length > 0) {
             o.k = kfs.map((v) => this.dump_kfe(v, this.dump_value(v.value)));
         }
@@ -63,7 +62,7 @@ export class Animatable<V, K extends Keyframe<V> = Keyframe<V>> extends Animated
         }
         return o;
     }
-    load_kfe(x: KFBase, value: V): K {
+    load_kfe(x: PlainKeyframe, value: V): K {
         const { t: time, h, o, i } = x;
         if (h) {
             return { time, easing: true, value } as K;
@@ -74,7 +73,7 @@ export class Animatable<V, K extends Keyframe<V> = Keyframe<V>> extends Animated
         }
         return { time, value } as K;
     }
-    load(x: ValueF<any>) {
+    load(x: PlainValue<any>) {
         const { k, v } = x;
         if (k != undefined) {
             const { r, b } = x;
@@ -127,10 +126,9 @@ export class AnimatableD<V> extends Animatable<V> {
     override key_value(
         frame: number,
         value: V,
-        start?: number,
-        easing?: Iterable<number> | boolean,
-        add?: boolean
+        extra?: KeyExtra
     ) {
+        const { start, easing, add } = extra ?? {};
         let { kfs } = this;
         let last;
 
@@ -233,7 +231,7 @@ export interface PositionKeyframe<V> extends Keyframe<V> {
     out_tan?: Iterable<number>;
 }
 
-export interface PositionKFData<V> extends KFData<V> {
+export interface PositionKFData<V> extends PlainKeyframeV<V> {
     ti?: Iterable<number>;
     to?: Iterable<number>;
 }
@@ -280,6 +278,40 @@ export class PositionValue extends VectorValue<PositionKeyframe<Vector>> {
         }
         return d;
     }
+    override load_kfe(x: PositionKFData<Vector>, value: Vector): PositionKeyframe<Vector> {
+        const kf: PositionKeyframe<Vector> = super.load_kfe(x, value);
+        const { ti, to } = x;
+        if (ti && to) {
+            kf.in_tan = ti;
+            kf.out_tan = to;
+        }
+        return kf;
+    }
+
+    override key_value(
+        frame: number,
+        value: Vector,
+        extra?: KeyExtra
+    ) {
+
+        let kf = super.key_value(frame, value, extra);
+        let last = this.kfs.at(-2);
+        if (last && extra) {
+            const [c1, c2] = extra?.curve ?? [];
+            if (c1) {
+                if (c2) {
+                    last.out_tan = c1;
+                    last.in_tan = c2;
+                } else {
+                    // reflect ?
+                }
+            }
+        }
+
+        return kf;
+
+    }
+
 }
 
 export class ScalarValue extends Animatable<number> {

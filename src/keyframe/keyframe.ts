@@ -1,5 +1,12 @@
 import { Keyframe, iter_frame_fun, ratio_at } from "./kfhelper.js";
 
+export type KeyExtra = {
+    start?: number,
+    easing?: Iterable<number> | true,
+    curve?: Array<number[]>,
+    add?: boolean
+}
+
 export class Animated<V, K extends Keyframe<V> = Keyframe<V>> {
     kfs: Array<K> = [];
     _repeat_count?: number;
@@ -96,10 +103,9 @@ export class Animated<V, K extends Keyframe<V> = Keyframe<V>> {
     key_value(
         frame: number,
         value: V,
-        start?: number,
-        easing?: Iterable<number> | true,
-        add?: boolean
+        extra?: KeyExtra
     ) {
+        const { start, easing, add } = extra ?? {};
         const { kfs } = this;
         let last = kfs.at(-1);
         if (last) {

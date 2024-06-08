@@ -58,8 +58,8 @@
     <circle
        style="fill:#a51d2d;stroke:none;stroke-width:6;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0"
        id="maru2"
-       cx="399.37073"
-       cy="400.92899"
+       cx="400"
+       cy="400"
        r="10" />
     <rect
        style="fill:#73d216;fill-opacity:0.203993;stroke:#a40000;stroke-width:3;paint-order:markers stroke fill"
@@ -69,11 +69,11 @@
        x="0"
        y="0" />
     <ellipse
-       style="fill:#73d216;fill-opacity:0.203993;stroke:#a40000;stroke-width:3;paint-order:markers stroke fill"
+       style="fill:#73d216;fill-opacity:0.203993;stroke:#a40000;stroke-width:3.78717;paint-order:markers stroke fill"
        id="elli1"
-       cx="270.70578"
+       cx="289.54388"
        cy="158.43661"
-       rx="30"
-       ry="30" />
+       rx="48.444527"
+       ry="29.606413" />
   </g>
 </svg>

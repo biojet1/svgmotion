@@ -257,10 +257,10 @@ test.test("Easing", (t) => {
             .map((v) => parseFloat(v));
     let v = new ScalarValue(6);
     v.key_value(0, 9999);
-    v.key_value(10, 3333, undefined, Easing.sigmoid);
-    v.key_value(20, 1000, undefined, Easing.outback);
-    v.key_value(30, 5000, undefined, true);
-    v.key_value(40, 2000, undefined);
+    v.key_value(10, 3333, { easing: Easing.sigmoid });
+    v.key_value(20, 1000, { easing: Easing.outback });
+    v.key_value(30, 5000, { easing: true });
+    v.key_value(40, 2000);
     const d = v.dump();
     // console.log(d)
     let u = new ScalarValue(9);

@@ -1,6 +1,6 @@
 import { Track } from "../track/track.js";
 import { BaseProps } from "./baseprops.js";
-import { ValueT } from "./value.js";
+import { PlainValue } from "./value.js";
 import { Animatable } from "./value.js";
 import { Vector, ScalarValue, PointsValue, PositionValue, TextValue, } from "./value.js";
 import { Node, Parent } from "./linked.js";
@@ -10,7 +10,7 @@ import { Keyframe } from "../keyframe/kfhelper.js";
 export interface PlainNode {
     tag: string;
     nodes: PlainNode[];
-    opacity?: ValueT<any>;
+    opacity?: PlainValue<any>;
 }
 
 export interface PlainRoot {

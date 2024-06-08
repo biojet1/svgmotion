@@ -167,3 +167,18 @@ test.test("Step", (t) => {
 
     t.end();
 });
+
+test.test("Curve", (t) => {
+    const { Seq, Track, To, PositionValue } = svgmotion;
+    let pos = new PositionValue([4, 5]);
+    let tr = new Track();
+    let a;
+    tr.run(a = To(pos, [-200, -100]).set({ curve: [[10, 10], [20, 20]] }));
+    t.same(Array.from(pos.get_value(0)), [4, 5]);
+    t.same(Array.from(pos.get_value(60)), [-200, -100]);
+    // console.log(a);
+    let d = pos.dump();
+    // console.log(d);
+    t.same(pos.dump(), d);
+    t.end();
+});

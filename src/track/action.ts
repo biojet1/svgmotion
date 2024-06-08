@@ -3,9 +3,12 @@ export interface IProperty<V> {
     key_value(
         time: number,
         value: V,
-        start?: number,
-        easing?: Iterable<number> | boolean,
-        add?: boolean
+        extra?: {
+            start?: number,
+            easing?: Iterable<number> | true,
+            add?: boolean
+            curve?: Iterable<number[]>
+        }
     ): any;
     check_value(x: any): V;
     add_value(a: V, b: V): V;
@@ -23,7 +26,7 @@ export interface IAction {
 }
 
 export interface IParent {
-    easing?: Iterable<number> | boolean;
+    easing?: Iterable<number> | true;
     frame_rate: number;
     to_frame(sec: number): number;
     add_prop(prop: IProperty<any>): void;
@@ -34,8 +37,9 @@ export class Action implements IAction {
     _end: number = -Infinity;
     _dur?: number;
     _params?: {
-        easing?: Iterable<number> | boolean;
+        easing?: Iterable<number> | true;
         dur?: number;
+        curve?: Iterable<number[]>
     };
     /* c8 ignore start */
     ready(parent: IParent): void {
@@ -66,9 +70,9 @@ export abstract class Actions extends Array<Action | Actions> implements IAction
     _start: number = -Infinity;
     _end: number = -Infinity;
     _hint_dur?: number;
-    _easing?: Iterable<number> | boolean;
+    _easing?: Iterable<number> | true;
     _params: {
-        easing?: Iterable<number> | boolean;
+        easing?: Iterable<number> | true;
         hint_dur?: number;
     } = {};
     ready(parent: IParent): void {
@@ -138,15 +142,6 @@ export class SeqA extends Actions {
         this._start = frame;
         this._end = e;
     }
-    // delay(sec: number) {
-    //     this._delay_sec = sec;
-    //     return this;
-    // }
-    // stagger(sec: number) {
-    //     this._stagger_sec = sec;
-    //     return this;
-    // }
-
 }
 
 export function Seq(...items: Array<Action | Actions>) {
@@ -206,10 +201,11 @@ export function ParE(...items: Array<Action | Actions>) {
 }
 
 export class ToA extends Action {
-    _easing?: Iterable<number> | boolean;
+    _easing?: Iterable<number> | true;
 
     constructor(props: IProperty<any>[], value: any) {
         super();
+        // this._params = params;
         this.ready = function (parent: IParent): void {
             const { dur, easing } = this._params ?? {};
             this._dur = (dur == undefined) ? undefined : parent.to_frame(dur);
@@ -219,9 +215,14 @@ export class ToA extends Action {
             }
         };
         this.run = function (): void {
-            const { _start, _end, _easing } = this;
+            const { _start: start, _end, _easing: easing, _params } = this;
+            const curve = _params?.curve;
+            let extra: Parameters<IProperty<any>['key_value']>[2] = { start, easing };
+            if (curve) {
+                extra.curve = curve;
+            }
             for (const prop of props) {
-                prop.key_value(_end, value, _start, _easing);
+                prop.key_value(_end, value, extra);
             }
         };
     }
@@ -238,7 +239,7 @@ export class PassA extends Action {
 }
 
 export class AddA extends Action {
-    _easing?: Iterable<number> | boolean;
+    _easing?: Iterable<number> | true;
     constructor(props: IProperty<any>[], value: any) {
         super();
         this.ready = function (parent: IParent): void {
@@ -250,9 +251,15 @@ export class AddA extends Action {
             }
         };
         this.run = function (): void {
-            const { _start, _end, _easing } = this;
+            const { _start: start, _end, _easing: easing, _params } = this;
+
+            const curve = _params?.curve;
+            let extra: Parameters<IProperty<any>['key_value']>[2] = { start, easing, add: true };
+            if (curve) {
+                extra.curve = curve;
+            }
             for (const prop of props) {
-                prop.key_value(_end, value, _start, _easing, true);
+                prop.key_value(_end, value, extra);
             }
         };
     }
@@ -266,11 +273,11 @@ function list_props(x: IProperty<any>[] | IProperty<any>) {
     }
 }
 
-export function To(props: IProperty<any>[] | IProperty<any>, value: any, dur?: number, easing?: Iterable<number> | boolean) {
+export function To(props: IProperty<any>[] | IProperty<any>, value: any, dur?: number, easing?: Iterable<number> | true) {
     return (new ToA(list_props(props), value)).set({ dur, easing });
 }
 
-export function Add(props: IProperty<any>[] | IProperty<any>, value: any, dur?: number, easing?: Iterable<number> | boolean) {
+export function Add(props: IProperty<any>[] | IProperty<any>, value: any, dur?: number, easing?: Iterable<number> | true) {
     return (new AddA(list_props(props), value)).set({ dur, easing });
 }
 
