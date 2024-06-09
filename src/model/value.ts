@@ -40,7 +40,7 @@ export class Animatable<
     set_value(value: V | any) {
         this.value = this.check_value(value);
     }
-    dump_kfe(kfe: K, value: any): PlainKeyframeV<V> {
+    dump_keyframe(kfe: K, value: any): PlainKeyframeV<V> {
         const { time: t, easing } = kfe;
         if (!easing) {
             return { t, v: value };
@@ -55,7 +55,7 @@ export class Animatable<
         const { value, kfs } = this;
         const o: PlainValue<V> = { v: this.dump_value(value) };
         if (kfs && kfs.length > 0) {
-            o.k = kfs.map((v) => this.dump_kfe(v, this.dump_value(v.value)));
+            o.k = kfs.map((v) => this.dump_keyframe(v, this.dump_value(v.value)));
         }
         if (this._repeat_count) {
             o.r = this._repeat_count;
@@ -65,7 +65,7 @@ export class Animatable<
         }
         return o;
     }
-    load_kfe(x: PlainKeyframe, value: V): K {
+    load_keyframe(x: PlainKeyframe, value: V): K {
         const { t: time, h, o, i } = x;
         if (h) {
             return { time, easing: true, value } as K;
@@ -80,7 +80,7 @@ export class Animatable<
         const { k, v } = x;
         if (k != undefined) {
             const { r, b } = x;
-            this.kfs = k.map((x) => this.load_kfe(x, this.load_value(x.v)));
+            this.kfs = k.map((x) => this.load_keyframe(x, this.load_value(x.v)));
             if (r != null) {
                 this._repeat_count = r;
             }
@@ -264,11 +264,11 @@ export class PositionValue extends VectorValue<PositionKeyframe<Vector>> {
         return super.lerp_keyframes(t, a, b);
     }
 
-    override dump_kfe(
+    override dump_keyframe(
         kfe: PositionKeyframe<Vector>,
         value: any
     ): PositionKFData<Vector> {
-        const d: PositionKFData<Vector> = super.dump_kfe(kfe, value);
+        const d: PositionKFData<Vector> = super.dump_keyframe(kfe, value);
         const ti = kfe.in_tan;
         if (ti) {
             const to = kfe.out_tan;
@@ -279,11 +279,11 @@ export class PositionValue extends VectorValue<PositionKeyframe<Vector>> {
         }
         return d;
     }
-    override load_kfe(
+    override load_keyframe(
         x: PositionKFData<Vector>,
         value: Vector
     ): PositionKeyframe<Vector> {
-        const kf: PositionKeyframe<Vector> = super.load_kfe(x, value);
+        const kf: PositionKeyframe<Vector> = super.load_keyframe(x, value);
         const { ti, to } = x;
         if (ti && to) {
             kf.in_tan = ti;

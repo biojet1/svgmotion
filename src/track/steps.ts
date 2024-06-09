@@ -36,15 +36,13 @@ interface Params {
     repeat?: number;
     max_dur?: number;
 }
-// const FIRST = {};
-const LAST = {};
 
 class Stepper {
-    do<V>(
-        step: StepA,
-        prop: IProperty<V>,
-        frame: number,
-        easing?: Iterable<number> | true
+    get_value<V>(
+        _step: StepA,
+        _prop: IProperty<V>,
+        _frame: number,
+        _cur: KF
     ): V {
         throw new Error(`Unexpected by '${this.constructor.name}'`);
     }
@@ -56,11 +54,11 @@ class Add extends Stepper {
         super();
         this.value = value;
     }
-    do<V>(
+    get_value<V>(
         step: StepA,
         prop: IProperty<V>,
-        frame: number,
-        easing?: Iterable<number> | true
+        _frame: number,
+        _cur: KF
     ): V {
         const v = prop.check_value(this.value);
         const p = prop.get_value(step._prev_frame ?? NaN);
@@ -69,31 +67,31 @@ class Add extends Stepper {
 }
 
 class Inital extends Stepper {
-    do<V>(
-        step: StepA,
+    get_value<V>(
+        _step: StepA,
         prop: IProperty<V>,
-        frame: number,
-        easing?: Iterable<number> | true
+        _frame: number,
+        _cur: KF
     ): V {
         return prop.initial_value();
     }
 }
 class First extends Stepper {
-    do<V>(
+    get_value<V>(
         step: StepA,
         prop: IProperty<V>,
-        frame: number,
-        easing?: Iterable<number> | true
+        _frame: number,
+        _cur: KF
     ): V {
         return prop.get_value(step._start);
     }
 }
 class Last extends Stepper {
-    do<V>(
+    get_value<V>(
         step: StepA,
-        prop: IProperty<V>,
-        frame: number,
-        easing?: Iterable<number> | true
+        _prop: IProperty<V>,
+        _frame: number,
+        _cur: KF
     ): V {
         const { _prev_value } = step;
         if (_prev_value == undefined) {
@@ -138,7 +136,7 @@ export class StepA extends Action {
 
             // collect names, parse inputs
             const names: Array<string> = [];
-            this._steps.map((e, i, a) => {
+            this._steps.map((e, _i, _a) => {
                 if (easing != undefined) {
                     if (e.easing == undefined) {
                         e.easing = easing;
@@ -221,19 +219,16 @@ export class StepA extends Action {
             for (const prop of enum_props(_vars, name)) {
                 this._prev_frame = _start;
                 this._prev_value = undefined;
-                for (const { t, value, easing, curve } of entries) {
+                for (const cur of entries) {
+                    const { t, value, easing, curve } = cur;
                     const frame = _start + t;
                     let v;
-
                     if (value instanceof Stepper) {
-                        v = value.do(this, prop, frame);
-                        if (value instanceof Hold) {
-
-                        }
+                        v = value.get_value(this, prop, frame, cur);
                     } else {
                         v = prop.check_value(value);
                     }
-                    prop.key_value(frame, v, { start: this._prev_frame, easing: easing, curve });
+                    prop.key_value(frame, v, { start: this._prev_frame, easing, curve });
                     this._prev_frame = frame;
                     this._prev_value = v;
                 }
@@ -250,7 +245,7 @@ function resolve_t(
 ) {
     const entries = new Array<Entry>();
     const names = Object.keys(vars);
-    steps.forEach((e, i, a) => {
+    steps.forEach((e, i, _a) => {
         let t_max: number | undefined = undefined;
         if (e.t == undefined) {
             const { dur } = e;
@@ -368,7 +363,7 @@ function resolve_repeat(steps: Array<Entry>, repeat: number): Array<Entry> {
     const t_dur = t_max + 1;
     let u = t_dur;
     while (n-- > 0) {
-        steps.forEach(({ t, ...etc }, i, a) => {
+        steps.forEach(({ t, ...etc }, i, _a) => {
             const e = { ...etc, t: t + u };
             if (i == 0) {
                 e.easing = true;
@@ -404,7 +399,7 @@ function map_keyframes(steps: Array<Entry>): KFMap {
     const kf_map: KFMap = {};
     for (const [name, entries] of Object.entries(entry_map)) {
         const x = entries
-            .map((v, i, a) => {
+            .map((v, _i, _a) => {
                 return { t: v.t, value: v[name], easing: v.easing, curve: v.curve };
             })
             .sort((a, b) => a.t - b.t);
@@ -440,4 +435,3 @@ Step.add = (value: any) => new Add(value);
 Step.initial = new Inital();
 Step.first = new First();
 Step.last = new Last();
-// Step.first = FIRST;
