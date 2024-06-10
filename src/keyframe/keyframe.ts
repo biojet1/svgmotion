@@ -155,6 +155,8 @@ export class Animated<V, K extends Keyframe<V> = Keyframe<V>> {
         if (easing) {
             kf.easing = easing;
         }
+        delete this["get_value_off"];
+        delete this["_end"];
         return kf as K;
     }
     add_keyframe(time: number, value: V, easing?: Iterable<number> | true) {

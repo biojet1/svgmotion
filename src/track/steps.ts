@@ -100,8 +100,6 @@ class Last extends Stepper {
         return _prev_value;
     }
 }
-class Hold extends Stepper {
-}
 
 
 export class StepA extends Action {
@@ -214,7 +212,7 @@ export class StepA extends Action {
     _prev_frame?: number;
     _prev_value?: any;
     run(): void {
-        const { _start, _vars, _kf_map, _base_frame } = this;
+        const { _start, _vars, _kf_map } = this;
         for (const [name, entries] of Object.entries(_kf_map!)) {
             for (const prop of enum_props(_vars, name)) {
                 this._prev_frame = _start;
@@ -244,9 +242,8 @@ function resolve_t(
     max_dur?: number
 ) {
     const entries = new Array<Entry>();
-    const names = Object.keys(vars);
+    let t_max: number | undefined = undefined;
     steps.forEach((e, i, _a) => {
-        let t_max: number | undefined = undefined;
         if (e.t == undefined) {
             const { dur } = e;
             if (dur == undefined) {

@@ -1,15 +1,16 @@
 type EasingT = Iterable<number> | true;
+export type ExtraT = {
+    start?: number;
+    easing?: EasingT;
+    add?: boolean;
+    curve?: Iterable<number[]>;
+}
 export interface IProperty<V> {
     get_value(time: number): V;
     key_value(
         time: number,
         value: V,
-        extra?: {
-            start?: number;
-            easing?: EasingT;
-            add?: boolean;
-            curve?: Iterable<number[]>;
-        }
+        extra?: ExtraT,
     ): any;
     check_value(x: any): V;
     add_value(a: V, b: V): V;
@@ -37,6 +38,7 @@ type ParamsT = {
     dur?: number;
     curve?: Iterable<number[]>;
 };
+
 export class Action implements IAction {
     _start: number = -Infinity;
     _end: number = -Infinity;
@@ -306,6 +308,21 @@ export function Add(
     params?: ParamsT
 ) {
     return new AddA(list_props(props), value, params);
+}
+
+export function To2(
+    props: IProperty<any>[] | IProperty<any>,
+    value: any,
+    params: ParamsT = {}
+) {
+    const map = new WeakMap<IProperty<any>>();
+    const ps = list_props(props);
+    for (const p of ps) {
+        map.set(p, params)
+    }
+
+
+    return new ToA(list_props(props), value, params);
 }
 
 export function Pass(dur?: number) {
