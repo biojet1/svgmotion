@@ -269,28 +269,34 @@ test.test("Curve", (t) => {
 
 test.test("Rel", (t) => {
     const { Track, To, PositionValue, Rel, ScalarValue } = svgmotion;
-    const { to } = Rel;
+    const { to, add } = Rel;
     let tr = new Track();
     let a = new ScalarValue(1);
     let b = new ScalarValue(2);
     let c = new ScalarValue(3);
     let d = new ScalarValue(4);
     let e = new ScalarValue(5);
+    let f = new ScalarValue(6);
+    c.tag = 'C';
     let r = Rel({
         '20%': [to(a, 3)],
-        '100%': [to([b, a], 10), to(e, 11)],
+        '100%': [to([b, a], 10), to([e], 11)],
         '50%': [to([b, c], 5)],
         '10%': [to([c], 0.5, {}), { easing: 8, curve: 9 }],
         '0%': [to(d, 9)],
-        10: [to(e, 1)]
+        10: [add(f, 1)]
     }, { dur: null });
+    // Rel.at('20%', to(a, 3)).at(10, add(f, 1))
+
+
     tr.pass(1);
+    // console.info(r.map, { depth: 100 });
     tr.run(r);
     t.same(r.map.get(c).map(v => v.time), [1, 5]);
     t.same(r.map.get(b).map(v => v.time), [5, 10]);
     t.same(r.map.get(a).map(v => v.time), [2, 10]);
-    console.info(r.map, { depth: 100 });
 
-    console.info(a.kfs, e.kfs);
+
+    // console.info(a.kfs, e.kfs);
     t.end();
 });

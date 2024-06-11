@@ -117,7 +117,7 @@ export class Animated<V, K extends Keyframe<V> = Keyframe<V>> {
             } else {
                 if (start != last.time) {
                     throw new Error(
-                        `unexpected start=${start} last.time=${last.time} time=${frame} value=${value} by '${this.constructor.name}'`
+                        `unexpected start=${start} last.time=${last.time} time=${frame} value=${value} by '${this.constructor.name}' ${JSON.stringify(extra)}`
                     );
                 }
             }

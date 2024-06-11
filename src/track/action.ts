@@ -18,13 +18,17 @@ export interface IProperty<V> {
     hold_last_value(frame: number): any;
 }
 
-export interface IAction {
-    _start?: number;
-    _end?: number;
-    ready(parent: IParent): void;
+
+export interface Runnable {
     resolve(frame: number, base_frame: number, hint_dur: number): void;
     get_active_dur(): number;
     run(): void;
+}
+
+export interface IAction extends Runnable {
+    _start?: number;
+    _end?: number;
+    ready(parent: IParent): void;
 }
 
 export interface IParent {
@@ -33,11 +37,14 @@ export interface IParent {
     to_frame(sec: number): number;
     add_prop(prop: IProperty<any>): void;
 }
-type ParamsT = {
+
+export type ParamsT = {
     easing?: EasingT;
     dur?: number;
     curve?: Iterable<number[]>;
 };
+
+export type RunGiver = (that: IParent) => Runnable;
 
 export class Action implements IAction {
     _start: number = -Infinity;
@@ -53,11 +60,8 @@ export class Action implements IAction {
     /* c8 ignore stop */
     resolve(frame: number, base_frame: number, hint_dur: number): void {
         let { _dur } = this;
-        if (_dur == undefined) {
-            _dur = this._dur = hint_dur;
-        }
         this._start = frame;
-        this._end = frame + _dur;
+        this._end = frame + (_dur ?? (this._dur = hint_dur));
     }
     get_active_dur() {
         return this._end - this._start;
@@ -315,16 +319,43 @@ export function To2(
     value: any,
     params: ParamsT = {}
 ) {
-    const map = new WeakMap<IProperty<any>>();
-    const ps = list_props(props);
-    for (const p of ps) {
-        map.set(p, params)
+    function list_props2(x: IProperty<any>[] | IProperty<any>) {
+        if (Array.isArray(x)) {
+            return x;
+        } else {
+            return [x];
+        }
     }
 
+    return function (track: IParent) {
 
-    return new ToA(list_props(props), value, params);
+
+    }
 }
 
 export function Pass(dur?: number) {
     return new PassA(dur);
+}
+
+export function Par2(items: Array<RunGiver>, params?: ParA['_params']) {
+    if (!Array.isArray(items)) {
+        throw new Error(`Unexpected`)
+    } else {
+        for (const a of items) {
+            if (typeof a == "function") {
+                continue;
+            }
+            throw new Error(`Unexpected`);
+        }
+    }
+    // const x = new ParA(...items);
+    // params && (x._params = params);
+    return function (track: IParent) {
+        for (const giver of items) {
+            const r = giver(track);
+            // push(r)
+        }
+
+
+    }
 }

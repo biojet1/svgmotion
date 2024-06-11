@@ -1,4 +1,4 @@
-import { Action, ExtraT, IParent, IProperty } from "../track/action.js";
+import { Action, ExtraT, IParent, IProperty, ParamsT } from "./action.js";
 
 
 type Entry = {
@@ -8,6 +8,7 @@ type Entry = {
     value: any;
     extra: ExtraT;
     _: string;
+    _next?: Entry;
 };
 
 function list_props(x: IProperty<any>[] | IProperty<any>) {
@@ -18,10 +19,10 @@ function list_props(x: IProperty<any>[] | IProperty<any>) {
     }
 }
 
-export function to(props: IProperty<any>[] | IProperty<any>, value: any) {
-    return { _: 'to', props: list_props(props) };
+// export function to(props: IProperty<any>[] | IProperty<any>, value: any) {
+//     return { _: 'to', props: list_props(props) };
 
-}
+// }
 
 class RelA extends Action {
     map: Map<IProperty<any>, Entry[]>;
@@ -33,6 +34,9 @@ class RelA extends Action {
         for (const [k, v] of this.map.entries()) {
             for (const e of v) {
                 e.frame = parent.to_frame(e.time);
+                if (e.extra.start) {
+
+                }
             }
 
         }
@@ -55,23 +59,39 @@ class RelA extends Action {
     override run() {
         for (const [k, v] of this.map.entries()) {
             for (const e of v) {
-                // e.end = frame + e.frame;
                 k.key_value(e.end, e.value, e.extra);
             }
         }
+        // this.map.clear();
     }
 }
 export function Rel(x: {
     [key: string]: Array<{
         _: string;
         props: IProperty<any>[];
-        value: any
+        value: any;
+        extra: ExtraT;
     }>;
-}, { dur }: { dur?: number }) {
-
-    let total_dur: number | undefined = dur;
-    let dur_max = -Infinity;
+}, { dur = -Infinity }: { dur?: number }) {
     const map = new Map<IProperty<any>, Entry[]>();
+    if (dur <= 0) {
+        for (const [time, _entries] of Object.entries(x)) {
+            if (!time.endsWith('%')) {
+                const sec = parseFloat(time);
+                if (!Number.isFinite(sec)) {
+                    throw new Error(`Invalid time: ${time}`);
+                } else if (sec < 0) {
+                    continue;
+                } else {
+                    dur = Math.max(dur, sec);
+                }
+            }
+        }
+        if (dur <= 0) {
+            throw new Error(`Invalid duration: ${dur}`);
+        }
+    }
+
     for (const [time, entries] of Object.entries(x)) {
         let sec;
         if (time.endsWith('%')) {
@@ -80,36 +100,18 @@ export function Rel(x: {
                 throw new Error(`Invalid time %: '${time}'`);
             } else if (cen < 0 || cen > 100) {
                 throw new Error(`Unexpected time % 0-100: '${time}'`);
-            }
-            if (total_dur == undefined) {
-                if (Number.isFinite(dur)) {
-                    total_dur = dur;
-                } else if (Number.isFinite(dur_max)) {
-                    total_dur = dur_max;
-                }
-            }
-            if (total_dur == undefined) {
+            } else if (dur == undefined) {
                 throw new Error(`time % needs duration: '${time}'`);
             }
-            sec = total_dur * cen / 100;
+            sec = dur * cen / 100;
         } else {
             sec = parseFloat(time);
-            if (!Number.isFinite(sec)) {
-                throw new Error(`Invalid time: ${time}`);
-            } else if (sec < 0) {
-                if (total_dur != undefined) {
-                    sec = total_dur + sec
-                } else {
-                    throw new Error(`Unexpected time < 0: '${time}'`);
-                }
-            } else {
-                dur_max = Math.max(dur_max, sec);
-            }
         }
-        if (total_dur != undefined) {
-            if (sec > total_dur) {
-                throw new Error(`Unexpected`);
-            }
+        if (sec < 0) {
+            sec = dur + sec;
+        }
+        if (sec < 0 || sec > dur) {
+            throw new Error(`time '${time}' out of range 0-${dur}`);
         }
         for (const e of entries) {
             if (e._) {
@@ -119,21 +121,32 @@ export function Rel(x: {
 
                     a.push({
                         time: sec, _: e._, frame: NaN, end: NaN, value:
-                            p.check_value(e.value), extra: {}
+                            p.check_value(e.value), extra: { ...e.extra }
                     })
                 }
             }
         }
     }
+    // return new RelA([...map.entries()].map(([k, v]) => {
+    //     v.sort((a, b) => a.time - b.time)
+    //     v.forEach((e, i, a) => {
+    //         e._next = a.at(i + 1);
+    //     });
+    //     return [k, v.at(0)!];
+    // }));
+
+
     for (const [k, v] of map.entries()) {
         v.sort((a, b) => a.time - b.time)
-
     }
-
-
     return new RelA(map);
 }
 
-Rel.to = function (props: IProperty<any>[] | IProperty<any>, value: any) {
-    return { _: 'to', props: list_props(props), value };
-}
+Rel.to = function (props: IProperty<any>[] | IProperty<any>, value: any, extra: ExtraT = {}) {
+    return { _: 'to', props: list_props(props), value, extra };
+};
+
+Rel.add = function (props: IProperty<any>[] | IProperty<any>, value: any, extra: ExtraT = {}) {
+    return { _: 'add', props: list_props(props), value, extra: { ...extra, add: true } }
+};
+
