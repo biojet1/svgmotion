@@ -1,9 +1,9 @@
-import { Action, ExtraT, IParent, IProperty, ParamsT } from "./action.js";
+import { Action, Actions, ExtraT, IParent, IProperty } from "./action.js";
 
 
 type Entry = {
-    time: number;
-    frame: number;
+    offset_sec: number;
+    offset_frames: number;
     end: number;
     value: any;
     extra: ExtraT;
@@ -33,7 +33,7 @@ class RelA extends Action {
     override ready(parent: IParent): void {
         for (const [k, v] of this.map.entries()) {
             for (const e of v) {
-                e.frame = parent.to_frame(e.time);
+                e.offset_frames = parent.to_frame(e.offset_sec);
                 if (e.extra.start) {
 
                 }
@@ -45,9 +45,9 @@ class RelA extends Action {
         for (const [k, v] of this.map.entries()) {
             let prev: Entry | undefined = undefined;
             for (const e of v) {
-                e.end = frame + e.frame;
+                e.end = frame + e.offset_frames;
                 if (!prev) {
-                    if (e.frame > 0) {
+                    if (e.offset_frames > 0) {
                         // e.extra.easing = true;
                         e.extra.start = frame;
                     }
@@ -120,7 +120,7 @@ export function Rel(x: {
                     (a = map.get(p)) ?? map.set(p, a = []);
 
                     a.push({
-                        time: sec, _: e._, frame: NaN, end: NaN, value:
+                        offset_sec: sec, _: e._, offset_frames: NaN, end: NaN, value:
                             p.check_value(e.value), extra: { ...e.extra }
                     })
                 }
@@ -137,7 +137,7 @@ export function Rel(x: {
 
 
     for (const [k, v] of map.entries()) {
-        v.sort((a, b) => a.time - b.time)
+        v.sort((a, b) => a.offset_sec - b.offset_sec)
     }
     return new RelA(map);
 }
@@ -150,3 +150,51 @@ Rel.add = function (props: IProperty<any>[] | IProperty<any>, value: any, extra:
     return { _: 'add', props: list_props(props), value, extra: { ...extra, add: true } }
 };
 
+export function Rel2(x: {
+    [key: string]: Array<Action | Actions>;
+}, { dur = -Infinity }: { dur?: number }) {
+
+    const map = new Map<IProperty<any>, Entry[]>();
+    if (dur <= 0) {
+        for (const [time, _] of Object.entries(x)) {
+            if (!time.endsWith('%')) {
+                const sec = parseFloat(time);
+                if (!Number.isFinite(sec)) {
+                    throw new Error(`Invalid time: ${time}`);
+                } else if (sec < 0) {
+                    continue;
+                } else {
+                    dur = Math.max(dur, sec);
+                }
+            }
+        }
+        if (dur <= 0) {
+            throw new Error(`Invalid duration: ${dur}`);
+        }
+    }
+    for (const [time, entries] of Object.entries(x)) {
+        let sec;
+        if (time.endsWith('%')) {
+            const cen = parseFloat(time);
+            if (!Number.isFinite(cen)) {
+                throw new Error(`Invalid time %: '${time}'`);
+            } else if (cen < 0 || cen > 100) {
+                throw new Error(`Unexpected time % 0-100: '${time}'`);
+            } else if (dur == undefined) {
+                throw new Error(`time % needs duration: '${time}'`);
+            }
+            sec = dur * cen / 100;
+        } else {
+            sec = parseFloat(time);
+        }
+        if (sec < 0) {
+            sec = dur + sec;
+        }
+        if (sec < 0 || sec > dur) {
+            throw new Error(`time '${time}' out of range 0-${dur}`);
+        }
+        for (const e of entries) {
+
+        }
+    }
+}

@@ -292,9 +292,9 @@ test.test("Rel", (t) => {
     tr.pass(1);
     // console.info(r.map, { depth: 100 });
     tr.run(r);
-    t.same(r.map.get(c).map(v => v.time), [1, 5]);
-    t.same(r.map.get(b).map(v => v.time), [5, 10]);
-    t.same(r.map.get(a).map(v => v.time), [2, 10]);
+    t.same(r.map.get(c).map(v => v.offset_sec), [1, 5]);
+    t.same(r.map.get(b).map(v => v.offset_sec), [5, 10]);
+    t.same(r.map.get(a).map(v => v.offset_sec), [2, 10]);
 
 
     // console.info(a.kfs, e.kfs);

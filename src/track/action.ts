@@ -229,26 +229,42 @@ export function ParE(items: Array<Action | Actions>, params?: ParA['_params']) {
     return x;
 }
 
+export type Params2 = {
+    property: IProperty<any>;
+    value: any;
+    extra: ExtraT;
+    _next?: Params2
+};
+
 export class ToA extends Action {
     constructor(props: IProperty<any>[], value: any, params?: ParamsT) {
         super();
+
         this.ready = function (parent: IParent): void {
-            let { dur, easing, curve } = params ?? {};
-            this._dur = dur == undefined ? undefined : parent.to_frame(dur);
+            let { dur, easing, ...extra } = params ?? {};
+            // this._dur = dur == undefined ? undefined : parent.to_frame(dur);
+            dur == undefined || (this._dur = parent.to_frame(dur));
             easing = easing ?? parent.easing;
             for (const prop of props) {
                 parent.add_prop(prop);
             }
+            const m = props.map((property) => {
+                return {
+                    property, value, extra: { ...extra, easing: easing ?? parent.easing }
+                } as Params2;
+            });
+            m.forEach((e, i, a) => {
+                e._next = a.at(i + 1);
+            });
+            const first = m.at(0);
             this.run = function (): void {
                 const { _start: start, _end } = this;
-                let extra: Parameters<IProperty<any>["key_value"]>[2] = {
-                    start,
-                    easing,
-                    curve,
-                };
                 for (const prop of props) {
-                    prop.key_value(_end, value, extra);
+                    prop.key_value(_end, value, { start, easing, ...extra });
                 }
+                // for (let cur = first; cur; cur = cur._next) {
+                //     cur.property.key_value(_end, value, { start, ...extra });
+                // }
             };
         };
     }
@@ -351,10 +367,10 @@ export function Par2(items: Array<RunGiver>, params?: ParA['_params']) {
     // const x = new ParA(...items);
     // params && (x._params = params);
     return function (track: IParent) {
-        for (const giver of items) {
+        const runs = items.map(giver => {
             const r = giver(track);
-            // push(r)
-        }
+            return r;
+        })
 
 
     }
