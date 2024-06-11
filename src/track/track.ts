@@ -1,4 +1,4 @@
-import { IAction, Action, IProperty, Actions } from "./action.js";
+import { IAction, Action, IProperty, Actions, RunGiver } from "./action.js";
 import { PropMap, Step, UserEntry } from "./steps.js";
 
 export class Track {
@@ -21,16 +21,21 @@ export class Track {
     step(step: UserEntry[], vars: PropMap, params: any) {
         return this.run(Step(step, vars, params));
     }
-    run(...args: Array<Action | Array<Action>>) {
+    run(...args: Array<Action | Actions | RunGiver | Array<Action | Actions | RunGiver>>) {
         let I = this.frame;
         let B = this.frame;
         for (const act of args) {
             let D = 0;
             if (!Array.isArray(act) || act instanceof Actions) {
-                D = feed(this, act, I, B);
+                if (typeof act == "function") {
+                    D = feed(this, act(this), I, B);
+                } else {
+                    D = feed(this, act, I, B);
+                }
+
             } else {
                 for (const a of act) {
-                    let d = feed(this, a, I, B);
+                    let d = feed(this, (typeof a == "function") ? a(this) : a, I, B);
                     D = Math.max(d, D);
                 }
             }

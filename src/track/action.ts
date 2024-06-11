@@ -20,15 +20,16 @@ export interface IProperty<V> {
 
 
 export interface Runnable {
+    ready(parent: IParent): void;
     resolve(frame: number, base_frame: number, hint_dur: number): void;
-    get_active_dur(): number;
     run(): void;
+    get_active_dur(): number;
 }
 
 export interface IAction extends Runnable {
-    _start?: number;
-    _end?: number;
-    ready(parent: IParent): void;
+    // _start?: number;
+    // _end?: number;
+    // ready(parent: IParent): void;
 }
 
 export interface IParent {
@@ -232,42 +233,33 @@ export function ParE(items: Array<Action | Actions>, params?: ParA['_params']) {
 export type Params2 = {
     property: IProperty<any>;
     value: any;
+    add: boolean;
     extra: ExtraT;
     _next?: Params2
 };
 
 export class ToA extends Action {
-    constructor(props: IProperty<any>[], value: any, params?: ParamsT) {
+    _first: Params2;
+    constructor(first: Params2, dur?: number, add?: boolean) {
         super();
-
+        this._first = first;
         this.ready = function (parent: IParent): void {
-            let { dur, easing, ...extra } = params ?? {};
-            // this._dur = dur == undefined ? undefined : parent.to_frame(dur);
             dur == undefined || (this._dur = parent.to_frame(dur));
-            easing = easing ?? parent.easing;
-            for (const prop of props) {
-                parent.add_prop(prop);
+            for (let cur: Params2 | undefined = first; cur; cur = cur._next) {
+                const { property, extra } = cur;
+                extra.easing ?? (extra.easing = parent.easing);
+                add && (extra.add = true);
+                parent.add_prop(property);
             }
-            const m = props.map((property) => {
-                return {
-                    property, value, extra: { ...extra, easing: easing ?? parent.easing }
-                } as Params2;
-            });
-            m.forEach((e, i, a) => {
-                e._next = a.at(i + 1);
-            });
-            const first = m.at(0);
-            this.run = function (): void {
-                const { _start: start, _end } = this;
-                for (const prop of props) {
-                    prop.key_value(_end, value, { start, easing, ...extra });
-                }
-                // for (let cur = first; cur; cur = cur._next) {
-                //     cur.property.key_value(_end, value, { start, ...extra });
-                // }
-            };
         };
     }
+    run(): void {
+        const { _start: start, _end, _first } = this;
+        for (let cur: Params2 | undefined = _first; cur; cur = cur._next) {
+            const { property, extra, value } = cur;
+            property.key_value(_end, value, { start, ...extra });
+        }
+    };
 }
 
 export class PassA extends Action {
@@ -280,31 +272,31 @@ export class PassA extends Action {
     }
 }
 
-export class AddA extends Action {
-    constructor(props: IProperty<any>[], value: any, params?: ParamsT) {
-        super();
-        this.ready = function (parent: IParent): void {
-            let { dur, easing, curve } = params ?? {};
-            this._dur = dur == undefined ? undefined : parent.to_frame(dur);
-            easing = easing ?? parent.easing;
-            for (const prop of props) {
-                parent.add_prop(prop);
-            }
-            this.run = function (): void {
-                const { _start: start, _end } = this;
-                let extra: Parameters<IProperty<any>["key_value"]>[2] = {
-                    start,
-                    easing,
-                    curve,
-                    add: true,
-                };
-                for (const prop of props) {
-                    prop.key_value(_end, value, extra);
-                }
-            };
-        };
-    }
-}
+// export class AddA extends Action {
+//     constructor(props: IProperty<any>[], value: any, params?: ParamsT) {
+//         super();
+//         this.ready = function (parent: IParent): void {
+//             let { dur, easing, curve } = params ?? {};
+//             this._dur = dur == undefined ? undefined : parent.to_frame(dur);
+//             easing = easing ?? parent.easing;
+//             for (const prop of props) {
+//                 parent.add_prop(prop);
+//             }
+//             this.run = function (): void {
+//                 const { _start: start, _end } = this;
+//                 let extra: Parameters<IProperty<any>["key_value"]>[2] = {
+//                     start,
+//                     easing,
+//                     curve,
+//                     add: true,
+//                 };
+//                 for (const prop of props) {
+//                     prop.key_value(_end, value, extra);
+//                 }
+//             };
+//         };
+//     }
+// }
 
 function list_props(x: IProperty<any>[] | IProperty<any>) {
     if (Array.isArray(x)) {
@@ -317,9 +309,15 @@ function list_props(x: IProperty<any>[] | IProperty<any>) {
 export function To(
     props: IProperty<any>[] | IProperty<any>,
     value: any,
-    params?: ParamsT
+    params?: ParamsT,
+    add?: boolean
 ) {
-    return new ToA(list_props(props), value, params);
+    let { dur, ...extra } = params ?? {};
+    const m = list_props(props).map((property) => ({ property, value, extra } as Params2));
+    m.forEach((e, i, a) => {
+        e._next = a.at(i + 1);
+    });
+    return new ToA(m.at(0)!, dur, add);
 }
 
 export function Add(
@@ -327,7 +325,8 @@ export function Add(
     value: any,
     params?: ParamsT
 ) {
-    return new AddA(list_props(props), value, params);
+    return To(props, value, params, true);
+    // return new AddA(list_props(props), value, params);
 }
 
 export function To2(
