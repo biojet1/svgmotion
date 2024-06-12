@@ -20,15 +20,16 @@ export interface IProperty<V> {
 
 
 export interface Runnable {
-    ready(parent: IParent): void;
+    _start: number;
+    _end: number;
+    // ready(parent: IParent): void;
     resolve(frame: number, base_frame: number, hint_dur: number): void;
     run(): void;
     get_active_dur(): number;
 }
 
 export interface IAction extends Runnable {
-    // _start?: number;
-    // _end?: number;
+
     // ready(parent: IParent): void;
 }
 
@@ -68,30 +69,32 @@ export class Action implements IAction {
         return this._end - this._start;
     }
 }
-
-export abstract class Actions
-    extends Array<Action | Actions>
-    implements IAction {
+type ActionsParams = {
+    easing?: EasingT;
+    hint_dur?: number;
+};
+export abstract class Actions implements IAction {
     _start: number = -Infinity;
     _end: number = -Infinity;
     _hint_dur?: number;
     _easing?: EasingT;
-    _params: {
-        easing?: EasingT;
-        hint_dur?: number;
-    } = {};
-    ready(parent: IParent): void {
-        const { easing, hint_dur } = this._params;
-        this._easing = easing ?? parent.easing;
-        hint_dur != undefined && (this._hint_dur = parent.to_frame(hint_dur));
+    _runs: Array<Runnable>;
+
+    constructor(parent: IParent, runs: Runnable[], { easing, hint_dur }: ActionsParams = {}) {
+        this._runs = runs;
+        easing == undefined || (this._easing = easing);
+        hint_dur == undefined || (this._hint_dur = parent.to_frame(hint_dur));
     }
+
     run() {
-        for (const act of this) {
+        for (const act of this._runs) {
             /* c8 ignore start */
-            if (act._start < 0 || act._start > act._end) {
-                throw new Error(
-                    `Unexpected _start=${act._start} _end=${act._end}`
-                );
+            if (act instanceof Action || act instanceof Actions) {
+                if (act._start < 0 || act._start > act._end) {
+                    throw new Error(
+                        `Unexpected _start=${act._start} _end=${act._end}`
+                    );
+                }
             }
             /* c8 ignore stop */
             act.run();
@@ -104,19 +107,16 @@ export abstract class Actions
     abstract resolve(frame: number, base_frame: number, hint_dur: number): void;
 }
 
+type SeqParams = ActionsParams & { delay?: number; stagger?: number }
 export class SeqA extends Actions {
     _delay?: number;
     _stagger?: number;
-    _params: Actions["_params"] & { delay?: number; stagger?: number } = {};
 
-    ready(parent: IParent): void {
-        super.ready(parent);
-        const { delay, stagger } = this._params;
+    constructor(parent: IParent, runs: Runnable[], params: SeqParams = {}) {
+        super(parent, runs, params);
+        const { delay, stagger } = params;
         delay && (this._delay = parent.to_frame(delay));
         stagger && (this._stagger = parent.to_frame(stagger));
-        for (const act of this) {
-            act.ready(parent);
-        }
     }
 
     resolve(frame: number, base_frame: number, hint_dur: number) {
@@ -124,20 +124,20 @@ export class SeqA extends Actions {
         let e = frame;
         if (_stagger) {
             let s = frame; // starting time
-            for (const act of this) {
+            for (const act of this._runs) {
                 act.resolve(s, base_frame, _hint_dur);
                 e = act._end;
                 s = Math.max(s + _stagger, base_frame); // next start time
             }
         } else if (_delay) {
             let s = frame; // starting time
-            for (const act of this) {
+            for (const act of this._runs) {
                 act.resolve(s, base_frame, _hint_dur);
                 e = act._end;
                 s = Math.max(e + _delay, base_frame); // next start time
             }
         } else {
-            for (const act of this) {
+            for (const act of this._runs) {
                 act.resolve(e, base_frame, _hint_dur);
                 e = act._end;
             }
@@ -147,36 +147,30 @@ export class SeqA extends Actions {
     }
 }
 
-export function Seq(items: Array<Action | Actions>, params?: SeqA['_params']) {
+export function Seq(items: Array<RunGiver>, params?: SeqParams) {
     if (!Array.isArray(items)) {
         throw new Error(`Unexpected`)
     } else {
         for (const a of items) {
-            if (a instanceof Action || a instanceof Actions) {
+            if (typeof a == "function") {
                 continue;
             }
             throw new Error(`Unexpected`);
         }
     }
-    const x = new SeqA(...items);
-    params && (x._params = params);
-    return x;
+    return function (track: IParent) {
+        return new SeqA(track, items.map(giver => giver(track)), params);
+    }
 }
 
 export class ParA extends Actions {
     _tail?: boolean;
 
-    ready(parent: IParent): void {
-        super.ready(parent);
-        for (const act of this) {
-            act.ready(parent);
-        }
-    }
     resolve(frame: number, base_frame: number, hint_dur_: number): void {
         let { _hint_dur = hint_dur_ } = this;
         let end = frame;
 
-        for (const act of this) {
+        for (const act of this._runs) {
             act.resolve(frame, base_frame, _hint_dur);
             if (_hint_dur == undefined) {
                 _hint_dur = act.get_active_dur();
@@ -186,7 +180,7 @@ export class ParA extends Actions {
             end = Math.max(end, act._end);
         }
         if (this._tail) {
-            for (const act of this) {
+            for (const act of this._runs) {
                 if (act._end != end) {
                     act.resolve(
                         end - act.get_active_dur(),
@@ -208,26 +202,38 @@ export class ParA extends Actions {
     }
 }
 
-export function Par(items: Array<Action | Actions>, params?: ParA['_params']) {
+export function Par(items: Array<RunGiver>, params?: ActionsParams): RunGiver {
     if (!Array.isArray(items)) {
         throw new Error(`Unexpected`)
     } else {
         for (const a of items) {
-            if (a instanceof Action || a instanceof Actions) {
+            if (typeof a == "function") {
                 continue;
             }
             throw new Error(`Unexpected`);
         }
     }
-    const x = new ParA(...items);
-    params && (x._params = params);
-    return x;
+    return function (track: IParent) {
+        return new ParA(track, items.map(giver => giver(track)), params);
+    }
 }
 
-export function ParE(items: Array<Action | Actions>, params?: ParA['_params']) {
-    const x = Par(items);
-    x._tail = true;
-    return x;
+export function ParE(items: Array<RunGiver>, params?: ActionsParams): RunGiver {
+    if (!Array.isArray(items)) {
+        throw new Error(`Unexpected`)
+    } else {
+        for (const a of items) {
+            if (typeof a == "function") {
+                continue;
+            }
+            throw new Error(`Unexpected`);
+        }
+    }
+    return function (track: IParent) {
+        const x = new ParA(track, items.map(giver => giver(track)), params);
+        x._tail = true;
+        return x;
+    }
 }
 
 export type Params2 = {
@@ -240,18 +246,20 @@ export type Params2 = {
 
 export class ToA extends Action {
     _first: Params2;
-    constructor(first: Params2, dur?: number, add?: boolean) {
+    constructor(parent: IParent, props: IProperty<any>[] | IProperty<any>, value: any, params?: ParamsT) {
         super();
-        this._first = first;
-        this.ready = function (parent: IParent): void {
-            dur == undefined || (this._dur = parent.to_frame(dur));
-            for (let cur: Params2 | undefined = first; cur; cur = cur._next) {
-                const { property, extra } = cur;
-                extra.easing ?? (extra.easing = parent.easing);
-                add && (extra.add = true);
-                parent.add_prop(property);
-            }
-        };
+        let { dur, ...extra } = params ?? {};
+        const m = list_props(props).map((property) => ({ property, value, extra } as Params2));
+        m.forEach((e, i, a) => {
+            e._next = a.at(i + 1);
+        });
+        this._first = m.at(0)!;
+        dur == undefined || (this._dur = parent.to_frame(dur));
+        for (let cur: Params2 | undefined = this._first; cur; cur = cur._next) {
+            const { property, extra } = cur;
+            extra.easing ?? (extra.easing = parent.easing);
+            parent.add_prop(property);
+        }
     }
     run(): void {
         const { _start: start, _end, _first } = this;
@@ -263,40 +271,23 @@ export class ToA extends Action {
 }
 
 export class PassA extends Action {
-    constructor(dur?: number) {
+    constructor(parent: IParent, dur?: number) {
         super();
-        this.ready = function (parent: IParent): void {
-            this._dur = dur == undefined ? undefined : parent.to_frame(dur);
-            this.run = function (): void { };
-        };
+        dur == undefined || (this._dur = parent.to_frame(dur));
     }
+    run(): void {
+
+    };
 }
 
-// export class AddA extends Action {
-//     constructor(props: IProperty<any>[], value: any, params?: ParamsT) {
-//         super();
-//         this.ready = function (parent: IParent): void {
-//             let { dur, easing, curve } = params ?? {};
-//             this._dur = dur == undefined ? undefined : parent.to_frame(dur);
-//             easing = easing ?? parent.easing;
-//             for (const prop of props) {
-//                 parent.add_prop(prop);
-//             }
-//             this.run = function (): void {
-//                 const { _start: start, _end } = this;
-//                 let extra: Parameters<IProperty<any>["key_value"]>[2] = {
-//                     start,
-//                     easing,
-//                     curve,
-//                     add: true,
-//                 };
-//                 for (const prop of props) {
-//                     prop.key_value(_end, value, extra);
-//                 }
-//             };
-//         };
-//     }
-// }
+export class AddA extends ToA {
+    constructor(parent: IParent, props: IProperty<any>[] | IProperty<any>, value: any, params?: ParamsT) {
+        super(parent, props, value, params);
+        for (let cur: Params2 | undefined = this._first; cur; cur = cur._next) {
+            cur.extra.add = true;
+        }
+    }
+}
 
 function list_props(x: IProperty<any>[] | IProperty<any>) {
     if (Array.isArray(x)) {
@@ -310,67 +301,25 @@ export function To(
     props: IProperty<any>[] | IProperty<any>,
     value: any,
     params?: ParamsT,
-    add?: boolean
-) {
-    let { dur, ...extra } = params ?? {};
-    const m = list_props(props).map((property) => ({ property, value, extra } as Params2));
-    m.forEach((e, i, a) => {
-        e._next = a.at(i + 1);
-    });
-    return new ToA(m.at(0)!, dur, add);
+): RunGiver {
+    return function (track: IParent) {
+        return new ToA(track, props, value, params);
+    }
 }
 
 export function Add(
     props: IProperty<any>[] | IProperty<any>,
     value: any,
     params?: ParamsT
-) {
-    return To(props, value, params, true);
-    // return new AddA(list_props(props), value, params);
-}
-
-export function To2(
-    props: IProperty<any>[] | IProperty<any>,
-    value: any,
-    params: ParamsT = {}
-) {
-    function list_props2(x: IProperty<any>[] | IProperty<any>) {
-        if (Array.isArray(x)) {
-            return x;
-        } else {
-            return [x];
-        }
-    }
-
+): RunGiver {
     return function (track: IParent) {
-
-
+        return new AddA(track, props, value, params);
     }
 }
 
-export function Pass(dur?: number) {
-    return new PassA(dur);
-}
-
-export function Par2(items: Array<RunGiver>, params?: ParA['_params']) {
-    if (!Array.isArray(items)) {
-        throw new Error(`Unexpected`)
-    } else {
-        for (const a of items) {
-            if (typeof a == "function") {
-                continue;
-            }
-            throw new Error(`Unexpected`);
-        }
-    }
-    // const x = new ParA(...items);
-    // params && (x._params = params);
+export function Pass(dur?: number): RunGiver {
     return function (track: IParent) {
-        const runs = items.map(giver => {
-            const r = giver(track);
-            return r;
-        })
-
-
+        return new PassA(track, dur);
     }
 }
+

@@ -13,29 +13,24 @@ export class Track {
     to_frame(sec: number) {
         return Math.round(this.frame_rate * sec);
     }
-    feed(cur: IAction) {
-        const d = feed(this, cur, this.frame, this.frame);
+    feed(cur: RunGiver) {
+        const d = feed(this, cur(this), this.frame, this.frame);
         this.frame += d;
         return this;
     }
     step(step: UserEntry[], vars: PropMap, params: any) {
         return this.run(Step(step, vars, params));
     }
-    run(...args: Array<Action | Actions | RunGiver | Array<Action | Actions | RunGiver>>) {
+    run(...args: Array<RunGiver | Array<RunGiver>>) {
         let I = this.frame;
         let B = this.frame;
         for (const act of args) {
             let D = 0;
-            if (!Array.isArray(act) || act instanceof Actions) {
-                if (typeof act == "function") {
-                    D = feed(this, act(this), I, B);
-                } else {
-                    D = feed(this, act, I, B);
-                }
-
+            if (!Array.isArray(act)) {
+                D = feed(this, act(this), I, B);
             } else {
                 for (const a of act) {
-                    let d = feed(this, (typeof a == "function") ? a(this) : a, I, B);
+                    let d = feed(this, a(this), I, B);
                     D = Math.max(d, D);
                 }
             }
@@ -59,7 +54,7 @@ export class Track {
 }
 
 function feed(track: Track, cur: IAction, frame: number, base_frame: number) {
-    cur.ready(track);
+    // cur.ready(track);
     cur.resolve(frame, base_frame, track.hint_dur);
     const d = cur.get_active_dur();
     /* c8 ignore start */

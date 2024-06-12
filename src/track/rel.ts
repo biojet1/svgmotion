@@ -26,11 +26,9 @@ function list_props(x: IProperty<any>[] | IProperty<any>) {
 
 class RelA extends Action {
     map: Map<IProperty<any>, Entry[]>;
-    constructor(map: Map<IProperty<any>, Entry[]>) {
+    constructor(parent: IParent, map: Map<IProperty<any>, Entry[]>) {
         super();
         this.map = map;
-    }
-    override ready(parent: IParent): void {
         for (const [k, v] of this.map.entries()) {
             for (const e of v) {
                 e.offset_frames = parent.to_frame(e.offset_sec);
@@ -38,9 +36,9 @@ class RelA extends Action {
 
                 }
             }
-
         }
     }
+
     override resolve(frame: number, base_frame: number, hint_dur: number): void {
         for (const [k, v] of this.map.entries()) {
             let prev: Entry | undefined = undefined;
@@ -139,7 +137,8 @@ export function Rel(x: {
     for (const [k, v] of map.entries()) {
         v.sort((a, b) => a.offset_sec - b.offset_sec)
     }
-    return new RelA(map);
+    return (track: IParent) => new RelA(track, map);
+
 }
 
 Rel.to = function (props: IProperty<any>[] | IProperty<any>, value: any, extra: ExtraT = {}) {
