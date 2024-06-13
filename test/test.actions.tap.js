@@ -13,8 +13,11 @@ test.test("Par 2", (t) => {
     let d = new ScalarValue(3);
     let tr = new Track();
     let x;
-    tr.frame_rate = 5;
-    tr.hint_dur = 5;
+    // tr.frame_rate = 5;
+    // tr.hint_dur = 5;
+    tr.set_frame_rate(5);
+    t.same(tr.hint_dur, 5);
+
     tr.run(
         ParE([
             (x = To(a, 11, { easing: Easing.linear, dur: 2 })),
@@ -171,15 +174,8 @@ test.test("Seq then Par", (t) => {
 });
 
 test.test("Step", (t) => {
-    const {
-        VectorValue,
-        Root,
-        Track,
-        ViewPort,
-        ScalarValue,
-        Step,
-        Vector,
-    } = svgmotion;
+    const { VectorValue, Root, Track, ViewPort, ScalarValue, Step, Vector } =
+        svgmotion;
     let tr = new Track();
     let head = new Root();
     let view = head.view;
@@ -223,12 +219,15 @@ test.test("Step", (t) => {
         // To, Add, Hold, Initial, Last, First
         // {frame, value, easing, curve, add }
         // to add initial hold
-        Rel({
-            '10%': [To(r.opacity, 0)],
-            '100%': [To(r.opacity, 0)],
-            3: [],
-            '10%': [to([r.opacity, r.xpos], 0.5, {}), {}]
-        }, { dur: 10 })
+        Rel(
+            {
+                "10%": [To(r.opacity, 0)],
+                "100%": [To(r.opacity, 0)],
+                3: [],
+                "10%": [to([r.opacity, r.xpos], 0.5, {}), {}],
+            },
+            { dur: 10 }
+        );
     }
 
     {
@@ -265,10 +264,64 @@ test.test("Curve", (t) => {
     t.same(pos.dump(), d);
     t.end();
 });
+test.test("Fun", (t) => {
+    class REL {
+        constructor(track, map) {
+            console.log(`REL constructor `, track, map);
+        }
 
+        static at(t) {
+            const map = new Map();
+            let cur = [];
+            map.set(t, cur);
+            function fn(c) {
+                // console.log('fn. ', this, map, c);
+                return new REL(c, map);
+            }
+            fn.at = function (c) {
+                (cur = map.get(c)) ?? map.set(c, (cur = []));
+                return this;
+            };
+            fn.to = function (c) {
+                cur.push(c);
+                return this;
+            };
+            fn.add = function (c) {
+                cur.push(c);
+                return this;
+            };
+            return fn;
+        }
+    }
+    // const Fun = function (c) {
+
+    //     console.log(this, c);
+    //     return 45;
+    // };
+    // const Fn3 = function () {
+    //     const map = {};
+    //     function fn(c) {
+
+    //         console.log('fn. ', this, map, c);
+    //         return 45;
+    //     };
+    //     fn.sub = function (c) {
+    //         map[`sub-${$c}`] = c;
+    //         console.log('fn.sub ', this, map, c);
+    //         return this;
+    //     };
+    //     return fn
+    // };
+
+    // let f4 = new Fn4("first");
+    let f = REL.at("50%").to("apple").add("banana");
+    f.at(5).add("citrus").add("lemon").add("tomato");
+    f();
+    t.end();
+});
 
 test.test("Rel", (t) => {
-    const { Track, To, PositionValue, Rel, ScalarValue } = svgmotion;
+    const { Track, To, Add, PositionValue, Rel, ScalarValue } = svgmotion;
     const { to, add } = Rel;
     let tr = new Track();
     let a = new ScalarValue(1);
@@ -277,26 +330,36 @@ test.test("Rel", (t) => {
     let d = new ScalarValue(4);
     let e = new ScalarValue(5);
     let f = new ScalarValue(6);
-    c.tag = 'C';
-    let r = Rel({
-        '20%': [to(a, 3)],
-        '100%': [to([b, a], 10), to([e], 11)],
-        '50%': [to([b, c], 5)],
-        '10%': [to([c], 0.5, {}), { easing: 8, curve: 9 }],
-        '0%': [to(d, 9)],
-        10: [add(f, 1)]
-    }, { dur: null });
+    c.tag = "C";
+    tr.set_frame_rate(5);
+
+    // let r = Rel(
+    //     {
+    //         "20%": [To(a, 3)],
+    //         "100%": [To([b, a], 10), To([e], 11)],
+    //         "50%": [To([b, c], 5)],
+    //         "10%": [To([c], 0.5, {})],
+    //         "0%": [To(d, 9)],
+    //         10: [Add(f, 1)],
+    //     },
+    //     { dur: null }
+    // );
     // Rel.at('20%', to(a, 3)).at(10, add(f, 1))
-
-
+    // Rel.at('20%').to(a, 3).add(f, 1)
     tr.pass(1);
     // console.info(r.map, { depth: 100 });
-    tr.run(r);
+    // tr.run(r);
     // t.same(r.map.get(c).map(v => v.offset_sec), [1, 5]);
     // t.same(r.map.get(b).map(v => v.offset_sec), [5, 10]);
     // t.same(r.map.get(a).map(v => v.offset_sec), [2, 10]);
-
-
     // console.info(a.kfs, e.kfs);
+    let rel = Rel.at("20%").to(a, 3);
+    rel.at("100%").to([b, a], 10).to([e], 11);
+    rel.at("50%").to([b, c], 5);
+    rel.at("10%").to([c], 0.5, {});
+    rel.at("0%").to(d, 9);
+    rel.at(10).add(f, 1);
+    tr.run(rel);
+    console.info(a.kfs, e.kfs);
     t.end();
 });

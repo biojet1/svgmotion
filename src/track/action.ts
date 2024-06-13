@@ -249,11 +249,13 @@ export class ToA extends Action {
     constructor(parent: IParent, props: IProperty<any>[] | IProperty<any>, value: any, params?: ParamsT) {
         super();
         let { dur, ...extra } = params ?? {};
-        const m = list_props(props).map((property) => ({ property, value, extra } as Params2));
-        m.forEach((e, i, a) => {
-            e._next = a.at(i + 1);
-        });
-        this._first = m.at(0)!;
+        {
+            const m = list_props(props).map((property) => ({ property, value, extra } as Params2));
+            m.forEach((e, i, a) => {
+                e._next = a.at(i + 1);
+            });
+            this._first = m.at(0)!;
+        }
         dur == undefined || (this._dur = parent.to_frame(dur));
         for (let cur: Params2 | undefined = this._first; cur; cur = cur._next) {
             const { property, extra } = cur;

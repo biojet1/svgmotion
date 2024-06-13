@@ -121,7 +121,6 @@ export class StepA extends Action {
         this._steps = steps;
         this._vars = vars;
         this._base_frame = Infinity;
-
         this._dur = dur == undefined ? undefined : parent.to_frame(dur);
         this._max_dur =
             max_dur == undefined ? undefined : parent.to_frame(max_dur);

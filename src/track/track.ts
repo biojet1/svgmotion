@@ -13,6 +13,11 @@ export class Track {
     to_frame(sec: number) {
         return Math.round(this.frame_rate * sec);
     }
+    set_frame_rate(n_per_sec: number) {
+        const { hint_dur, frame_rate } = this;
+        this.frame_rate = n_per_sec;
+        this.hint_dur = this.to_frame(hint_dur / frame_rate)
+    }
     feed(cur: RunGiver) {
         const d = feed(this, cur(this), this.frame, this.frame);
         this.frame += d;
