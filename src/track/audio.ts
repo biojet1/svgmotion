@@ -1,4 +1,4 @@
-import { Action, IParent } from "./action.js";
+import { Action } from "./action.js";
 export type AudioEntry = {
     path?: string;
     duration?: number;
@@ -15,14 +15,14 @@ export type AudioEntry = {
     fadeOut?: { duration: number; curve: string };
     fadeIn?: { duration: number; curve: string };
 };
-export abstract class AudioActionBase extends Action {
-    protected abstract entry(): AudioEntry;
-    resolve(frame: number, base_frame: number, hint_dur_: number): void {
+// export abstract class AudioActionBase extends Action {
+//     protected abstract entry(): AudioEntry;
+//     resolve(frame: number, base_frame: number, hint_dur_: number): void {
 
-    }
-    override ready(parent: IParent): void {
-        // const { dur } = this._params ?? {};
-        // this._dur = (dur == undefined) ? undefined : parent.to_frame(dur);
+//     }
+//     override ready(track: IParent): void {
+//         // const { dur } = this._params ?? {};
+//         // this._dur = (dur == undefined) ? undefined : parent.to_frame(dur);
 
-    }
-}
+//     }
+// }
