@@ -26,7 +26,7 @@ export async function animate(lib) {
         "all" in r2.transform,
         Object.hasOwn(r2.transform, "all")
     );
-    tr.feed(
+    tr.run(
         Step(
             [
                 { t: 0, R: [400, 400], C: "orange" },
@@ -49,7 +49,7 @@ export async function animate(lib) {
             // { easing: Easing.inoutquart }
         )
     );
-    anim.track().feed(
+    anim.track().run(
         Step(
             [
                 { t: 0, X: [1, 1], easing: Easing.linear, C: "blue" },
@@ -74,7 +74,7 @@ export async function animate(lib) {
     delete e1.cy;
     delete e1.cx;
     const mov = e1.transform.add_translate();
-    anim.track().feed(
+    anim.track().run(
         Step(
             [
                 { P: [100, 100] },
@@ -92,7 +92,7 @@ export async function animate(lib) {
     // mov.repeat_count = 66666666666;
     mov.repeat(1, true);
     // console.log(mov.dump());
-    anim.track().feed(
+    anim.track().run(
         Step(
             [
                 { t: 0, EX: 40, EY: 40, easing: Easing.linear },
@@ -112,7 +112,7 @@ export async function animate(lib) {
 
     {
         const S = maru1.transform.add_translate();
-        anim.track(1).feed(
+        anim.track(1).run(
             Step(
                 [
                     { t: 0, S: [0, 0] },
@@ -135,7 +135,7 @@ export async function animate(lib) {
     {
         const pos = maru2.transform.add_translate();
         const CO = maru2.fill.color;
-        anim.track().feed(
+        anim.track().run(
             Step(
                 [
                     { t: 0, CO: "yellow" },

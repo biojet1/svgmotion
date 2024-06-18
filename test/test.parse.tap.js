@@ -13,7 +13,7 @@ test.test("Item", async (t) => {
 
         // console.log("first_child", );
 
-        tr.feed(
+        tr.run(
             Step(
                 [
                     {

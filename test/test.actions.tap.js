@@ -213,20 +213,7 @@ test.test("Step", (t) => {
     // s.ready(tr);
     s.resolve(0, 0, tr.hint_dur);
     s.run();
-    if (0) {
-        // To, Add, Hold, Initial, Last, First
-        // {frame, value, easing, curve, add }
-        // to add initial hold
-        Rel(
-            {
-                "10%": [To(r.opacity, 0)],
-                "100%": [To(r.opacity, 0)],
-                3: [],
-                "10%": [to([r.opacity, r.xpos], 0.5, {}), {}],
-            },
-            { dur: 10 }
-        );
-    }
+
 
     {
         const q = r.position.kfs;

@@ -8,7 +8,7 @@ export async function animate(lib) {
     console.log(anim);
     const p = anim.view.first_child().first_child().first_child();
 
-    tr.feed(
+    tr.run(
         Step(
             [
                 {

@@ -547,7 +547,7 @@ PointsValue.prototype.set_parse_points = function (s: string) {
     }
     this.value = points;
 }
-
+// VectorValue.prototype.
 VectorValue.prototype.set_parse_dashes = function (s: string) {
     this.value = this.load_value(s.split(/[\s,]+/).map(function (str) {
         return parseFloat(str.trim());
