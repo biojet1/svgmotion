@@ -18,11 +18,11 @@ export class Track implements Updateable {
     set_frame_rate(n_per_sec: number) {
         const { hint_dur, frame_rate } = this;
         this.frame_rate = n_per_sec;
-        this.hint_dur = this.to_frame(hint_dur / frame_rate)
+        this.hint_dur = this.to_frame(hint_dur / frame_rate);
         return this;
     }
     set_frame(sec: number) {
-        this.frame = this.to_frame(sec)
+        this.frame = this.to_frame(sec);
         return this;
     }
     feed(cur: IAction) {
@@ -42,6 +42,7 @@ export class Track implements Updateable {
                 D = feed(this, act(this), I, B);
             } else {
                 for (const a of act) {
+
                     let d = feed(this, a(this), I, B);
                     D = Math.max(d, D);
                 }
@@ -72,8 +73,7 @@ export class Track implements Updateable {
         if ((this.updates?.size ?? 0) <= 0) {
             throw Error(`No updatables`);
         }
-
-        for (const cur of (this.updates ?? [])) {
+        for (const cur of this.updates ?? []) {
             const up = cur.updater();
             const { start: S, end: E } = up;
             if (isFinite(E) && E > end) {
@@ -85,7 +85,9 @@ export class Track implements Updateable {
             ups.push(up);
         }
         return {
-            start, end, update(frame: number) {
+            start,
+            end,
+            update(frame: number) {
                 // this.start + (frame - _start)
                 for (const up of ups) {
                     const { start: s, end: e } = up;
@@ -94,44 +96,76 @@ export class Track implements Updateable {
                     }
                     up.update(frame);
                 }
-            }
-        }
+            },
+        };
     }
     give(): RunGiver {
         const self = this;
         return (track: Track) => {
+            let ups: Updater[] = [];
+            if ((self.updates?.size ?? 0) <= 0) {
+                throw Error(`No updatables`);
+            }
+            let _out = -Infinity;
+            let _in = -Infinity;
+            for (const cur of this.updates ?? []) {
+                const up = cur.updater();
+                const { start: S, end: E } = up;
+                if (isFinite(E) && E > _out) {
+                    _out = E;
+                }
+                if (S < _in) {
+                    _in = S;
+                }
+                ups.push(up);
+            }
+            if (_out <= _in) {
+                throw Error(`Unexpected`);
+            }
+
             return {
-                _start: 0,
-                _end: 0,
+                _start: -Infinity,
+                _end: -Infinity,
                 resolve(frame: number, base_frame: number, hint_dur: number): void {
-                    let end = -1;
-                    let start = -1;
-                    if ((self.updates?.size ?? 0) <= 0) {
-                        throw Error(`No updatables`);
-                    }
-
-                    for (const cur of (self.updates ?? [])) {
-                        const up = cur.updater();
-                        const { start: S, end: E } = up;
-                        if (isFinite(E) && E > end) {
-                            end = E;
-                        }
-                        if (S < start) {
-                            start = S;
-                        }
-                    }
-
                     this._start = frame;
-                    this._end = frame + (end - start);
+                    this._end = frame + (_out - _in);
                 },
                 run(): void {
-                    track.add_update(self);
+                    const start = this._start;
+                    const end = this._end;
+                    if (end <= start) {
+                        throw Error(`Unexpected`);
+                    }
+                    if (_out - _in !== end - start) {
+                        throw Error(`Unexpected`);
+                    }
+                    track.add_update({
+                        updater() {
+                            return {
+                                start,
+                                end,
+                                update(frame: number) {
+                                    const off = _in + (frame - start);
+                                    for (const up of ups) {
+                                        const { start: s, end: e } = up;
+                                        if (e <= s) {
+                                            throw Error(`Unexpected`);
+                                        }
+                                        if (off < s || off >= e) {
+                                            continue;
+                                        }
+                                        up.update(off);
+                                    }
+                                },
+                            };
+                        },
+                    });
                 },
                 get_active_dur(): number {
-                    return this._end - this._start
-                }
-            }
-        }
+                    return this._end - this._start;
+                },
+            };
+        };
     }
 }
 
@@ -145,5 +179,8 @@ function feed(track: Track, cur: IAction, frame: number, base_frame: number) {
     }
     /* c8 ignore stop */
     cur.run();
+    // const x = cur.apply(frame, base_frame, track.hint_dur);
+    // const d = x.end - x.start;
+    // x.apply(track);
     return d;
 }

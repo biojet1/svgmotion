@@ -4,7 +4,11 @@ import { Track } from "./track";
 type EasingT = Iterable<number> | true;
 
 export type IProperty<V> = Animated<V>
-
+export type Applier = {
+    start: number;
+    end: number;
+    supply: ((that: Track) => void);
+};
 export interface Runnable {
     _start: number;
     _end: number;
@@ -23,6 +27,8 @@ export type ParamsT = {
     dur?: number;
     curve?: Iterable<number[]>;
 };
+
+
 
 export type RunGiver = (that: Track) => Runnable;
 
