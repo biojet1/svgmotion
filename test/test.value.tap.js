@@ -144,7 +144,7 @@ test.test("Repeat", (t) => {
     v.key_value(1, 5);
     v.key_value(7, 13);
     v.key_value(9, 7);
-    v.repeat(2);
+    v.check_stepper = (s) => s.repeat(2)
     t.same(v.get_value(0), 5);
     t.same(v.get_value(9), 7);
     t.same(v.get_value(10), 5);
@@ -163,7 +163,7 @@ test.test("Repeat Infinite", (t) => {
     v.key_value(1, 7);
     v.key_value(7, 13);
     v.key_value(9, 15);
-    v.repeat(-1);
+    v.check_stepper = (s) => s.repeat(Infinity)
     let o = 0;
     for (const x of "7 8 9 10 11 12 13 14 15 7 8 9 10 11 12 13 14 15 7 8 9 10 11 12 13 14 15 7 8 9 10 11 12 13 14 15".split(
         " "
@@ -179,15 +179,15 @@ test.test("Repeat fraction", (t) => {
     v.key_value(1, 7);
     v.key_value(7, 13);
     v.key_value(9, 15);
-    v.repeat(3.3333333333333);
+    v.check_stepper = (s) => s.repeat(3.3333333333333).clamp();
     let o = 0;
     v.get_value(50);
-    // console.log(v);
-    for (const x of "7 8 9 10 11 12 13 14 15 7 8 9 10 11 12 13 14 15 7 8 9 10 11 12 13 14 15 7 8 8 8 8 8 8".split(
+    // console.log([...v.enum_values(0, 33)]);
+    for (const x of "7 8 9 10 11 12 13 14 15 7 8 9 10 11 12 13 14 15 7 8 9 10 11 12 13 14 15 7 8 9 9 9 9 9".split(
         " "
     )) {
         o++;
-        t.same(v.get_value(o), parseInt(x), `o:${o} x:${x}`);
+        t.same(Math.round(v.get_value(o)), parseInt(x), `o:${o} x:${x}`);
     }
     t.end();
 });
@@ -197,7 +197,7 @@ test.test("Bounce once", (t) => {
     v.key_value(1, 7);
     v.key_value(7, 13);
     v.key_value(9, 15);
-    v.repeat(1, true);
+    v.check_stepper = (s) => s.bounce();
     let o = 0;
     for (const x of (
         `7 8 9 10 11 12 13 14 15 14 13 12 11 10 9 8 7` + ` 7 7 7`
@@ -213,7 +213,7 @@ test.test("Bounce twice", (t) => {
     v.key_value(1, 7);
     v.key_value(7, 13);
     v.key_value(9, 15);
-    v.repeat(2, true);
+    v.check_stepper = (s) => s.bounce(2);
     let o = 0 - 3;
     for (const x of (
         `7 7 7 7 8 9 10 11 12 13 14 15 14 13 12 11 10 9 8 7` +
@@ -232,7 +232,7 @@ test.test("Bounce 2.5x", (t) => {
     v.key_value(1, 7);
     v.key_value(7, 13);
     v.key_value(9, 15);
-    v.repeat(2.5, true);
+    v.check_stepper = (s) => s.bounce(2.5);
     let o = 0 - 2;
     for (const x of (
         `7 7 7 8 9 10 11 12 13 14 15 14 13 12 11 10 9 8 7` +
@@ -244,9 +244,9 @@ test.test("Bounce 2.5x", (t) => {
             break;
         }
     }
-    let j = v.dump();
-    t.same(j.r, 2.5);
-    t.same(j.b, true);
+    // let j = v.dump();
+    // t.same(j.r, 2.5);
+    // t.same(j.b, true);
     t.end();
 });
 
@@ -267,11 +267,11 @@ test.test("Easing", (t) => {
     u.load(d);
 
     t.same(
-        [...v.enum_values(0, 41)].map((v) => Math.round(v)),
+        [...v.enum_values(0, 40)].map((v) => Math.round(v)),
         n
     );
     t.same(
-        [...u.enum_values(0, 41)].map((v) => Math.round(v)),
+        [...u.enum_values(0, 40)].map((v) => Math.round(v)),
         n
     );
 

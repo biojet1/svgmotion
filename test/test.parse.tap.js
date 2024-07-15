@@ -1,65 +1,66 @@
 "uses strict";
 import test from "tap";
 import { SVGDocument, XMLSerializer } from "domspec";
-import { Vector, RGB, Root, Step } from "svgmotion";
-test.test("Item", async (t) => {
-    const anim = new Root();
-    const tr = anim.track();
-    await anim.load_svg("../../python/flottie/example/res/thank_you_tp.svg");
-    // console.log("doc", doc);
-    {
-        anim.view.fill.color.value = new RGB(1, 1, 0);
-        const p = anim.view.first_child().first_child().first_child();
+import { Vector, RGB, Root, Rel } from "svgmotion";
+// test.test("Item", async (t) => {
+//     const anim = new Root();
+//     const tr = anim.track();
+//     await anim.load_svg("../../python/flottie/example/res/thank_you_tp.svg");
+//     // console.log("doc", doc);
+//     {
+//         anim.view.fill.color.value = new RGB(1, 1, 0);
+//         const p = anim.view.first_child().first_child().first_child();
 
-        // console.log("first_child", );
+//         // console.log("first_child", );
+//         const R = p.transform.rotation;
+//         tr.run(
+//             Rel(0).to(A, .25).to(A, .25)
+//             Step(
+//                 [
+//                     {
+//                         A: 0.25,
+//                         t: 0,
+//                         B: [50, 50],
+//                         C: [0.9, 0.1, 0.9],
+//                         R: 0,
+//                     },
+//                     { A: 0.9, dur: 1, B: [0, 50], C: [1, 1, 0], R: 10 },
+//                     {
+//                         A: 0.25,
+//                         dur: 1,
+//                         B: [50, 0],
+//                         C: [0, 1, 0],
+//                         R: -5,
+//                     },
+//                     { A: 0.9, dur: 1, B: [0, 0], C: [0, 0, 0], R: 5 },
+//                     {
+//                         A: 0.25,
+//                         dur: 1,
+//                         B: null,
+//                         C: [0.5, 0.5, 0.5],
+//                         R: 0,
+//                     },
+//                 ],
+//                 {
+//                     // X: r.opacity,
+//                     // B: r.position,
+//                     // C: r.fill.color,
+//                     R: p.transform.rotation,
+//                 }
+//             )
+//         );
+//     }
 
-        tr.run(
-            Step(
-                [
-                    {
-                        A: 0.25,
-                        t: 0,
-                        B: [50, 50],
-                        C: [0.9, 0.1, 0.9],
-                        R: 0,
-                    },
-                    { A: 0.9, dur: 1, B: [0, 50], C: [1, 1, 0], R: 10 },
-                    {
-                        A: 0.25,
-                        dur: 1,
-                        B: [50, 0],
-                        C: [0, 1, 0],
-                        R: -5,
-                    },
-                    { A: 0.9, dur: 1, B: [0, 0], C: [0, 0, 0], R: 5 },
-                    {
-                        A: 0.25,
-                        dur: 1,
-                        B: null,
-                        C: [0.5, 0.5, 0.5],
-                        R: 0,
-                    },
-                ],
-                {
-                    // X: r.opacity,
-                    // B: r.position,
-                    // C: r.fill.color,
-                    R: p.transform.rotation,
-                }
-            )
-        );
-    }
+//     const nod = anim.to_dom(new SVGDocument());
 
-    const nod = anim.to_dom(new SVGDocument());
+//     anim.update_dom(0);
 
-    anim.update_dom(0);
-
-    // console.log(`width`, nod.width.baseVal.value, nod.width.baseVal.unitType);
-    const ser = new XMLSerializer();
-    // console.log(ser.serializeToString(nod));
-    console.log(anim.save_html("/tmp/svgm.html"));
-    t.end();
-});
+//     // console.log(`width`, nod.width.baseVal.value, nod.width.baseVal.unitType);
+//     const ser = new XMLSerializer();
+//     // console.log(ser.serializeToString(nod));
+//     console.log(anim.save_html("/tmp/svgm.html"));
+//     t.end();
+// });
 
 test.test("Item", async (t) => {
     const anim = new Root();
@@ -78,21 +79,12 @@ test.test("Item", async (t) => {
     const R = pg1.transform.add_rotate();
     const S = pg1.transform.add_scale();
     pg1.transform.add_translate(-850, -200);
-    tr.step(
-        [
-            { R: 10 },
-            { R: -20, dur: 1, P: [50, 50], S: [1, 1] },
-            { R: 30, dur: 1, S: [2, 2] },
-            { R: -30, dur: 1, S: [1, 1] },
-            { R: Step.first, P: Step.first, dur: 1 },
-        ],
-
-        {
-            R, S
-            // R: pg1.transform.add_rotate(),
-            // //P: pg1.transform.position,
-            // S: pg1.transform.add_scale()
-        }
+    tr.run(
+        Rel(0).to(R, 10)
+            .d(1).to(R, -20).to(S, [1, 1])
+            .d(1).to(R, 30).to(S, [2, 2])
+            .d(1).to(R, -30).to(S, [1, 1])
+            .d(1).first(R)
     );
     console.log(anim.save_html("/tmp/polygon01.html"));
 

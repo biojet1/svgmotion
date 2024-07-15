@@ -1,4 +1,5 @@
-import { Keyframe, iter_frame_fun, ratio_at } from "./kfhelper.js";
+import { Steppable, Stepper } from "../track/stepper.js";
+import { Keyframe, ratio_at } from "./kfhelper.js";
 
 export type KeyExtra = {
     start?: number,
@@ -7,12 +8,8 @@ export type KeyExtra = {
     add?: boolean
 }
 
-export class Animated<V, K extends Keyframe<V> = Keyframe<V>> {
+export class Animated<V, K extends Keyframe<V> = Keyframe<V>> implements Steppable {
     kfs: Array<K> = [];
-    _repeat_count?: number;
-    _bounce?: boolean;
-    _end?: number;
-    _start?: number;
     // static
     /* c8 ignore start */
     // should be static
@@ -31,9 +28,6 @@ export class Animated<V, K extends Keyframe<V> = Keyframe<V>> {
     load_value(_a: any): V {
         throw Error(`Not implemented by '${this.constructor.name}'`);
     }
-    // static load_value_2(_a: any): V {
-    //     throw Error(`Not implemented by '${this.constructor.name}'`);
-    // }
     // should be static
     initial_value(): V {
         throw Error(`Not implemented by '${this.constructor.name}'`);
@@ -85,32 +79,9 @@ export class Animated<V, K extends Keyframe<V> = Keyframe<V>> {
     }
     // static
     get_value_off?(frame: number): V {
-        const { kfs } = this;
-        const first = kfs.at(0);
-        if (first) {
-            const last = kfs.at(-1);
-            if (last) {
-                let { _repeat_count, _bounce } = this;
-                const fo = iter_frame_fun(
-                    first.time,
-                    last.time,
-                    _repeat_count,
-                    _bounce,
-                    this
-                );
-                const fg = (this.get_value_off = function (frame: number) {
-                    return this.get_value(fo(frame));
-                });
-                if (Number.isNaN(frame)) {
-                    throw new TypeError();
-                } else {
-                    return fg.call(this, frame);
-                }
-            }
-        }
-        /* c8 ignore start */
-        throw Error(`Unexpected by '${this.constructor.name}'`);
-        /* c8 ignore stop */
+        const { step } = this.make_stepper((n: number) => this.get_value(n));
+        this.get_value_off = step;
+        return step(frame);
     }
     key_value(
         frame: number,
@@ -143,7 +114,6 @@ export class Animated<V, K extends Keyframe<V> = Keyframe<V>> {
 
         value = this.check_value(value);
         delete this["get_value_off"];
-        delete this["_end"];
         if (last) {
             if (easing != undefined) {
                 last.easing = easing;
@@ -168,7 +138,6 @@ export class Animated<V, K extends Keyframe<V> = Keyframe<V>> {
             kf.easing = easing;
         }
         delete this["get_value_off"];
-        delete this["_end"];
         return kf as K;
     }
     add_keyframe(time: number, value: V, easing?: Iterable<number> | true) {
@@ -196,72 +165,26 @@ export class Animated<V, K extends Keyframe<V> = Keyframe<V>> {
         return last;
     }
     *enum_values(start: number, end: number) {
-        while (start < end) {
-            yield this.get_value(start++);
+        const st = this.make_stepper((n: number) => this.get_value(n));
+        while (start <= end) {
+            yield st.step(start++);
         }
     }
-
-    frame_range(): [number, number] {
-        if (this._end == undefined) {
-            try {
-                this.get_value_off?.(NaN);
-            } catch (e) {
-                if (!(e instanceof TypeError)) {
-                    throw Error(`Unexpected`);
-                }
-            }
-        }
-
-        const { _start, _end } = this;
-        /* c8 ignore start */
-        if (_end == undefined || _start == undefined) {
-            throw Error(`Unexpected by '${this.constructor.name}'`);
-        }
-        /* c8 ignore stop */
-        return [_start, _end];
+    stepper(): Stepper {
+        return this.make_stepper((n: number) => this.update_value(n));
     }
-    repeat(count: number = 2, bounce: boolean = false) {
-        this._repeat_count = count;
-        this._bounce = bounce;
-        delete this["get_value_off"];
-        delete this["_end"];
-        return this;
-    }
-    updater(): Updater {
+    make_stepper<V>(step: (frame: number) => V) {
         const { kfs } = this;
         const first = kfs.at(0);
-        if (first) {
-            const last = kfs.at(-1);
-            if (last) {
-                let { _repeat_count, _bounce } = this;
-                const start = first.time;
-                const end = last.time;
-                const fof = iter_frame_fun(
-                    start,
-                    end,
-                    _repeat_count,
-                    _bounce,
-                    this
-                );
-                return {
-                    start: this._start!, end: this._end!, update: (frame: number) => {
-                        this.update_value(fof(frame));
-                    }
-                }
-            }
+        const last = kfs.at(-1);
+        if (first && last) {
+            return this.check_stepper(Stepper.create(step, first.time, last.time)).clamp();
         }
-        /* c8 ignore start */
         throw Error(`Unexpected by '${this.constructor.name}'`);
-        /* c8 ignore stop */
     }
+    check_stepper<U>(stepper: Stepper<U>) {
+        return stepper;
+    }
+}
 
-}
-export interface Updater {
-    start: number;
-    end: number;
-    update(frame: number): any;
-}
-export interface Updateable {
-    updater(): Updater;
-}
 

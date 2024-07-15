@@ -57,12 +57,6 @@ export class Animatable<
         if (kfs && kfs.length > 0) {
             o.k = kfs.map((v) => this.dump_keyframe(v, this.dump_value(v.value)));
         }
-        if (this._repeat_count) {
-            o.r = this._repeat_count;
-        }
-        if (this._bounce) {
-            o.b = this._bounce;
-        }
         return o;
     }
     load_keyframe(x: PlainKeyframe, value: V): K {
@@ -81,12 +75,6 @@ export class Animatable<
         if (k != undefined) {
             const { r, b } = x;
             this.kfs = k.map((x) => this.load_keyframe(x, this.load_value(x.v)));
-            if (r != null) {
-                this._repeat_count = r;
-            }
-            if (b != null) {
-                this._bounce = b;
-            }
         }
         if (v != undefined) {
             this.value = this.load_value(x.v);

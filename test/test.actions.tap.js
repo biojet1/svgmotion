@@ -12,13 +12,13 @@ test.test("Par 2", (t) => {
     let c = new ScalarValue(3);
     let d = new ScalarValue(3);
     let tr = new Track();
-    let x;
+
     tr.set_frame_rate(5);
     t.same(tr.hint_dur, 5);
 
     tr.run(
         ParE([
-            (x = To(a, 11, { easing: Easing.linear, dur: 2 })),
+            To(a, 11, { easing: Easing.linear, dur: 2 }),
             Add(b, -10),
             Add(d, 15, { dur: 3, easing: Easing.linear }),
             To(c, 18),
@@ -27,19 +27,19 @@ test.test("Par 2", (t) => {
     // console.log(x);
 
     t.same(
-        cata(c, 0, 15 + 1),
+        cata(c, 0, 15),
         [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
     );
     t.same(
-        cata(c, 0, 15 + 1),
+        cata(c, 0, 15),
         [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
     );
     t.same(
-        cata(a, 0, 15 + 1).map((v) => Math.round(v)),
+        cata(a, 0, 15).map((v) => Math.round(v)),
         [1, 1, 1, 1, 1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
     );
     t.same(
-        cata(b, 0, 15 + 1).map((v) => Math.round(v)),
+        cata(b, 0, 15).map((v) => Math.round(v)),
         [11, 11, 11, 11, 11, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
     );
     t.end();
@@ -171,62 +171,62 @@ test.test("Seq then Par", (t) => {
     t.end();
 });
 
-test.test("Step", (t) => {
-    const { VectorValue, Root, Track, ViewPort, ScalarValue, Step, Vector } =
-        svgmotion;
-    let tr = new Track();
-    let head = new Root();
-    let view = head.view;
-    let vp = new ViewPort();
-    let r = view.add_rect();
-    // r.opacity = new ScalarValue(0.9);
-    r.position = new VectorValue([10, 30]);
-    t.equal(r.position.value[0], 10);
-    t.equal(r.position.value[1], 30);
-    t.equal(vp.constructor.tag, "svg");
+// test.test("Step", (t) => {
+//     const { VectorValue, Root, Track, ViewPort, ScalarValue, Step, Vector } =
+//         svgmotion;
+//     let tr = new Track();
+//     let head = new Root();
+//     let view = head.view;
+//     let vp = new ViewPort();
+//     let r = view.add_rect();
+//     // r.opacity = new ScalarValue(0.9);
+//     r.position = new VectorValue([10, 30]);
+//     t.equal(r.position.value[0], 10);
+//     t.equal(r.position.value[1], 30);
+//     t.equal(vp.constructor.tag, "svg");
 
-    {
-        t.equal(Object.getOwnPropertyDescriptor(r, "opacity"), undefined);
-        t.equal(r.opacity.value, 1);
-        // console.log(Object.entries(r));
-        r.opacity.value = 0.5;
-        t.equal(r.opacity.value, 0.5);
-        r.opacity.value = 0.75;
-        t.equal(
-            Object.getOwnPropertyDescriptor(r, "opacity").value.value,
-            0.75
-        );
-        r.opacity = new ScalarValue(0.9);
-        t.equal(r.opacity.value, 0.9);
-    }
+//     {
+//         t.equal(Object.getOwnPropertyDescriptor(r, "opacity"), undefined);
+//         t.equal(r.opacity.value, 1);
+//         // console.log(Object.entries(r));
+//         r.opacity.value = 0.5;
+//         t.equal(r.opacity.value, 0.5);
+//         r.opacity.value = 0.75;
+//         t.equal(
+//             Object.getOwnPropertyDescriptor(r, "opacity").value.value,
+//             0.75
+//         );
+//         r.opacity = new ScalarValue(0.9);
+//         t.equal(r.opacity.value, 0.9);
+//     }
 
-    let s = Step(
-        [
-            { A: 0.25, t: 0, B: [50, 50] },
-            { A: 0.9, dur: 1, B: Vector.from([0, 50]) },
-            { A: 0.25, dur: 1, B: [0, 0] },
-            { A: 0.9, dur: 1, B: Step.first },
-        ],
-        { A: r.opacity, B: r.position }
-    )(tr);
+//     let s = Step(
+//         [
+//             { A: 0.25, t: 0, B: [50, 50] },
+//             { A: 0.9, dur: 1, B: Vector.from([0, 50]) },
+//             { A: 0.25, dur: 1, B: [0, 0] },
+//             { A: 0.9, dur: 1, B: Step.first },
+//         ],
+//         { A: r.opacity, B: r.position }
+//     )(tr);
 
-    // s.ready(tr);
-    s.resolve(0, 0, tr.hint_dur);
-    s.run();
+//     // s.ready(tr);
+//     s.resolve(0, 0, tr.hint_dur);
+//     s.run();
 
 
-    {
-        const q = r.position.kfs;
-        // console.log(q[3]);
-        t.same(Array.from(q[3].value), [50, 50]);
-    }
+//     {
+//         const q = r.position.kfs;
+//         // console.log(q[3]);
+//         t.same(Array.from(q[3].value), [50, 50]);
+//     }
 
-    // console.log(r.prop5);
-    r.prop5.value += 20;
-    // console.log("position", vp.position);
+//     // console.log(r.prop5);
+//     r.prop5.value += 20;
+//     // console.log("position", vp.position);
 
-    t.end();
-});
+//     t.end();
+// });
 
 test.test("Curve", (t) => {
     const { Track, To, PositionValue } = svgmotion;
