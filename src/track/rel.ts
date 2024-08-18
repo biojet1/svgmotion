@@ -79,7 +79,7 @@ export function Rel(t: string | number): Proxy {
             }
         }
         // console.log("map2", map2);
-        if (t_max <= 0) {
+        if (t_max < 0) {
             // console.log(map2);
             throw new Error(`Invalid duration: ${t_max}`);
         }
@@ -178,6 +178,7 @@ export function Rel(t: string | number): Proxy {
         return this;
     };
     fn.at = function (o: number | string) {
+        // console.log("AT", typeof o, o, arguments)
         if (typeof o == "number") {
             return this.t(o);
         } else if (o.endsWith("%")) {
@@ -196,7 +197,7 @@ export function Rel(t: string | number): Proxy {
         cur.push({ props: list_props(props), op: new RelTo(value, extra) });
         return this;
     };
-    fn.add = function (
+    fn.by = function (
         props: IProperty<any>[] | IProperty<any>,
         value: any,
         extra: KeyExtra = {}

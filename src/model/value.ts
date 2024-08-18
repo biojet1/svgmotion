@@ -1,6 +1,6 @@
 import { cubic_point_at } from "../keyframe/bezier.js";
 import { Animated, KeyExtra } from "../keyframe/keyframe.js";
-import { Keyframe } from "../keyframe/kfhelper.js";
+import { Keyframe } from "../keyframe/keyframe.js";
 export interface PlainKeyframe {
     t: number;
     h?: boolean;

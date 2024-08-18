@@ -3,7 +3,8 @@ import { Steppable, Stepper } from "./stepper.js";
 
 
 export class Track implements Steppable {
-    frame: number = 0;
+    end_frame: number = 0;
+    start_frame: number = 0;
     frame_rate: number = 60;
     hint_dur: number = 60; // 1s * frame_rate
     easing?: Iterable<number> | true;
@@ -22,18 +23,18 @@ export class Track implements Steppable {
         return this;
     }
     set_frame(sec: number) {
-        this.frame = this.to_frame(sec);
+        this.end_frame = this.to_frame(sec);
         return this;
     }
     feed(cur: Resolver) {
-        const d = feed(this, cur, this.frame, this.frame);
-        this.frame += d;
+        const d = feed(this, cur, this.end_frame, this.end_frame);
+        this.end_frame += d;
         return this;
     }
 
     run(...args: Array<Proxy | Array<Proxy>>) {
-        let I = this.frame;
-        let B = this.frame;
+        let I = this.end_frame;
+        let B = this.end_frame;
         for (const act of args) {
             let D = 0;
             if (!Array.isArray(act)) {
@@ -47,20 +48,21 @@ export class Track implements Steppable {
             }
             I += D;
         }
-        this.frame = I;
+        this.end_frame = I;
     }
-    track() {
+    sub(offset: number = 0) {
         const tr = new Track();
         tr.frame_rate = this.frame_rate;
         tr.hint_dur = this.hint_dur;
         tr.easing = this.easing;
-        tr.frame = this.frame;
+        tr.end_frame = this.end_frame;
         tr.steppers = this.steppers;
-        // tr.in_frame = tr.out_frame = this.out_frame;
+        tr.start_frame = this.start_frame;
+        tr.end_frame = this.end_frame + this.to_frame(offset);
         return tr;
     }
     pass(sec: number) {
-        this.frame += this.to_frame(sec);
+        this.end_frame += this.to_frame(sec);
         return this;
     }
     stepper(): Stepper {

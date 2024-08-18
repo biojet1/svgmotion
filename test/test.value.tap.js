@@ -270,6 +270,11 @@ test.test("Easing", (t) => {
         [...v.enum_values(0, 40)].map((v) => Math.round(v)),
         n
     );
+    delete v.kfs_stepper
+    t.same(
+        [...v.enum_values(0, 40)].map((v) => Math.round(v)),
+        n
+    );
     t.same(
         [...u.enum_values(0, 40)].map((v) => Math.round(v)),
         n

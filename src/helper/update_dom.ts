@@ -3,6 +3,7 @@ import { Animatable } from "../model/value.js";
 import { Container, Root, Item } from "../model/node.js";
 import { Node } from "../model/linked.js";
 import { Transform, Fill, Box, Font, Stroke, ValueSet } from "../model/valuesets.js";
+import { Stepper } from "../track/stepper.js";
 
 const FILL_MAP: {
     [key: string]: ((frame: number, node: SVGElement, prop: any) => void);
@@ -123,7 +124,6 @@ const PROP_MAP: {
 
         }
     },
-
     line_height: function (frame: number, node: SVGElement, prop: ScalarValue) {
         node.style.lineHeight = prop.get_value(frame) + '';
     },
@@ -133,11 +133,9 @@ const PROP_MAP: {
     white_space: function (frame: number, node: SVGElement, prop: TextValue) {
         node.style.whiteSpace = prop.get_value(frame) + '';
     },
-
     points: function (frame: number, node: SVGElement, prop: PointsValue) {
         node.setAttribute("points", prop.get_points_repr(frame));
     },
-
 };
 
 function update_dom(frame: number, target: Item | Container) {
@@ -167,6 +165,7 @@ declare module "../model/node" {
         _element?: SVGElement;
         to_dom(doc: typeof SVGElement.prototype.ownerDocument): SVGElement;
         update_dom(frame: number): void;
+        stepper(): Stepper;
     }
     interface Item {
         _element?: SVGElement;
@@ -245,6 +244,22 @@ Item.prototype.update_dom = function (frame: number) {
 Container.prototype.update_dom = function (frame: number) {
     update_dom(frame, this);
 }
+
+Container.prototype.stepper = function () {
+    let max = 0;
+    let min = 0;
+    for (let v of this.enum_values()) {
+        const { start, end } = v.kfs_stepper!;
+        if (isFinite(end) && end > max) {
+            max = end;
+        }
+        if (isFinite(start) && start < min) {
+            min = start;
+        }
+    }
+    return Stepper.create((n) => update_dom(n, this), min, max);
+}
+
 
 RGBValue.prototype.get_rgb_repr = function (frame: number) {
     return (this.value == null) ? 'none' : RGBValue.to_css_rgb(this.get_value(frame));

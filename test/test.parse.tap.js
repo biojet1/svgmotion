@@ -65,7 +65,7 @@ import { Vector, RGB, Root, Rel } from "svgmotion";
 test.test("Item", async (t) => {
     const anim = new Root();
     await anim.load_svg("res/polygon01.svg");
-    const tr = anim.track();
+    const tr = anim.at(0);
     console.log(anim.view);
 
     const pg1 = anim.get_polygon(1);

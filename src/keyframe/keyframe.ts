@@ -1,5 +1,5 @@
 import { Steppable, Stepper } from "../track/stepper.js";
-import { Keyframe, ratio_at } from "./kfhelper.js";
+import { cubic_bezier_y_of_x } from "./bezier.js";
 
 export type KeyExtra = {
     start?: number,
@@ -70,7 +70,7 @@ export class Animated<V, K extends Keyframe<V> = Keyframe<V>> implements Steppab
             p = k;
         }
         if (p) {
-            return this.get_value_off!(frame);
+            return this.kfs_stepper!.step(frame);
         }
         return this.initial_value();
     }
@@ -78,11 +78,20 @@ export class Animated<V, K extends Keyframe<V> = Keyframe<V>> implements Steppab
         return this.lerp_value(t, p.value, k.value);
     }
     // static
-    get_value_off?(frame: number): V {
-        const { step } = this.make_stepper((n: number) => this.get_value(n));
-        this.get_value_off = step;
-        return step(frame);
+    get kfs_stepper() {
+        const value = this.make_stepper((n: number) => this.get_value(n));
+        Object.defineProperty(this, 'kfs_stepper', {
+            value,
+            writable: true,
+            enumerable: true,
+            configurable: true,
+        });
+        return value;
     }
+    set kfs_stepper(v: Stepper<V> | undefined) {
+
+    }
+
     key_value(
         frame: number,
         value: V,
@@ -113,7 +122,7 @@ export class Animated<V, K extends Keyframe<V> = Keyframe<V>> implements Steppab
         }
 
         value = this.check_value(value);
-        delete this["get_value_off"];
+        delete this['kfs_stepper'];
         if (last) {
             if (easing != undefined) {
                 last.easing = easing;
@@ -137,7 +146,7 @@ export class Animated<V, K extends Keyframe<V> = Keyframe<V>> implements Steppab
         if (easing) {
             kf.easing = easing;
         }
-        delete this["get_value_off"];
+        delete this['kfs_stepper'];
         return kf as K;
     }
     add_keyframe(time: number, value: V, easing?: Iterable<number> | true) {
@@ -165,7 +174,7 @@ export class Animated<V, K extends Keyframe<V> = Keyframe<V>> implements Steppab
         return last;
     }
     *enum_values(start: number, end: number) {
-        const st = this.make_stepper((n: number) => this.get_value(n));
+        const st = this.kfs_stepper!;
         while (start <= end) {
             yield st.step(start++);
         }
@@ -173,18 +182,34 @@ export class Animated<V, K extends Keyframe<V> = Keyframe<V>> implements Steppab
     stepper(): Stepper {
         return this.make_stepper((n: number) => this.update_value(n));
     }
-    make_stepper<V>(step: (frame: number) => V) {
+
+    make_stepper<U>(step: (frame: number) => U) {
         const { kfs } = this;
         const first = kfs.at(0);
         const last = kfs.at(-1);
         if (first && last) {
-            return this.check_stepper(Stepper.create(step, first.time, last.time)).clamp();
+            return this.check_stepper(Stepper.create<U>(step, first.time, last.time)).clamp();
         }
         throw Error(`Unexpected by '${this.constructor.name}'`);
     }
     check_stepper<U>(stepper: Stepper<U>) {
         return stepper;
     }
+    // on_stepper<U>(check: (stepper: Stepper<U>) => Stepper<U>) {
+    //     delete this['kfs_stepper'];
+    //     this.check_stepper = check;
+    // }
+}
+
+export type Keyframe<V> = {
+    time: number;
+    value: V;
+    easing?: Iterable<number> | Array<number> | true;
+    [k: string]: any;
+};
+export function ratio_at(a: Iterable<number>, t: number) {
+    const [ox, oy, ix, iy] = a;
+    return cubic_bezier_y_of_x([0, 0], [ox, oy], [ix, iy], [1, 1])(t);
 }
 
 

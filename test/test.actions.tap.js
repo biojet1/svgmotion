@@ -265,7 +265,7 @@ test.test("Rel", (t) => {
     r.at("50%").to([b, c], 5);
     r.at("10%").to([c], 0.5, {});
     r.at("0%").to(d, 9);
-    r.at(10).add(f, 1);
+    r.at(10).by(f, 1);
     tr.set_frame_rate(5);
     tr.pass(1).run(r);
     // console.info(a.kfs, e.kfs);

@@ -52,13 +52,14 @@ export function ffGraph(fg: Iterable<FilterChain>) {
 				(f) =>
 					`${f.name}=` +
 					Object.entries(f)
-						.filter(([key , value]) => key && key != 'name' && value != null)
+						.filter(([key, value]) => key && key != 'name' && value != null)
 						.map(([key, value]) => {
 							if (Array.isArray(value)) {
 								value = value.map((v) => v.toString()).join(' ');
 							}
 							// escape ":", "'"
-							return `${key}=${value.toString().replace(/([:'])/, '\\$1')}`;
+							const v = value.toString().replace(/([:'])/, '\\$1');
+							return `${key}=${v}`;
 						})
 						.join(':')
 						// escape  "[", "]", ",", ";", "'"

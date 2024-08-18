@@ -24,7 +24,7 @@
                 To,
                 Seq,
                 Par,
-                Step,
+                Rel,
                 Doc,
             } = svgmotion;
 
@@ -35,6 +35,10 @@
             // console.info(animate);
             r.position = new VectorValue([10, 10]);
             let tr = new Track();
+            let X = r.opacity;
+            let B = r.position;
+            let C = r.fill.color;
+            let R = r.transform.rotation;
             tr.run(
                 Par([
                     Seq([
@@ -42,39 +46,31 @@
                         To([r.size], new Size(100, 100)),
                         To([r.size], new Size(10, 10)),
                     ]),
-                    Step(
-                        [
-                            {
-                                A: 0.25,
-                                t: 0,
-                                B: [50, 50],
-                                C: [0.9, 0.1, 0.9],
-                                R: 0,
-                            },
-                            { A: 0.9, dur: 1, B: [0, 50], C: [1, 1, 0], R: 10 },
-                            {
-                                A: 0.25,
-                                dur: 1,
-                                B: [50, 0],
-                                C: [0, 1, 0],
-                                R: -5,
-                            },
-                            { A: 0.9, dur: 1, B: [0, 0], C: [0, 0, 0], R: 5 },
-                            {
-                                A: 0.25,
-                                dur: 1,
-                                B: null,
-                                C: [0.5, 0.5, 0.5],
-                                R: 0,
-                            },
-                        ],
-                        {
-                            X: r.opacity,
-                            B: r.position,
-                            C: r.fill.color,
-                            R: r.transform.rotation,
-                        }
-                    ),
+                    Rel(0)
+                        .to(A, 0.25)
+                        .to(B, [50, 50])
+                        .to(C, [0.9, 0.1, 0.9])
+                        .to(R, 0)
+                        .d(1)
+                        .to(A, 0.9)
+                        .to(B, [0, 50])
+                        .to(C, [1, 1, 0])
+                        .to(R, 10)
+                        .d(1)
+                        .to(A, 0.25)
+                        .to(B, [50, 0])
+                        .to(C, [0, 1, 0])
+                        .to(R, -5)
+                        .d(1)
+                        .to(A, 0.9)
+                        .to(B, [0, 0])
+                        .to(C, [0, 0, 0])
+                        .to(R, 5)
+                        .d(1)
+                        .to(A, 0.25)
+                        .first(B)
+                        .to(C, [0.5, 0.5, 0.5])
+                        .to(R, 0),
                 ])
             );
             console.log(doc);

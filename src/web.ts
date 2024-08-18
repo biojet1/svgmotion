@@ -35,6 +35,37 @@ export function animate(anim: Root, fps: number) {
     }
 }
 
+export function animate2(root: Root, fps: number) {
+    const st = root.stepper();
+    if (st.start < st.end) {
+
+        const mspf = 1000 / fps; // miliseconds per frame
+        const frames = st.end - st.start + 1;
+        let frame = st.start;
+
+        function render(currentTime: DOMHighResTimeStamp) {
+            const t = performance.now();
+            {
+                if ((frame + 1) == frames) {
+                    console.info(`${frame} t=${t} frames=${frames} ${st.start}-${st.end}`);
+                }
+                st.step(frame);
+            }
+            frame = (frame + 1) % frames;
+            const excess = mspf - (performance.now() - t);
+            if (excess > 0) {
+                setTimeout(() => requestAnimationFrame(render), excess);
+            }
+            else {
+                requestAnimationFrame(render);
+            }
+        }
+        requestAnimationFrame(render);
+    } else {
+        st.step(st.start);
+    }
+}
+
 declare module "./model/node" {
     interface Root {
         animate(params: {

@@ -5,7 +5,7 @@ import { Animatable } from "./value.js";
 import { Vector, ScalarValue, PointsValue, PositionValue, TextValue, } from "./value.js";
 import { Node, Parent } from "./linked.js";
 import { Box, ValueSet, xget, xset } from "./valuesets.js";
-import { Keyframe } from "../keyframe/kfhelper.js";
+import { Keyframe } from "../keyframe/keyframe.js";
 
 export interface PlainNode {
     tag: string;
@@ -61,8 +61,8 @@ export class Container extends BaseProps(Parent) {
     }
 
     *enum_keyframes(): Generator<Array<Keyframe<any>>, void, unknown> {
-        for (let { kfs } of this.enum_values()) {
-            yield kfs;
+        for (let v of this.enum_values()) {
+            yield v.kfs;
         }
     }
     calc_time_range() {
@@ -478,11 +478,22 @@ export class Root extends Container {
     }
 
     // new_view, new_rect
-    track(offset: number = 0) {
+    at(offset: number) {
+        // const tr = new Track();
+        // tr.frame_rate = this.frame_rate;
+        // tr.hint_dur = 1 * this.frame_rate;
+        // tr.end_frame = tr.to_frame(offset);
+        // return tr;
+        return this.track.sub(offset)
+    }
+    //
+    get track() {
         const tr = new Track();
         tr.frame_rate = this.frame_rate;
         tr.hint_dur = 1 * this.frame_rate;
-        tr.frame = tr.to_frame(offset);
-        return tr;
+        return xget(this, "track", tr);
+    }
+    set track(v: Track) {
+        xset(this, "track", v);
     }
 }
