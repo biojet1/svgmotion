@@ -286,7 +286,7 @@ function set_common_attr(
                 node.text_align.set_parse_text(value);
             }
             break;
-        case "white-space":// .text?
+        case "white-space": // put<>
             if (value) {
                 node.white_space.set_parse_text(value);
             }

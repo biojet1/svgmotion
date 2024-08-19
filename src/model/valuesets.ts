@@ -62,22 +62,22 @@ export class Box extends ValueSet {
     constructor(position: Iterable<number>, size: Iterable<number>) {
         super();
         if (size) {
-            this.size = new PositionValue(new Vector(size));
+            this.size = new PositionValue(size);
         }
         if (position) {
-            this.position = new PositionValue(new Vector(position));
+            this.position = new PositionValue(position);
         }
     }
     /// size
     get size() {
-        return xget(this, "size", new PositionValue(new Vector([100, 100])));
+        return xget(this, "size", new PositionValue([100, 100]));
     }
     set size(v: PositionValue) {
         xset(this, "size", v);
     }
     /// position
     get position() {
-        return xget(this, "position", new PositionValue(new Vector([0, 0])));
+        return xget(this, "position", new PositionValue([0, 0]));
     }
     set position(v: PositionValue) {
         xset(this, "position", v);

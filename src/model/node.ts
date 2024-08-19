@@ -259,7 +259,7 @@ export class Rect extends Shape {
     }
     ///
     get size() {
-        return xget(this, "size", new PositionValue(new Vector([100, 100])));
+        return xget(this, "size", new PositionValue([100, 100]));
     }
     set size(v: PositionValue) {
         xset(this, "size", v);

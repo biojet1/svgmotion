@@ -131,6 +131,7 @@ const PROP_MAP: {
         node.style.textAlign = prop.get_value(frame) + '';
     },
     white_space: function (frame: number, node: SVGElement, prop: TextValue) {
+        /// update<white-space>
         node.style.whiteSpace = prop.get_value(frame) + '';
     },
     points: function (frame: number, node: SVGElement, prop: PointsValue) {

@@ -99,8 +99,15 @@ export class AnimatableD<V> extends Animatable<V> {
         const { kfs } = this;
         let p = undefined; // previous Keyframe<V>
         for (const k of kfs) {
-            if (k.time >= frame) {
-                return k.value;
+            // if (k.time >= frame) {
+            //     return k.value;
+            // }
+            if (frame < k.time) {
+                if (p) {
+                    return p.value;
+                } else {
+                    return k.value;
+                }
             }
             p = k;
         }
@@ -152,9 +159,7 @@ export class AnimatableD<V> extends Animatable<V> {
     }
 }
 
-export class VectorValue<
-    K extends Keyframe<Vector> = Keyframe<Vector>
-> extends Animatable<Vector, K> {
+export class VectorValue<K extends Keyframe<Vector> = Keyframe<Vector>> extends Animatable<Vector, K> {
     override lerp_value(r: number, a: Vector, b: Vector): Vector {
         return a.lerp(b, r);
     }
@@ -179,8 +184,12 @@ export class VectorValue<
         return new Vector(a);
     }
 
-    constructor(v: Vector) {
-        super(v);
+    constructor(v: Vector | Iterable<number>) {
+        if (v instanceof Vector) {
+            super(v);
+        } else {
+            super(new Vector(v));
+        }
     }
 }
 
@@ -192,6 +201,7 @@ export class PointsValue extends AnimatableD<number[][]> {
         return a as number[][];
     }
 }
+
 export class TextValue extends AnimatableD<string> {
     override add_value(a: string, b: string): string {
         return a + "" + b;
@@ -353,4 +363,60 @@ export class RGBNone extends RGB {
     constructor() {
         super(NaN, NaN, NaN);
     }
+}
+
+export abstract class EnumeratedValue<V> extends AnimatableD<V> {
+
+
+}
+
+export abstract class MatchValue extends TextValue {
+    static _re = /.*/;
+
+    override check_value(x: any): string {
+        if ((this.constructor as typeof MatchValue)._re.exec(x) == null) {
+            throw Error(`Unexpected value ${x}`)
+        }
+        return x as string;
+    }
+    constructor(x: string) {
+        super(x)
+        this.check_value(x)
+    }
+}
+
+export abstract class EnumTextValue extends TextValue {
+    static _values: string[] = [];
+
+    override check_value(x: any): string {
+        if ((this.constructor as typeof EnumTextValue)._values.indexOf(x) < 0) {
+            throw Error(`Unexpected value ${x}`)
+        }
+        return x as string;
+    }
+    constructor(x: string) {
+        super(x)
+        this.check_value(x)
+    }
+}
+
+export class UnicodeBidiValue extends EnumeratedValue<string> {
+    static _values = ["normal", "embed", "isolate", "bidi-override", "isolate-override", "plaintext"]
+
+    constructor(x: string = "normal") {
+        if (UnicodeBidiValue._values.indexOf(x) < 0) {
+            throw Error(`Unexpected value ${x}`)
+        }
+        super(x)
+    }
+    override check_value(x: any): string {
+        if (UnicodeBidiValue._values.indexOf(x) < 0) {
+            throw Error(`Unexpected value ${x}`)
+        }
+        return x as string;
+    }
+}
+
+export class WritingModeValue extends MatchValue {
+    static _re = /^horizontal-tb|vertical-rl|vertical-lr$/;
 }
