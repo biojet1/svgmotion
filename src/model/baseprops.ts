@@ -1,4 +1,4 @@
-import { Vector, ScalarValue, PositionValue, TextValue, UnicodeBidiValue, WritingModeValue } from "./value.js";
+import { Vector, ScalarValue, PositionValue, TextValue, EnumTextValue } from "./value.js";
 import { Fill, Transform, xset, xget, Font, Stroke } from "./valuesets.js";
 import { Node, Parent } from "./linked.js";
 export type Constructor = (new (...args: any[]) => Parent) | (new (...args: any[]) => Node);
@@ -73,9 +73,16 @@ export function BaseProps<TBase extends Constructor>(Base: TBase) {
             xset(this, "anchor", v);
         }
         ////////
+        /// getset<text-rendering>
+        get text_rendering() {
+            return xget(this, 'text_rendering', new TextRenderingValue());
+        }
+        set text_rendering(v: TextRenderingValue) {
+            xset(this, 'text_rendering', v);
+        }
         /// getset<unicode-bidi>
         get unicode_bidi() {
-            return xget(this, 'unicode_bidi', new UnicodeBidiValue('normal'));
+            return xget(this, 'unicode_bidi', new UnicodeBidiValue());
         }
         set unicode_bidi(v: UnicodeBidiValue) {
             xset(this, 'unicode_bidi', v);
@@ -89,16 +96,16 @@ export function BaseProps<TBase extends Constructor>(Base: TBase) {
         }
         /// getset<visibility>
         get visibility() {
-            return xget(this, 'visibility', new TextValue('visible'));
+            return xget(this, 'visibility', new VisibilityValue());
         }
-        set visibility(v: TextValue) {
+        set visibility(v: VisibilityValue) {
             xset(this, 'visibility', v);
         }
         /// getset<white-space>
         get white_space() {
-            return xget(this, 'white_space', new TextValue('normal'));
+            return xget(this, 'white_space', new WhiteSpaceValue());
         }
-        set white_space(v: TextValue) {
+        set white_space(v: WhiteSpaceValue) {
             xset(this, 'white_space', v);
         }
         /// getset<word-spacing>
@@ -110,17 +117,54 @@ export function BaseProps<TBase extends Constructor>(Base: TBase) {
         }
         /// getset<writing-mode>
         get writing_mode() {
-            return xget(this, 'writing_mode', new WritingModeValue('horizontal-tb'));
+            return xget(this, 'writing_mode', new WritingModeValue());
         }
         set writing_mode(v: WritingModeValue) {
             xset(this, 'writing_mode', v);
         }
 
-
     };
 }
 
-/*
-alignment-baseline, baseline-shift, clip, clip-path, clip-rule, color, color-interpolation, color-interpolation-filters, color-rendering, cursor, direction, display, dominant-baseline, fill-opacity, fill-rule, filter, flood-color, flood-opacity, font-family, font-size, font-size-adjust, font-stretch, font-style, font-variant, font-weight, glyph-orientation-horizontal, glyph-orientation-vertical, image-rendering, letter-spacing, lighting-color, marker-end, marker-mid, marker-start, mask, opacity, overflow, pointer-events, shape-rendering, solid-color, solid-opacity, stop-color, stop-opacity, stroke, stroke-dasharray, stroke-dashoffset, stroke-linecap, stroke-linejoin, stroke-miterlimit, stroke-opacity, stroke-width, text-anchor, text-decoration, text-overflow, text-rendering,
-, vector-effect, visibility, word-spacing, writing-mode
-*/
+/// EnumTextValue ////////////
+export class TextRenderingValue extends EnumTextValue {
+    static _values = ['auto', 'optimizeSpeed', 'optimizeLegibility', 'geometricPrecision'];
+    constructor(x: string = 'auto') {
+        super(x)
+        this.check_value(x)
+    }
+}
+
+export class UnicodeBidiValue extends EnumTextValue {
+    static _values = ['normal', 'embed', 'isolate', 'bidi-override', 'isolate-override', 'plaintext'];
+    constructor(x: string = 'normal') {
+        super(x)
+        this.check_value(x)
+    }
+}
+
+export class VisibilityValue extends EnumTextValue {
+    static _values = ['visible', 'hidden', 'collapse'];
+    constructor(x: string = 'visible') {
+        super(x)
+        this.check_value(x)
+    }
+}
+
+export class WhiteSpaceValue extends EnumTextValue {
+    static _values = ['normal', 'pre', 'nowrap', 'pre-wrap', 'pre-line'];
+    constructor(x: string = 'normal') {
+        super(x)
+        this.check_value(x)
+    }
+}
+
+export class WritingModeValue extends EnumTextValue {
+    static _values = ['horizontal-tb', 'vertical-rl', 'vertical-lr'];
+    constructor(x: string = 'horizontal-tb') {
+        super(x)
+        this.check_value(x)
+    }
+}
+
+

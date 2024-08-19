@@ -370,11 +370,11 @@ export abstract class EnumeratedValue<V> extends AnimatableD<V> {
 
 }
 
-export abstract class MatchValue extends TextValue {
+export abstract class MatchTextValue extends TextValue {
     static _re = /.*/;
 
     override check_value(x: any): string {
-        if ((this.constructor as typeof MatchValue)._re.exec(x) == null) {
+        if ((this.constructor as typeof MatchTextValue)._re.exec(x) == null) {
             throw Error(`Unexpected value ${x}`)
         }
         return x as string;
@@ -399,24 +399,15 @@ export abstract class EnumTextValue extends TextValue {
         this.check_value(x)
     }
 }
+//////////
+// export class UnicodeBidiValue extends EnumTextValue {
+//     static _values = ["normal", "embed", "isolate", "bidi-override", "isolate-override", "plaintext"]
+//     // constructor(x: string) {
+//     //     super(x)
+//     //     this.check_value(x)
+//     // }
+// }
 
-export class UnicodeBidiValue extends EnumeratedValue<string> {
-    static _values = ["normal", "embed", "isolate", "bidi-override", "isolate-override", "plaintext"]
-
-    constructor(x: string = "normal") {
-        if (UnicodeBidiValue._values.indexOf(x) < 0) {
-            throw Error(`Unexpected value ${x}`)
-        }
-        super(x)
-    }
-    override check_value(x: any): string {
-        if (UnicodeBidiValue._values.indexOf(x) < 0) {
-            throw Error(`Unexpected value ${x}`)
-        }
-        return x as string;
-    }
-}
-
-export class WritingModeValue extends MatchValue {
-    static _re = /^horizontal-tb|vertical-rl|vertical-lr$/;
-}
+// export class WritingModeValue extends MatchTextValue {
+//     static _re = /^horizontal-tb|vertical-rl|vertical-lr$/;
+// }
