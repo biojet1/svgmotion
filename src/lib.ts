@@ -1,3 +1,5 @@
+export * from "./geom/vector.js";
+export * from "./geom/bbox.js";
 export * from "./track/index.js";
 export * from "./keyframe/index.js";
 export * from "./model/index.js";

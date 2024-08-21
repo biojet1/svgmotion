@@ -1,7 +1,8 @@
 
 import { Item, Container, Root } from "../model/node.js";
-import { Vector, VectorValue, ScalarValue, PointsValue, RGB, RGBValue, TextValue } from "../model/value.js";
-import { Node } from "../model/linked.js";
+import { VectorValue, ScalarValue, PointsValue, RGB, RGBValue, TextValue } from "../model/value.js";
+import { Vector } from "../geom/vector.js";
+import { Node, Parent } from "../model/linked.js";
 import { parse_css_color } from "./parse_color.js";
 const BOTH_MATCH =
     /^\s*(([-+]?[0-9]+(\.[0-9]*)?|[-+]?\.[0-9]+)([eE][-+]?[0-9]+)?)\s*(in|pt|px|mm|cm|m|km|Q|pc|yd|ft||%|em|ex|ch|rem|vw|vh|vmin|vmax|deg|grad|rad|turn|s|ms|Hz|kHz|dpi|dpcm|dppx)\s*$/i;
@@ -74,22 +75,22 @@ const TAG_DOM: {
                     break;
                 case "preserveAspectRatio":
                     // node.fit_view.constructor.name
-                    node.fit_view.set_parse_text(value);
+                    node.fit_view.set_parse_text(value, node);
                     break;
                 case "zoomAndPan":
-                    node.zoom_pan.set_parse_text(value);
+                    node.zoom_pan.set_parse_text(value, node);
                     break;
                 case "height":
-                    node.height.set_parse_length(value);
+                    node.height.set_parse_length(value, node);
                     break;
                 case "width":
-                    node.width.set_parse_length(value);
+                    node.width.set_parse_length(value, node);
                     break;
                 case "y":
-                    node.y.set_parse_length(value);
+                    node.y.set_parse_length(value, node);
                     break;
                 case "x":
-                    node.y.set_parse_length(value);
+                    node.y.set_parse_length(value, node);
                     break;
                 default:
                     set_common_attr(node, name, value, e);
@@ -103,22 +104,22 @@ const TAG_DOM: {
         for (const [name, value] of enum_attrs(e)) {
             switch (name) {
                 case "height":
-                    node.height.set_parse_length(value);
+                    node.height.set_parse_length(value, parent);
                     break;
                 case "width":
-                    node.width.set_parse_length(value);
+                    node.width.set_parse_length(value, parent);
                     break;
                 case "y":
-                    node.y.set_parse_length(value);
+                    node.y.set_parse_length(value, parent);
                     break;
                 case "x":
-                    node.x.set_parse_length(value);
+                    node.x.set_parse_length(value, parent);
                     break;
                 case "ry":
-                    node.ry.set_parse_length(value);
+                    node.ry.set_parse_length(value, parent);
                     break;
                 case "rx":
-                    node.rx.set_parse_length(value);
+                    node.rx.set_parse_length(value, parent);
                     break;
                 default:
                     set_common_attr(node, name, value, e);
@@ -159,13 +160,13 @@ const TAG_DOM: {
             // console.info(`PATH ATTR _ ${name} ${value}`);
             switch (name) {
                 case "r":
-                    node.r.set_parse_length(value);
+                    node.r.set_parse_length(value, parent);
                     break;
                 case "cx":
-                    node.cx.set_parse_length(value);
+                    node.cx.set_parse_length(value, parent);
                     break;
                 case "cy":
-                    node.cy.set_parse_length(value);
+                    node.cy.set_parse_length(value, parent);
                     break;
                 default:
                     set_common_attr(node, name, value, e);
@@ -181,16 +182,16 @@ const TAG_DOM: {
             // console.info(`PATH ATTR _ ${name} ${value}`);
             switch (name) {
                 case "rx":
-                    node.rx.set_parse_length(value);
+                    node.rx.set_parse_length(value, parent);
                     break;
                 case "ry":
-                    node.ry.set_parse_length(value);
+                    node.ry.set_parse_length(value, parent);
                     break;
                 case "cx":
-                    node.cx.set_parse_length(value);
+                    node.cx.set_parse_length(value, parent);
                     break;
                 case "cy":
-                    node.cy.set_parse_length(value);
+                    node.cy.set_parse_length(value, parent);
                     break;
                 default:
                     set_common_attr(node, name, value, e);
@@ -203,7 +204,7 @@ const TAG_DOM: {
         for (const [name, value] of enum_attrs(e)) {
             switch (name) {
                 case "points":
-                    node.points.set_parse_points(value);
+                    node.points.set_parse_points(value, parent);
                     break;
                 default:
                     set_common_attr(node, name, value, e);
@@ -216,7 +217,7 @@ const TAG_DOM: {
         for (const [name, value] of enum_attrs(e)) {
             switch (name) {
                 case "points":
-                    node.points.set_parse_points(value);
+                    node.points.set_parse_points(value, parent);
                     break;
                 default:
                     set_common_attr(node, name, value, e);
@@ -263,73 +264,73 @@ function set_common_attr(
             break;
         case "font-weight":
             if (value) {
-                node.font.weight.set_parse_text(value);
+                node.font.weight.set_parse_text(value, node);
             }
             break;
         case "font-size":
             if (value) {
-                node.font.size.set_parse_text(value);
+                node.font.size.set_parse_text(value, node);
             }
             break;
         case "font-family":
             if (value) {
-                node.font.family.set_parse_text(value);
+                node.font.family.set_parse_text(value, node);
             }
             break;
         case "line-height":// .text?
             if (value) {
-                node.line_height.set_parse_line_height(value);
+                node.line_height.set_parse_line_height(value, node);
             }
             break;
         case "text-align":// .text?
             if (value) {
-                node.text_align.set_parse_text(value);
+                node.text_align.set_parse_text(value, node);
             }
             break;
         case "white-space": // put<>
             if (value) {
-                node.white_space.set_parse_text(value);
+                node.white_space.set_parse_text(value, node);
             }
             break;
         case "fill":// 
             if (value) {
-                node.fill.color.set_parse_rgb(value);
+                node.fill.color.set_parse_rgb(value, node);
             }
             break;
         case "fill-opacity":// 
             if (value) {
-                node.fill.opacity.set_parse_percentage(value);
+                node.fill.opacity.set_parse_percentage(value, node);
             }
             break;
         case "stroke":// 
             if (value) {
-                node.stroke.color.set_parse_rgb(value);
+                node.stroke.color.set_parse_rgb(value, node);
             }
             break;
         case "stroke-opacity":// 
             if (value) {
-                node.stroke.opacity.set_parse_percentage(value);
+                node.stroke.opacity.set_parse_percentage(value, node);
             }
             break;
         case "stroke-width":// 
             if (value) {
-                node.stroke.width.set_parse_length(value);
+                node.stroke.width.set_parse_length(value, node);
             }
             break;
         case "stroke-miterlimit":// 
             if (value) {
-                node.stroke.miter_limit.set_parse_number(value);
+                node.stroke.miter_limit.set_parse_number(value, node);
             }
             break;
 
         case "stroke-dasharray":// 
             if (value) {
-                node.stroke.dash_array.set_parse_dashes(value);
+                node.stroke.dash_array.set_parse_dashes(value, node);
             }
             break;
         case "stroke-dashoffset":// 
             if (value) {
-                node.stroke.dash_offset.set_parse_length(value);
+                node.stroke.dash_offset.set_parse_length(value, node);
             }
             break;
         case "style":
@@ -466,23 +467,23 @@ declare module "../model/node" {
 
 declare module "../model/value" {
     interface ScalarValue {
-        set_parse_length(s: string): void;
-        set_parse_number(s: string): void;
-        set_parse_percentage(s: string): void;
-        set_parse_line_height(s: string): void;
+        set_parse_length(s: string, container: Container | Item): void;
+        set_parse_number(s: string, container: Container | Item): void;
+        set_parse_percentage(s: string, container: Container | Item): void;
+        set_parse_line_height(s: string, container: Container | Item): void;
     }
     interface RGBValue {
-        set_parse_rgb(s: string): void;
+        set_parse_rgb(s: string, container: Container | Item): void;
     }
     interface TextValue {
-        set_parse_text(s: string): void;
+        set_parse_text(s: string, container: Container | Item): void;
     }
     interface PointsValue {
-        set_parse_points(s: string): void;
+        set_parse_points(s: string, container: Container | Item): void;
     }
     interface VectorValue {
-        set_parse_dashes(s: string): void;
-        set_parse_anchor(s: string): void;
+        set_parse_dashes(s: string, container: Container | Item): void;
+        set_parse_anchor(s: string, container: Container | Item): void;
     }
 
 
@@ -493,15 +494,15 @@ Container.prototype.load_svg = async function (src: string | URL,
     return load_svg(this, src, opt);
 }
 
-ScalarValue.prototype.set_parse_number = function (s: string) {
+ScalarValue.prototype.set_parse_number = function (s: string, parent: Container | Item) {
     this.value = parseFloat(s);
 }
 
-ScalarValue.prototype.set_parse_length = function (s: string) {
+ScalarValue.prototype.set_parse_length = function (s: string, parent: Container | Item) {
     this.value = parse_len(s);
 }
 
-ScalarValue.prototype.set_parse_percentage = function (s: string) {
+ScalarValue.prototype.set_parse_percentage = function (s: string, parent: Container | Item) {
     if (s.endsWith('%')) {
         this.value = parseFloat(s.replaceAll('%', '')) / 100;
     } else {
@@ -509,7 +510,7 @@ ScalarValue.prototype.set_parse_percentage = function (s: string) {
     }
 }
 
-ScalarValue.prototype.set_parse_line_height = function (s: string) {
+ScalarValue.prototype.set_parse_line_height = function (s: string, parent: Container | Item) {
     if (s.endsWith('%')) {
         this.value = parseFloat(s.replaceAll('%', '')) / 100;
     } else if (s == 'normal') {
@@ -520,7 +521,7 @@ ScalarValue.prototype.set_parse_line_height = function (s: string) {
 }
 
 
-RGBValue.prototype.set_parse_rgb = function (s: string) {
+RGBValue.prototype.set_parse_rgb = function (s: string, parent: Container | Item) {
     if (s == "none") {
         this.value = null;
         return;
@@ -532,11 +533,11 @@ RGBValue.prototype.set_parse_rgb = function (s: string) {
     this.value = new RGB(c[0] / 255, c[1] / 255, c[2] / 255);
 }
 
-TextValue.prototype.set_parse_text = function (s: string) {
+TextValue.prototype.set_parse_text = function (s: string, parent: Container | Item) {
     this.value = s;
 }
 
-PointsValue.prototype.set_parse_points = function (s: string) {
+PointsValue.prototype.set_parse_points = function (s: string, parent: Container | Item) {
     const nums = s.split(/[\s,]+/).map(function (str) {
         return parseFloat(str.trim());
     });
@@ -548,13 +549,13 @@ PointsValue.prototype.set_parse_points = function (s: string) {
     this.value = points;
 }
 // VectorValue.prototype.
-VectorValue.prototype.set_parse_dashes = function (s: string) {
+VectorValue.prototype.set_parse_dashes = function (s: string, parent: Container | Item) {
     this.value = this.load_value(s.split(/[\s,]+/).map(function (str) {
         return parseFloat(str.trim());
     }));
 }
 
-VectorValue.prototype.set_parse_anchor = function (s: string) {
+VectorValue.prototype.set_parse_anchor = function (s: string, parent: Container | Item) {
     this.value = this.load_value(s.split(/[\s,]+/).map(function (str) {
         return parseFloat(str.trim());
     }));

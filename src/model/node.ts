@@ -2,7 +2,7 @@ import { Track } from "../track/track.js";
 import { BaseProps } from "./baseprops.js";
 import { PlainValue } from "./value.js";
 import { Animatable } from "./value.js";
-import { Vector, ScalarValue, PointsValue, PositionValue, TextValue, } from "./value.js";
+import { ScalarValue, PointsValue, PositionValue, TextValue } from "./value.js";
 import { Node, Parent } from "./linked.js";
 import { Box, ValueSet, xget, xset } from "./valuesets.js";
 import { Keyframe } from "../keyframe/keyframe.js";
@@ -42,6 +42,34 @@ export abstract class Item extends BaseProps(Node) {
 
         }
     }
+    *ancestors() {
+        let top = this._parent;
+        while (top) {
+            yield top
+            top = top._parent;
+        }
+    }
+
+    owner_viewport() {
+        //  nearest ancestor ‘svg’ element. 
+        for (const a of this.ancestors()) {
+            if (a instanceof ViewPort) {
+                return a;
+            }
+        }
+    }
+
+    farthest_viewport(): ViewPort | undefined {
+        let parent: Item | Parent | undefined = this;
+        let farthest: ViewPort | undefined = undefined;
+        while ((parent = parent._parent)) {
+            if (parent instanceof ViewPort) {
+                farthest = parent;
+            }
+        }
+        return farthest;
+    }
+
 }
 
 export abstract class Shape extends Item { }

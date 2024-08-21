@@ -1,10 +1,10 @@
+import { Vector } from "../geom/vector.js";
 import {
-    Vector,
     VectorValue,
     ScalarValue,
     PositionValue,
     RGBValue,
-    TextValue,
+    TextValue
 } from "./value.js";
 import { PlainValue } from "./value.js";
 import { Animatable } from "./value.js";

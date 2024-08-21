@@ -221,9 +221,6 @@ test.test("Seq then Par", (t) => {
 //         t.same(Array.from(q[3].value), [50, 50]);
 //     }
 
-//     // console.log(r.prop5);
-//     r.prop5.value += 20;
-//     // console.log("position", vp.position);
 
 //     t.end();
 // });
