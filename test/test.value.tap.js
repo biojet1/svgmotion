@@ -385,6 +385,7 @@ test.test("UnicodeBidiValue", (t) => {
     t.same(e.unicode_bidi.get_value(15), "embed")
     t.end();
 });
+
 test.test("WritingModeValue", (t) => {
     const { Circle, WritingModeValue } = svgmotion;
     let e = new Circle();
@@ -395,5 +396,15 @@ test.test("WritingModeValue", (t) => {
     t.throws(() => {
         e.writing_mode.set_value('diagonal-rl')
     })
+    t.end();
+});
+
+test.test("Vector", (t) => {
+    const { Vector } = svgmotion;
+    let e = new Vector([1, -2, 3, -4]);
+    t.same(e, [1, -2, 3, -4]);
+    t.same(e[1], -2);
+    t.same(e[3], -4);
+    t.same([...e], [1, -2, 3, -4]);
     t.end();
 });
