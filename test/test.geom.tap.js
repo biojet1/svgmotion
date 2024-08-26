@@ -20,8 +20,8 @@ test.test("BoundingInterval", (t) => {
     t.same(new BoundingInterval([-10, 10]).size, 20);
     t.same(new BoundingInterval([10, 30]).size, 20);
     ///
-    t.same(new BoundingInterval([9, 10]).add(new BoundingInterval([4, 5])), [4, 10]);
-    t.same(new BoundingInterval([4]).add(new BoundingInterval([3])).add(new BoundingInterval([10])), [3, 10]);
+    t.same(new BoundingInterval([9, 10]).merge(new BoundingInterval([4, 5])), [4, 10]);
+    t.same(new BoundingInterval([4]).merge(new BoundingInterval([3])).merge(new BoundingInterval([10])), [3, 10]);
     ///
     t.same(new BoundingInterval([2, 2]).mul(2), [4, 4]);
     ///
@@ -30,7 +30,7 @@ test.test("BoundingInterval", (t) => {
     t.same(new BoundingInterval([100, 110]).neg(), [-110, -100]);
     t.same(new BoundingInterval([-110, -100]).neg(), [100, 110]);
     ///
-    t.same(new BoundingInterval(new BoundingInterval([9, 7])), [7, 9]);
+    t.same(new BoundingInterval(BoundingInterval.check([9, 7])), [7, 9]);
     ///
     t.end();
 });
@@ -41,7 +41,7 @@ test.test("BoundingBox", (t) => {
 
     ///
     t.same(
-        (new BoundingBox([0, 10], [0, 10]).add(new BoundingBox([-10, 0], [-10, 0]))),
+        (new BoundingBox([0, 10], [0, 10]).merge(new BoundingBox([-10, 0], [-10, 0]))),
         [[-10, 10], [-10, 10]],
     )
     // ret = sum(

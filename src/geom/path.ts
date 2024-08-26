@@ -23,7 +23,7 @@ export class Command {
         const { at: [x1, y1] } = prev;
         const [xmin, xmax] = [Math.min(x1, x2), Math.max(x1, x2)];
         const [ymin, ymax] = [Math.min(y1, y2), Math.max(y1, y2)];
-        bbox.add_self(new BoundingBox([xmin, xmax], [ymin, ymax]))
+        bbox.merge_self(new BoundingBox([xmin, xmax], [ymin, ymax]))
     }
 }
 
