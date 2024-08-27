@@ -4,7 +4,7 @@ import { VectorValue, ScalarValue, PointsValue, RGB, RGBValue, TextValue } from 
 import { Node, Parent } from "../model/linked.js";
 import { Item, Container, Root } from "../model/elements.js";
 import { parse_css_color } from "./parse_color.js";
-import { parse_svg_length } from "./svg_length.js";
+import { ComputeLength } from "./svg_length.js";
 const BOTH_MATCH =
     /^\s*(([-+]?[0-9]+(\.[0-9]*)?|[-+]?\.[0-9]+)([eE][-+]?[0-9]+)?)\s*(in|pt|px|mm|cm|m|km|Q|pc|yd|ft||%|em|ex|ch|rem|vw|vh|vmin|vmax|deg|grad|rad|turn|s|ms|Hz|kHz|dpi|dpcm|dppx)\s*$/i;
 const CONVERSIONS: { [k: string]: number } = {
@@ -84,16 +84,16 @@ const TAG_DOM: {
                     node.zoom_pan.set_parse_text(value, node);
                     break;
                 case "height":
-                    node.height.set_parse_length(value, node);
+                    node.height.set_parse_length(value, node, name, "h");
                     break;
                 case "width":
-                    node.width.set_parse_length(value, node);
+                    node.width.set_parse_length(value, node, name, "w");
                     break;
                 case "y":
-                    node.y.set_parse_length(value, node);
+                    node.y.set_parse_length(value, node, name, "h");
                     break;
                 case "x":
-                    node.y.set_parse_length(value, node);
+                    node.x.set_parse_length(value, node, name, "w");
                     break;
                 default:
                     set_common_attr(node, name, value, e);
@@ -107,22 +107,22 @@ const TAG_DOM: {
         for (const [name, value] of enum_attrs(e)) {
             switch (name) {
                 case "height":
-                    node.height.set_parse_length(value, parent);
+                    node.height.set_parse_length(value, node, name, "h");
                     break;
                 case "width":
-                    node.width.set_parse_length(value, parent);
+                    node.width.set_parse_length(value, node, name, "w");
                     break;
                 case "y":
-                    node.y.set_parse_length(value, parent);
+                    node.y.set_parse_length(value, node, name, "h");
                     break;
                 case "x":
-                    node.x.set_parse_length(value, parent);
+                    node.x.set_parse_length(value, node, name, "w");
                     break;
                 case "ry":
-                    node.ry.set_parse_length(value, parent);
+                    node.ry.set_parse_length(value, node, name, "h");
                     break;
                 case "rx":
-                    node.rx.set_parse_length(value, parent);
+                    node.rx.set_parse_length(value, node, name, "w");
                     break;
                 default:
                     set_common_attr(node, name, value, e);
@@ -163,13 +163,13 @@ const TAG_DOM: {
             // console.info(`PATH ATTR _ ${name} ${value}`);
             switch (name) {
                 case "r":
-                    node.r.set_parse_length(value, parent);
+                    node.r.set_parse_length(value, node, name);
                     break;
                 case "cx":
-                    node.cx.set_parse_length(value, parent);
+                    node.cx.set_parse_length(value, node, name, "w");
                     break;
                 case "cy":
-                    node.cy.set_parse_length(value, parent);
+                    node.cy.set_parse_length(value, node, name, "h");
                     break;
                 default:
                     set_common_attr(node, name, value, e);
@@ -185,16 +185,16 @@ const TAG_DOM: {
             // console.info(`PATH ATTR _ ${name} ${value}`);
             switch (name) {
                 case "rx":
-                    node.rx.set_parse_length(value, parent);
+                    node.rx.set_parse_length(value, node, name);
                     break;
                 case "ry":
-                    node.ry.set_parse_length(value, parent);
+                    node.ry.set_parse_length(value, node, name);
                     break;
                 case "cx":
-                    node.cx.set_parse_length(value, parent);
+                    node.cx.set_parse_length(value, node, name);
                     break;
                 case "cy":
-                    node.cy.set_parse_length(value, parent);
+                    node.cy.set_parse_length(value, node, name);
                     break;
                 default:
                     set_common_attr(node, name, value, e);
@@ -221,6 +221,28 @@ const TAG_DOM: {
             switch (name) {
                 case "points":
                     node.points.set_parse_points(value, parent);
+                    break;
+                default:
+                    set_common_attr(node, name, value, e);
+            }
+        }
+        return node;
+    },
+    line: function (e: SVGElement, parent: Container) {
+        let node = parent.add_line();
+        for (const [name, value] of enum_attrs(e)) {
+            switch (name) {
+                case "x1":
+                    node.x1.set_parse_length(value, node, name);
+                    break;
+                case "x2":
+                    node.x2.set_parse_length(value, node, name);
+                    break
+                case "y1":
+                    node.y1.set_parse_length(value, node, name);
+                    break;
+                case "y2":
+                    node.y2.set_parse_length(value, node, name);
                     break;
                 default:
                     set_common_attr(node, name, value, e);
@@ -317,7 +339,7 @@ function set_common_attr(
             break;
         case "stroke-width":// 
             if (value) {
-                node.stroke.width.set_parse_length(value, node);
+                node.stroke.width.set_parse_length(value, node, name);
             }
             break;
         case "stroke-miterlimit":// 
@@ -333,7 +355,7 @@ function set_common_attr(
             break;
         case "stroke-dashoffset":// 
             if (value) {
-                node.stroke.dash_offset.set_parse_length(value, node);
+                node.stroke.dash_offset.set_parse_length(value, node, name);
             }
             break;
         case "style":
@@ -347,6 +369,11 @@ function set_common_attr(
             if (value) {
                 // node.anchor.set_parse_anchor(value);
             }
+        case "opacity":
+            if (value) {
+                node.opacity.set_parse_percentage(value, node);
+            }
+
         case "shape-inside":
         case "paint-order":
             break;
@@ -364,17 +391,32 @@ function set_common_attr(
 
 function* enum_attrs(e: SVGElement) {
     const attrs = e.attributes;
-    for (let i = attrs.length; i-- > 0;) {
-        const attr = attrs[i];
-        // console.log(`enum_attrs`, e.localName, localName, namespaceURI);
+    for (const attr of attrs) {
+        // let attr = attrs.item(i);
+        // if (e.id == 'R5') {
+        //     console.log(`enum_attrs`, attr.name, e.localName, e.id);
+        // }
         if (attr != undefined) {
             const { localName, namespaceURI, value } = attr;
             // console.log(`enum_attrs`, e.localName, localName, namespaceURI, i);
             if (!namespaceURI || namespaceURI == NS_SVG) {
+                // if (e.id == 'R5') {
+                //     console.log(`\tR5`, localName, attr.name, value);
+                // }
                 yield [localName, value];
             }
         }
     }
+    // if (e.id == 'R5') {
+    //     let i = attrs.length;
+    //     // console.log(`enum_attrs`, i, e.localName);
+    //     for (; i-- > 0;) {
+    //         const attr = attrs[i];
+    //         const { localName, namespaceURI, value, name } = attr;
+    //         console.log(` - ${i}`, { localName, namespaceURI, value, name },);
+    //     }
+    // }
+
 }
 
 function walk(elem: SVGElement, parent: Container) {
@@ -383,6 +425,7 @@ function walk(elem: SVGElement, parent: Container) {
         case "desc":
         case "metadata":
         case "title":
+        case "script":
 
             return;
     }
@@ -470,7 +513,7 @@ declare module "../model/elements" {
 
 declare module "../model/value" {
     interface ScalarValue {
-        set_parse_length(s: string, container: Container | Item): void;
+        set_parse_length(s: string, container: Container | Item, name: string, mode?: string): void;
         set_parse_number(s: string, container: Container | Item): void;
         set_parse_percentage(s: string, container: Container | Item): void;
         set_parse_line_height(s: string, container: Container | Item): void;
@@ -501,8 +544,12 @@ ScalarValue.prototype.set_parse_number = function (s: string, parent: Container 
     this.value = parseFloat(s);
 }
 
-ScalarValue.prototype.set_parse_length = function (s: string, parent: Container | Item) {
-    this.value = parse_len(s);
+ScalarValue.prototype.set_parse_length = function (s: string, parent: Container | Item, name: string, mode?: string) {
+    console.log(`set_parse_length ${s} [${parent.id}] [${name}]`)
+    const cl = new ComputeLength(parent, 0);
+    cl.length_mode = mode;
+    this.value = cl.parse_len(s);
+    // this.value = parse_len(s);
 }
 
 ScalarValue.prototype.set_parse_percentage = function (s: string, parent: Container | Item) {

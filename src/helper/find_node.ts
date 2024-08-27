@@ -10,11 +10,12 @@ import {
     Polyline,
     Rect,
     Use,
-    ViewPort, Image, Symbol
+    ViewPort, Image, Symbol, Element
 } from "../model/elements.js";
 
 declare module "../model/elements" {
     interface Container {
+        get_any(x: number | string): Element;
         get_circle(x: number | string): Circle;
         get_ellipse(x: number | string): Ellipse;
         get_group(x: number | string): Group;
@@ -39,10 +40,11 @@ declare module "../model/elements" {
         find_symbol(x: number | string): Symbol | void;
         find_use(x: number | string): Use | void;
         find_view(x: number | string): ViewPort | void;
-
     }
 }
-
+Container.prototype.get_any = function (x: number | string = 0) {
+    return get_node(this, x, Element);
+}
 Container.prototype.get_circle = function (x: number | string = 0) {
     return get_node(this, x, Circle);
 }
@@ -126,7 +128,7 @@ function get_node<T>(
     if (n) {
         return n;
     }
-    throw new Error(`not found ${K} '${x}'`);
+    throw new Error(`not found ${K.name} '${x}'`);
 }
 
 function find_node<T>(

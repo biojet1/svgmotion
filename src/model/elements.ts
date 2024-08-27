@@ -147,14 +147,18 @@ export class ViewPort extends Container {
     }
     ///
     get width() {
-        return xget(this, "width", new ScalarValue(100));
+        const vp = this.owner_viewport();
+        const n = vp ? vp.get_vp_width(0) : 384
+        return xget(this, "width", new ScalarValue(n));
     }
     set width(v: ScalarValue) {
         xset(this, "width", v);
     }
     ///
     get height() {
-        return xget(this, "height", new ScalarValue(100));
+        const vp = this.owner_viewport();
+        const n = vp ? vp.get_vp_height(0) : 216
+        return xget(this, "height", new ScalarValue(n));
     }
     set height(v: ScalarValue) {
         xset(this, "height", v);
@@ -188,62 +192,7 @@ export class ViewPort extends Container {
         xset(this, "zoom_pan", v);
     }
     // 
-    // get_vp_width(frame: number): number {
-    //     if (Object.hasOwn(this, "view_box")) {
-    //         const s = this.view_box.size.get_value(frame);
-    //         return s.x;
-    //     }
-    //     if (Object.hasOwn(this, "width")) {
-    //         const s = this.width.get_value(frame);
-    //         return s;
-    //     }
-    //     const ov = this.owner_viewport();
-    //     if (ov) {
-    //         return ov.get_vp_width(frame);
-    //     }
-    //     throw new Error(`cant get_vp_width`);
-    //     // return 100; 
-    // }
-    // get_vp_height(frame: number): number {
-    //     if (Object.hasOwn(this, "view_box")) {
-    //         const s = this.view_box.size.get_value(frame);
-    //         return s.y;
-    //     }
-    //     if (Object.hasOwn(this, "height")) {
-    //         const s = this.height.get_value(frame);
-    //         return s;
-    //     }
-    //     const ov = this.owner_viewport();
-    //     if (ov) {
-    //         return ov.get_vp_height(frame);
-    //     }
-    //     throw new Error(`cant get_vp_height`);
-    //     // return 100; 
-    // }
-    // get_vp_size(frame: number, w?: number, h?: number): Vector {
-    //     if (Object.hasOwn(this, "view_box")) {
-    //         const s = this.view_box.size.get_value(frame);
-    //         return Vector.pos(w ?? s.x, h ?? s.y);
-    //     }
-    //     if (typeof h == 'undefined' && Object.hasOwn(this, "height")) {
-    //         h = this.height.get_value(frame);
-    //         if (typeof w !== 'undefined') {
-    //             return Vector.pos(w, h);
-    //         }
-    //     }
-    //     if (typeof w == 'undefined' && Object.hasOwn(this, "width")) {
-    //         w = this.width.get_value(frame);
-    //         if (typeof h !== 'undefined') {
-    //             return Vector.pos(w, h);
-    //         }
-    //     }
-    //     const ov = this.owner_viewport();
-    //     if (ov) {
-    //         return ov.get_vp_size(frame, w, h);
-    //     }
-    //     throw new Error(`cant get_vp_height`);
-    //     // return Vector.pos(100, 100); 
-    // }
+
 }
 
 export abstract class Shape extends Item {
@@ -354,14 +303,18 @@ export class Rect extends Shape {
     static tag = "rect";
     ///
     get width() {
-        return xget(this, "width", new ScalarValue(100));
+        const vp = this.owner_viewport();
+        const n = vp ? vp.get_vp_width(0) : 384
+        return xget(this, "width", new ScalarValue(n));
     }
     set width(v: ScalarValue) {
         xset(this, "width", v);
     }
     ///
     get height() {
-        return xget(this, "height", new ScalarValue(100));
+        const vp = this.owner_viewport();
+        const n = vp ? vp.get_vp_height(0) : 216
+        return xget(this, "height", new ScalarValue(n));
     }
     set height(v: ScalarValue) {
         xset(this, "height", v);
@@ -676,3 +629,4 @@ export class Root extends Container {
 }
 
 import { } from "./mixinvp.js";
+export { Element }
