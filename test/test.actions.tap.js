@@ -269,6 +269,6 @@ test.test("Rel", (t) => {
     t.same(b.kfs.map(v => v.time), [5, 5 + 25, 5 + 50]);
     t.same(a.kfs.map(v => v.time), [5, 5 + 2 * 5, 5 + 10 * 5]);
     t.same(c.kfs.map(v => v.time), [5, 5 + 1 * 5, 5 + 5 * 5]);
-    console.info(...a.enum_values(0, 60));
+    // console.info(...a.enum_values(0, 60));
     t.end();
 });

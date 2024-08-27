@@ -1,11 +1,32 @@
 import { ScalarValue, PositionValue, TextValue, EnumTextValue, LengthValue, PercentageValue } from "./value.js";
 import { Fill, Transform, xset, xget, Font, Stroke } from "./valuesets.js";
 import { Node, Parent } from "./linked.js";
+import { Matrix, MatrixMut } from "../geom/matrix.js";
+import { BoundingBox } from "../geom/bbox.js";
 export type Constructor = (new (...args: any[]) => Parent) | (new (...args: any[]) => Node);
 export function BaseProps<TBase extends Constructor>(Base: TBase) {
     return class BaseProps extends Base {
         id?: string;
         static tag = '?';
+        cat_transform(frame: number, n: Matrix) {
+            if (Object.hasOwn(this, "transform")) {
+                this.transform.cat_transform(frame, n);
+            }
+        }
+
+        update_bbox(bbox: BoundingBox, frame: number, m?: Matrix) {
+
+        }
+        bounding_box(frame: number, m?: Matrix) {
+            const bb = BoundingBox.not();
+            this.update_bbox(bb, frame, m);
+            return bb
+        }
+
+        // def update_bbox(self, bb: BoundingBox, time: float, tm: Optional[Matrix] = None):
+        // # raise NotImplementedError(f"{self.__class__.__name__}")
+        // # print("update_bbox:", f"{self.__class__.__name__}")
+        // return
         /// fill
         get fill() {
             return xget(this, "fill", new Fill());

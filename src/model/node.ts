@@ -6,6 +6,11 @@ import { ScalarValue, PointsValue, PositionValue, TextValue } from "./value.js";
 import { Node, Parent } from "./linked.js";
 import { Box, ValueSet, xget, xset } from "./valuesets.js";
 import { Keyframe } from "../keyframe/keyframe.js";
+import { PathLC } from "../geom/path/pathlc.js";
+import { Matrix, MatrixMut } from "../geom/matrix.js";
+import { BoundingBox } from "../geom/bbox.js";
+import { Vector } from "../geom/vector.js";
+
 
 export interface PlainNode {
     tag: string;
@@ -69,10 +74,20 @@ export abstract class Item extends BaseProps(Node) {
         }
         return farthest;
     }
-
 }
 
-export abstract class Shape extends Item { }
+export abstract class Shape extends Item {
+    describe(frame: number): string {
+        throw new Error(`Not implemented`);
+    }
+    get_path(frame: number): PathLC {
+        return PathLC.parse(this.describe(frame));
+    }
+    override update_bbox(bbox: BoundingBox, frame: number, m?: Matrix) {
+        const p = this.get_path(frame);
+        bbox.merge_self((m ? p.transform(m) : p).bbox());
+    }
+}
 
 export class Container extends BaseProps(Parent) {
     *enum_values(): Generator<Animatable<any>, void, unknown> {
@@ -120,10 +135,64 @@ export class Container extends BaseProps(Parent) {
             }
         } while (cur !== end && (cur = cur._next));
     }
+    bbox_of(frame: number, ...args: Item[]) {
+        const bb = BoundingBox.not();
+        for (const x of args) {
+            const m = transform_up_to(this, x, frame);
+            x.update_bbox(bb, frame, m);
+        }
+        return bb;
+    }
+    override update_bbox(bbox: BoundingBox, frame: number, m?: Matrix) {
+        let w = this.transform.get_transform(frame);
+        if (m) {
+            m = m.cat(w)
+        }
+        for (const x of this.children<Item | Container>()) {
+            x.update_bbox(bbox, frame, m)
+        }
+    }
+    *ancestors() {
+        let top = this._parent;
+        while (top) {
+            yield top
+            top = top._parent;
+        }
+    }
+
+    owner_viewport() {
+        //  nearest ancestor ‘svg’ element. 
+        for (const a of this.ancestors()) {
+            if (a instanceof ViewPort) {
+                return a;
+            }
+        }
+    }
+
+}
+
+function transform_up_to(top: Parent, desc: Item | Container, time: number) {
+    let cur: Item | Container | undefined = desc;
+    let ls: (Item | Container)[] = []
+    while (cur) {
+        cur = cur.parent<Container>();
+        if (cur === top) {
+            let m = MatrixMut.identity();
+            ls.reverse();
+            for (const x of ls) {
+                x.cat_transform(time, m)
+            }
+            return m;
+        } else if (cur) {
+            ls.push(cur);
+        }
+    }
+    throw new Error(`No parent`);
 }
 
 export class Group extends Container {
     static tag = "g";
+
 }
 
 export class ViewPort extends Container {
@@ -177,6 +246,64 @@ export class ViewPort extends Container {
     set zoom_pan(v: TextValue) {
         xset(this, "zoom_pan", v);
     }
+    // 
+    get_vp_width(frame: number): number {
+        if (Object.hasOwn(this, "view_box")) {
+            const s = this.view_box.size.get_value(frame);
+            return s.x;
+        }
+        if (Object.hasOwn(this, "width")) {
+            const s = this.width.get_value(frame);
+            return s;
+        }
+        const ov = this.owner_viewport();
+        if (ov) {
+            return ov.get_vp_width(frame);
+        }
+        throw new Error(`cant get_vp_width`)
+        // return 100; 
+    }
+    get_vp_height(frame: number): number {
+        if (Object.hasOwn(this, "view_box")) {
+            const s = this.view_box.size.get_value(frame);
+            return s.y;
+        }
+        if (Object.hasOwn(this, "height")) {
+            const s = this.height.get_value(frame);
+            return s;
+        }
+        const ov = this.owner_viewport();
+        if (ov) {
+            return ov.get_vp_height(frame);
+        }
+        throw new Error(`cant get_vp_height`);
+        // return 100; 
+    }
+    get_vp_size(frame: number, w?: number, h?: number): Vector {
+        if (Object.hasOwn(this, "view_box")) {
+            const s = this.view_box.size.get_value(frame);
+            return Vector.pos(w ?? s.x, h ?? s.y);
+        }
+        if (typeof h == 'undefined' && Object.hasOwn(this, "height")) {
+            h = this.height.get_value(frame);
+            if (typeof w !== 'undefined') {
+                return Vector.pos(w, h);
+            }
+        }
+        if (typeof w == 'undefined' && Object.hasOwn(this, "width")) {
+            w = this.width.get_value(frame);
+            if (typeof h !== 'undefined') {
+                return Vector.pos(w, h);
+            }
+        }
+        const ov = this.owner_viewport();
+        if (ov) {
+            return ov.get_vp_size(frame, w, h);
+        }
+        throw new Error(`cant get_vp_height`);
+        // return Vector.pos(100, 100); 
+    }
+
 }
 export class Symbol extends Container {
     static tag = "symbol";
@@ -239,6 +366,10 @@ export class Path extends Shape {
     set d(v: TextValue) {
         xset(this, "d", v);
     }
+    override describe(frame: number) {
+        return this.d.get_value(frame);
+    }
+
 }
 
 export class Rect extends Shape {
@@ -293,6 +424,16 @@ export class Rect extends Shape {
         xset(this, "size", v);
     }
     //
+    override describe(frame: number) {
+        const width = this.width.get_value(frame);
+        const height = this.height.get_value(frame);
+        const x = this.x.get_value(frame);
+        const y = this.y.get_value(frame);
+        const rx = this.rx.get_value(frame);
+        const ry = this.ry.get_value(frame);
+        return `M ${x} ${y} h ${width} v ${height} h ${-width} Z`;
+    }
+
 }
 
 export class Circle extends Shape {
@@ -317,6 +458,14 @@ export class Circle extends Shape {
     }
     set r(v: ScalarValue) {
         xset(this, "r", v);
+    }
+    ////
+    override describe(frame: number) {
+        const x = this.cx.get_value(frame);
+        const y = this.cy.get_value(frame);
+        const r = this.r.get_value(frame);
+        if (r === 0) return "M0 0";
+        return `M ${x - r} ${y} A ${r} ${r} 0 0 0 ${x + r} ${y} A ${r} ${r} 0 0 0 ${x - r} ${y}`;
     }
 }
 
@@ -350,6 +499,15 @@ export class Ellipse extends Shape {
     set ry(v: ScalarValue) {
         xset(this, "ry", v);
     }
+    override describe(frame: number) {
+        const x = this.cx.get_value(frame);
+        const y = this.cy.get_value(frame);
+        const rx = this.rx.get_value(frame);
+        const ry = this.ry.get_value(frame);
+        return `M ${x - rx} ${y} A ${rx} ${ry} 0 0 0 ${x + rx
+            } ${y} A ${rx} ${ry} 0 0 0 ${x - rx} ${y}`;
+    }
+
 }
 
 export class Line extends Shape {
@@ -382,6 +540,15 @@ export class Line extends Shape {
     set y2(v: ScalarValue) {
         xset(this, "y2", v);
     }
+    ////
+    override describe(frame: number) {
+        const x1 = this.x1.get_value(frame);
+        const x2 = this.x2.get_value(frame);
+        const y1 = this.y1.get_value(frame);
+        const y2 = this.y2.get_value(frame);
+        return `M ${x1} ${y1} L ${x2} ${y2}`;
+    }
+
 }
 
 export class Polyline extends Shape {
@@ -393,6 +560,11 @@ export class Polyline extends Shape {
     set points(v: PointsValue) {
         xset(this, "points", v);
     }
+    ///
+    override describe(frame: number) {
+        const s = this.points.get_value(frame).map(v => `${v[0]},${v[1]}`).join(' ');
+        return s ? `M ${s}` : "";
+    }
 }
 
 export class Polygon extends Shape {
@@ -403,6 +575,11 @@ export class Polygon extends Shape {
     }
     set points(v: PointsValue) {
         xset(this, "points", v);
+    }
+    ///
+    override describe(frame: number) {
+        const s = this.points.get_value(frame).map(v => `${v[0]},${v[1]}`).join(' ');
+        return s ? `M ${s}` : "";
     }
 }
 

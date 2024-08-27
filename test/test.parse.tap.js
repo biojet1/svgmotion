@@ -66,8 +66,7 @@ test.test("Item", async (t) => {
     const anim = new Root();
     await anim.load_svg("res/polygon01.svg");
     const tr = anim.at(0);
-    console.log(anim.view);
-
+    // console.log(anim.view);
     const pg1 = anim.get_polygon(1);
     const c = anim.view.add_circle();
     c.r.key_value(0, 10);
@@ -86,15 +85,12 @@ test.test("Item", async (t) => {
             .d(1).to(R, -30).to(S, [1, 1])
             .d(1).first(R)
     );
-    console.log(anim.save_html("/tmp/polygon01.html"));
-
+    // console.log(anim.save_html("/tmp/polygon01.html"));
     const nod = anim.to_dom(new SVGDocument());
     anim.update_dom(0);
     const ser = new XMLSerializer();
     const xml = ser.serializeToString(nod);
     // console.log(ser.serializeToString(nod));
-
-
     {
         const fs = await import('fs/promises');
         const h = await fs.open('/tmp/polygon01.svg', 'w');

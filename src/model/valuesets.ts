@@ -1,11 +1,6 @@
+import { Matrix, MatrixMut } from "../geom/matrix.js";
 import { Vector } from "../geom/vector.js";
-import {
-    VectorValue,
-    ScalarValue,
-    PositionValue,
-    RGBValue,
-    TextValue
-} from "./value.js";
+import { VectorValue, ScalarValue, PositionValue, RGBValue, TextValue } from "./value.js";
 import { PlainValue } from "./value.js";
 import { Animatable } from "./value.js";
 
@@ -220,6 +215,18 @@ export class Transform extends ValueSet {
         }
         return '';
     }
+    cat_transform(frame: number, n: Matrix) {
+        if (Object.hasOwn(this, "all")) {
+            return this.all.map((x) => x.cat_transform(frame, n));
+        }
+    }
+    get_transform(frame: number): Matrix {
+        const m = MatrixMut.identity();
+        if (Object.hasOwn(this, "all")) {
+            this.all.map((x) => x.cat_transform(frame, m));
+        }
+        return m;
+    }
     ///
     get all() {
         return xget(this, "all", new Array<MT>());
@@ -401,6 +408,10 @@ class MTranslate extends PositionValue {
         const [x, y] = this.get_value(frame);
         return `translate(${x} ${y})`;
     }
+    cat_transform(frame: number, m: Matrix) {
+        const [x, y] = this.get_value(frame);
+        m.cat_self(Matrix.translate(x, y));
+    }
     override dump() {
         const o = super.dump();
         o._ = "t";
@@ -411,6 +422,10 @@ class MScale extends VectorValue {
     get_transform_repr(frame: number) {
         const [x, y] = this.get_value(frame);
         return `scale(${x} ${y})`;
+    }
+    cat_transform(frame: number, m: Matrix) {
+        const [x, y] = this.get_value(frame);
+        m.cat_self(Matrix.scale(x, y));
     }
     override dump() {
         const o = super.dump();
@@ -427,6 +442,10 @@ class MRotateAt extends VectorValue {
         }
         return `rotate(${a})`;
     }
+    cat_transform(frame: number, m: Matrix) {
+        const [a, x, y] = this.get_value(frame);
+        m.cat_self(Matrix.rotate(a, x, y));
+    }
     override dump() {
         const o = super.dump();
         o._ = "R";
@@ -438,6 +457,10 @@ class MRotation extends ScalarValue {
     get_transform_repr(frame: number) {
         const a = this.get_value(frame);
         return `rotate(${a})`;
+    }
+    cat_transform(frame: number, m: Matrix) {
+        const a = this.get_value(frame);
+        m.cat_self(Matrix.rotate(a));
     }
     override dump() {
         const o = super.dump();
@@ -451,6 +474,10 @@ class MSkewX extends ScalarValue {
         const a = this.get_value(frame);
         return `skewX(${a})`;
     }
+    cat_transform(frame: number, m: Matrix) {
+        const a = this.get_value(frame);
+        m.cat_self(Matrix.skewX(a));
+    }
     override dump() {
         const o = super.dump();
         o._ = "x";
@@ -463,6 +490,10 @@ class MSkewY extends ScalarValue {
         const a = this.get_value(frame);
         return `skewY(${a})`;
     }
+    cat_transform(frame: number, m: Matrix) {
+        const a = this.get_value(frame);
+        m.cat_self(Matrix.skewY(a));
+    }
     override dump() {
         const o = super.dump();
         o._ = "y";
@@ -474,6 +505,10 @@ class MHexad extends VectorValue {
     get_transform_repr(frame: number) {
         const [a, b, c, d, e, f] = this.get_value(frame);
         return `matrix(${a} ${b} ${c} ${d} ${e} ${f})`;
+    }
+    cat_transform(frame: number, m: Matrix) {
+        const [a, b, c, d, e, f] = this.get_value(frame);
+        m.cat_self(Matrix.hexad(a, b, c, d, e, f));
     }
     override dump() {
         const o = super.dump();

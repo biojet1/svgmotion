@@ -4,6 +4,7 @@ import { VectorValue, ScalarValue, PointsValue, RGB, RGBValue, TextValue } from 
 import { Vector } from "../geom/vector.js";
 import { Node, Parent } from "../model/linked.js";
 import { parse_css_color } from "./parse_color.js";
+import { parse_svg_length } from "./svg_length.js";
 const BOTH_MATCH =
     /^\s*(([-+]?[0-9]+(\.[0-9]*)?|[-+]?\.[0-9]+)([eE][-+]?[0-9]+)?)\s*(in|pt|px|mm|cm|m|km|Q|pc|yd|ft||%|em|ex|ch|rem|vw|vh|vmin|vmax|deg|grad|rad|turn|s|ms|Hz|kHz|dpi|dpcm|dppx)\s*$/i;
 const CONVERSIONS: { [k: string]: number } = {
@@ -24,11 +25,13 @@ function parse_len(value: string) {
     if (m) {
         const num = parseFloat(m[1]);
         const suf = m.pop();
+
         if (suf) {
             const unit = CONVERSIONS[suf.toLowerCase()];
             if (unit > 1) {
                 return num * unit;
             }
+            // parse_svg_length(num, )
         } else {
             return num;
         }

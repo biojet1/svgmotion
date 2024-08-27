@@ -1,0 +1,31 @@
+<svg id="V0" viewBox="0 0 300 400" xmlns="http://www.w3.org/2000/svg" >
+  <rect rx="20" x="0" y="0" width="300" height="400" />
+  <circle id="C4" cx="150" cy="5.08cm" fill="blue"/>
+  <circle id="C1" cx="150" cy="70" r="10%" fill="green"/>
+  <circle id="C2" cx="55" cy="70" r="40" fill="yellow" />
+  <svg id="V1" viewBox="0 0 10 8" x="200" width="100">
+    <rect  x="0" y="0" width="100%" height="100%" fill="grey" />
+    <circle id="C3" cx="50%" cy="50%" r="50%" fill="orange" />
+    <rect id="R1" transform="" rx="1" x="0%" y="0" width="5" height="50%" fill="cyan" />
+    <rect id="R3" transform="" rx="1" x="50%" width="5" height="50%" fill="magenta" />
+    <rect id="R4" transform="" rx="1" x="??" y="50%" width="5" height="50%" fill="orangered" />
+  </svg>
+  <svg id="V2" viewBox="0 0 10 10" y="200" height="100">
+    <circle id="C5" cx="50%" cy="50%" r="50%" fill="orange" />
+    <svg id="V3">
+      <line x1="0%" y1="25%" x2="50%" y2="75%" id="L1"/>
+      <line x1="0%" y1="25%" x2="50%" y2="75%" stroke="red"/>
+      <circle id="C6" cx="50%" cy="50%" r="10%" fill="grey" />
+    </svg>
+  </svg>
+  <rect id="R5" x="200" y="160" width="50" height="40" style="fill:#81b4fe;stroke:none;opacity:0.5"/>
+  <rect id="R6" transform="translate(50, 40)" x="200" y="160" width="50" height="40" style="fill:#81b4fe;stroke:none;opacity:0.5"/>
+  <rect id="R7" style="stroke:pink;opacity:0.5"/>
+  <script>const svg = document.documentElement;
+
+         svg.setAttribute("width",'300px');
+        svg.setAttribute("height", 400);
+
+  </script>
+  <script href="metrics.js"></script>
+</svg>

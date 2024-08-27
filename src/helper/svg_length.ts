@@ -1,5 +1,5 @@
 
-function uulen(amount: number, units: string | undefined, ctx: { relative_length?: number, ppi?: number, vw?: number, vh?: number, font_size?: number, font_height?: number }) {
+export function parse_svg_length(amount: number, units: string | undefined, ctx: { relative_length?: number, ppi?: number, vw?: number, vh?: number, font_size?: number, font_height?: number }) {
     switch (units) {
         case "%": {
             const { relative_length } = ctx;
@@ -73,7 +73,6 @@ function uulen(amount: number, units: string | undefined, ctx: { relative_length
         case "": {
             return amount
         }
-
     }
     throw Error(`Unexpected unit "${units}"`);
 }

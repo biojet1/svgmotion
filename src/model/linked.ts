@@ -44,7 +44,7 @@ export class Node {
         }
     }
     parent<T extends Parent = Parent>() {
-        return this._parent;
+        return this._parent as T;
     }
     _link_next(node?: Node) {
         // [THIS]<->node

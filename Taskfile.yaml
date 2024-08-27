@@ -56,3 +56,7 @@ tasks:
         cmds:
             - c8 npx tap -t600 --disable-coverage --reporter=terse {{.CLI_ARGS}}
             - c8 report -r html
+    clean:
+        method: none
+        cmds:
+            - rm -r dist
