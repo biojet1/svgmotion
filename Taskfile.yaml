@@ -8,6 +8,7 @@ tasks:
         generates:
             - dist/**/*.js
         cmds:
+            -  # rm -r dist
             - npx tsc -d --sourcemap
 
     webpack:

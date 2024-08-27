@@ -11,9 +11,9 @@ import {
     Rect,
     Use,
     ViewPort, Image, Symbol
-} from "../model/node.js";
+} from "../model/elements.js";
 
-declare module "../model/node" {
+declare module "../model/elements" {
     interface Container {
         get_circle(x: number | string): Circle;
         get_ellipse(x: number | string): Ellipse;

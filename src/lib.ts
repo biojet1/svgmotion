@@ -1,16 +1,16 @@
-export * from "./geom/vector.js";
-export * from "./geom/bbox.js";
+export * from "./geom/index.js";
 export * from "./track/index.js";
 export * from "./keyframe/index.js";
 export * from "./model/index.js";
+export * from "./model/mixinvp.js";
 export * from "./helper/from_dom.js";
 export * from "./helper/dump.js";
 export * from "./helper/load.js";
 export * from "./helper/parse_color.js";
 export * from "./helper/find_node.js";
 export * from "./helper/update_dom.js";
-import { Root } from "./model/node.js";
-declare module "./model/node" {
+import { Root } from "./model/elements.js";
+declare module "./model/elements" {
     interface Root {
         save_html(file: string): Promise<void>;
     }

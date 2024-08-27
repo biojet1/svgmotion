@@ -6,7 +6,7 @@ import {
     ViewPort, Rect, Path, Line, Group,
     Ellipse, Circle, Polyline, Polygon, Image, Symbol,
     Use
-} from "../model/node.js";
+} from "../model/elements.js";
 
 const TAGS: {
     [key: string]: (parent: Container) => Item | Container;
@@ -63,7 +63,7 @@ function load_container(obj: PlainNode, parent: Container) {
     }
 }
 
-declare module "../model/node" {
+declare module "../model/elements" {
     interface Root {
         load(src: PlainRoot): void;
         parse_json(src: string): void;

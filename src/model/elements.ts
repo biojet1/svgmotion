@@ -1,16 +1,11 @@
+import { BoundingBox, Matrix, MatrixMut, PathLC, Vector } from "../geom/index.js";
 import { Track } from "../track/track.js";
-import { BaseProps } from "./baseprops.js";
-import { PlainValue } from "./value.js";
-import { Animatable } from "./value.js";
-import { ScalarValue, PointsValue, PositionValue, TextValue } from "./value.js";
-import { Node, Parent } from "./linked.js";
-import { Box, ValueSet, xget, xset } from "./valuesets.js";
 import { Keyframe } from "../keyframe/keyframe.js";
-import { PathLC } from "../geom/path/pathlc.js";
-import { Matrix, MatrixMut } from "../geom/matrix.js";
-import { BoundingBox } from "../geom/bbox.js";
-import { Vector } from "../geom/vector.js";
-
+import { PlainValue, Animatable } from "./value.js";
+import { ScalarValue, PointsValue, PositionValue, TextValue } from "./value.js";
+import { Box, ValueSet, xget, xset } from "./valuesets.js";
+import { Node, Parent } from "./linked.js";
+import { BaseProps, Element } from "./baseprops.js";
 
 export interface PlainNode {
     tag: string;
@@ -25,7 +20,7 @@ export interface PlainRoot {
     frame_rate: number;
 }
 
-export abstract class Item extends BaseProps(Node) {
+export abstract class Item extends Element {
     *enum_values(): Generator<Animatable<any>, void, unknown> {
         for (let v of Object.values(this)) {
             if (v instanceof Animatable) {
@@ -76,20 +71,7 @@ export abstract class Item extends BaseProps(Node) {
     }
 }
 
-export abstract class Shape extends Item {
-    describe(frame: number): string {
-        throw new Error(`Not implemented`);
-    }
-    get_path(frame: number): PathLC {
-        return PathLC.parse(this.describe(frame));
-    }
-    override update_bbox(bbox: BoundingBox, frame: number, m?: Matrix) {
-        const p = this.get_path(frame);
-        bbox.merge_self((m ? p.transform(m) : p).bbox());
-    }
-}
-
-export class Container extends BaseProps(Parent) {
+export class Container extends Element {
     *enum_values(): Generator<Animatable<any>, void, unknown> {
         for (let v of Object.values(this)) {
             if (v instanceof Animatable) {
@@ -152,47 +134,6 @@ export class Container extends BaseProps(Parent) {
             x.update_bbox(bbox, frame, m)
         }
     }
-    *ancestors() {
-        let top = this._parent;
-        while (top) {
-            yield top
-            top = top._parent;
-        }
-    }
-
-    owner_viewport() {
-        //  nearest ancestor ‘svg’ element. 
-        for (const a of this.ancestors()) {
-            if (a instanceof ViewPort) {
-                return a;
-            }
-        }
-    }
-
-}
-
-function transform_up_to(top: Parent, desc: Item | Container, time: number) {
-    let cur: Item | Container | undefined = desc;
-    let ls: (Item | Container)[] = []
-    while (cur) {
-        cur = cur.parent<Container>();
-        if (cur === top) {
-            let m = MatrixMut.identity();
-            ls.reverse();
-            for (const x of ls) {
-                x.cat_transform(time, m)
-            }
-            return m;
-        } else if (cur) {
-            ls.push(cur);
-        }
-    }
-    throw new Error(`No parent`);
-}
-
-export class Group extends Container {
-    static tag = "g";
-
 }
 
 export class ViewPort extends Container {
@@ -247,64 +188,101 @@ export class ViewPort extends Container {
         xset(this, "zoom_pan", v);
     }
     // 
-    get_vp_width(frame: number): number {
-        if (Object.hasOwn(this, "view_box")) {
-            const s = this.view_box.size.get_value(frame);
-            return s.x;
-        }
-        if (Object.hasOwn(this, "width")) {
-            const s = this.width.get_value(frame);
-            return s;
-        }
-        const ov = this.owner_viewport();
-        if (ov) {
-            return ov.get_vp_width(frame);
-        }
-        throw new Error(`cant get_vp_width`)
-        // return 100; 
+    // get_vp_width(frame: number): number {
+    //     if (Object.hasOwn(this, "view_box")) {
+    //         const s = this.view_box.size.get_value(frame);
+    //         return s.x;
+    //     }
+    //     if (Object.hasOwn(this, "width")) {
+    //         const s = this.width.get_value(frame);
+    //         return s;
+    //     }
+    //     const ov = this.owner_viewport();
+    //     if (ov) {
+    //         return ov.get_vp_width(frame);
+    //     }
+    //     throw new Error(`cant get_vp_width`);
+    //     // return 100; 
+    // }
+    // get_vp_height(frame: number): number {
+    //     if (Object.hasOwn(this, "view_box")) {
+    //         const s = this.view_box.size.get_value(frame);
+    //         return s.y;
+    //     }
+    //     if (Object.hasOwn(this, "height")) {
+    //         const s = this.height.get_value(frame);
+    //         return s;
+    //     }
+    //     const ov = this.owner_viewport();
+    //     if (ov) {
+    //         return ov.get_vp_height(frame);
+    //     }
+    //     throw new Error(`cant get_vp_height`);
+    //     // return 100; 
+    // }
+    // get_vp_size(frame: number, w?: number, h?: number): Vector {
+    //     if (Object.hasOwn(this, "view_box")) {
+    //         const s = this.view_box.size.get_value(frame);
+    //         return Vector.pos(w ?? s.x, h ?? s.y);
+    //     }
+    //     if (typeof h == 'undefined' && Object.hasOwn(this, "height")) {
+    //         h = this.height.get_value(frame);
+    //         if (typeof w !== 'undefined') {
+    //             return Vector.pos(w, h);
+    //         }
+    //     }
+    //     if (typeof w == 'undefined' && Object.hasOwn(this, "width")) {
+    //         w = this.width.get_value(frame);
+    //         if (typeof h !== 'undefined') {
+    //             return Vector.pos(w, h);
+    //         }
+    //     }
+    //     const ov = this.owner_viewport();
+    //     if (ov) {
+    //         return ov.get_vp_size(frame, w, h);
+    //     }
+    //     throw new Error(`cant get_vp_height`);
+    //     // return Vector.pos(100, 100); 
+    // }
+}
+
+export abstract class Shape extends Item {
+    describe(frame: number): string {
+        throw new Error(`Not implemented`);
     }
-    get_vp_height(frame: number): number {
-        if (Object.hasOwn(this, "view_box")) {
-            const s = this.view_box.size.get_value(frame);
-            return s.y;
-        }
-        if (Object.hasOwn(this, "height")) {
-            const s = this.height.get_value(frame);
-            return s;
-        }
-        const ov = this.owner_viewport();
-        if (ov) {
-            return ov.get_vp_height(frame);
-        }
-        throw new Error(`cant get_vp_height`);
-        // return 100; 
+    get_path(frame: number): PathLC {
+        return PathLC.parse(this.describe(frame));
     }
-    get_vp_size(frame: number, w?: number, h?: number): Vector {
-        if (Object.hasOwn(this, "view_box")) {
-            const s = this.view_box.size.get_value(frame);
-            return Vector.pos(w ?? s.x, h ?? s.y);
-        }
-        if (typeof h == 'undefined' && Object.hasOwn(this, "height")) {
-            h = this.height.get_value(frame);
-            if (typeof w !== 'undefined') {
-                return Vector.pos(w, h);
+    override update_bbox(bbox: BoundingBox, frame: number, m?: Matrix) {
+        const p = this.get_path(frame);
+        bbox.merge_self((m ? p.transform(m) : p).bbox());
+    }
+}
+
+function transform_up_to(top: Parent, desc: Item | Container, time: number) {
+    let cur: Item | Container | undefined = desc;
+    let ls: (Item | Container)[] = []
+    while (cur) {
+        cur = cur.parent<Container>();
+        if (cur === top) {
+            let m = MatrixMut.identity();
+            ls.reverse();
+            for (const x of ls) {
+                x.cat_transform(time, m)
             }
+            return m;
+        } else if (cur) {
+            ls.push(cur);
         }
-        if (typeof w == 'undefined' && Object.hasOwn(this, "width")) {
-            w = this.width.get_value(frame);
-            if (typeof h !== 'undefined') {
-                return Vector.pos(w, h);
-            }
-        }
-        const ov = this.owner_viewport();
-        if (ov) {
-            return ov.get_vp_size(frame, w, h);
-        }
-        throw new Error(`cant get_vp_height`);
-        // return Vector.pos(100, 100); 
     }
+    throw new Error(`No parent`);
+}
+
+export class Group extends Container {
+    static tag = "g";
 
 }
+
 export class Symbol extends Container {
     static tag = "symbol";
     ///
@@ -433,7 +411,6 @@ export class Rect extends Shape {
         const ry = this.ry.get_value(frame);
         return `M ${x} ${y} h ${width} v ${height} h ${-width} Z`;
     }
-
 }
 
 export class Circle extends Shape {
@@ -684,11 +661,6 @@ export class Root extends Container {
 
     // new_view, new_rect
     at(offset: number) {
-        // const tr = new Track();
-        // tr.frame_rate = this.frame_rate;
-        // tr.hint_dur = 1 * this.frame_rate;
-        // tr.end_frame = tr.to_frame(offset);
-        // return tr;
         return this.track.sub(offset)
     }
     //
@@ -702,3 +674,5 @@ export class Root extends Container {
         xset(this, "track", v);
     }
 }
+
+import { } from "./mixinvp.js";

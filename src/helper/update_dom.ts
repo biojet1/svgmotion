@@ -1,6 +1,6 @@
 import { VectorValue, ScalarValue, PointsValue, RGBValue, TextValue } from "../model/value.js";
 import { Animatable } from "../model/value.js";
-import { Container, Root, Item } from "../model/node.js";
+import { Container, Root, Item } from "../model/elements.js";
 import { Node } from "../model/linked.js";
 import { Transform, Fill, Box, Font, Stroke, ValueSet } from "../model/valuesets.js";
 import { Stepper } from "../track/stepper.js";
@@ -161,7 +161,7 @@ function update_dom(frame: number, target: Item | Container) {
 
 const NS_SVG = "http://www.w3.org/2000/svg";
 
-declare module "../model/node" {
+declare module "../model/elements" {
     interface Container {
         _element?: SVGElement;
         to_dom(doc: typeof SVGElement.prototype.ownerDocument): SVGElement;

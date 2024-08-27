@@ -1,5 +1,4 @@
-import { Matrix, MatrixMut } from "../geom/matrix.js";
-import { Vector } from "../geom/vector.js";
+import { Matrix, MatrixMut, Vector } from "../geom/index.js";
 import { VectorValue, ScalarValue, PositionValue, RGBValue, TextValue } from "./value.js";
 import { PlainValue } from "./value.js";
 import { Animatable } from "./value.js";

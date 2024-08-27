@@ -1,8 +1,8 @@
 
-import { Item, Container, Root } from "../model/node.js";
+import { Vector } from "../geom/index.js";
 import { VectorValue, ScalarValue, PointsValue, RGB, RGBValue, TextValue } from "../model/value.js";
-import { Vector } from "../geom/vector.js";
 import { Node, Parent } from "../model/linked.js";
+import { Item, Container, Root } from "../model/elements.js";
 import { parse_css_color } from "./parse_color.js";
 import { parse_svg_length } from "./svg_length.js";
 const BOTH_MATCH =
@@ -459,7 +459,7 @@ async function load_svg(
     }
 }
 
-declare module "../model/node" {
+declare module "../model/elements" {
     interface Container {
         load_svg(src: string | URL, opt: { xinclude?: boolean; base?: string | URL }): Promise<void>;
     }

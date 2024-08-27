@@ -1,6 +1,7 @@
-import { Root } from "./model/node.js";
+import { Root } from "./model/elements.js";
 
 export * from "./model/index.js";
+export * from "./model/mixinvp.js";
 export * from "./helper/update_dom.js";
 export * from "./helper/load.js";
 
@@ -66,7 +67,7 @@ export function animate2(root: Root, fps: number) {
     }
 }
 
-declare module "./model/node" {
+declare module "./model/elements" {
     interface Root {
         animate(params: {
             fps: number,

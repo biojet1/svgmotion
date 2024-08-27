@@ -1,9 +1,9 @@
 import { Animatable } from "../model/value.js";
-import { Container, Root, Item, PlainRoot, PlainNode } from "../model/node.js";
+import { Container, Root, Item, PlainRoot, PlainNode } from "../model/elements.js";
 import { ValueSet } from "../model/valuesets.js";
 
 
-declare module "../model/node" {
+declare module "../model/elements" {
     interface Container {
         dump(): any;
     }
