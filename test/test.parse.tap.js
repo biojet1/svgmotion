@@ -62,7 +62,7 @@ import { Vector, RGB, Root, Rel } from "svgmotion";
 //     t.end();
 // });
 
-test.test("Item", async (t) => {
+test.test("load_svg polygon01", async (t) => {
     const anim = new Root();
     await anim.load_svg("res/polygon01.svg");
     const tr = anim.at(0);
@@ -97,6 +97,30 @@ test.test("Item", async (t) => {
         await h.write(xml);
         await h.close();
     }
+
+    t.end();
+});
+test.test("parse_svg", async (t) => {
+    const anim = new Root();
+    await anim.parse_svg(`<?xml version="1.0" standalone="no"?>
+<svg width="10cm" height="3cm" viewBox="0 0 1000 300"     xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <g font-family="Verdana" font-size="64" >
+    <text x="100" y="180" fill="blue" >
+        But you
+        <tspan dx="2em" dy="-50" font-weight="bold" fill="red" >
+          are
+        </tspan>
+        <tspan dy="100">
+          a peach!
+        </tspan>
+    </text>
+  </g>
+</svg>
+        `)
+
+
+    console.dir(anim.dump(), { depth: 100 })
+
 
     t.end();
 });

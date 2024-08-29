@@ -3,6 +3,23 @@ import { ScalarValue, PositionValue, TextValue, EnumTextValue, LengthValue, Perc
 import { Fill, Transform, xset, xget, Font, Stroke } from "./valuesets.js";
 import { Node, Parent } from "./linked.js";
 /// @@@ //////////
+export class TextData extends Node {
+    _data: string = "";
+    get data() {
+        return this._data;
+    }
+
+    set data(data: string) {
+        switch (data) {
+            case null:
+                this._data = "";
+                break;
+            default:
+                this._data = data + "";
+        }
+    }
+}
+
 export class Element extends Parent {
     id?: string;
     static tag = '?';
@@ -70,6 +87,13 @@ export class Element extends Parent {
         xset(this, "anchor", v);
     }
     /// Properties ////////////
+    /// getset<font-size>
+    get font_size() {
+        return xget(this, 'font_size', new LengthValue(16));
+    }
+    set font_size(v: LengthValue) {
+        xset(this, 'font_size', v);
+    }
     /// getset<image-rendering>
     get image_rendering() {
         return xget(this, 'image_rendering', new ImageRenderingValue());
@@ -218,8 +242,6 @@ export class Element extends Parent {
         xset(this, 'text_align', v);
     }
     /// Properties ////////////
-
-
 
 
 

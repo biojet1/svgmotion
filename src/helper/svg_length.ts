@@ -1,11 +1,11 @@
 import { Vector } from "../geom/index.js";
 import { xget } from "../model/index.js";
-import { Element } from "../model/elements.js";
+import { Element } from "../model/base.js";
 const BOTH_MATCH =
     /^\s*(([-+]?[0-9]+(\.[0-9]*)?|[-+]?\.[0-9]+)([eE][-+]?[0-9]+)?)\s*(in|pt|px|mm|cm|m|km|Q|pc|yd|ft||%|em|ex|ch|rem|vw|vh|vmin|vmax|deg|grad|rad|turn|s|ms|Hz|kHz|dpi|dpcm|dppx)\s*$/i;
 
 export function parse_svg_length(amount: number, units: string | undefined, ctx: { relative_length?: number, ppi?: number, vw?: number, vh?: number, font_size?: number, font_height?: number }) {
-    console.log(`parse_svg_length ${amount} ${units}`)
+    // console.log(`parse_svg_length ${amount} ${units}`)
     switch (units) {
         case "%": {
             const { relative_length } = ctx;
@@ -92,10 +92,16 @@ export class ComputeLength {
         this.frame = frame;
         // this.length_mode = undefined;
     }
+
+    get font_size() {
+        const n = this.node.get_font_size(this.frame);
+        return xget(this, "font_size", n);
+    }
     get vw() {
         const n = this.node.get_vp_width(this.frame);
         return xget(this, "vw", n);
     }
+
     get vh() {
         const n = this.node.get_vp_height(this.frame);
         return xget(this, "vh", n);
@@ -125,7 +131,7 @@ export class ComputeLength {
         if (m) {
             const num = parseFloat(m[1]);
             const suf = m.pop();
-            console.log(`parse_len ${value} ${this.node.id} ${this.node.constructor.name} ${[num, suf]}`)
+            // console.log(`parse_len ${value} ${this.node.id} ${this.node.constructor.name} ${[num, suf]}`)
             const n = parse_svg_length(num, suf, this);
             // console.log(`parse_svg_length OK ${value} ${n} [${this.node.constructor.name}]`);
             return n;

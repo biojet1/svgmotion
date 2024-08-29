@@ -1,7 +1,7 @@
 import { Animatable } from "../model/value.js";
 import { Container, Root, Item, PlainRoot, PlainNode } from "../model/elements.js";
 import { ValueSet } from "../model/valuesets.js";
-
+import { TextData } from "../model/base.js";
 
 declare module "../model/elements" {
     interface Container {
@@ -14,6 +14,13 @@ declare module "../model/elements" {
         dump(): any;
     }
 }
+
+declare module "../model/base" {
+    interface TextData {
+        dump(): any;
+    }
+}
+
 
 Container.prototype.dump = function () {
     const o: any = { tag: (<typeof Container>this.constructor).tag };
@@ -57,3 +64,8 @@ Root.prototype.dump = function (): PlainRoot {
         ),
     };
 }
+
+TextData.prototype.dump = function (): string {
+    return this.data;
+}
+

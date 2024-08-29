@@ -1,7 +1,7 @@
 
 import { VectorValue, ScalarValue, PointsValue, RGB, RGBValue, TextValue } from "../model/value.js";
 import { Node } from "../model/linked.js";
-import { Item, Container, Root } from "../model/elements.js";
+import { Item, Container, Root, Text, TSpan } from "../model/elements.js";
 import { parse_css_color } from "./parse_color.js";
 import { ComputeLength } from "./svg_length.js";
 
@@ -197,6 +197,51 @@ const TAG_DOM: {
         }
         return node;
     },
+    text: function (props: Map<string, string>, parent: Container) {
+        let node = parent.add_text();
+        for (const [name, value] of props.entries()) {
+            switch (name) {
+                case "y":
+                    node.y.set_parse_length(value, node, name, "h");
+                    break;
+                case "x":
+                    node.x.set_parse_length(value, node, name, "w");
+                    break;
+                case "dy":
+                    node.dy.set_parse_length(value, node, name, "h");
+                    break;
+                case "dx":
+                    node.dx.set_parse_length(value, node, name, "w");
+                    break;
+                default:
+                    set_common_attr(node, name, value);
+            }
+        }
+        return node;
+    },
+    tspan: function (props: Map<string, string>, parent: Container) {
+        let node = parent.add_tspan();
+        for (const [name, value] of props.entries()) {
+            switch (name) {
+                case "y":
+                    node.y.set_parse_length(value, node, name, "h");
+                    break;
+                case "x":
+                    node.x.set_parse_length(value, node, name, "w");
+                    break;
+                case "dy":
+                    node.dy.set_parse_length(value, node, name, "h");
+                    break;
+                case "dx":
+                    node.dx.set_parse_length(value, node, name, "w");
+                    break;
+                default:
+                    set_common_attr(node, name, value);
+            }
+        }
+        return node;
+    },
+
 
     a: (props: Map<string, string>, parent: Container) => false,
     clipPath: (props: Map<string, string>, parent: Container) => false,
@@ -237,10 +282,10 @@ const TAG_DOM: {
     style: (props: Map<string, string>, parent: Container) => false,
     switch: (props: Map<string, string>, parent: Container) => false,
     symbol: (props: Map<string, string>, parent: Container) => false,
-    text: (props: Map<string, string>, parent: Container) => false,
+
     textPath: (props: Map<string, string>, parent: Container) => false,
     tref: (props: Map<string, string>, parent: Container) => false,
-    tspan: (props: Map<string, string>, parent: Container) => false,
+
     use: (props: Map<string, string>, parent: Container) => false,
 };
 
@@ -277,16 +322,20 @@ function set_common_attr(
                 node.transform.set_parse_transform(value);
             }
             break;
+        case "font-size":
+            if (value) {
+                node.font_size.set_parse_length(value, node, name);
+            }
         case "font-weight":
             if (value) {
                 node.font.weight.set_parse_text(value, node);
             }
             break;
-        case "font-size":
-            if (value) {
-                node.font.size.set_parse_text(value, node);
-            }
-            break;
+        // case "font-size":
+        //     if (value) {
+        //         node.font.size.set_parse_text(value, node);
+        //     }
+        //     break;
         case "font-family":
             if (value) {
                 node.font.family.set_parse_text(value, node);
@@ -431,58 +480,81 @@ function walk(elem: SVGElement, parent: Container) {
             props.set(key, value);
         }
     }
-    //     const id = props.get("id");
-    //     if(id){
-    //    get_root(node).remember_id((node.id = value), node);
-
-    //     }
     const make_node = TAG_DOM[tag];
     if (make_node) {
-        console.log(`walk-->`, tag, parent.constructor.name);
+        // console.log(`walk-->`, tag, parent.constructor.name);
         const node = make_node(props, parent);
-        console.log(`walk<-- ${node.constructor.name}`, tag);
+        // console.log(`walk<-- ${node.constructor.name}`, tag);
         if (node instanceof Container) {
-            for (const child of elem.children) {
-                if (child.namespaceURI == "http://www.w3.org/2000/svg") {
-                    walk(child as SVGElement, node);
+            for (const child of elem.childNodes) {
+                switch (child.nodeType) {
+                    case 1: {
+                        if ((child as Element).namespaceURI == "http://www.w3.org/2000/svg") {
+                            walk(child as SVGElement, node);
+                        }
+                    }
+                    case 3:// TEXT_NODE
+                    case 4: //CDATA_SECTION_NODE
+                        {
+                            const { textContent } = child
+                            if (textContent && (node instanceof Text || node instanceof TSpan)) {
+                                node.add_chars(textContent);
+                            }
+                        }
+
                 }
             }
+        } else if (node === false) {
+            console.log(`tag "${tag}" not implemented`);
+        } else if (node instanceof Item) {
+            //
+        } else {
+            throw new Error(`tag "${tag}"`);
         }
         return node;
     } else if (make_node === false) {
-        console.log(`tag "${tag}" not implemented`);
+        console.log(`tag "${tag}" ignored`);
     } else {
         throw new Error(`No processor for "${tag}"`);
     }
 }
 
-export function parse_svg(
-    src: string | URL,
+export async function parse_svg(
+    root: Root,
+    src: string,
     opt: { xinclude?: boolean; base?: string | URL } = {}
 ) {
-    return import("domspec").then((domspec) => {
-        // console.log("domspec", domspec.DOMParser.loadXML);
-        return domspec.DOMParser.loadXML(src, { ...opt, type: "image/svg+xml" })
-            .then((doc) => {
-                const base = opt.base || src;
-                const top = (doc as unknown as XMLDocument).documentElement;
-                // console.info(`loadrd "${src}" ${top?.localName}`);
-                if (top.namespaceURI != NS_SVG) {
-                    throw new Error(`not svg namespace ${top.namespaceURI}`);
-                } else if (top.localName != "svg") {
-                    throw new Error(`not svg tag ${top.localName}`);
-                } else {
-                    const doc = new Root();
-                    // console.log(doc.innerHTML);
-                    const f = walk(top as unknown as SVGSVGElement, doc);
-                    return doc;
-                }
-            })
-            .catch((err) => {
-                console.error(`Failed to load "${src}"`);
-                throw err;
-            });
-    });
+    try {
+        const domspec = await import("domspec");
+        const doc = domspec.DOMParser.parseString(src, "image/svg+xml");
+        const base = opt.base || src;
+        const top = (doc as unknown as XMLDocument).documentElement;
+        // console.info(`loadrd "${src}" ${top?.localName}`);
+        if (top.namespaceURI != NS_SVG) {
+            throw new Error(`not svg namespace ${top.namespaceURI}`);
+        } else if (top.localName != "svg") {
+            throw new Error(`not svg tag ${top.localName}`);
+        } else {
+            walk(top as unknown as SVGSVGElement, root);
+        }
+    } catch (err) {
+        console.error(`Failed to load "${src}"`);
+        throw err;
+    };
+}
+
+function load_svg_dom(parent: Container, doc: Document) {
+    const top = (doc as unknown as XMLDocument).documentElement;
+    // console.info(`loadrd "${src}" ${top?.localName}`);
+    if (top.namespaceURI != NS_SVG) {
+        throw new Error(`not svg namespace ${top.namespaceURI}`);
+    }
+    if (parent instanceof Root) {
+        if (top.localName != "svg") {
+            throw new Error(`not svg tag ${top.localName}`);
+        }
+    }
+    walk(top as unknown as SVGSVGElement, parent);
 }
 
 async function load_svg(
@@ -494,29 +566,34 @@ async function load_svg(
     try {
         const doc = await domspec.DOMParser.loadXML(src, { ...opt, type: "image/svg+xml" });
         const base = opt.base || src;
-        const top = (doc as unknown as XMLDocument).documentElement;
-        // console.info(`loadrd "${src}" ${top?.localName}`);
-        if (top.namespaceURI != NS_SVG) {
-            throw new Error(`not svg namespace ${top.namespaceURI}`);
-        }
-        if (parent instanceof Root) {
-            if (top.localName != "svg") {
-                throw new Error(`not svg tag ${top.localName}`);
-            }
-        }
-        const f = walk(top as unknown as SVGSVGElement, parent);
+        load_svg_dom(parent, doc as any as Document);
     } catch (err) {
         console.error(`Failed to load "${src}"`);
         throw err;
     }
 }
-
+async function _parse_svg(
+    parent: Container,
+    src: string | URL,
+    opt: { xinclude?: boolean; base?: string | URL } = {}
+) {
+    const domspec = await import("domspec");
+    try {
+        const doc = await domspec.DOMParser.loadXML(src, { ...opt, type: "image/svg+xml" });
+        const base = opt.base || src;
+        load_svg_dom(parent, doc as any as Document);
+    } catch (err) {
+        console.error(`Failed to load "${src}"`);
+        throw err;
+    }
+}
 declare module "../model/elements" {
     interface Container {
         load_svg(src: string | URL, opt: { xinclude?: boolean; base?: string | URL }): Promise<void>;
     }
     interface Root {
         load_json(src: string): void;
+        parse_svg(src: string): Promise<void>;
     }
 }
 
@@ -546,6 +623,11 @@ Container.prototype.load_svg = async function (src: string | URL,
     opt: { xinclude?: boolean; base?: string | URL }) {
     return load_svg(this, src, opt);
 }
+
+Root.prototype.parse_svg = async function (src: string) {
+    return parse_svg(this, src);
+}
+
 
 ScalarValue.prototype.set_parse_number = function (s: string, parent: Container | Item) {
     this.value = parseFloat(s);

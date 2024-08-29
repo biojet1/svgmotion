@@ -5,14 +5,17 @@ import { PlainValue, Animatable } from "./value.js";
 import { ScalarValue, PointsValue, PositionValue, TextValue } from "./value.js";
 import { Box, ValueSet, xget, xset } from "./valuesets.js";
 import { Node, Parent } from "./linked.js";
-import { Element } from "./base.js";
+import { Element, TextData } from "./base.js";
 
 export interface PlainNode {
     tag: string;
     nodes: PlainNode[];
     opacity?: PlainValue<any>;
 }
-
+export interface PlainTextNode {
+    tag: string;
+    nodes: (PlainNode | string)[];
+}
 export interface PlainRoot {
     version: string;
     view: PlainNode;
@@ -610,6 +613,45 @@ export class Text extends Container {
     set tail(v: TextValue) {
         xset(this, "tail", v);
     }
+    ///
+    get x() {
+        return xget(this, "x", new ScalarValue(0));
+    }
+    set x(v: ScalarValue) {
+        xset(this, "x", v);
+    }
+    ///
+    get y() {
+        return xget(this, "y", new ScalarValue(0));
+    }
+    set y(v: ScalarValue) {
+        xset(this, "y", v);
+    }
+    ///
+    get dx() {
+        return xget(this, "dx", new ScalarValue(0));
+    }
+    set dx(v: ScalarValue) {
+        xset(this, "dx", v);
+    }
+    ///
+    get dy() {
+        return xget(this, "dy", new ScalarValue(0));
+    }
+    set dy(v: ScalarValue) {
+        xset(this, "dy", v);
+    }
+
+    //     ‘x’
+    // ‘y’
+    // ‘dx’
+    // ‘dy’
+    ///
+    add_chars(text: string, before?: Node) {
+        const x = new TextData();
+        x.data = text;
+        this.insert_before(before ?? this._end, x);
+    }
 }
 
 export class TSpan extends Text {
@@ -716,4 +758,4 @@ export function viewbox_transform(
     return [translate_x, translate_y, scale_x, scale_y];
 }
 // import { } from "./mixinvp.js";
-export { Element }
+// export { Element, TextData }

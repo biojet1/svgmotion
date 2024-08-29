@@ -10,8 +10,9 @@ import {
     Polyline,
     Rect,
     Use,
-    ViewPort, Image, Symbol, Element
+    ViewPort, Image, Symbol
 } from "../model/elements.js";
+import { Element } from "../model/base.js";
 
 declare module "../model/elements" {
     interface Container {
