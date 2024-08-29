@@ -13,7 +13,7 @@
   <svg id="V2" viewBox="0 0 10 10" y="200" height="100">
     <circle id="C5" cx="50%" cy="50%" r="50%" fill="orange" />
     <svg id="V3">
-      <line x1="0%" y1="25%" x2="50%" y2="75%" id="L1"/>
+      <line id="L1" x1="0%" y1="25%" x2="50%" y2="75%"/>
       <line x1="0%" y1="25%" x2="50%" y2="75%" stroke="red"/>
       <circle id="C6" cx="50%" cy="50%" r="10%" fill="grey" />
     </svg>
@@ -21,6 +21,7 @@
   <rect id="R5" x="200" y="160" width="50" height="40" style="fill:#81b4fe;stroke:none;opacity:0.5"/>
   <rect id="R6" transform="translate(50, 40)" x="200" y="160" width="50" height="40" style="fill:#81b4fe;stroke:none;opacity:0.5"/>
   <rect id="R7" style="stroke:pink;opacity:0.5"/>
+  <line  id="L9" x1="-1" y1="2" x2="-3" y2="4"/>
   <script>const svg = document.documentElement;
 
          svg.setAttribute("width",'300px');

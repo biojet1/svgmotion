@@ -15,7 +15,7 @@ import {
 
 declare module "../model/elements" {
     interface Container {
-        get_any(x: number | string): Element;
+        get_element(x: number | string): Element;
         get_circle(x: number | string): Circle;
         get_ellipse(x: number | string): Ellipse;
         get_group(x: number | string): Group;
@@ -42,7 +42,7 @@ declare module "../model/elements" {
         find_view(x: number | string): ViewPort | void;
     }
 }
-Container.prototype.get_any = function (x: number | string = 0) {
+Container.prototype.get_element = function (x: number | string = 0) {
     return get_node(this, x, Element);
 }
 Container.prototype.get_circle = function (x: number | string = 0) {

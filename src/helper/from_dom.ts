@@ -5,39 +5,39 @@ import { Node, Parent } from "../model/linked.js";
 import { Item, Container, Root } from "../model/elements.js";
 import { parse_css_color } from "./parse_color.js";
 import { ComputeLength } from "./svg_length.js";
-const BOTH_MATCH =
-    /^\s*(([-+]?[0-9]+(\.[0-9]*)?|[-+]?\.[0-9]+)([eE][-+]?[0-9]+)?)\s*(in|pt|px|mm|cm|m|km|Q|pc|yd|ft||%|em|ex|ch|rem|vw|vh|vmin|vmax|deg|grad|rad|turn|s|ms|Hz|kHz|dpi|dpcm|dppx)\s*$/i;
-const CONVERSIONS: { [k: string]: number } = {
-    in: 96.0,
-    pt: 1.3333333333333333,
-    px: 1.0,
-    mm: 3.779527559055118,
-    cm: 37.79527559055118,
-    m: 3779.527559055118,
-    km: 3779527.559055118,
-    Q: 0.94488188976378,
-    pc: 16.0,
-    yd: 3456.0,
-    ft: 1152.0,
-};
-function parse_len(value: string) {
-    const m = BOTH_MATCH.exec(value);
-    if (m) {
-        const num = parseFloat(m[1]);
-        const suf = m.pop();
+// const BOTH_MATCH =
+//     /^\s*(([-+]?[0-9]+(\.[0-9]*)?|[-+]?\.[0-9]+)([eE][-+]?[0-9]+)?)\s*(in|pt|px|mm|cm|m|km|Q|pc|yd|ft||%|em|ex|ch|rem|vw|vh|vmin|vmax|deg|grad|rad|turn|s|ms|Hz|kHz|dpi|dpcm|dppx)\s*$/i;
+// const CONVERSIONS: { [k: string]: number } = {
+//     in: 96.0,
+//     pt: 1.3333333333333333,
+//     px: 1.0,
+//     mm: 3.779527559055118,
+//     cm: 37.79527559055118,
+//     m: 3779.527559055118,
+//     km: 3779527.559055118,
+//     Q: 0.94488188976378,
+//     pc: 16.0,
+//     yd: 3456.0,
+//     ft: 1152.0,
+// };
+// function parse_len(value: string) {
+//     const m = BOTH_MATCH.exec(value);
+//     if (m) {
+//         const num = parseFloat(m[1]);
+//         const suf = m.pop();
 
-        if (suf) {
-            const unit = CONVERSIONS[suf.toLowerCase()];
-            if (unit > 1) {
-                return num * unit;
-            }
-            // parse_svg_length(num, )
-        } else {
-            return num;
-        }
-    }
-    throw new Error(`Unexpected length "${value}"`);
-}
+//         if (suf) {
+//             const unit = CONVERSIONS[suf.toLowerCase()];
+//             if (unit > 1) {
+//                 return num * unit;
+//             }
+//             // parse_svg_length(num, )
+//         } else {
+//             return num;
+//         }
+//     }
+//     throw new Error(`Unexpected length "${value}"`);
+// }
 
 const NS_SVG = "http://www.w3.org/2000/svg";
 const TAG_DOM: {
@@ -72,8 +72,9 @@ const TAG_DOM: {
                 case "viewBox": {
                     const v = value.split(/[\s,]+/).map(parseFloat);
                     const u = node.view_box;
-                    u.position.value = new Vector([v[0], v[1]]);
-                    u.size.value = new Vector([v[2], v[3]]);
+                    u.position.set_value([v[0], v[1]]);
+                    u.size.set_value([v[2], v[3]]);
+                    // console.log("viewBox", e.id, value, v, u.size.dump())
                 }
                     break;
                 case "preserveAspectRatio":
@@ -233,16 +234,16 @@ const TAG_DOM: {
         for (const [name, value] of enum_attrs(e)) {
             switch (name) {
                 case "x1":
-                    node.x1.set_parse_length(value, node, name);
+                    node.x1.set_parse_length(value, node, name,);
                     break;
                 case "x2":
-                    node.x2.set_parse_length(value, node, name);
+                    node.x2.set_parse_length(value, node, name,);
                     break
                 case "y1":
-                    node.y1.set_parse_length(value, node, name);
+                    node.y1.set_parse_length(value, node, name,);
                     break;
                 case "y2":
-                    node.y2.set_parse_length(value, node, name);
+                    node.y2.set_parse_length(value, node, name,);
                     break;
                 default:
                     set_common_attr(node, name, value, e);
@@ -531,8 +532,6 @@ declare module "../model/value" {
         set_parse_dashes(s: string, container: Container | Item): void;
         set_parse_anchor(s: string, container: Container | Item): void;
     }
-
-
 }
 
 Container.prototype.load_svg = async function (src: string | URL,
@@ -545,7 +544,7 @@ ScalarValue.prototype.set_parse_number = function (s: string, parent: Container 
 }
 
 ScalarValue.prototype.set_parse_length = function (s: string, parent: Container | Item, name: string, mode?: string) {
-    console.log(`set_parse_length ${s} [${parent.id}] [${name}]`)
+    console.log(`set_parse_length ${s} [${(parent.constructor as any).tag}:${parent.id}] [${name}]`)
     const cl = new ComputeLength(parent, 0);
     cl.length_mode = mode;
     this.value = cl.parse_len(s);
@@ -566,10 +565,11 @@ ScalarValue.prototype.set_parse_line_height = function (s: string, parent: Conta
     } else if (s == 'normal') {
         this.value = null;
     } else {
-        this.value = parse_len(s);
+        const cl = new ComputeLength(parent, 0);
+        this.value = cl.parse_len(s);
+        // this.value = parse_len(s);
     }
 }
-
 
 RGBValue.prototype.set_parse_rgb = function (s: string, parent: Container | Item) {
     if (s == "none") {
@@ -598,7 +598,7 @@ PointsValue.prototype.set_parse_points = function (s: string, parent: Container 
     }
     this.value = points;
 }
-// VectorValue.prototype.
+
 VectorValue.prototype.set_parse_dashes = function (s: string, parent: Container | Item) {
     this.value = this.load_value(s.split(/[\s,]+/).map(function (str) {
         return parseFloat(str.trim());

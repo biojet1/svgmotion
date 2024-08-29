@@ -60,7 +60,9 @@ export class BoundingInterval extends Vector {
         // !isNaN(a) && !isNaN(b)
         return b >= a;
     }
-
+    toString() {
+        return '[' + this.join('..') + ']';
+    }
     static check(p: Iterable<number>) {
         if (p) {
             let [min, max] = p;
@@ -143,7 +145,7 @@ export class BoundingBox extends Array<BoundingInterval> {
         return new Vector([x.size, y.size]);
     }
     toString(): string {
-        return [...this].map(v => `[${v.toString()}]`).join(", ")
+        return "(" + [...this].map(v => v.toString()).join(", ") + ")"
     }
     dump() {
         return [...this].map(v => [...v])

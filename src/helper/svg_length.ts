@@ -161,8 +161,13 @@ export class ComputeLength {
     }
     get relative_length() {
         if (!this.length_mode) {
-            const b = get_vp_size(this.node, this.frame);
-            const n = Math.sqrt((b.x ** 2 + b.y ** 2) / 2);
+            // const x = get_vp_width(this.node, this.frame);
+            // const y = get_vp_height(this.node, this.frame);
+            const { x, y } = get_vp_size(this.node, this.frame);
+            // const n = Math.sqrt((x ** 2 + y ** 2)c
+            // const n = Math.sqrt(((x + y) * (x + y) - 2 * x * y) / 2)
+            const n = Math.hypot(x, y) / Math.sqrt(2)
+            //  * Math.SQRT1_2
             return xget(this, "relative_length", n);
         } else if (this.length_mode.startsWith("w")) {
             const n = get_vp_width(this.node, this.frame);
@@ -173,7 +178,6 @@ export class ComputeLength {
         } else {
             throw new Error(``);
         }
-
     }
 
     // relative_length?: number, ppi?: number, ,
