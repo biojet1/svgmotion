@@ -50,15 +50,6 @@ export abstract class Item extends Element {
         }
     }
 
-    owner_viewport() {
-        //  nearest ancestor ‘svg’ element. 
-        for (const a of this.ancestors()) {
-            if (a instanceof ViewPort) {
-                return a;
-            }
-        }
-    }
-
     farthest_viewport(): ViewPort | undefined {
         let parent: Item | Parent | undefined = this;
         let farthest: ViewPort | undefined = undefined;
@@ -147,8 +138,7 @@ export class ViewPort extends Container {
     }
     ///
     get width() {
-        const vp = this.owner_viewport();
-        const n = vp ? vp.get_vp_width(0) : 384
+        const n = this.get_vp_width(0);
         return xget(this, "width", new ScalarValue(n));
     }
     set width(v: ScalarValue) {
@@ -156,8 +146,7 @@ export class ViewPort extends Container {
     }
     ///
     get height() {
-        const vp = this.owner_viewport();
-        const n = vp ? vp.get_vp_height(0) : 216
+        const n = this.get_vp_height(0);
         return xget(this, "height", new ScalarValue(n));
     }
     set height(v: ScalarValue) {
@@ -353,8 +342,7 @@ export class Rect extends Shape {
     static tag = "rect";
     ///
     get width() {
-        const vp = this.owner_viewport();
-        const n = vp ? vp.get_vp_width(0) : 384
+        const n = this.get_vp_width(0);
         return xget(this, "width", new ScalarValue(n));
     }
     set width(v: ScalarValue) {
@@ -362,8 +350,7 @@ export class Rect extends Shape {
     }
     ///
     get height() {
-        const vp = this.owner_viewport();
-        const n = vp ? vp.get_vp_height(0) : 216
+        const n = this.get_vp_height(0);
         return xget(this, "height", new ScalarValue(n));
     }
     set height(v: ScalarValue) {

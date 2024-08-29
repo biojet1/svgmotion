@@ -5,6 +5,7 @@ const BOTH_MATCH =
     /^\s*(([-+]?[0-9]+(\.[0-9]*)?|[-+]?\.[0-9]+)([eE][-+]?[0-9]+)?)\s*(in|pt|px|mm|cm|m|km|Q|pc|yd|ft||%|em|ex|ch|rem|vw|vh|vmin|vmax|deg|grad|rad|turn|s|ms|Hz|kHz|dpi|dpcm|dppx)\s*$/i;
 
 export function parse_svg_length(amount: number, units: string | undefined, ctx: { relative_length?: number, ppi?: number, vw?: number, vh?: number, font_size?: number, font_height?: number }) {
+    console.log(`parse_svg_length ${amount} ${units}`)
     switch (units) {
         case "%": {
             const { relative_length } = ctx;
@@ -82,46 +83,6 @@ export function parse_svg_length(amount: number, units: string | undefined, ctx:
     throw Error(`Unexpected unit "${units}"`);
 }
 
-
-function get_vp_width(node: Element, frame: number): number {
-    const ov = node.owner_viewport();
-    if (ov) {
-        if (Object.hasOwn(ov, "view_box")) {
-            const s = ov.view_box.size.get_value(frame);
-            return s.x;
-        }
-        return get_vp_width(ov, frame);
-    }
-    throw new Error(`cant get_vp_width`);
-    // return 100;
-}
-
-function get_vp_height(node: Element, frame: number): number {
-    const ov = node.owner_viewport();
-    if (ov) {
-        if (Object.hasOwn(ov, "view_box")) {
-            const s = ov.view_box.size.get_value(frame);
-            return s.y;
-        }
-        return get_vp_height(ov, frame);
-    }
-    throw new Error(`cant get_vp_height`);
-    // return 100;
-}
-
-function get_vp_size(node: Element, frame: number, w?: number, h?: number): Vector {
-    const ov = node.owner_viewport();
-    if (ov) {
-        if (Object.hasOwn(ov, "view_box")) {
-            const s = ov.view_box.size.get_value(frame);
-            return Vector.pos(w ?? s.x, h ?? s.y);
-        }
-        return get_vp_size(ov, frame, w, h);
-    }
-    throw new Error(`cant get_vp_size`);
-    // return Vector.pos(100, 100);
-}
-
 export class ComputeLength {
     node: Element;
     frame: number;
@@ -132,28 +93,26 @@ export class ComputeLength {
         // this.length_mode = undefined;
     }
     get vw() {
-        const n = get_vp_width(this.node, this.frame);
+        const n = this.node.get_vp_width(this.frame);
         return xget(this, "vw", n);
     }
     get vh() {
-        const n = get_vp_height(this.node, this.frame);
+        const n = this.node.get_vp_height(this.frame);
         return xget(this, "vh", n);
     }
     get relative_length() {
         if (!this.length_mode) {
-            // const x = get_vp_width(this.node, this.frame);
-            // const y = get_vp_height(this.node, this.frame);
-            const { x, y } = get_vp_size(this.node, this.frame);
+            const { x, y } = this.node.get_vp_size(this.frame);
             // const n = Math.sqrt((x ** 2 + y ** 2)c
             // const n = Math.sqrt(((x + y) * (x + y) - 2 * x * y) / 2)
             const n = Math.hypot(x, y) / Math.sqrt(2)
             //  * Math.SQRT1_2
             return xget(this, "relative_length", n);
         } else if (this.length_mode.startsWith("w")) {
-            const n = get_vp_width(this.node, this.frame);
+            const n = this.node.get_vp_size(this.frame).x;
             return xget(this, "relative_length", n);
         } else if (this.length_mode.startsWith("h")) {
-            const n = get_vp_height(this.node, this.frame);
+            const n = this.node.get_vp_size(this.frame).y;
             return xget(this, "relative_length", n);
         } else {
             throw new Error(``);
@@ -163,10 +122,10 @@ export class ComputeLength {
     // relative_length?: number, ppi?: number, ,
     parse_len(value: string, per_len = -1) {
         const m = BOTH_MATCH.exec(value);
-        // console.log(`parse_len ${value} ${this.node.id}`)
         if (m) {
             const num = parseFloat(m[1]);
             const suf = m.pop();
+            console.log(`parse_len ${value} ${this.node.id} ${this.node.constructor.name} ${[num, suf]}`)
             const n = parse_svg_length(num, suf, this);
             // console.log(`parse_svg_length OK ${value} ${n} [${this.node.constructor.name}]`);
             return n;

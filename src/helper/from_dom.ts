@@ -8,7 +8,7 @@ import { ComputeLength } from "./svg_length.js";
 const NS_SVG = "http://www.w3.org/2000/svg";
 
 const TAG_DOM: {
-    [key: string]: (props: Map<string, string>, parent: Container) => Item | Container | false;
+    [key: string]: (props: Map<string, string>, parent: Container) => Item | Container | false | 0;
 } = {
     svg: function (props: Map<string, string>, parent: Container) {
         // Node
@@ -405,6 +405,8 @@ function walk(elem: SVGElement, parent: Container) {
         }
     }
 
+
+
     for (const [key, value] of enum_attrs(elem)) {
         if (key == "style") {
             for (const s of value.split(/\s*;\s*/)) {
@@ -429,11 +431,16 @@ function walk(elem: SVGElement, parent: Container) {
             props.set(key, value);
         }
     }
+    //     const id = props.get("id");
+    //     if(id){
+    //    get_root(node).remember_id((node.id = value), node);
+
+    //     }
     const make_node = TAG_DOM[tag];
     if (make_node) {
-        // console.log(`walk--`, parent.constructor.name);
+        console.log(`walk-->`, tag, parent.constructor.name);
         const node = make_node(props, parent);
-        // console.log(`walk ${ x.constructor.name }`, elem.localName);
+        console.log(`walk<-- ${node.constructor.name}`, tag);
         if (node instanceof Container) {
             for (const child of elem.children) {
                 if (child.namespaceURI == "http://www.w3.org/2000/svg") {
@@ -442,9 +449,9 @@ function walk(elem: SVGElement, parent: Container) {
             }
         }
         return node;
-    } else if (make_node !== false) {
-
-    } else if (make_node !== false) {
+    } else if (make_node === false) {
+        console.log(`tag "${tag}" not implemented`);
+    } else {
         throw new Error(`No processor for "${tag}"`);
     }
 }
@@ -545,7 +552,7 @@ ScalarValue.prototype.set_parse_number = function (s: string, parent: Container 
 }
 
 ScalarValue.prototype.set_parse_length = function (s: string, parent: Container | Item, name: string, mode?: string) {
-    // console.log(`set_parse_length ${s} [${(parent.constructor as any).tag}:${parent.id}] [${name}]`)
+    console.log(`set_parse_length ${s} [${(parent.constructor as any).tag}:${parent.id}] [${name}]`)
     const cl = new ComputeLength(parent, 0);
     cl.length_mode = mode;
     this.value = cl.parse_len(s);
