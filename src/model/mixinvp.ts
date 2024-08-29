@@ -1,7 +1,7 @@
 import { Vector } from "../geom/index.js";
-import { Element } from "./baseprops.js";
+import { Element } from "./base.js";
 
-declare module "./baseprops" {
+declare module "./base" {
     interface Element {
         owner_viewport(): ViewPort | undefined;
     }

@@ -1,71 +1,20 @@
 
-import { Vector } from "../geom/index.js";
 import { VectorValue, ScalarValue, PointsValue, RGB, RGBValue, TextValue } from "../model/value.js";
-import { Node, Parent } from "../model/linked.js";
+import { Node } from "../model/linked.js";
 import { Item, Container, Root } from "../model/elements.js";
 import { parse_css_color } from "./parse_color.js";
 import { ComputeLength } from "./svg_length.js";
-// const BOTH_MATCH =
-//     /^\s*(([-+]?[0-9]+(\.[0-9]*)?|[-+]?\.[0-9]+)([eE][-+]?[0-9]+)?)\s*(in|pt|px|mm|cm|m|km|Q|pc|yd|ft||%|em|ex|ch|rem|vw|vh|vmin|vmax|deg|grad|rad|turn|s|ms|Hz|kHz|dpi|dpcm|dppx)\s*$/i;
-// const CONVERSIONS: { [k: string]: number } = {
-//     in: 96.0,
-//     pt: 1.3333333333333333,
-//     px: 1.0,
-//     mm: 3.779527559055118,
-//     cm: 37.79527559055118,
-//     m: 3779.527559055118,
-//     km: 3779527.559055118,
-//     Q: 0.94488188976378,
-//     pc: 16.0,
-//     yd: 3456.0,
-//     ft: 1152.0,
-// };
-// function parse_len(value: string) {
-//     const m = BOTH_MATCH.exec(value);
-//     if (m) {
-//         const num = parseFloat(m[1]);
-//         const suf = m.pop();
-
-//         if (suf) {
-//             const unit = CONVERSIONS[suf.toLowerCase()];
-//             if (unit > 1) {
-//                 return num * unit;
-//             }
-//             // parse_svg_length(num, )
-//         } else {
-//             return num;
-//         }
-//     }
-//     throw new Error(`Unexpected length "${value}"`);
-// }
 
 const NS_SVG = "http://www.w3.org/2000/svg";
+
 const TAG_DOM: {
-    [key: string]: (elem: SVGElement, parent: Container) => Item | Container;
+    [key: string]: (props: Map<string, string>, parent: Container) => Item | Container | false;
 } = {
-    svg: function (e: SVGElement, parent: Container) {
-        let elem = e as SVGSVGElement;
+    svg: function (props: Map<string, string>, parent: Container) {
         // Node
         let node = parent.add_view();
-        // Defs
-        {
-            for (const child of [...e.children]) {
-                const { id, namespaceURI, localName } = child;
-                if (localName == "defs" && namespaceURI == NS_SVG) {
-                    const defs = get_root(node).defs;
-                    child.remove();
-                    for (const sub of [...child.children]) {
-                        const m = walk(sub as SVGElement, node);
-                        if (m) {
-                            m.remove();
-                            defs[id] = m;
-                        }
-                    }
-                }
-            }
-        }
         // Properties console.info(`svg _read ${elem?.localName} ${vp.constructor.name} ${elem.viewBox.baseVal}`);
-        for (const [name, value] of enum_attrs(e)) {
+        for (const [name, value] of props.entries()) {
             switch (name) {
                 case "version":
                     break;
@@ -97,15 +46,15 @@ const TAG_DOM: {
                     node.x.set_parse_length(value, node, name, "w");
                     break;
                 default:
-                    set_common_attr(node, name, value, e);
+                    set_common_attr(node, name, value);
             }
         }
 
         return node;
     },
-    rect: function (e: SVGElement, parent: Container) {
+    rect: function (props: Map<string, string>, parent: Container) {
         let node = parent.add_rect();
-        for (const [name, value] of enum_attrs(e)) {
+        for (const [name, value] of props.entries()) {
             switch (name) {
                 case "height":
                     node.height.set_parse_length(value, node, name, "h");
@@ -126,41 +75,38 @@ const TAG_DOM: {
                     node.rx.set_parse_length(value, node, name, "w");
                     break;
                 default:
-                    set_common_attr(node, name, value, e);
+                    set_common_attr(node, name, value);
             }
         }
 
         return node;
     },
-    g: function (e: SVGElement, parent: Container) {
+    g: function (props: Map<string, string>, parent: Container) {
         let node = parent.add_group();
         // Properties
-        for (const [name, value] of enum_attrs(e)) {
-            set_common_attr(node, name, value, e);
+        for (const [name, value] of props.entries()) {
+            set_common_attr(node, name, value);
         }
         return node;
     },
-    path: function (e: SVGElement, parent: Container) {
+    path: function (props: Map<string, string>, parent: Container) {
         let node = parent.add_path();
-        // Properties
-        // console.info(`PATH`, e.getAttributeNames(), e.innerHTML);
-        for (const [name, value] of enum_attrs(e)) {
-            // console.info(`PATH ATTR _ ${name} ${value}`);
+        for (const [name, value] of props.entries()) {
             switch (name) {
                 case "d":
                     node.d.value = value;
                     break;
                 default:
-                    set_common_attr(node, name, value, e);
+                    set_common_attr(node, name, value);
             }
         }
         return node;
     },
-    circle: function (e: SVGElement, parent: Container) {
+    circle: function (props: Map<string, string>, parent: Container) {
         let node = parent.add_circle();
         // Properties
         // console.info(`PATH`, e.getAttributeNames(), e.innerHTML);
-        for (const [name, value] of enum_attrs(e)) {
+        for (const [name, value] of props.entries()) {
             // console.info(`PATH ATTR _ ${name} ${value}`);
             switch (name) {
                 case "r":
@@ -173,16 +119,16 @@ const TAG_DOM: {
                     node.cy.set_parse_length(value, node, name, "h");
                     break;
                 default:
-                    set_common_attr(node, name, value, e);
+                    set_common_attr(node, name, value);
             }
         }
         return node;
     },
-    ellipse: function (e: SVGElement, parent: Container) {
+    ellipse: function (props: Map<string, string>, parent: Container) {
         let node = parent.add_ellipse();
         // Properties
         // console.info(`PATH`, e.getAttributeNames(), e.innerHTML);
-        for (const [name, value] of enum_attrs(e)) {
+        for (const [name, value] of props.entries()) {
             // console.info(`PATH ATTR _ ${name} ${value}`);
             switch (name) {
                 case "rx":
@@ -198,40 +144,40 @@ const TAG_DOM: {
                     node.cy.set_parse_length(value, node, name);
                     break;
                 default:
-                    set_common_attr(node, name, value, e);
+                    set_common_attr(node, name, value);
             }
         }
         return node;
     },
-    polygon: function (e: SVGElement, parent: Container) {
+    polygon: function (props: Map<string, string>, parent: Container) {
         let node = parent.add_polygon();
-        for (const [name, value] of enum_attrs(e)) {
+        for (const [name, value] of props.entries()) {
             switch (name) {
                 case "points":
                     node.points.set_parse_points(value, parent);
                     break;
                 default:
-                    set_common_attr(node, name, value, e);
+                    set_common_attr(node, name, value);
             }
         }
         return node;
     },
-    polyline: function (e: SVGElement, parent: Container) {
+    polyline: function (props: Map<string, string>, parent: Container) {
         let node = parent.add_polyline();
-        for (const [name, value] of enum_attrs(e)) {
+        for (const [name, value] of props.entries()) {
             switch (name) {
                 case "points":
                     node.points.set_parse_points(value, parent);
                     break;
                 default:
-                    set_common_attr(node, name, value, e);
+                    set_common_attr(node, name, value);
             }
         }
         return node;
     },
-    line: function (e: SVGElement, parent: Container) {
+    line: function (props: Map<string, string>, parent: Container) {
         let node = parent.add_line();
-        for (const [name, value] of enum_attrs(e)) {
+        for (const [name, value] of props.entries()) {
             switch (name) {
                 case "x1":
                     node.x1.set_parse_length(value, node, name,);
@@ -246,11 +192,56 @@ const TAG_DOM: {
                     node.y2.set_parse_length(value, node, name,);
                     break;
                 default:
-                    set_common_attr(node, name, value, e);
+                    set_common_attr(node, name, value);
             }
         }
         return node;
-    }
+    },
+
+    a: (props: Map<string, string>, parent: Container) => false,
+    clipPath: (props: Map<string, string>, parent: Container) => false,
+    defs: (props: Map<string, string>, parent: Container) => false,
+    feBlend: (props: Map<string, string>, parent: Container) => false,
+    feColorMatrix: (props: Map<string, string>, parent: Container) => false,
+    feComponentTransfer: (props: Map<string, string>, parent: Container) => false,
+    feComposite: (props: Map<string, string>, parent: Container) => false,
+    feConvolveMatrix: (props: Map<string, string>, parent: Container) => false,
+    feDiffuseLighting: (props: Map<string, string>, parent: Container) => false,
+    feDisplacementMap: (props: Map<string, string>, parent: Container) => false,
+    feDistantLight: (props: Map<string, string>, parent: Container) => false,
+    feDropShadow: (props: Map<string, string>, parent: Container) => false,
+    feFlood: (props: Map<string, string>, parent: Container) => false,
+    feFuncA: (props: Map<string, string>, parent: Container) => false,
+    feFuncB: (props: Map<string, string>, parent: Container) => false,
+    feFuncG: (props: Map<string, string>, parent: Container) => false,
+    feFuncR: (props: Map<string, string>, parent: Container) => false,
+    feGaussianBlur: (props: Map<string, string>, parent: Container) => false,
+    feImage: (props: Map<string, string>, parent: Container) => false,
+    feMerge: (props: Map<string, string>, parent: Container) => false,
+    feMergeNode: (props: Map<string, string>, parent: Container) => false,
+    feMorphology: (props: Map<string, string>, parent: Container) => false,
+    feOffset: (props: Map<string, string>, parent: Container) => false,
+    fePointLight: (props: Map<string, string>, parent: Container) => false,
+    feSpecularLighting: (props: Map<string, string>, parent: Container) => false,
+    feSpotLight: (props: Map<string, string>, parent: Container) => false,
+    feTile: (props: Map<string, string>, parent: Container) => false,
+    feTurbulence: (props: Map<string, string>, parent: Container) => false,
+    filter: (props: Map<string, string>, parent: Container) => false,
+    image: (props: Map<string, string>, parent: Container) => false,
+    linearGradient: (props: Map<string, string>, parent: Container) => false,
+    marker: (props: Map<string, string>, parent: Container) => false,
+    mask: (props: Map<string, string>, parent: Container) => false,
+    pattern: (props: Map<string, string>, parent: Container) => false,
+    radialGradient: (props: Map<string, string>, parent: Container) => false,
+    stop: (props: Map<string, string>, parent: Container) => false,
+    style: (props: Map<string, string>, parent: Container) => false,
+    switch: (props: Map<string, string>, parent: Container) => false,
+    symbol: (props: Map<string, string>, parent: Container) => false,
+    text: (props: Map<string, string>, parent: Container) => false,
+    textPath: (props: Map<string, string>, parent: Container) => false,
+    tref: (props: Map<string, string>, parent: Container) => false,
+    tspan: (props: Map<string, string>, parent: Container) => false,
+    use: (props: Map<string, string>, parent: Container) => false,
 };
 
 
@@ -269,8 +260,6 @@ function set_common_attr(
     node: Container | Item,
     name: string,
     value: string,
-    elem: SVGElement,
-    style: boolean = false
 ) {
     // console.log(
     //     `set_common_attr ${name}="${value}" ${elem.localName} ${node.constructor.name} ${style}`
@@ -359,13 +348,6 @@ function set_common_attr(
                 node.stroke.dash_offset.set_parse_length(value, node, name);
             }
             break;
-        case "style":
-            const asm = elem.attributeStyleMap;
-            for (const [sname, value] of asm.entries()) {
-                console.log("STYLE", sname, value, value.constructor.name, style);
-                set_common_attr(node, sname, value.toString(), elem, true);
-            }
-            break;
         case "transform-origin":
             if (value) {
                 // node.anchor.set_parse_anchor(value);
@@ -380,45 +362,14 @@ function set_common_attr(
             break;
         default:
             if (!(name.startsWith("aria-") || name.startsWith("-inkscape"))) {
-                // console.log(
-                //     `set_common_attr No ${name}="${value}" ${elem.localName} ${node.constructor.name} ${style}`
-                // );
                 throw new Error(
-                    `Unexpected attribute [${name}]="${value}" tag="${elem.localName}" node="${node.constructor.name}"`
+                    `Unexpected attribute [${name}]="${value}" tag="${(node.constructor as any).tag}" node="${node.constructor.name}"`
                 );
             }
     }
 }
 
-function* enum_attrs(e: SVGElement) {
-    const attrs = e.attributes;
-    for (const attr of attrs) {
-        // let attr = attrs.item(i);
-        // if (e.id == 'R5') {
-        //     console.log(`enum_attrs`, attr.name, e.localName, e.id);
-        // }
-        if (attr != undefined) {
-            const { localName, namespaceURI, value } = attr;
-            // console.log(`enum_attrs`, e.localName, localName, namespaceURI, i);
-            if (!namespaceURI || namespaceURI == NS_SVG) {
-                // if (e.id == 'R5') {
-                //     console.log(`\tR5`, localName, attr.name, value);
-                // }
-                yield [localName, value];
-            }
-        }
-    }
-    // if (e.id == 'R5') {
-    //     let i = attrs.length;
-    //     // console.log(`enum_attrs`, i, e.localName);
-    //     for (; i-- > 0;) {
-    //         const attr = attrs[i];
-    //         const { localName, namespaceURI, value, name } = attr;
-    //         console.log(` - ${i}`, { localName, namespaceURI, value, name },);
-    //     }
-    // }
 
-}
 
 function walk(elem: SVGElement, parent: Container) {
     const { localName: tag } = elem;
@@ -427,13 +378,61 @@ function walk(elem: SVGElement, parent: Container) {
         case "metadata":
         case "title":
         case "script":
-
             return;
+        case "defs":
+            {
+                const defs = get_root(parent).defs;
+                for (const sub of [...elem.children]) {
+                    const { id } = sub;
+                    const m = walk(sub as SVGElement, parent);
+                    if (m && id) {
+                        m.remove();
+                        defs[id] = m;
+                    }
+                }
+                return;
+            }
+    }
+    const props = new Map<string, string>();
+    function* enum_attrs(e: SVGElement) {
+        for (const attr of e.attributes) {
+            if (attr != undefined) {
+                const { localName, namespaceURI, value } = attr;
+                if (!namespaceURI || namespaceURI == NS_SVG) {
+                    yield [localName, value];
+                }
+            }
+        }
+    }
+
+    for (const [key, value] of enum_attrs(elem)) {
+        if (key == "style") {
+            for (const s of value.split(/\s*;\s*/)) {
+                if (s) {
+                    const i = s.indexOf(':');
+                    if (i > 0) {
+                        const k = s.substring(0, i).trim();
+                        const v = s.substring(i + 1).trim();
+                        if (k && v) {
+                            const m = v.match(/(.+)\s*!\s*(\w+)$/);
+                            if (m) {
+                                props.set(k, m[1].trim());
+                                // this._tag[k] = { priority: m[2] };
+                            } else {
+                                props.set(k, v);
+                            }
+                        }
+                    }
+                }
+            }
+        } else if (!(key.startsWith("aria-") || key.startsWith("-inkscape"))) {
+            props.set(key, value);
+        }
     }
     const make_node = TAG_DOM[tag];
     if (make_node) {
         // console.log(`walk--`, parent.constructor.name);
-        const node = make_node(elem, parent);
+        const node = make_node(props, parent);
         // console.log(`walk ${ x.constructor.name }`, elem.localName);
         if (node instanceof Container) {
             for (const child of elem.children) {
@@ -443,7 +442,9 @@ function walk(elem: SVGElement, parent: Container) {
             }
         }
         return node;
-    } else {
+    } else if (make_node !== false) {
+
+    } else if (make_node !== false) {
         throw new Error(`No processor for "${tag}"`);
     }
 }
@@ -544,7 +545,7 @@ ScalarValue.prototype.set_parse_number = function (s: string, parent: Container 
 }
 
 ScalarValue.prototype.set_parse_length = function (s: string, parent: Container | Item, name: string, mode?: string) {
-    console.log(`set_parse_length ${s} [${(parent.constructor as any).tag}:${parent.id}] [${name}]`)
+    // console.log(`set_parse_length ${s} [${(parent.constructor as any).tag}:${parent.id}] [${name}]`)
     const cl = new ComputeLength(parent, 0);
     cl.length_mode = mode;
     this.value = cl.parse_len(s);

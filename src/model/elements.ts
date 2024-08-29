@@ -5,7 +5,7 @@ import { PlainValue, Animatable } from "./value.js";
 import { ScalarValue, PointsValue, PositionValue, TextValue } from "./value.js";
 import { Box, ValueSet, xget, xset } from "./valuesets.js";
 import { Node, Parent } from "./linked.js";
-import { Element } from "./baseprops.js";
+import { Element } from "./base.js";
 
 export interface PlainNode {
     tag: string;

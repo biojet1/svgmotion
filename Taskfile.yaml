@@ -2,7 +2,8 @@ version: "3"
 
 tasks:
     compile:
-        method: timestamp
+        # method: timestamp
+        method: checksum
         sources:
             - src/**/*.ts
         generates:
