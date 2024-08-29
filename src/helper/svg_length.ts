@@ -90,10 +90,6 @@ function get_vp_width(node: Element, frame: number): number {
             const s = ov.view_box.size.get_value(frame);
             return s.x;
         }
-        if (Object.hasOwn(ov, "width")) {
-            const s = ov.width.get_value(frame);
-            return s;
-        }
         return get_vp_width(ov, frame);
     }
     throw new Error(`cant get_vp_width`);
@@ -107,10 +103,6 @@ function get_vp_height(node: Element, frame: number): number {
             const s = ov.view_box.size.get_value(frame);
             return s.y;
         }
-        if (Object.hasOwn(ov, "height")) {
-            const s = ov.height.get_value(frame);
-            return s;
-        }
         return get_vp_height(ov, frame);
     }
     throw new Error(`cant get_vp_height`);
@@ -123,18 +115,6 @@ function get_vp_size(node: Element, frame: number, w?: number, h?: number): Vect
         if (Object.hasOwn(ov, "view_box")) {
             const s = ov.view_box.size.get_value(frame);
             return Vector.pos(w ?? s.x, h ?? s.y);
-        }
-        if (typeof h == 'undefined' && Object.hasOwn(ov, "height")) {
-            h = ov.height.get_value(frame);
-            if (typeof w !== 'undefined') {
-                return Vector.pos(w, h);
-            }
-        }
-        if (typeof w == 'undefined' && Object.hasOwn(ov, "width")) {
-            w = ov.width.get_value(frame);
-            if (typeof h !== 'undefined') {
-                return Vector.pos(w, h);
-            }
         }
         return get_vp_size(ov, frame, w, h);
     }
