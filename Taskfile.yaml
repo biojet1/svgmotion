@@ -14,6 +14,7 @@ tasks:
 
     webpack:
         # method: timestamp
+        method: checksum
         sources:
             - src/**/*.ts
             - webpack.config.mjs
@@ -49,7 +50,7 @@ tasks:
 
     tapx:
         method: timestamp
-        deps: [compile]
+        deps: [compile, webpack]
         cmds:
             - npx tap -t600 --disable-coverage --reporter=terse {{.CLI_ARGS}}
 

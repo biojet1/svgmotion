@@ -3,6 +3,7 @@ export * from "./track/index.js";
 export * from "./keyframe/index.js";
 export * from "./model/index.js";
 export * from "./model/mixinvp.js";
+export * from "./model/base.js";
 export * from "./helper/from_dom.js";
 export * from "./helper/dump.js";
 export * from "./helper/load.js";

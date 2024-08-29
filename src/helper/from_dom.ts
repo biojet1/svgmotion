@@ -420,7 +420,7 @@ function set_common_attr(
 
 
 
-function walk(elem: SVGElement, parent: Container) {
+function walk(elem: SVGElement, parent: Container, attrs: Map<string, string>) {
     const { localName: tag } = elem;
     switch (tag) {
         case "desc":
@@ -433,7 +433,7 @@ function walk(elem: SVGElement, parent: Container) {
                 const defs = get_root(parent).defs;
                 for (const sub of [...elem.children]) {
                     const { id } = sub;
-                    const m = walk(sub as SVGElement, parent);
+                    const m = walk(sub as SVGElement, parent, attrs);
                     if (m && id) {
                         m.remove();
                         defs[id] = m;
@@ -453,8 +453,6 @@ function walk(elem: SVGElement, parent: Container) {
             }
         }
     }
-
-
 
     for (const [key, value] of enum_attrs(elem)) {
         if (key == "style") {
@@ -486,12 +484,19 @@ function walk(elem: SVGElement, parent: Container) {
         const node = make_node(props, parent);
         // console.log(`walk<-- ${node.constructor.name}`, tag);
         if (node instanceof Container) {
+            // Non-propagating values
+            for (const s of ['id', 'class', 'clip-path', 'viewBox', 'preserveAspectRatio']) {
+                props.delete(s);
+            }
+
+            var merged = new Map([...attrs, ...props])
             for (const child of elem.childNodes) {
                 switch (child.nodeType) {
                     case 1: {
                         if ((child as Element).namespaceURI == "http://www.w3.org/2000/svg") {
-                            walk(child as SVGElement, node);
+                            walk(child as SVGElement, node, merged);
                         }
+                        break;
                     }
                     case 3:// TEXT_NODE
                     case 4: //CDATA_SECTION_NODE
@@ -500,8 +505,8 @@ function walk(elem: SVGElement, parent: Container) {
                             if (textContent && (node instanceof Text || node instanceof TSpan)) {
                                 node.add_chars(textContent);
                             }
+                            break;
                         }
-
                 }
             }
         } else if (node === false) {
@@ -535,7 +540,7 @@ export async function parse_svg(
         } else if (top.localName != "svg") {
             throw new Error(`not svg tag ${top.localName}`);
         } else {
-            walk(top as unknown as SVGSVGElement, root);
+            walk(top as unknown as SVGSVGElement, root, new Map());
         }
     } catch (err) {
         console.error(`Failed to load "${src}"`);
@@ -554,7 +559,7 @@ function load_svg_dom(parent: Container, doc: Document) {
             throw new Error(`not svg tag ${top.localName}`);
         }
     }
-    walk(top as unknown as SVGSVGElement, parent);
+    walk(top as unknown as SVGSVGElement, parent, new Map());
 }
 
 async function load_svg(
@@ -572,6 +577,7 @@ async function load_svg(
         throw err;
     }
 }
+
 async function _parse_svg(
     parent: Container,
     src: string | URL,
@@ -587,6 +593,7 @@ async function _parse_svg(
         throw err;
     }
 }
+
 declare module "../model/elements" {
     interface Container {
         load_svg(src: string | URL, opt: { xinclude?: boolean; base?: string | URL }): Promise<void>;
@@ -634,7 +641,7 @@ ScalarValue.prototype.set_parse_number = function (s: string, parent: Container 
 }
 
 ScalarValue.prototype.set_parse_length = function (s: string, parent: Container | Item, name: string, mode?: string) {
-    console.log(`set_parse_length ${s} [${(parent.constructor as any).tag}:${parent.id}] [${name}]`)
+    // console.log(`set_parse_length ${s} [${(parent.constructor as any).tag}:${parent.id}] [${name}]`)
     const cl = new ComputeLength(parent, 0);
     cl.length_mode = mode;
     this.value = cl.parse_len(s);
@@ -684,7 +691,6 @@ PointsValue.prototype.set_parse_points = function (s: string, parent: Container 
     const points: number[][] = [];
     for (let n = nums.length - 1; n-- > 0; n--) {
         points.push([nums.shift()!, nums.shift()!]);
-
     }
     this.value = points;
 }

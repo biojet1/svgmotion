@@ -117,10 +117,33 @@ test.test("parse_svg", async (t) => {
   </g>
 </svg>
         `)
-
-
-    console.dir(anim.dump(), { depth: 100 })
-
-
+    const d1 = anim.dump();
+    // console.dir(d1, { depth: 100 })
+    {
+        const anim2 = new Root();
+        anim2.load(d1);
+        const d2 = anim2.dump();
+        {
+            const fs = await import('fs/promises');
+            const h = await fs.open('/tmp/parse1.json', 'w');
+            await h.write(JSON.stringify(d1));
+            await h.close();
+        }
+        {
+            const fs = await import('fs/promises');
+            const h = await fs.open('/tmp/parse2.json', 'w');
+            await h.write(JSON.stringify(d2));
+            await h.close();
+        }
+        // console.dir(d2, { depth: 100 })
+        t.match(d2, d1)
+    }
+    const ts = anim.get_tspan(0);
+    const g = anim.get_group(0);
+    anim.at(0).run(Rel(1).to(ts.dx, -50).at(2).to(ts.dx, 50));
+    // anim.at(0).run(Rel(0).to(ts.dx, -50).at(1).to(ts.dx, 50));
+    // anim.calc_time_range();
+    console.dir(ts.dx, { depth: 100 })
+    anim.save_html('/tmp/parse1.html');
     t.end();
 });

@@ -24,6 +24,8 @@ const TAGS: {
     symbol: function (parent: Container) { return parent.add_symbol(); },
     use: function (parent: Container) { return parent.add_use(); },
     svg: function (parent: Container) { return parent.add_view(); },
+    text: function (parent: Container) { return parent.add_text(); },
+    tspan: function (parent: Container) { return parent.add_tspan(); },
 };
 
 function load_properties(that: any, props: { [key: string]: PlainValue<any> }) {
@@ -52,11 +54,21 @@ function load_container(obj: PlainNode, parent: Container) {
         if (node instanceof Container) {
             if (nodes) {
                 for (const child of nodes) {
-                    load_container(child, node);
+                    if (typeof child === "string") {
+                        if (node instanceof Text) {
+                            node.add_chars(child);
+                        } else {
+                            throw new Error(`"${tag}"`);
+                        }
+                    } else {
+                        load_container(child, node);
+                    }
                 }
             }
-        } else if (nodes != undefined) {
-            throw new Error(`unexpected nodes in "${tag}"`);
+        } else if (node == undefined) {
+            throw new Error(`unexpected "${tag}" `);
+        } else if (!(node instanceof Item)) {
+            throw new Error(`unexpected nodes in "${tag}" ${(node as any).constructor.name}`);
         }
         return node;
     } else {
@@ -81,10 +93,10 @@ declare module "../model/elements" {
         add_polyline(): Polyline;
         add_rect(): Rect;
         add_symbol(): Symbol;
+        add_text(): Text;
+        add_tspan(): TSpan;
         add_use(): Use;
         add_view(): ViewPort;
-        add_tspan(): TSpan;
-        add_text(): Text;
     }
 }
 
@@ -133,7 +145,7 @@ Container.prototype.add_polygon = function () { const x = new Polygon(); this.ap
 Container.prototype.add_polyline = function () { const x = new Polyline(); this.append_child(x); return x; }
 Container.prototype.add_rect = function () { const x = new Rect(); this.append_child(x); return x; }
 Container.prototype.add_symbol = function () { const x = new Symbol(); this.append_child(x); return x; }
+Container.prototype.add_text = function () { const x = new Text(); this.append_child(x); return x; }
+Container.prototype.add_tspan = function () { const x = new TSpan(); this.append_child(x); return x; }
 Container.prototype.add_use = function () { const x = new Use(); this.append_child(x); return x; }
 Container.prototype.add_view = function () { const x = new ViewPort(); this.append_child(x); return x; }
-Container.prototype.add_tspan = function () { const x = new TSpan(); this.append_child(x); return x; }
-Container.prototype.add_text = function () { const x = new Text(); this.append_child(x); return x; }

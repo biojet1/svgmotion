@@ -4,6 +4,8 @@ import { Container, Root, Item } from "../model/elements.js";
 import { Node } from "../model/linked.js";
 import { Transform, Fill, Box, Font, Stroke, ValueSet } from "../model/valuesets.js";
 import { Stepper } from "../track/stepper.js";
+import { Element, TextData } from "../model/base.js";
+
 
 const FILL_MAP: {
     [key: string]: ((frame: number, node: SVGElement, prop: any) => void);
@@ -137,6 +139,16 @@ const PROP_MAP: {
     points: function (frame: number, node: SVGElement, prop: PointsValue) {
         node.setAttribute("points", prop.get_points_repr(frame));
     },
+    font_size: function (frame: number, node: SVGElement, prop: ScalarValue) {
+        node.setAttribute("font-size", prop.get_value(frame) + '');
+    },
+    dx: function (frame: number, node: SVGRectElement | SVGEllipseElement, prop: ScalarValue) {
+        node.setAttribute("dx", prop.get_length_repr(frame));
+    },
+    dy: function (frame: number, node: SVGRectElement | SVGEllipseElement, prop: ScalarValue) {
+        node.setAttribute("dy", prop.get_length_repr(frame));
+    },
+
 };
 
 function update_dom(frame: number, target: Item | Container) {
@@ -175,6 +187,12 @@ declare module "../model/elements" {
     }
     interface Root {
         to_dom(doc: typeof SVGElement.prototype.ownerDocument): SVGElement;
+    }
+}
+
+declare module "../model/base" {
+    interface TextData {
+        to_dom(doc: typeof SVGElement.prototype.ownerDocument): Text;
     }
 }
 
@@ -221,6 +239,10 @@ Item.prototype.to_dom = function (doc: typeof SVGElement.prototype.ownerDocument
     return set_svg(e, this);
 }
 
+TextData.prototype.to_dom = function (doc: typeof SVGElement.prototype.ownerDocument) {
+    return doc.createTextNode(this.data);
+
+}
 Root.prototype.to_dom = function to_dom(doc: typeof SVGElement.prototype.ownerDocument): SVGElement {
     const element = this.view.to_dom(doc);
 

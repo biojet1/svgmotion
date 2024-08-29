@@ -1,7 +1,8 @@
 import { Matrix, MatrixMut, BoundingBox } from "../geom/index.js";
 import { ScalarValue, PositionValue, TextValue, EnumTextValue, LengthValue, PercentageValue } from "./value.js";
-import { Fill, Transform, xset, xget, Font, Stroke } from "./valuesets.js";
+import { Fill, Transform, xset, xget, Font, Stroke, ValueSet } from "./valuesets.js";
 import { Node, Parent } from "./linked.js";
+import { PlainValue, Animatable } from "./value.js";
 /// @@@ //////////
 export class TextData extends Node {
     _data: string = "";
@@ -26,6 +27,15 @@ export class Element extends Parent {
     cat_transform(frame: number, n: Matrix) {
         if (Object.hasOwn(this, "transform")) {
             this.transform.cat_transform(frame, n);
+        }
+    }
+    *enum_values(): Generator<Animatable<any>, void, unknown> {
+        for (let v of Object.values(this)) {
+            if (v instanceof Animatable) {
+                yield v;
+            } else if (v instanceof ValueSet) {
+                yield* v.enum_values();
+            }
         }
     }
     update_bbox(bbox: BoundingBox, frame: number, m?: Matrix) {

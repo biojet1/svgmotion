@@ -32,8 +32,10 @@ function* enum1(all) {
     for (const [kind, v] of Object.entries(all)) {
         const q = ptypes(v);
         const t = [...q];
-        if (t.includes("Item") || t.includes("Container")) {
+        // console.log("X", kind, t)
+        if (t.includes("Item") || t.includes("Container") || t.includes("Element")) {
             const { tag } = v;
+            // console.log("N", tag, kind)
             if (tag && /^[a-zA-Z]/.test(tag)) {
                 let name = v.tag;
                 switch (name) {
@@ -48,6 +50,7 @@ function* enum1(all) {
             }
         }
     }
+    yield { name: "element", kind: "Element", tag: "" };
 }
 if (1) {
     const col = [...enum1(all)];
@@ -60,7 +63,7 @@ if (1) {
         );
     }
     for (const { name, kind, tag } of col) {
-        console.log(`        add_${name}(): ${kind};`
+        tag && console.log(`        add_${name}(): ${kind};`
         );
     }
     for (const { name, kind, tag } of col) {
@@ -70,11 +73,11 @@ if (1) {
         console.log(`Container.prototype.find_${name} = function (x: number | string = 0) : ${kind} | void {\n            return find_node(this, x, ${kind});\n}`);
     }
     for (const { name, kind, tag } of col) {
-        console.log(`Container.prototype.add_${name} = function () {` +
+        tag && console.log(`Container.prototype.add_${name} = function () {` +
             `const x = new ${kind}();this.append_child(x);return x;}`);
     }
     for (const { name, kind, tag } of col) {
-        console.log(`${tag} : function (parent: Container) {` +
+        tag && console.log(`${tag} : function (parent: Container) {` +
             `return parent.add_${name}();},`);
     }
 

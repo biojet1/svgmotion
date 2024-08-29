@@ -9,15 +9,15 @@ import {
     Polygon,
     Polyline,
     Rect,
-    Use,
+    Use, Text, TSpan,
     ViewPort, Image, Symbol
 } from "../model/elements.js";
 import { Element } from "../model/base.js";
 
 declare module "../model/elements" {
     interface Container {
-        get_element(x: number | string): Element;
         get_circle(x: number | string): Circle;
+        get_element(x: number | string): Element;
         get_ellipse(x: number | string): Ellipse;
         get_group(x: number | string): Group;
         get_image(x: number | string): Image;
@@ -27,9 +27,12 @@ declare module "../model/elements" {
         get_polyline(x: number | string): Polyline;
         get_rect(x: number | string): Rect;
         get_symbol(x: number | string): Symbol;
+        get_text(x: number | string): Text;
+        get_tspan(x: number | string): TSpan;
         get_use(x: number | string): Use;
         get_view(x: number | string): ViewPort;
         find_circle(x: number | string): Circle | void;
+        find_element(x: number | string): Element | void;
         find_ellipse(x: number | string): Ellipse | void;
         find_group(x: number | string): Group | void;
         find_image(x: number | string): Image | void;
@@ -39,15 +42,17 @@ declare module "../model/elements" {
         find_polyline(x: number | string): Polyline | void;
         find_rect(x: number | string): Rect | void;
         find_symbol(x: number | string): Symbol | void;
+        find_text(x: number | string): Text | void;
+        find_tspan(x: number | string): TSpan | void;
         find_use(x: number | string): Use | void;
         find_view(x: number | string): ViewPort | void;
     }
 }
-Container.prototype.get_element = function (x: number | string = 0) {
-    return get_node(this, x, Element);
-}
 Container.prototype.get_circle = function (x: number | string = 0) {
     return get_node(this, x, Circle);
+}
+Container.prototype.get_element = function (x: number | string = 0) {
+    return get_node(this, x, Element);
 }
 Container.prototype.get_ellipse = function (x: number | string = 0) {
     return get_node(this, x, Ellipse);
@@ -76,6 +81,12 @@ Container.prototype.get_rect = function (x: number | string = 0) {
 Container.prototype.get_symbol = function (x: number | string = 0) {
     return get_node(this, x, Symbol);
 }
+Container.prototype.get_text = function (x: number | string = 0) {
+    return get_node(this, x, Text);
+}
+Container.prototype.get_tspan = function (x: number | string = 0) {
+    return get_node(this, x, TSpan);
+}
 Container.prototype.get_use = function (x: number | string = 0) {
     return get_node(this, x, Use);
 }
@@ -84,6 +95,9 @@ Container.prototype.get_view = function (x: number | string = 0) {
 }
 Container.prototype.find_circle = function (x: number | string = 0): Circle | void {
     return find_node(this, x, Circle);
+}
+Container.prototype.find_element = function (x: number | string = 0): Element | void {
+    return find_node(this, x, Element);
 }
 Container.prototype.find_ellipse = function (x: number | string = 0): Ellipse | void {
     return find_node(this, x, Ellipse);
@@ -111,6 +125,12 @@ Container.prototype.find_rect = function (x: number | string = 0): Rect | void {
 }
 Container.prototype.find_symbol = function (x: number | string = 0): Symbol | void {
     return find_node(this, x, Symbol);
+}
+Container.prototype.find_text = function (x: number | string = 0): Text | void {
+    return find_node(this, x, Text);
+}
+Container.prototype.find_tspan = function (x: number | string = 0): TSpan | void {
+    return find_node(this, x, TSpan);
 }
 Container.prototype.find_use = function (x: number | string = 0): Use | void {
     return find_node(this, x, Use);

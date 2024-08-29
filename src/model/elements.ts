@@ -24,15 +24,15 @@ export interface PlainRoot {
 }
 
 export abstract class Item extends Element {
-    *enum_values(): Generator<Animatable<any>, void, unknown> {
-        for (let v of Object.values(this)) {
-            if (v instanceof Animatable) {
-                yield v;
-            } else if (v instanceof ValueSet) {
-                yield* v.enum_values();
-            }
-        }
-    }
+    // *enum_values(): Generator<Animatable<any>, void, unknown> {
+    //     for (let v of Object.values(this)) {
+    //         if (v instanceof Animatable) {
+    //             yield v;
+    //         } else if (v instanceof ValueSet) {
+    //             yield* v.enum_values();
+    //         }
+    //     }
+    // }
     g_wrap() {
         const p = this.parent();
         if (p) {
@@ -45,13 +45,13 @@ export abstract class Item extends Element {
 
         }
     }
-    *ancestors() {
-        let top = this._parent;
-        while (top) {
-            yield top
-            top = top._parent;
-        }
-    }
+    // *ancestors() {
+    //     let top = this._parent;
+    //     while (top) {
+    //         yield top
+    //         top = top._parent;
+    //     }
+    // }
 
     farthest_viewport(): ViewPort | undefined {
         let parent: Item | Parent | undefined = this;
@@ -74,8 +74,10 @@ export class Container extends Element {
                 yield* v.enum_values();
             }
         }
-        for (const sub of this.children<Container | Item>()) {
-            yield* sub.enum_values();
+        for (const sub of this.children<Element>()) {
+            if (sub instanceof Element) {
+                yield* sub.enum_values();
+            }
         }
     }
 
