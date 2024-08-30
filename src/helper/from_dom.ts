@@ -488,13 +488,14 @@ function walk(elem: SVGElement, parent: Container, attrs: Map<string, string>) {
             for (const s of ['id', 'class', 'clip-path', 'viewBox', 'preserveAspectRatio']) {
                 props.delete(s);
             }
+            let prev: Item | Container | undefined = undefined;
 
-            var merged = new Map([...attrs, ...props])
+            const merged = new Map([...attrs, ...props])
             for (const child of elem.childNodes) {
                 switch (child.nodeType) {
                     case 1: {
                         if ((child as Element).namespaceURI == "http://www.w3.org/2000/svg") {
-                            walk(child as SVGElement, node, merged);
+                            prev = walk(child as SVGElement, node, merged);
                         }
                         break;
                     }
@@ -505,12 +506,25 @@ function walk(elem: SVGElement, parent: Container, attrs: Map<string, string>) {
                             if (textContent && (node instanceof Text || node instanceof TSpan)) {
                                 node.add_chars(textContent);
                             }
+                            // if (textContent) {
+                            //     if (prev) {
+                            //         if (prev instanceof Text) {
+                            //             prev.tail.set_value(textContent)
+                            //         }
+                            //     } else {
+                            //         if (node instanceof Text) {
+                            //             node.text.set_value(textContent)
+                            //         }
+                            //     }
+                            // }
+                            // child.previousSibling
                             break;
                         }
                 }
             }
         } else if (node === false) {
             console.log(`tag "${tag}" not implemented`);
+            return undefined;
         } else if (node instanceof Item) {
             //
         } else {

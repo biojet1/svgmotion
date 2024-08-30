@@ -140,10 +140,13 @@ test.test("parse_svg", async (t) => {
     }
     const ts = anim.get_tspan(0);
     const g = anim.get_group(0);
+    const c = ts.get_data(0).content;
     anim.at(0).run(Rel(1).to(ts.dx, -50).at(2).to(ts.dx, 50));
+    anim.at(0).run(Rel(0).to(c, 'A').at(0.5).to(c, 'B').at(1).to(c, 'C'));
     // anim.at(0).run(Rel(0).to(ts.dx, -50).at(1).to(ts.dx, 50));
     // anim.calc_time_range();
-    console.dir(ts.dx, { depth: 100 })
+
+    // console.dir(c, { depth: 100 })
     anim.save_html('/tmp/parse1.html');
     t.end();
 });

@@ -51,6 +51,7 @@ function* enum1(all) {
         }
     }
     yield { name: "element", kind: "Element", tag: "" };
+    yield { name: "data", kind: "TextData", tag: "" };
 }
 if (1) {
     const col = [...enum1(all)];

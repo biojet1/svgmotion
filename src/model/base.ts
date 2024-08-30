@@ -5,20 +5,28 @@ import { Node, Parent } from "./linked.js";
 import { PlainValue, Animatable } from "./value.js";
 /// @@@ //////////
 export class TextData extends Node {
-    _data: string = "";
-    get data() {
-        return this._data;
+    id?: string;
+    // _data: string = "";
+    // get data() {
+    //     return this._data;
+    // }
+
+    // set data(data: string) {
+    //     switch (data) {
+    //         case null:
+    //             this._data = "";
+    //             break;
+    //         default:
+    //             this._data = data + "";
+    //     }
+    // }
+    get content() {
+        return xget(this, "content", new TextValue(''));
+    }
+    set content(v: TextValue) {
+        xset(this, "content", v);
     }
 
-    set data(data: string) {
-        switch (data) {
-            case null:
-                this._data = "";
-                break;
-            default:
-                this._data = data + "";
-        }
-    }
 }
 
 export class Element extends Parent {

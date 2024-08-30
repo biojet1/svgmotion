@@ -65,7 +65,9 @@ Root.prototype.dump = function (): PlainRoot {
     };
 }
 
-TextData.prototype.dump = function (): string {
-    return this.data;
+TextData.prototype.dump = function (): any {
+    const d = this.content.dump();
+    (d as any).tag = "$";
+    return d;
 }
 

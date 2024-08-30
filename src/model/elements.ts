@@ -10,7 +10,7 @@ import { Element, TextData } from "./base.js";
 export interface PlainNode {
     tag: string;
     nodes: PlainNode[];
-    opacity?: PlainValue<any>;
+    // opacity?: PlainValue<any>;
 }
 export interface PlainTextNode {
     tag: string;
@@ -601,20 +601,20 @@ export class Image extends Use {
 
 export class Text extends Container {
     static tag = "text";
-    /// text
-    get text() {
-        return xget(this, "text", new TextValue(''));
-    }
-    set text(v: TextValue) {
-        xset(this, "text", v);
-    }
-    /// tail
-    get tail() {
-        return xget(this, "tail", new TextValue(''));
-    }
-    set tail(v: TextValue) {
-        xset(this, "tail", v);
-    }
+    // /// text
+    // get text() {
+    //     return xget(this, "text", new TextValue(''));
+    // }
+    // set text(v: TextValue) {
+    //     xset(this, "text", v);
+    // }
+    // /// tail
+    // get tail() {
+    //     return xget(this, "tail", new TextValue(''));
+    // }
+    // set tail(v: TextValue) {
+    //     xset(this, "tail", v);
+    // }
     ///
     get x() {
         return xget(this, "x", new ScalarValue(0));
@@ -643,16 +643,17 @@ export class Text extends Container {
     set dy(v: ScalarValue) {
         xset(this, "dy", v);
     }
-
-    //     ‘x’
-    // ‘y’
-    // ‘dx’
-    // ‘dy’
     ///
     add_chars(text: string, before?: Node) {
         const x = new TextData();
-        x.data = text;
+        // x.data = text;
+        x.content.set_value(text);
         this.insert_before(before ?? this._end, x);
+    }
+    add_content(before?: Node) {
+        const x = new TextData();
+        this.insert_before(before ?? this._end, x);
+        return x;
     }
 }
 

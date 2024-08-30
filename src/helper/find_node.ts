@@ -12,11 +12,12 @@ import {
     Use, Text, TSpan,
     ViewPort, Image, Symbol
 } from "../model/elements.js";
-import { Element } from "../model/base.js";
+import { Element, TextData } from "../model/base.js";
 
 declare module "../model/elements" {
     interface Container {
         get_circle(x: number | string): Circle;
+        get_data(x: number | string): TextData;
         get_element(x: number | string): Element;
         get_ellipse(x: number | string): Ellipse;
         get_group(x: number | string): Group;
@@ -32,6 +33,7 @@ declare module "../model/elements" {
         get_use(x: number | string): Use;
         get_view(x: number | string): ViewPort;
         find_circle(x: number | string): Circle | void;
+        find_data(x: number | string): TextData | void;
         find_element(x: number | string): Element | void;
         find_ellipse(x: number | string): Ellipse | void;
         find_group(x: number | string): Group | void;
@@ -48,6 +50,10 @@ declare module "../model/elements" {
         find_view(x: number | string): ViewPort | void;
     }
 }
+Container.prototype.get_data = function (x: number | string = 0) {
+    return get_node(this, x, TextData);
+}
+
 Container.prototype.get_circle = function (x: number | string = 0) {
     return get_node(this, x, Circle);
 }
@@ -176,7 +182,7 @@ function* enum_node_type<T>(that: Container, x: { new(...args: any[]): T }) {
     const { _start, _end: end } = that;
     let cur: typeof _start | undefined = _start;
     do {
-        if (cur instanceof Item || cur instanceof Container) {
+        if (cur instanceof Item || cur instanceof Container || cur instanceof TextData) {
             if (cur instanceof x) {
                 yield cur;
             }

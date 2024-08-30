@@ -148,7 +148,9 @@ const PROP_MAP: {
     dy: function (frame: number, node: SVGRectElement | SVGEllipseElement, prop: ScalarValue) {
         node.setAttribute("dy", prop.get_length_repr(frame));
     },
-
+    content: function (frame: number, node: SVGRectElement | SVGEllipseElement, prop: TextValue) {
+        node.textContent = prop.get_value(frame);
+    },
 };
 
 function update_dom(frame: number, target: Item | Container) {
@@ -186,13 +188,16 @@ declare module "../model/elements" {
         update_dom(frame: number): void;
     }
     interface Root {
+
         to_dom(doc: typeof SVGElement.prototype.ownerDocument): SVGElement;
     }
 }
 
 declare module "../model/base" {
     interface TextData {
+        _element?: Text;
         to_dom(doc: typeof SVGElement.prototype.ownerDocument): Text;
+        update_dom(frame: number): void;
     }
 }
 
@@ -240,9 +245,9 @@ Item.prototype.to_dom = function (doc: typeof SVGElement.prototype.ownerDocument
 }
 
 TextData.prototype.to_dom = function (doc: typeof SVGElement.prototype.ownerDocument) {
-    return doc.createTextNode(this.data);
-
+    return (this._element = doc.createTextNode(this.content.get_value(0)));
 }
+
 Root.prototype.to_dom = function to_dom(doc: typeof SVGElement.prototype.ownerDocument): SVGElement {
     const element = this.view.to_dom(doc);
 
@@ -267,7 +272,13 @@ Item.prototype.update_dom = function (frame: number) {
 Container.prototype.update_dom = function (frame: number) {
     update_dom(frame, this);
 }
-
+TextData.prototype.update_dom = function (frame: number) {
+    // TODO: this function not called
+    const elem: Text = (this as any)._element;
+    if (elem) {
+        elem.textContent = this.content.get_value(frame);
+    }
+}
 Container.prototype.stepper = function () {
     let max = 0;
     let min = 0;
