@@ -252,7 +252,7 @@ export class BoundingBox extends Array<BoundingInterval> {
                 maxY = max(maxY, y);
             }
         );
-        return (this.constructor as typeof BoundingBox).extrema(xMin, xMax, yMin, maxY);
+        return (this.constructor as typeof BoundingBox).extrema([xMin, xMax], [yMin, maxY]);
     }
     overlap(other: BoundingBox): BoundingBox {
         if (!this.is_valid()) {
@@ -268,7 +268,7 @@ export class BoundingBox extends Array<BoundingInterval> {
                 const yMin = max(yMin1, yMin2);
                 const yMax = min(yMax1, yMax2);
                 if (yMax >= yMin) {
-                    return BoundingBox.extrema(xMin, xMax, yMin, yMax);
+                    return BoundingBox.extrema([xMin, xMax], [yMin, yMax]);
                 }
             }
         }
@@ -283,8 +283,14 @@ export class BoundingBox extends Array<BoundingInterval> {
     public static rect(x: number, y: number, width: number, height: number) {
         return new this([x, x + width], [y, y + height]);
     }
-    public static extrema(x1: number, x2: number, y1: number, y2: number) {
-        return new this([x1, x2], [y1, y2]);
+    public static extrema(x: number | Iterable<number>, ...args: (number | Iterable<number>)[]) {
+        if (typeof x == 'number') {
+            const [x2, y1, y2] = args as Iterable<number>;
+            return new this([x, x2], [y1, y2]);
+        } else {
+            const [y,] = args as Iterable<Iterable<number>>;
+            return new this(x, y);
+        }
     }
     public static check(x: Iterable<number>, y: Iterable<number>) {
         return new this(BoundingInterval.check(x), BoundingInterval.check(y));
@@ -318,10 +324,8 @@ export class BoundingBox extends Array<BoundingInterval> {
                         const [x1, x2] = first[0] as number[];
                         const [y1, y2] = first[1] as number[];
                         return this.extrema(
-                            x1 as number,
-                            x2 as number,
-                            y1 as number,
-                            y2 as number
+                            [x1 as number, x2 as number],
+                            [y1 as number, y2 as number]
                         );
                     } else {
                         return this.rect(

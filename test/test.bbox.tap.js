@@ -67,7 +67,7 @@ test.test("Item", async (t) => {
     t.same(L9.x2.get_value(0), -3);
     t.same(L9.y2.get_value(0), 4);
     t.same(L9.describe(0), 'M -1 2 L -3 4');
-    t.same(V0.bbox_of(0, L9).dump(), BoundingBox.extrema(-3, -1, 2, 4).dump());
+    t.same(V0.bbox_of(0, L9).dump(), BoundingBox.extrema([-3, -1], [2, 4]).dump());
     //
     const V2 = anim.get_view('V2');
     t.same(V2.id, 'V2', `V2.id`);

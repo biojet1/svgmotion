@@ -1,4 +1,3 @@
-import { Vector } from "../geom/index.js";
 import { xget } from "../model/index.js";
 import { Element } from "../model/base.js";
 const BOTH_MATCH =

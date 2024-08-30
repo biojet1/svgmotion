@@ -10,6 +10,7 @@ export * from "./helper/load.js";
 export * from "./helper/parse_color.js";
 export * from "./helper/find_node.js";
 export * from "./helper/update_dom.js";
+export * from "./helper/image.js";
 import { Root } from "./model/elements.js";
 declare module "./model/elements" {
     interface Root {

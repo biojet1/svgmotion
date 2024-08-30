@@ -1,6 +1,7 @@
 import { PlainValue } from "../model/value.js";
 import { Animatable } from "../model/value.js";
 import { ValueSet } from "../model/valuesets.js";
+import { Element } from "../model/base.js";
 import {
     Container, Root, Item, PlainRoot, PlainNode,
     ViewPort, Rect, Path, Line, Group,
@@ -92,20 +93,21 @@ declare module "../model/elements" {
     }
 
     interface Container {
-        add_circle(): Circle;
-        add_ellipse(): Ellipse;
-        add_group(): Group;
-        add_image(): Image;
-        add_line(): Line;
-        add_path(): Path;
-        add_polygon(): Polygon;
-        add_polyline(): Polyline;
-        add_rect(): Rect;
-        add_symbol(): Symbol;
-        add_text(): Text;
-        add_tspan(): TSpan;
-        add_use(): Use;
-        add_view(): ViewPort;
+        add_circle(before?: Element): Circle;
+        add_ellipse(before?: Element): Ellipse;
+        add_group(before?: Element): Group;
+        add_image(before?: Element): Image;
+        add_line(before?: Element): Line;
+        add_path(before?: Element): Path;
+        add_polygon(before?: Element): Polygon;
+        add_polyline(before?: Element): Polyline;
+        add_rect(before?: Element): Rect;
+        add_symbol(before?: Element): Symbol;
+        add_text(before?: Element): Text;
+        add_tspan(before?: Element): TSpan;
+        add_use(before?: Element): Use;
+        add_view(before?: Element): ViewPort;
+
     }
 }
 
@@ -143,18 +145,17 @@ Root.prototype.load = function (src: PlainRoot) {
 Root.prototype.parse_json = function (src: string) {
     return this.load(JSON.parse(src))
 }
-
-Container.prototype.add_circle = function () { const x = new Circle(); this.append_child(x); return x; }
-Container.prototype.add_ellipse = function () { const x = new Ellipse(); this.append_child(x); return x; }
-Container.prototype.add_group = function () { const x = new Group(); this.append_child(x); return x; }
-Container.prototype.add_image = function () { const x = new Image(); this.append_child(x); return x; }
-Container.prototype.add_line = function () { const x = new Line(); this.append_child(x); return x; }
-Container.prototype.add_path = function () { const x = new Path(); this.append_child(x); return x; }
-Container.prototype.add_polygon = function () { const x = new Polygon(); this.append_child(x); return x; }
-Container.prototype.add_polyline = function () { const x = new Polyline(); this.append_child(x); return x; }
-Container.prototype.add_rect = function () { const x = new Rect(); this.append_child(x); return x; }
-Container.prototype.add_symbol = function () { const x = new Symbol(); this.append_child(x); return x; }
-Container.prototype.add_text = function () { const x = new Text(); this.append_child(x); return x; }
-Container.prototype.add_tspan = function () { const x = new TSpan(); this.append_child(x); return x; }
-Container.prototype.add_use = function () { const x = new Use(); this.append_child(x); return x; }
-Container.prototype.add_view = function () { const x = new ViewPort(); this.append_child(x); return x; }
+Container.prototype.add_circle = function (before?: Element) { const x = new Circle(); this.insert_before(before ?? this._end, x); return x; }
+Container.prototype.add_ellipse = function (before?: Element) { const x = new Ellipse(); this.insert_before(before ?? this._end, x); return x; }
+Container.prototype.add_group = function (before?: Element) { const x = new Group(); this.insert_before(before ?? this._end, x); return x; }
+Container.prototype.add_image = function (before?: Element) { const x = new Image(); this.insert_before(before ?? this._end, x); return x; }
+Container.prototype.add_line = function (before?: Element) { const x = new Line(); this.insert_before(before ?? this._end, x); return x; }
+Container.prototype.add_path = function (before?: Element) { const x = new Path(); this.insert_before(before ?? this._end, x); return x; }
+Container.prototype.add_polygon = function (before?: Element) { const x = new Polygon(); this.insert_before(before ?? this._end, x); return x; }
+Container.prototype.add_polyline = function (before?: Element) { const x = new Polyline(); this.insert_before(before ?? this._end, x); return x; }
+Container.prototype.add_rect = function (before?: Element) { const x = new Rect(); this.insert_before(before ?? this._end, x); return x; }
+Container.prototype.add_symbol = function (before?: Element) { const x = new Symbol(); this.insert_before(before ?? this._end, x); return x; }
+Container.prototype.add_text = function (before?: Element) { const x = new Text(); this.insert_before(before ?? this._end, x); return x; }
+Container.prototype.add_tspan = function (before?: Element) { const x = new TSpan(); this.insert_before(before ?? this._end, x); return x; }
+Container.prototype.add_use = function (before?: Element) { const x = new Use(); this.insert_before(before ?? this._end, x); return x; }
+Container.prototype.add_view = function (before?: Element) { const x = new ViewPort(); this.insert_before(before ?? this._end, x); return x; }

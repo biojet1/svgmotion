@@ -2,65 +2,6 @@
 import test from "tap";
 import { SVGDocument, XMLSerializer } from "domspec";
 import { Vector, RGB, Root, Rel } from "svgmotion";
-// test.test("Item", async (t) => {
-//     const anim = new Root();
-//     const tr = anim.track();
-//     await anim.load_svg("../../python/flottie/example/res/thank_you_tp.svg");
-//     // console.log("doc", doc);
-//     {
-//         anim.view.fill.color.value = new RGB(1, 1, 0);
-//         const p = anim.view.first_child().first_child().first_child();
-
-//         // console.log("first_child", );
-//         const R = p.transform.rotation;
-//         tr.run(
-//             Rel(0).to(A, .25).to(A, .25)
-//             Step(
-//                 [
-//                     {
-//                         A: 0.25,
-//                         t: 0,
-//                         B: [50, 50],
-//                         C: [0.9, 0.1, 0.9],
-//                         R: 0,
-//                     },
-//                     { A: 0.9, dur: 1, B: [0, 50], C: [1, 1, 0], R: 10 },
-//                     {
-//                         A: 0.25,
-//                         dur: 1,
-//                         B: [50, 0],
-//                         C: [0, 1, 0],
-//                         R: -5,
-//                     },
-//                     { A: 0.9, dur: 1, B: [0, 0], C: [0, 0, 0], R: 5 },
-//                     {
-//                         A: 0.25,
-//                         dur: 1,
-//                         B: null,
-//                         C: [0.5, 0.5, 0.5],
-//                         R: 0,
-//                     },
-//                 ],
-//                 {
-//                     // X: r.opacity,
-//                     // B: r.position,
-//                     // C: r.fill.color,
-//                     R: p.transform.rotation,
-//                 }
-//             )
-//         );
-//     }
-
-//     const nod = anim.to_dom(new SVGDocument());
-
-//     anim.update_dom(0);
-
-//     // console.log(`width`, nod.width.baseVal.value, nod.width.baseVal.unitType);
-//     const ser = new XMLSerializer();
-//     // console.log(ser.serializeToString(nod));
-//     console.log(anim.save_html("/tmp/svgm.html"));
-//     t.end();
-// });
 
 test.test("load_svg polygon01", async (t) => {
     const anim = new Root();
@@ -114,6 +55,7 @@ test.test("parse_svg", async (t) => {
           a peach!
         </tspan>
     </text>
+
   </g>
 </svg>
         `)
@@ -145,8 +87,13 @@ test.test("parse_svg", async (t) => {
     anim.at(0).run(Rel(0).to(c, 'A').at(0.5).to(c, 'B').at(1).to(c, 'C'));
     // anim.at(0).run(Rel(0).to(ts.dx, -50).at(1).to(ts.dx, 50));
     // anim.calc_time_range();
-
     // console.dir(c, { depth: 100 })
+    // const im = anim.view.add_image(g);
+    // const src = `/mnt/C1/media/Tabby_cat_with_blue_eyes-3336579.jpg`;
+    // await im.image_blob(src);
+    // im.x.set_value(5);
+    // im.y.set_value(5);
+    // console.dir(im.href, { depth: 100 })
     anim.save_html('/tmp/parse1.html');
     t.end();
 });

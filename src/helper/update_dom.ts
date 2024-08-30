@@ -151,6 +151,9 @@ const PROP_MAP: {
     content: function (frame: number, node: SVGRectElement | SVGEllipseElement, prop: TextValue) {
         node.textContent = prop.get_value(frame);
     },
+    href: function (frame: number, node: SVGRectElement | SVGEllipseElement, prop: TextValue) {
+        node.setAttribute("href", prop.get_value(frame));
+    },
 };
 
 function update_dom(frame: number, target: Item | Container) {

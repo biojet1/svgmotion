@@ -82,7 +82,7 @@ test.test("ViewPort", (t) => {
     // console.log(tag, nodes, props);
     t.equal(tag, "svg");
     t.equal(nodes[0].tag, "rect");
-    t.same([...props.view_box.size.v], [100, 100]);
+    t.same(props.view_box.size.v.slice(0, 2), [100, 100]);
     let head2 = new Root();
     head2.load(json);
     t.same(head2.dump(), json);

@@ -367,9 +367,7 @@ export class LineCL extends BaseLC {
         } = this;
         if (_prev) {
             const [x1, y1] = _prev.to;
-            const [xmin, xmax] = [min(x1, x2), max(x1, x2)];
-            const [ymin, ymax] = [min(y1, y2), max(y1, y2)];
-            return BoundingBox.extrema(xmin, xmax, ymin, ymax);
+            return BoundingBox.extrema([min(x1, x2), max(x1, x2)], [min(y1, y2), max(y1, y2)]);
         }
         return BoundingBox.not();
     }
@@ -599,7 +597,7 @@ export class CubicLC extends BaseLC {
     }
     /////
     override point_at(t: number) {
-        return cubic_point_at(this._cpts, tCheck(t));
+        return Vector.new(cubic_point_at(this._cpts, tCheck(t)));
     }
     override bbox() {
         const { _prev } = this;

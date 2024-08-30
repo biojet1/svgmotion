@@ -1,13 +1,29 @@
 import { Vector } from "../geom/index.js";
 import { Element } from "./base.js";
+import { Group, Item, ViewPort } from "./elements.js";
+import { Parent } from "./linked.js";
 
 declare module "./base" {
     interface Element {
         owner_viewport(): ViewPort | undefined;
+        farthest_viewport(): ViewPort | undefined;
+        g_wrap(): Group;
+        get_font_size(frame: number): number;
         get_vp_width(frame: number): number;
         get_vp_height(frame: number): number;
-        get_font_size(frame: number): number;
         get_vp_size(frame: number, w?: number, h?: number): Vector;
+    }
+}
+
+Element.prototype.g_wrap = function () {
+    const p = this.parent();
+    if (p) {
+        const g = new Group();
+        this.place_after(g);
+        g.append_child(this);
+        return g;
+    } else {
+        throw new Error(`No parent`);
     }
 }
 
@@ -20,6 +36,16 @@ Element.prototype.owner_viewport = function () {
     }
 }
 
+Element.prototype.farthest_viewport = function () {
+    let parent: Item | Parent | undefined = this;
+    let farthest: ViewPort | undefined = undefined;
+    while ((parent = parent._parent)) {
+        if (parent instanceof ViewPort) {
+            farthest = parent;
+        }
+    }
+    return farthest;
+}
 
 Element.prototype.get_vp_width = function (frame: number): number {
     const ov = this.owner_viewport();
@@ -59,7 +85,8 @@ Element.prototype.get_vp_size = function (frame: number, w?: number, h?: number)
         }
         return ov.get_vp_size(frame, w, h);
     }
-    throw new Error(`cant get_vp_size`);
+    // throw new Error(`cant get_vp_size`);
+    return Vector.pos(100, 100);
 }
 
 Element.prototype.get_font_size = function (frame: number): number {
@@ -75,7 +102,7 @@ Element.prototype.get_font_size = function (frame: number): number {
     if (p instanceof Element) {
         return p.get_font_size(0);
     }
-    throw new Error(`cant get_font_size <${this.constructor.name}> <${p.constructor.name}>`);
+    throw new Error(`cant get_font_size <${this.constructor.name}> <${p?.constructor.name}>`);
 }
 
-import { ViewPort } from "./elements.js";
+

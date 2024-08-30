@@ -64,7 +64,7 @@ if (1) {
         );
     }
     for (const { name, kind, tag } of col) {
-        tag && console.log(`        add_${name}(): ${kind};`
+        tag && console.log(`        add_${name}(before?: Element): ${kind};`
         );
     }
     for (const { name, kind, tag } of col) {
@@ -73,10 +73,13 @@ if (1) {
     for (const { name, kind, tag } of col) {
         console.log(`Container.prototype.find_${name} = function (x: number | string = 0) : ${kind} | void {\n            return find_node(this, x, ${kind});\n}`);
     }
+    console.log(`// Container.prototype.add_...`);
     for (const { name, kind, tag } of col) {
-        tag && console.log(`Container.prototype.add_${name} = function () {` +
-            `const x = new ${kind}();this.append_child(x);return x;}`);
+        tag && console.log(`Container.prototype.add_${name} = function (before?: Element) {` +
+            `const x = new ${kind}();this.insert_before(before ?? this._end, x);return x;}`);
     }
+    console.log(``);
+    console.log(`// function (parent: Container)...`);
     for (const { name, kind, tag } of col) {
         tag && console.log(`${tag} : function (parent: Container) {` +
             `return parent.add_${name}();},`);

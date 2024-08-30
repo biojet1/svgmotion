@@ -40,6 +40,7 @@
     "test": "npx tap -t600 --disable-coverage 'test/**/*.tap.*js'"
   },
   "devDependencies": {
+    "@types/probe-image-size": "^7.2.5",
     "@types/yargs": "^17.0.32",
     "typescript": "^5.4.3",
     "webpack": "^5.91.0",
@@ -47,6 +48,7 @@
   },
   "dependencies": {
     "domspec": "github:biojet1/domspec#release",
+    "probe-image-size": "^7.2.3",
     "puppeteer": "^22.6.0",
     "tap": "^18.7.1",
     "yargs": "^17.7.2"

@@ -1,32 +1,17 @@
-import { Matrix, MatrixMut, BoundingBox } from "../geom/index.js";
+import { Matrix, BoundingBox } from "../geom/index.js";
 import { ScalarValue, PositionValue, TextValue, EnumTextValue, LengthValue, PercentageValue } from "./value.js";
 import { Fill, Transform, xset, xget, Font, Stroke, ValueSet } from "./valuesets.js";
 import { Node, Parent } from "./linked.js";
-import { PlainValue, Animatable } from "./value.js";
+import { Animatable } from "./value.js";
 /// @@@ //////////
 export class TextData extends Node {
     id?: string;
-    // _data: string = "";
-    // get data() {
-    //     return this._data;
-    // }
-
-    // set data(data: string) {
-    //     switch (data) {
-    //         case null:
-    //             this._data = "";
-    //             break;
-    //         default:
-    //             this._data = data + "";
-    //     }
-    // }
     get content() {
         return xget(this, "content", new TextValue(''));
     }
     set content(v: TextValue) {
         xset(this, "content", v);
     }
-
 }
 
 export class Element extends Parent {

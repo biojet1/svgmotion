@@ -10,12 +10,8 @@ import { Element, TextData } from "./base.js";
 export interface PlainNode {
     tag: string;
     nodes: PlainNode[];
-    // opacity?: PlainValue<any>;
 }
-export interface PlainTextNode {
-    tag: string;
-    nodes: (PlainNode | string)[];
-}
+
 export interface PlainRoot {
     version: string;
     view: PlainNode;
@@ -24,45 +20,7 @@ export interface PlainRoot {
 }
 
 export abstract class Item extends Element {
-    // *enum_values(): Generator<Animatable<any>, void, unknown> {
-    //     for (let v of Object.values(this)) {
-    //         if (v instanceof Animatable) {
-    //             yield v;
-    //         } else if (v instanceof ValueSet) {
-    //             yield* v.enum_values();
-    //         }
-    //     }
-    // }
-    g_wrap() {
-        const p = this.parent();
-        if (p) {
-            const g = new Group();
-            this.place_after(g);
-            g.append_child(this);
-            return g;
-        } else {
-            throw new Error(`No parent`);
 
-        }
-    }
-    // *ancestors() {
-    //     let top = this._parent;
-    //     while (top) {
-    //         yield top
-    //         top = top._parent;
-    //     }
-    // }
-
-    farthest_viewport(): ViewPort | undefined {
-        let parent: Item | Parent | undefined = this;
-        let farthest: ViewPort | undefined = undefined;
-        while ((parent = parent._parent)) {
-            if (parent instanceof ViewPort) {
-                farthest = parent;
-            }
-        }
-        return farthest;
-    }
 }
 
 export class Container extends Element {
@@ -136,7 +94,8 @@ export class ViewPort extends Container {
     static tag = "svg";
     ///
     get view_box() {
-        return xget(this, "view_box", new Box([0, 0], [100, 100]));
+        const n = this.get_vp_size(0);
+        return xget(this, "view_box", new Box([0, 0], n));
     }
     set view_box(v: Box) {
         xset(this, "view_box", v);
@@ -345,9 +304,13 @@ export class Path extends Shape {
 
 export class Rect extends Shape {
     static tag = "rect";
+    new_x_length(n: number) {
+
+    }
     ///
     get width() {
-        const n = this.get_vp_width(0);
+        // const n = this.get_vp_width(0);
+        const n = 100;
         return xget(this, "width", new ScalarValue(n));
     }
     set width(v: ScalarValue) {
@@ -355,7 +318,8 @@ export class Rect extends Shape {
     }
     ///
     get height() {
-        const n = this.get_vp_height(0);
+        // const n = this.get_vp_height(0);
+        const n = 100;
         return xget(this, "height", new ScalarValue(n));
     }
     set height(v: ScalarValue) {
@@ -597,6 +561,8 @@ export class Use extends Item {
 
 export class Image extends Use {
     static tag = "image";
+
+
 }
 
 export class Text extends Container {
@@ -666,6 +632,7 @@ export class Root extends Container {
     all: { [key: string]: Item | Container } = {};
     frame_rate: number = 60;
     version: string = "0.0.1";
+    working_dir?: string;
     // view
     get view() {
         let x = this.first_child();
@@ -693,8 +660,6 @@ export class Root extends Container {
     remember_id(id: string, node: Item | Container) {
         this.all[id] = node;
     }
-
-    // new_view, new_rect
     at(offset: number) {
         return this.track.sub(offset)
     }
@@ -760,5 +725,3 @@ export function viewbox_transform(
     // translate(translate-x, translate-y) scale(scale-x, scale-y)
     return [translate_x, translate_y, scale_x, scale_y];
 }
-// import { } from "./mixinvp.js";
-// export { Element, TextData }
