@@ -52,11 +52,15 @@ export class Animatable<
             return { t, o: [ox, oy], i: [ix, iy], v: value };
         }
     }
+    dump_key_value(x: V | null): any {
+        return this.dump_value(x)
+    }
+
     dump(): PlainValue<V> {
         const { value, kfs } = this;
         const o: PlainValue<V> = { v: this.dump_value(value) };
         if (kfs && kfs.length > 0) {
-            o.k = kfs.map((v) => this.dump_keyframe(v, this.dump_value(v.value)));
+            o.k = kfs.map((v) => this.dump_keyframe(v, this.dump_key_value(v.value)));
         }
         return o;
     }
@@ -71,11 +75,14 @@ export class Animatable<
         }
         return { time, value } as K;
     }
+    load_key_value(x: any): V {
+        return this.load_value(x);
+    }
     load(x: PlainValue<any>) {
         const { k, v } = x;
         if (k != undefined) {
             const { r, b } = x;
-            this.kfs = k.map((x) => this.load_keyframe(x, this.load_value(x.v)));
+            this.kfs = k.map((x) => this.load_keyframe(x, this.load_key_value(x.v)));
         }
         if (v != undefined) {
             this.value = this.load_value(x.v);
@@ -175,15 +182,35 @@ export class VectorValue<K extends Keyframe<Vector> = Keyframe<Vector>> extends 
         }
     }
     override dump_value(a: Vector): any {
-        if (a == null) {
-            return null;
+        if (a == null || typeof a == "string") {
+            return a;
+        } else {
+            return this.dump_key_value(a);
         }
-        return Array.from(a); // NaN -> null
+    }
+    override dump_key_value(a: Vector): any {
+        if (a instanceof Vector) {
+            return Array.from(a); // NaN -> null
+        } else {
+            throw new Error(`not a Vector`);
+        }
     }
 
     override load_value(a: any): Vector {
-        return new Vector(a);
+        if (a == null || typeof a == "string") {
+            return a;
+        } else {
+            return this.load_key_value(a);
+        }
+
     }
+    override load_key_value(a: any): Vector {
+        if (Array.isArray(a)) {
+            return new Vector(a);
+        }
+        throw new Error(`not array of numbers`);
+    }
+
 
     constructor(v: Vector | Iterable<number>) {
         if (v instanceof Vector) {
@@ -354,14 +381,17 @@ export class Size extends Vector {
 
 export class RGB extends Vector {
     constructor(r: number = 0, g: number = 0, b: number = 0) {
+        if (!isFinite(r) || !isFinite(g) || !isFinite(b)) {
+            throw new TypeError(`Not a finite number ${[r, g, b]}`);
+        }
         super([r, g, b]);
     }
 }
-export class RGBNone extends RGB {
-    constructor() {
-        super(NaN, NaN, NaN);
-    }
-}
+// export class RGBNone extends RGB {
+//     constructor() {
+//         super(NaN, NaN, NaN);
+//     }
+// }
 
 export abstract class EnumeratedValue<V> extends AnimatableD<V> {
 

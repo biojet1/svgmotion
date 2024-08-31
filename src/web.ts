@@ -1,7 +1,7 @@
 import { Root } from "./model/elements.js";
 
 export * from "./model/index.js";
-export * from "./model/mixinvp.js";
+export * from "./model/mixin.js";
 export * from "./helper/update_dom.js";
 export * from "./helper/load.js";
 

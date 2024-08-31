@@ -32,6 +32,7 @@ export class Element extends Parent {
         }
     }
     update_bbox(bbox: BoundingBox, frame: number, m?: Matrix) {
+
     }
     bounding_box(frame: number, m?: Matrix) {
         const bb = BoundingBox.not();
@@ -80,8 +81,6 @@ export class Element extends Parent {
     set line_height(v: ScalarValue) {
         xset(this, "line_height", v);
     }
-
-
     /// anchor
     get anchor() {
         return xget(this, "anchor", new PositionValue([0, 0]));
@@ -103,6 +102,13 @@ export class Element extends Parent {
     }
     set image_rendering(v: ImageRenderingValue) {
         xset(this, 'image_rendering', v);
+    }
+    /// getset<letter-spacing>
+    get letter_spacing() {
+        return xget(this, 'letter_spacing', new LengthValue(0));
+    }
+    set letter_spacing(v: LengthValue) {
+        xset(this, 'letter_spacing', v);
     }
     /// getset<opacity>
     get opacity() {
@@ -245,7 +251,6 @@ export class Element extends Parent {
         xset(this, 'text_align', v);
     }
     /// Properties ////////////
-
 
 
 

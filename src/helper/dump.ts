@@ -1,15 +1,13 @@
 import { Animatable } from "../model/value.js";
 import { Container, Root, Item, PlainRoot, PlainNode } from "../model/elements.js";
 import { ValueSet } from "../model/valuesets.js";
-import { TextData } from "../model/base.js";
+import { TextData, Element } from "../model/base.js";
 
 declare module "../model/elements" {
     interface Container {
         dump(): any;
     }
-    interface Item {
-        dump(): any;
-    }
+
     interface Root {
         dump(): any;
     }
@@ -17,6 +15,9 @@ declare module "../model/elements" {
 
 declare module "../model/base" {
     interface TextData {
+        dump(): any;
+    }
+    interface Element {
         dump(): any;
     }
 }
@@ -40,7 +41,7 @@ Container.prototype.dump = function () {
     return o;
 }
 
-Item.prototype.dump = function (): PlainNode {
+Element.prototype.dump = function (): PlainNode {
     const o: any = { tag: (<typeof Container>this.constructor).tag };
     for (let [k, v] of Object.entries(this)) {
         if (v instanceof ValueSet || v instanceof Animatable) {

@@ -2,7 +2,7 @@ export * from "./geom/index.js";
 export * from "./track/index.js";
 export * from "./keyframe/index.js";
 export * from "./model/index.js";
-export * from "./model/mixinvp.js";
+export * from "./model/mixin.js";
 export * from "./model/base.js";
 export * from "./helper/from_dom.js";
 export * from "./helper/dump.js";
@@ -15,6 +15,7 @@ import { Root } from "./model/elements.js";
 declare module "./model/elements" {
     interface Root {
         save_html(file: string): Promise<void>;
+        save_json(file: string): Promise<void>;
     }
 }
 
@@ -35,3 +36,10 @@ Root.prototype.save_html = async function (file: string) {
     return h.close();
 }
 
+Root.prototype.save_json = async function (file: string) {
+    const o = this.dump();
+    const fs = await import('fs/promises');
+    const h = await fs.open(file, 'w');
+    await h.write(JSON.stringify(o));
+    return h.close();
+}

@@ -14,6 +14,8 @@ const FILL_MAP: {
         node.setAttribute("fill-opacity", prop.get_percentage_repr(frame));
     },
     color: function (frame: number, node: SVGElement, prop: RGBValue) {
+        // console.log("Set color", prop.constructor.name);
+        // console.dir(prop);
         node.setAttribute("fill", prop.get_rgb_repr(frame));
     },
 };
@@ -123,7 +125,6 @@ const PROP_MAP: {
                     node.style.fontFamily = v.get_value(frame);
                     break;
             }
-
         }
     },
     line_height: function (frame: number, node: SVGElement, prop: ScalarValue) {
@@ -154,6 +155,13 @@ const PROP_MAP: {
     href: function (frame: number, node: SVGRectElement | SVGEllipseElement, prop: TextValue) {
         node.setAttribute("href", prop.get_value(frame));
     },
+
+    letter_spacing: function (frame: number, node: SVGRectElement | SVGEllipseElement, prop: TextValue) {
+        node.setAttribute("letter-spacing", prop.get_value(frame).toString());
+    },
+    word_spacing: function (frame: number, node: SVGRectElement | SVGEllipseElement, prop: TextValue) {
+        node.setAttribute("word-spacing", prop.get_value(frame).toString());
+    },
 };
 
 function update_dom(frame: number, target: Item | Container) {
@@ -180,18 +188,17 @@ const NS_SVG = "http://www.w3.org/2000/svg";
 
 declare module "../model/elements" {
     interface Container {
-        _element?: SVGElement;
+        // _element?: SVGElement;
         to_dom(doc: typeof SVGElement.prototype.ownerDocument): SVGElement;
         update_dom(frame: number): void;
         stepper(): Stepper;
     }
     interface Item {
-        _element?: SVGElement;
-        to_dom(doc: typeof SVGElement.prototype.ownerDocument): SVGElement;
+        // _element?: SVGElement;
+        // to_dom(doc: typeof SVGElement.prototype.ownerDocument): SVGElement;
         update_dom(frame: number): void;
     }
     interface Root {
-
         to_dom(doc: typeof SVGElement.prototype.ownerDocument): SVGElement;
     }
 }
@@ -201,6 +208,10 @@ declare module "../model/base" {
         _element?: Text;
         to_dom(doc: typeof SVGElement.prototype.ownerDocument): Text;
         update_dom(frame: number): void;
+    }
+    interface Element {
+        _element?: SVGElement;
+        to_dom(doc: typeof SVGElement.prototype.ownerDocument): SVGElement;
     }
 }
 
@@ -220,7 +231,7 @@ declare module "../model/value" {
     }
 }
 
-function set_svg(elem: SVGElement, node: Item | Container): SVGElement {
+function set_svg(elem: SVGElement, node: Element): SVGElement {
     const { id } = node;
     if (id) {
         elem.id = id;
@@ -239,7 +250,7 @@ Container.prototype.to_dom = function (doc: typeof SVGElement.prototype.ownerDoc
     return set_svg(con, this);
 }
 
-Item.prototype.to_dom = function (doc: typeof SVGElement.prototype.ownerDocument): SVGElement {
+Element.prototype.to_dom = function (doc: typeof SVGElement.prototype.ownerDocument): SVGElement {
     const e = (this._element = doc.createElementNS(
         NS_SVG,
         (<typeof Item>this.constructor).tag
@@ -299,7 +310,7 @@ Container.prototype.stepper = function () {
 
 
 RGBValue.prototype.get_rgb_repr = function (frame: number) {
-    return (this.value == null) ? 'none' : RGBValue.to_css_rgb(this.get_value(frame));
+    return (this.value == null || (this.value as any) == 'none') ? 'none' : RGBValue.to_css_rgb(this.get_value(frame));
 }
 
 PointsValue.prototype.get_points_repr = function (frame: number) {

@@ -84,7 +84,7 @@ export class Container extends Element {
         if (m) {
             m = m.cat(w)
         }
-        for (const x of this.children<Item | Container>()) {
+        for (const x of this.children<Element>()) {
             x.update_bbox(bbox, frame, m)
         }
     }
@@ -561,27 +561,10 @@ export class Use extends Item {
 
 export class Image extends Use {
     static tag = "image";
-
-
 }
 
 export class Text extends Container {
     static tag = "text";
-    // /// text
-    // get text() {
-    //     return xget(this, "text", new TextValue(''));
-    // }
-    // set text(v: TextValue) {
-    //     xset(this, "text", v);
-    // }
-    // /// tail
-    // get tail() {
-    //     return xget(this, "tail", new TextValue(''));
-    // }
-    // set tail(v: TextValue) {
-    //     xset(this, "tail", v);
-    // }
-    ///
     get x() {
         return xget(this, "x", new ScalarValue(0));
     }
@@ -628,8 +611,8 @@ export class TSpan extends Text {
 }
 
 export class Root extends Container {
-    defs: { [key: string]: Item | Container } = {};
-    all: { [key: string]: Item | Container } = {};
+    defs: { [key: string]: Element } = {};
+    all: { [key: string]: Element } = {};
     frame_rate: number = 60;
     version: string = "0.0.1";
     working_dir?: string;
@@ -657,7 +640,7 @@ export class Root extends Container {
         return super.add_view();
     }
     // etc
-    remember_id(id: string, node: Item | Container) {
+    remember_id(id: string, node: Element) {
         this.all[id] = node;
     }
     at(offset: number) {

@@ -1,314 +1,18 @@
 
 import { VectorValue, ScalarValue, PointsValue, RGB, RGBValue, TextValue } from "../model/value.js";
-import { Node } from "../model/linked.js";
+import { Element } from "../model/base.js";
 import { Item, Container, Root, Text, TSpan } from "../model/elements.js";
 import { parse_css_color } from "./parse_color.js";
 import { ComputeLength } from "./svg_length.js";
 
-const NS_SVG = "http://www.w3.org/2000/svg";
-
-const TAG_DOM: {
-    [key: string]: (props: Map<string, string>, parent: Container) => Item | Container | false | 0;
-} = {
-    svg: function (props: Map<string, string>, parent: Container) {
-        // Node
-        let node = parent.add_view();
-        // Properties console.info(`svg _read ${elem?.localName} ${vp.constructor.name} ${elem.viewBox.baseVal}`);
-        for (const [name, value] of props.entries()) {
-            switch (name) {
-                case "version":
-                    break;
-                case "viewBox": {
-                    const v = value.split(/[\s,]+/).map(parseFloat);
-                    const u = node.view_box;
-                    u.position.set_value([v[0], v[1]]);
-                    u.size.set_value([v[2], v[3]]);
-                    // console.log("viewBox", e.id, value, v, u.size.dump())
-                }
-                    break;
-                case "preserveAspectRatio":
-                    // node.fit_view.constructor.name
-                    node.fit_view.set_parse_text(value, node);
-                    break;
-                case "zoomAndPan":
-                    node.zoom_pan.set_parse_text(value, node);
-                    break;
-                case "height":
-                    node.height.set_parse_length(value, node, name, "h");
-                    break;
-                case "width":
-                    node.width.set_parse_length(value, node, name, "w");
-                    break;
-                case "y":
-                    node.y.set_parse_length(value, node, name, "h");
-                    break;
-                case "x":
-                    node.x.set_parse_length(value, node, name, "w");
-                    break;
-                default:
-                    set_common_attr(node, name, value);
-            }
-        }
-
-        return node;
-    },
-    rect: function (props: Map<string, string>, parent: Container) {
-        let node = parent.add_rect();
-        for (const [name, value] of props.entries()) {
-            switch (name) {
-                case "height":
-                    node.height.set_parse_length(value, node, name, "h");
-                    break;
-                case "width":
-                    node.width.set_parse_length(value, node, name, "w");
-                    break;
-                case "y":
-                    node.y.set_parse_length(value, node, name, "h");
-                    break;
-                case "x":
-                    node.x.set_parse_length(value, node, name, "w");
-                    break;
-                case "ry":
-                    node.ry.set_parse_length(value, node, name, "h");
-                    break;
-                case "rx":
-                    node.rx.set_parse_length(value, node, name, "w");
-                    break;
-                default:
-                    set_common_attr(node, name, value);
-            }
-        }
-
-        return node;
-    },
-    g: function (props: Map<string, string>, parent: Container) {
-        let node = parent.add_group();
-        // Properties
-        for (const [name, value] of props.entries()) {
-            set_common_attr(node, name, value);
-        }
-        return node;
-    },
-    path: function (props: Map<string, string>, parent: Container) {
-        let node = parent.add_path();
-        for (const [name, value] of props.entries()) {
-            switch (name) {
-                case "d":
-                    node.d.value = value;
-                    break;
-                default:
-                    set_common_attr(node, name, value);
-            }
-        }
-        return node;
-    },
-    circle: function (props: Map<string, string>, parent: Container) {
-        let node = parent.add_circle();
-        // Properties
-        // console.info(`PATH`, e.getAttributeNames(), e.innerHTML);
-        for (const [name, value] of props.entries()) {
-            // console.info(`PATH ATTR _ ${name} ${value}`);
-            switch (name) {
-                case "r":
-                    node.r.set_parse_length(value, node, name);
-                    break;
-                case "cx":
-                    node.cx.set_parse_length(value, node, name, "w");
-                    break;
-                case "cy":
-                    node.cy.set_parse_length(value, node, name, "h");
-                    break;
-                default:
-                    set_common_attr(node, name, value);
-            }
-        }
-        return node;
-    },
-    ellipse: function (props: Map<string, string>, parent: Container) {
-        let node = parent.add_ellipse();
-        // Properties
-        // console.info(`PATH`, e.getAttributeNames(), e.innerHTML);
-        for (const [name, value] of props.entries()) {
-            // console.info(`PATH ATTR _ ${name} ${value}`);
-            switch (name) {
-                case "rx":
-                    node.rx.set_parse_length(value, node, name);
-                    break;
-                case "ry":
-                    node.ry.set_parse_length(value, node, name);
-                    break;
-                case "cx":
-                    node.cx.set_parse_length(value, node, name);
-                    break;
-                case "cy":
-                    node.cy.set_parse_length(value, node, name);
-                    break;
-                default:
-                    set_common_attr(node, name, value);
-            }
-        }
-        return node;
-    },
-    polygon: function (props: Map<string, string>, parent: Container) {
-        let node = parent.add_polygon();
-        for (const [name, value] of props.entries()) {
-            switch (name) {
-                case "points":
-                    node.points.set_parse_points(value, parent);
-                    break;
-                default:
-                    set_common_attr(node, name, value);
-            }
-        }
-        return node;
-    },
-    polyline: function (props: Map<string, string>, parent: Container) {
-        let node = parent.add_polyline();
-        for (const [name, value] of props.entries()) {
-            switch (name) {
-                case "points":
-                    node.points.set_parse_points(value, parent);
-                    break;
-                default:
-                    set_common_attr(node, name, value);
-            }
-        }
-        return node;
-    },
-    line: function (props: Map<string, string>, parent: Container) {
-        let node = parent.add_line();
-        for (const [name, value] of props.entries()) {
-            switch (name) {
-                case "x1":
-                    node.x1.set_parse_length(value, node, name,);
-                    break;
-                case "x2":
-                    node.x2.set_parse_length(value, node, name,);
-                    break
-                case "y1":
-                    node.y1.set_parse_length(value, node, name,);
-                    break;
-                case "y2":
-                    node.y2.set_parse_length(value, node, name,);
-                    break;
-                default:
-                    set_common_attr(node, name, value);
-            }
-        }
-        return node;
-    },
-    text: function (props: Map<string, string>, parent: Container) {
-        let node = parent.add_text();
-        for (const [name, value] of props.entries()) {
-            switch (name) {
-                case "y":
-                    node.y.set_parse_length(value, node, name, "h");
-                    break;
-                case "x":
-                    node.x.set_parse_length(value, node, name, "w");
-                    break;
-                case "dy":
-                    node.dy.set_parse_length(value, node, name, "h");
-                    break;
-                case "dx":
-                    node.dx.set_parse_length(value, node, name, "w");
-                    break;
-                default:
-                    set_common_attr(node, name, value);
-            }
-        }
-        return node;
-    },
-    tspan: function (props: Map<string, string>, parent: Container) {
-        let node = parent.add_tspan();
-        for (const [name, value] of props.entries()) {
-            switch (name) {
-                case "y":
-                    node.y.set_parse_length(value, node, name, "h");
-                    break;
-                case "x":
-                    node.x.set_parse_length(value, node, name, "w");
-                    break;
-                case "dy":
-                    node.dy.set_parse_length(value, node, name, "h");
-                    break;
-                case "dx":
-                    node.dx.set_parse_length(value, node, name, "w");
-                    break;
-                default:
-                    set_common_attr(node, name, value);
-            }
-        }
-        return node;
-    },
-
-
-    a: (props: Map<string, string>, parent: Container) => false,
-    clipPath: (props: Map<string, string>, parent: Container) => false,
-    defs: (props: Map<string, string>, parent: Container) => false,
-    feBlend: (props: Map<string, string>, parent: Container) => false,
-    feColorMatrix: (props: Map<string, string>, parent: Container) => false,
-    feComponentTransfer: (props: Map<string, string>, parent: Container) => false,
-    feComposite: (props: Map<string, string>, parent: Container) => false,
-    feConvolveMatrix: (props: Map<string, string>, parent: Container) => false,
-    feDiffuseLighting: (props: Map<string, string>, parent: Container) => false,
-    feDisplacementMap: (props: Map<string, string>, parent: Container) => false,
-    feDistantLight: (props: Map<string, string>, parent: Container) => false,
-    feDropShadow: (props: Map<string, string>, parent: Container) => false,
-    feFlood: (props: Map<string, string>, parent: Container) => false,
-    feFuncA: (props: Map<string, string>, parent: Container) => false,
-    feFuncB: (props: Map<string, string>, parent: Container) => false,
-    feFuncG: (props: Map<string, string>, parent: Container) => false,
-    feFuncR: (props: Map<string, string>, parent: Container) => false,
-    feGaussianBlur: (props: Map<string, string>, parent: Container) => false,
-    feImage: (props: Map<string, string>, parent: Container) => false,
-    feMerge: (props: Map<string, string>, parent: Container) => false,
-    feMergeNode: (props: Map<string, string>, parent: Container) => false,
-    feMorphology: (props: Map<string, string>, parent: Container) => false,
-    feOffset: (props: Map<string, string>, parent: Container) => false,
-    fePointLight: (props: Map<string, string>, parent: Container) => false,
-    feSpecularLighting: (props: Map<string, string>, parent: Container) => false,
-    feSpotLight: (props: Map<string, string>, parent: Container) => false,
-    feTile: (props: Map<string, string>, parent: Container) => false,
-    feTurbulence: (props: Map<string, string>, parent: Container) => false,
-    filter: (props: Map<string, string>, parent: Container) => false,
-    image: (props: Map<string, string>, parent: Container) => false,
-    linearGradient: (props: Map<string, string>, parent: Container) => false,
-    marker: (props: Map<string, string>, parent: Container) => false,
-    mask: (props: Map<string, string>, parent: Container) => false,
-    pattern: (props: Map<string, string>, parent: Container) => false,
-    radialGradient: (props: Map<string, string>, parent: Container) => false,
-    stop: (props: Map<string, string>, parent: Container) => false,
-    style: (props: Map<string, string>, parent: Container) => false,
-    switch: (props: Map<string, string>, parent: Container) => false,
-    symbol: (props: Map<string, string>, parent: Container) => false,
-
-    textPath: (props: Map<string, string>, parent: Container) => false,
-    tref: (props: Map<string, string>, parent: Container) => false,
-
-    use: (props: Map<string, string>, parent: Container) => false,
-};
-
-
-function get_root(cur: Container | Item) {
-    for (let x: Node | undefined = cur; x; x = x._parent) {
-        if (x instanceof Root) {
-            return x;
-        }
+declare module "../model/base" {
+    interface Element {
+        set_attribute(name: string, value: string): void;
     }
-    throw new Error(
-        `Unexpected ${cur.constructor.name} ${cur._parent?.constructor.name}`
-    );
 }
 
-function set_common_attr(
-    node: Container | Item,
-    name: string,
-    value: string,
-) {
-    // console.log(
-    //     `set_common_attr ${name}="${value}" ${elem.localName} ${node.constructor.name} ${style}`
-    // );
+Element.prototype.set_attribute = async function (name: string, value: string) {
+    const node = this;
     switch (name) {
         case "id":
             if (value) {
@@ -396,6 +100,15 @@ function set_common_attr(
             if (value) {
                 node.stroke.dash_offset.set_parse_length(value, node, name);
             }
+        case "letter-spacing":// 
+            if (value) {
+                node.letter_spacing.set_parse_length(value, node, name);
+            }
+        case "word-spacing":// 
+            if (value) {
+                node.word_spacing.set_parse_text(value, node);
+            }
+
             break;
         case "transform-origin":
             if (value) {
@@ -417,6 +130,311 @@ function set_common_attr(
             }
     }
 }
+
+
+const NS_SVG = "http://www.w3.org/2000/svg";
+
+const TAG_DOM: {
+    [key: string]: (props: Map<string, string>, parent: Container) => Item | Container | false | 0;
+} = {
+    svg: function (props: Map<string, string>, parent: Container) {
+        // Node
+        let node = parent.add_view();
+        // Properties console.info(`svg _read ${elem?.localName} ${vp.constructor.name} ${elem.viewBox.baseVal}`);
+        for (const [name, value] of props.entries()) {
+            switch (name) {
+                case "version":
+                    break;
+                case "viewBox": {
+                    const v = value.split(/[\s,]+/).map(parseFloat);
+                    const u = node.view_box;
+                    u.position.set_value([v[0], v[1]]);
+                    u.size.set_value([v[2], v[3]]);
+                    // console.log("viewBox", e.id, value, v, u.size.dump())
+                }
+                    break;
+                case "preserveAspectRatio":
+                    // node.fit_view.constructor.name
+                    node.fit_view.set_parse_text(value, node);
+                    break;
+                case "zoomAndPan":
+                    node.zoom_pan.set_parse_text(value, node);
+                    break;
+                case "height":
+                    node.height.set_parse_length(value, node, name, "h");
+                    break;
+                case "width":
+                    node.width.set_parse_length(value, node, name, "w");
+                    break;
+                case "y":
+                    node.y.set_parse_length(value, node, name, "h");
+                    break;
+                case "x":
+                    node.x.set_parse_length(value, node, name, "w");
+                    break;
+                default:
+                    node.set_attribute(name, value);
+            }
+        }
+
+        return node;
+    },
+    rect: function (props: Map<string, string>, parent: Container) {
+        let node = parent.add_rect();
+        for (const [name, value] of props.entries()) {
+            switch (name) {
+                case "height":
+                    node.height.set_parse_length(value, node, name, "h");
+                    break;
+                case "width":
+                    node.width.set_parse_length(value, node, name, "w");
+                    break;
+                case "y":
+                    node.y.set_parse_length(value, node, name, "h");
+                    break;
+                case "x":
+                    node.x.set_parse_length(value, node, name, "w");
+                    break;
+                case "ry":
+                    node.ry.set_parse_length(value, node, name, "h");
+                    break;
+                case "rx":
+                    node.rx.set_parse_length(value, node, name, "w");
+                    break;
+                default:
+                    node.set_attribute(name, value);
+
+            }
+        }
+
+        return node;
+    },
+    g: function (props: Map<string, string>, parent: Container) {
+        let node = parent.add_group();
+        // Properties
+        for (const [name, value] of props.entries()) {
+            node.set_attribute(name, value);
+
+        }
+        return node;
+    },
+    path: function (props: Map<string, string>, parent: Container) {
+        let node = parent.add_path();
+        for (const [name, value] of props.entries()) {
+            switch (name) {
+                case "d":
+                    node.d.value = value;
+                    break;
+                default:
+                    node.set_attribute(name, value);
+            }
+        }
+        return node;
+    },
+    circle: function (props: Map<string, string>, parent: Container) {
+        let node = parent.add_circle();
+        // Properties
+        // console.info(`PATH`, e.getAttributeNames(), e.innerHTML);
+        for (const [name, value] of props.entries()) {
+            // console.info(`PATH ATTR _ ${name} ${value}`);
+            switch (name) {
+                case "r":
+                    node.r.set_parse_length(value, node, name);
+                    break;
+                case "cx":
+                    node.cx.set_parse_length(value, node, name, "w");
+                    break;
+                case "cy":
+                    node.cy.set_parse_length(value, node, name, "h");
+                    break;
+                default:
+                    node.set_attribute(name, value);
+            }
+        }
+        return node;
+    },
+    ellipse: function (props: Map<string, string>, parent: Container) {
+        let node = parent.add_ellipse();
+        // Properties
+        // console.info(`PATH`, e.getAttributeNames(), e.innerHTML);
+        for (const [name, value] of props.entries()) {
+            // console.info(`PATH ATTR _ ${name} ${value}`);
+            switch (name) {
+                case "rx":
+                    node.rx.set_parse_length(value, node, name);
+                    break;
+                case "ry":
+                    node.ry.set_parse_length(value, node, name);
+                    break;
+                case "cx":
+                    node.cx.set_parse_length(value, node, name);
+                    break;
+                case "cy":
+                    node.cy.set_parse_length(value, node, name);
+                    break;
+                default:
+                    node.set_attribute(name, value);
+
+            }
+        }
+        return node;
+    },
+    polygon: function (props: Map<string, string>, parent: Container) {
+        let node = parent.add_polygon();
+        for (const [name, value] of props.entries()) {
+            switch (name) {
+                case "points":
+                    node.points.set_parse_points(value, parent);
+                    break;
+                default:
+                    node.set_attribute(name, value);
+
+            }
+        }
+        return node;
+    },
+    polyline: function (props: Map<string, string>, parent: Container) {
+        let node = parent.add_polyline();
+        for (const [name, value] of props.entries()) {
+            switch (name) {
+                case "points":
+                    node.points.set_parse_points(value, parent);
+                    break;
+                default:
+                    node.set_attribute(name, value);
+
+            }
+        }
+        return node;
+    },
+    line: function (props: Map<string, string>, parent: Container) {
+        let node = parent.add_line();
+        for (const [name, value] of props.entries()) {
+            switch (name) {
+                case "x1":
+                    node.x1.set_parse_length(value, node, name,);
+                    break;
+                case "x2":
+                    node.x2.set_parse_length(value, node, name,);
+                    break
+                case "y1":
+                    node.y1.set_parse_length(value, node, name,);
+                    break;
+                case "y2":
+                    node.y2.set_parse_length(value, node, name,);
+                    break;
+                default:
+                    node.set_attribute(name, value);
+
+            }
+        }
+        return node;
+    },
+    text: function (props: Map<string, string>, parent: Container) {
+        let node = parent.add_text();
+        for (const [name, value] of props.entries()) {
+            switch (name) {
+                case "y":
+                    node.y.set_parse_length(value, node, name, "h");
+                    break;
+                case "x":
+                    node.x.set_parse_length(value, node, name, "w");
+                    break;
+                case "dy":
+                    node.dy.set_parse_length(value, node, name, "h");
+                    break;
+                case "dx":
+                    node.dx.set_parse_length(value, node, name, "w");
+                    break;
+                default:
+                    node.set_attribute(name, value);
+
+            }
+        }
+        return node;
+    },
+    tspan: function (props: Map<string, string>, parent: Container) {
+        let node = parent.add_tspan();
+        for (const [name, value] of props.entries()) {
+            switch (name) {
+                case "y":
+                    node.y.set_parse_length(value, node, name, "h");
+                    break;
+                case "x":
+                    node.x.set_parse_length(value, node, name, "w");
+                    break;
+                case "dy":
+                    node.dy.set_parse_length(value, node, name, "h");
+                    break;
+                case "dx":
+                    node.dx.set_parse_length(value, node, name, "w");
+                    break;
+                default:
+                    node.set_attribute(name, value);
+            }
+        }
+        return node;
+    },
+
+
+    a: (props: Map<string, string>, parent: Container) => false,
+    clipPath: (props: Map<string, string>, parent: Container) => false,
+    defs: (props: Map<string, string>, parent: Container) => false,
+    feBlend: (props: Map<string, string>, parent: Container) => false,
+    feColorMatrix: (props: Map<string, string>, parent: Container) => false,
+    feComponentTransfer: (props: Map<string, string>, parent: Container) => false,
+    feComposite: (props: Map<string, string>, parent: Container) => false,
+    feConvolveMatrix: (props: Map<string, string>, parent: Container) => false,
+    feDiffuseLighting: (props: Map<string, string>, parent: Container) => false,
+    feDisplacementMap: (props: Map<string, string>, parent: Container) => false,
+    feDistantLight: (props: Map<string, string>, parent: Container) => false,
+    feDropShadow: (props: Map<string, string>, parent: Container) => false,
+    feFlood: (props: Map<string, string>, parent: Container) => false,
+    feFuncA: (props: Map<string, string>, parent: Container) => false,
+    feFuncB: (props: Map<string, string>, parent: Container) => false,
+    feFuncG: (props: Map<string, string>, parent: Container) => false,
+    feFuncR: (props: Map<string, string>, parent: Container) => false,
+    feGaussianBlur: (props: Map<string, string>, parent: Container) => false,
+    feImage: (props: Map<string, string>, parent: Container) => false,
+    feMerge: (props: Map<string, string>, parent: Container) => false,
+    feMergeNode: (props: Map<string, string>, parent: Container) => false,
+    feMorphology: (props: Map<string, string>, parent: Container) => false,
+    feOffset: (props: Map<string, string>, parent: Container) => false,
+    fePointLight: (props: Map<string, string>, parent: Container) => false,
+    feSpecularLighting: (props: Map<string, string>, parent: Container) => false,
+    feSpotLight: (props: Map<string, string>, parent: Container) => false,
+    feTile: (props: Map<string, string>, parent: Container) => false,
+    feTurbulence: (props: Map<string, string>, parent: Container) => false,
+    filter: (props: Map<string, string>, parent: Container) => false,
+    image: (props: Map<string, string>, parent: Container) => false,
+    linearGradient: (props: Map<string, string>, parent: Container) => false,
+    marker: (props: Map<string, string>, parent: Container) => false,
+    mask: (props: Map<string, string>, parent: Container) => false,
+    pattern: (props: Map<string, string>, parent: Container) => false,
+    radialGradient: (props: Map<string, string>, parent: Container) => false,
+    stop: (props: Map<string, string>, parent: Container) => false,
+    style: (props: Map<string, string>, parent: Container) => false,
+    switch: (props: Map<string, string>, parent: Container) => false,
+    symbol: (props: Map<string, string>, parent: Container) => false,
+
+    textPath: (props: Map<string, string>, parent: Container) => false,
+    tref: (props: Map<string, string>, parent: Container) => false,
+
+    use: (props: Map<string, string>, parent: Container) => false,
+};
+
+
+function get_root(cur: Element) {
+    for (let x of cur.ancestors()) {
+        if (x instanceof Root) {
+            return x;
+        }
+    }
+    throw new Error(
+        `Unexpected ${cur.constructor.name} ${cur._parent?.constructor.name}`
+    );
+}
+
 
 
 
@@ -494,7 +512,7 @@ function walk(elem: SVGElement, parent: Container, attrs: Map<string, string>) {
             for (const child of elem.childNodes) {
                 switch (child.nodeType) {
                     case 1: {
-                        if ((child as Element).namespaceURI == "http://www.w3.org/2000/svg") {
+                        if ((child as any)?.namespaceURI == "http://www.w3.org/2000/svg") {
                             prev = walk(child as SVGElement, node, merged);
                         }
                         break;
@@ -620,23 +638,23 @@ declare module "../model/elements" {
 
 declare module "../model/value" {
     interface ScalarValue {
-        set_parse_length(s: string, container: Container | Item, name: string, mode?: string): void;
-        set_parse_number(s: string, container: Container | Item): void;
-        set_parse_percentage(s: string, container: Container | Item): void;
-        set_parse_line_height(s: string, container: Container | Item): void;
+        set_parse_length(s: string, container: Element, name: string, mode?: string): void;
+        set_parse_number(s: string, container: Element): void;
+        set_parse_percentage(s: string, container: Element): void;
+        set_parse_line_height(s: string, container: Element): void;
     }
     interface RGBValue {
-        set_parse_rgb(s: string, container: Container | Item): void;
+        set_parse_rgb(s: string, container: Element): void;
     }
     interface TextValue {
-        set_parse_text(s: string, container: Container | Item): void;
+        set_parse_text(s: string, container: Element): void;
     }
     interface PointsValue {
-        set_parse_points(s: string, container: Container | Item): void;
+        set_parse_points(s: string, container: Element): void;
     }
     interface VectorValue {
-        set_parse_dashes(s: string, container: Container | Item): void;
-        set_parse_anchor(s: string, container: Container | Item): void;
+        set_parse_dashes(s: string, container: Element): void;
+        set_parse_anchor(s: string, container: Element): void;
     }
 }
 

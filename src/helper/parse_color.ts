@@ -15,6 +15,25 @@ RGBValue.prototype.check_value = function (x: RGB) {
     }
 };
 
+RGBValue.prototype.set_value = function (value: RGB | any) {
+    if (value instanceof RGB) {
+        this.value = value;
+    } else if (typeof value == "string") {
+        if (value == "none") {
+            (this as any).value = value;
+            return;
+        }
+        const c = parse_css_color(value);
+        if (c == null) {
+            throw new Error(`Invalid color "${value}"`);
+        }
+        return new RGB(c[0] / 255, c[1] / 255, c[2] / 255);
+    } else {
+        // value
+        return new RGB(...(value as number[]));
+    }
+};
+
 
 
 export type RGBA = [number, number, number, number];

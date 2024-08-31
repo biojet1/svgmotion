@@ -64,15 +64,6 @@ function load_container(obj: PlainNode, parent: Container) {
                     } else {
                         load_container(child, node);
                     }
-                    // if (typeof child === "string") {
-                    //     if (node instanceof Text) {
-                    //         node.add_chars(child);
-                    //     } else {
-                    //         throw new Error(`"${tag}"`);
-                    //     }
-                    // } else {
-                    //     load_container(child, node);
-                    // }
                 }
             }
         } else if (node == undefined) {
