@@ -1,6 +1,6 @@
-import { Vector } from "../geom/index.js";
+import { Matrix, MatrixMut, Vector } from "../geom/index.js";
 import { Element } from "./base.js";
-import { Group, Item, ViewPort, Root } from "./elements.js";
+import { Group, Item, ViewPort, Root, Container } from "./elements.js";
 import { Parent } from "./linked.js";
 
 declare module "./base" {
@@ -13,6 +13,7 @@ declare module "./base" {
         get_vp_width(frame: number): number;
         get_vp_height(frame: number): number;
         get_vp_size(frame: number, w?: number, h?: number): Vector;
+        _transform_up_to(frame: number, top: Parent): Matrix;
     }
 }
 Element.prototype.get_root = function () {
@@ -113,6 +114,24 @@ Element.prototype.get_font_size = function (frame: number): number {
         return p.get_font_size(0);
     }
     throw new Error(`cant get_font_size <${this.constructor.name}> <${p?.constructor.name}>`);
+}
+Element.prototype._transform_up_to = function (frame: number, top: Parent): Matrix {
+    let cur: Element | undefined = this;
+    let ls: Element[] = []
+    while (cur) {
+        cur = cur.parent<Container>();
+        if (cur === top) {
+            let m = MatrixMut.identity();
+            ls.reverse();
+            for (const x of ls) {
+                x.cat_transform(frame, m)
+            }
+            return m;
+        } else if (cur) {
+            ls.push(cur);
+        }
+    }
+    throw new Error(`No parent`);
 }
 
 

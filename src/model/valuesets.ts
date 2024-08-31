@@ -1,4 +1,4 @@
-import { Matrix, MatrixMut, Vector } from "../geom/index.js";
+import { BoundingBox, Matrix, MatrixMut, Vector } from "../geom/index.js";
 import { VectorValue, ScalarValue, PositionValue, RGBValue, TextValue } from "./value.js";
 import { PlainValue } from "./value.js";
 import { Animatable } from "./value.js";
@@ -75,6 +75,17 @@ export class Box extends ValueSet {
     }
     set position(v: PositionValue) {
         xset(this, "position", v);
+    }
+    //
+    bbox(frame: number) {
+        if (Object.hasOwn(this, "size")) {
+            if (Object.hasOwn(this, "position")) {
+                const [w, h] = this.size.get_value(frame);
+                const [x, y] = this.position.get_value(frame);
+                return BoundingBox.rect(x, y, w, h);
+            }
+        }
+        return BoundingBox.not();
     }
 }
 

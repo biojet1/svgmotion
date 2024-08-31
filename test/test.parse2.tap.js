@@ -1,7 +1,6 @@
 "uses strict";
 import test from "tap";
-import { SVGDocument, XMLSerializer } from "domspec";
-import { Vector, RGB, Root, Rel } from "svgmotion";
+import { Vector, RGB, Root, Rel, ZoomTo, Pass, Easing } from "svgmotion";
 
 test.test("load_svg the_quick", async (t) => {
     const anim = new Root();
@@ -10,26 +9,36 @@ test.test("load_svg the_quick", async (t) => {
     view.width.set_value(384);
     view.height.set_value(216);
     let the = view.get_group("The");
-    let bb = view.bbox_of(0, the);
-    console.log(bb.dump_rect());
+    let dog = view.get_group("dog");
+    let quick = view.get_group("quick");
+    let lazy = view.get_group("lazy");
+    let bb = view.bbox_of(0, dog, the);
+    // console.log(bb.dump_rect());
 
-    let r = view.add_rect();
-    r.x.set_value(bb.x);
-    r.y.set_value(bb.y);
-    r.width.set_value(bb.width);
-    r.height.set_value(bb.height);
-    // r.stroke.width.set_value(1);
-    // r.stroke.color.set_value("red");
-    r.fill.color.set_value("none")
-    r.set_attributes({
-        "stroke": "red",
-        "stroke-width": 1,
-    })
+    {
+        let r = view.add_rect();
+        r.x.set_value(bb.x);
+        r.y.set_value(bb.y);
+        r.width.set_value(bb.width);
+        r.height.set_value(bb.height);
+        r.set_attributes({ "stroke": "red", "stroke-width": 1, "fill": "none" })
+    }
+    {
+        let tr = the.transform.add_translate(20, 20);
+
+        anim.at(0).run(Rel(.8).to(tr, [100, 100], { easing: Easing.sigmoid }).at(1).to(tr, [100, 10]));
+    }
+    const tr = anim.at(0);
+    tr.run(Pass(1))
+    const bbo = view.view_box.bbox();
+    tr.run(ZoomTo(view, [lazy]))
+    tr.run(ZoomTo(view, [dog]))
+    tr.run(ZoomTo(view, [the]))
+    tr.run(ZoomTo(view, [bbo]))
     // console.log(r.fill.color.value, r.fill.color.get_rgb_repr(0) + "", r.fill.color.get_value(0));
     // console.dir(r.fill);
-
     // r.fill.opacity.set_value(.4)
-    // anim.save_json('/tmp/the_quick.json')
+    anim.save_json('/tmp/the_quick.json')
     anim.save_html('/tmp/the_quick.html');
     t.end();
 });

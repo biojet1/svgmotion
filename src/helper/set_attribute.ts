@@ -6,7 +6,7 @@ import { Element } from "../model/base.js";
 
 declare module "../model/base" {
     interface Element {
-        set_attribute(name: string, value: string): void;
+        set_attribute(name: string, value: string): this;
         set_attributes(all: {
             [key: string]: string
         }): void;
@@ -21,7 +21,7 @@ Element.prototype.set_attributes = function (all: {
     }
 }
 
-Element.prototype.set_attribute = function (name: string, value: string) {
+Element.prototype.set_attribute = function (name: string, value: string): Element {
     switch (name) {
         case "id":
             if (value) {
@@ -138,6 +138,7 @@ Element.prototype.set_attribute = function (name: string, value: string) {
                 );
             }
     }
+    return this;
 }
 
 declare module "../model/value" {
@@ -240,9 +241,10 @@ import {
     Use,
     TSpan, Text
 } from "../model/elements.js";
+
 declare module "../model/elements" {
     interface ViewPort {
-        set_attribute(name: string, value: string): void;
+        set_attribute(name: string, value: string): this;
     }
 }
 
@@ -255,11 +257,9 @@ ViewPort.prototype.set_attribute = function (name: string, value: string) {
             const u = this.view_box;
             u.position.set_value([v[0], v[1]]);
             u.size.set_value([v[2], v[3]]);
-            // console.log("viewBox", e.id, value, v, u.size.dump())
         }
             break;
         case "preserveAspectRatio":
-            // this.fit_view.constructor.name
             this.fit_view.set_parse_text(value, this);
             break;
         case "zoomAndPan":
@@ -281,6 +281,7 @@ ViewPort.prototype.set_attribute = function (name: string, value: string) {
             Element.prototype.set_attribute.call(this, name, value);
         // super.set_attribute(name, value); error TS2660: 
     }
+    return this;
 }
 
 Rect.prototype.set_attribute = function (name: string, value: string) {
@@ -306,6 +307,7 @@ Rect.prototype.set_attribute = function (name: string, value: string) {
         default:
             Element.prototype.set_attribute.call(this, name, value);
     }
+    return this;
 }
 
 
@@ -323,7 +325,7 @@ Circle.prototype.set_attribute = function (name: string, value: string) {
             break;
         default:
             Element.prototype.set_attribute.call(this, name, value);
-    }
+    }    return this;
 }
 
 Ellipse.prototype.set_attribute = function (name: string, value: string) {
@@ -342,7 +344,7 @@ Ellipse.prototype.set_attribute = function (name: string, value: string) {
             break;
         default:
             Element.prototype.set_attribute.call(this, name, value);
-    }
+    }    return this;
 }
 
 Polygon.prototype.set_attribute = function (name: string, value: string) {
@@ -352,7 +354,7 @@ Polygon.prototype.set_attribute = function (name: string, value: string) {
             break;
         default:
             Element.prototype.set_attribute.call(this, name, value);
-    }
+    }    return this;
 }
 
 Polyline.prototype.set_attribute = function (name: string, value: string) {
@@ -362,7 +364,7 @@ Polyline.prototype.set_attribute = function (name: string, value: string) {
             break;
         default:
             Element.prototype.set_attribute.call(this, name, value);
-    }
+    }    return this;
 }
 Line.prototype.set_attribute = function (name: string, value: string) {
     switch (name) {
@@ -380,7 +382,7 @@ Line.prototype.set_attribute = function (name: string, value: string) {
             break;
         default:
             Element.prototype.set_attribute.call(this, name, value);
-    }
+    }    return this;
 }
 
 Text.prototype.set_attribute = function (name: string, value: string) {
@@ -399,7 +401,7 @@ Text.prototype.set_attribute = function (name: string, value: string) {
             break;
         default:
             Element.prototype.set_attribute.call(this, name, value);
-    }
+    }    return this;
 }
 
 TSpan.prototype.set_attribute = function (name: string, value: string) {
@@ -418,7 +420,81 @@ TSpan.prototype.set_attribute = function (name: string, value: string) {
             break;
         default:
             Element.prototype.set_attribute.call(this, name, value);
+    }    return this;
+}
+
+
+Image.prototype.set_attribute = function (name: string, value: string) {
+    switch (name) {
+        case "height":
+            this.height.set_parse_length(value, this, name, "h");
+            break;
+        case "width":
+            this.width.set_parse_length(value, this, name, "w");
+            break;
+        case "y":
+            this.y.set_parse_length(value, this, name, "h");
+            break;
+        case "x":
+            this.x.set_parse_length(value, this, name, "w");
+            break;
+        case "href":
+            this.href.set_parse_text(value, this);
+            break;
+        //             ‘preserveAspectRatio’
+        // ‘crossorigin’
+        default:
+            Element.prototype.set_attribute.call(this, name, value);
     }
+    return this;
+}
+
+Use.prototype.set_attribute = function (name: string, value: string) {
+    switch (name) {
+        case "height":
+            this.height.set_parse_length(value, this, name, "h");
+            break;
+        case "width":
+            this.width.set_parse_length(value, this, name, "w");
+            break;
+        case "y":
+            this.y.set_parse_length(value, this, name, "h");
+            break;
+        case "x":
+            this.x.set_parse_length(value, this, name, "w");
+            break;
+        case "href":
+            this.href.set_parse_text(value, this);
+            break;
+        default:
+            Element.prototype.set_attribute.call(this, name, value);
+    }
+    return this;
+}
+
+Symbol.prototype.set_attribute = function (name: string, value: string) {
+    switch (name) {
+        case "height":
+            this.height.set_parse_length(value, this, name, "h");
+            break;
+        case "width":
+            this.width.set_parse_length(value, this, name, "w");
+            break;
+        case "y":
+            this.y.set_parse_length(value, this, name, "h");
+            break;
+        case "x":
+            this.x.set_parse_length(value, this, name, "w");
+            break;
+        // ‘preserveAspectRatio’
+        // ‘viewBox’
+        // ‘refX’
+        // ‘refY’
+
+        default:
+            Element.prototype.set_attribute.call(this, name, value);
+    }
+    return this;
 }
 
 Path.prototype.set_attribute = function (name: string, value: string) {
@@ -428,5 +504,5 @@ Path.prototype.set_attribute = function (name: string, value: string) {
             break;
         default:
             Element.prototype.set_attribute.call(this, name, value);
-    }
+    }    return this;
 }

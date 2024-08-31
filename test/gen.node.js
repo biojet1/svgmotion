@@ -85,15 +85,15 @@ if (1) {
             `return parent.add_${name}();},`);
     }
 
-    console.log(`Container.prototype._add_element = function (name: string) {`);
-    console.log(`\tswitch (name) {`);
+    console.log(`Container.prototype._add_element = function (tag: string) {`);
+    console.log(`\tswitch (tag) {`);
     for (const { name, kind, tag } of col) {
         tag && console.log(`\t\tcase "${tag}": return this.add_${name}();`);
         // tag && console.log(`${tag} : function () {` +
         //     `return this.add_${name}();},`);
     }
     console.log(`\t}`);
-    console.log(`\tthrow new Error("Unexpected tag: " + name);`);
+    console.log(`\tthrow new Error("Unexpected tag: " + tag);`);
     console.log(`}`);
 
 }

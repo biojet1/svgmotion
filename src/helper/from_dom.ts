@@ -1,5 +1,4 @@
 
-import { Element } from "../model/base.js";
 import { Item, Container, Root, Text, TSpan } from "../model/elements.js";
 import "./set_attribute.js";
 
@@ -8,140 +7,51 @@ const NS_SVG = "http://www.w3.org/2000/svg";
 const TAG_DOM: {
     [key: string]: (props: Map<string, string>, parent: Container) => Item | Container | false | 0;
 } = {
-    svg: function (props: Map<string, string>, parent: Container) {
-        // Node
-        let node = parent.add_view();
-        // Properties console.info(`svg _read ${elem?.localName} ${vp.constructor.name} ${elem.viewBox.baseVal}`);
-        for (const [name, value] of props.entries()) {
-            node.set_attribute(name, value);
-        }
-
-        return node;
-    },
-    rect: function (props: Map<string, string>, parent: Container) {
-        let node = parent.add_rect();
-        for (const [name, value] of props.entries()) {
-            node.set_attribute(name, value);
-        }
-        return node;
-    },
-    g: function (props: Map<string, string>, parent: Container) {
-        let node = parent.add_group();
-        // Properties
-        for (const [name, value] of props.entries()) {
-            node.set_attribute(name, value);
-        }
-        return node;
-    },
-    path: function (props: Map<string, string>, parent: Container) {
-        let node = parent.add_path();
-        for (const [name, value] of props.entries()) {
-            node.set_attribute(name, value);
-        }
-        return node;
-    },
-    circle: function (props: Map<string, string>, parent: Container) {
-        let node = parent.add_circle();
-        // Properties
-        // console.info(`PATH`, e.getAttributeNames(), e.innerHTML);
-        for (const [name, value] of props.entries()) {
-            node.set_attribute(name, value);
-        }
-        return node;
-    },
-    ellipse: function (props: Map<string, string>, parent: Container) {
-        let node = parent.add_ellipse();
-        // Properties
-        // console.info(`PATH`, e.getAttributeNames(), e.innerHTML);
-        for (const [name, value] of props.entries()) {
-            node.set_attribute(name, value);
-        }
-        return node;
-    },
-    polygon: function (props: Map<string, string>, parent: Container) {
-        let node = parent.add_polygon();
-        for (const [name, value] of props.entries()) {
-            node.set_attribute(name, value);
-        }
-        return node;
-    },
-    polyline: function (props: Map<string, string>, parent: Container) {
-        let node = parent.add_polyline();
-        for (const [name, value] of props.entries()) {
-            node.set_attribute(name, value);
-        }
-        return node;
-    },
-    line: function (props: Map<string, string>, parent: Container) {
-        let node = parent.add_line();
-        for (const [name, value] of props.entries()) {
-            node.set_attribute(name, value);
-        }
-        return node;
-    },
-    text: function (props: Map<string, string>, parent: Container) {
-        let node = parent.add_text();
-        for (const [name, value] of props.entries()) {
-            node.set_attribute(name, value);
-        }
-        return node;
-    },
-    tspan: function (props: Map<string, string>, parent: Container) {
-        let node = parent.add_tspan();
-        for (const [name, value] of props.entries()) {
-            node.set_attribute(name, value);
-        }
-        return node;
-    },
-
-
-    a: (props: Map<string, string>, parent: Container) => false,
-    clipPath: (props: Map<string, string>, parent: Container) => false,
-    defs: (props: Map<string, string>, parent: Container) => false,
-    feBlend: (props: Map<string, string>, parent: Container) => false,
-    feColorMatrix: (props: Map<string, string>, parent: Container) => false,
-    feComponentTransfer: (props: Map<string, string>, parent: Container) => false,
-    feComposite: (props: Map<string, string>, parent: Container) => false,
-    feConvolveMatrix: (props: Map<string, string>, parent: Container) => false,
-    feDiffuseLighting: (props: Map<string, string>, parent: Container) => false,
-    feDisplacementMap: (props: Map<string, string>, parent: Container) => false,
-    feDistantLight: (props: Map<string, string>, parent: Container) => false,
-    feDropShadow: (props: Map<string, string>, parent: Container) => false,
-    feFlood: (props: Map<string, string>, parent: Container) => false,
-    feFuncA: (props: Map<string, string>, parent: Container) => false,
-    feFuncB: (props: Map<string, string>, parent: Container) => false,
-    feFuncG: (props: Map<string, string>, parent: Container) => false,
-    feFuncR: (props: Map<string, string>, parent: Container) => false,
-    feGaussianBlur: (props: Map<string, string>, parent: Container) => false,
-    feImage: (props: Map<string, string>, parent: Container) => false,
-    feMerge: (props: Map<string, string>, parent: Container) => false,
-    feMergeNode: (props: Map<string, string>, parent: Container) => false,
-    feMorphology: (props: Map<string, string>, parent: Container) => false,
-    feOffset: (props: Map<string, string>, parent: Container) => false,
-    fePointLight: (props: Map<string, string>, parent: Container) => false,
-    feSpecularLighting: (props: Map<string, string>, parent: Container) => false,
-    feSpotLight: (props: Map<string, string>, parent: Container) => false,
-    feTile: (props: Map<string, string>, parent: Container) => false,
-    feTurbulence: (props: Map<string, string>, parent: Container) => false,
-    filter: (props: Map<string, string>, parent: Container) => false,
-    image: (props: Map<string, string>, parent: Container) => false,
-    linearGradient: (props: Map<string, string>, parent: Container) => false,
-    marker: (props: Map<string, string>, parent: Container) => false,
-    mask: (props: Map<string, string>, parent: Container) => false,
-    pattern: (props: Map<string, string>, parent: Container) => false,
-    radialGradient: (props: Map<string, string>, parent: Container) => false,
-    stop: (props: Map<string, string>, parent: Container) => false,
-    style: (props: Map<string, string>, parent: Container) => false,
-    switch: (props: Map<string, string>, parent: Container) => false,
-    symbol: (props: Map<string, string>, parent: Container) => false,
-
-    textPath: (props: Map<string, string>, parent: Container) => false,
-    tref: (props: Map<string, string>, parent: Container) => false,
-
-    use: (props: Map<string, string>, parent: Container) => false,
+    // a: (props: Map<string, string>, parent: Container) => false,
+    // clipPath: (props: Map<string, string>, parent: Container) => false,
+    // defs: (props: Map<string, string>, parent: Container) => false,
+    // feBlend: (props: Map<string, string>, parent: Container) => false,
+    // feColorMatrix: (props: Map<string, string>, parent: Container) => false,
+    // feComponentTransfer: (props: Map<string, string>, parent: Container) => false,
+    // feComposite: (props: Map<string, string>, parent: Container) => false,
+    // feConvolveMatrix: (props: Map<string, string>, parent: Container) => false,
+    // feDiffuseLighting: (props: Map<string, string>, parent: Container) => false,
+    // feDisplacementMap: (props: Map<string, string>, parent: Container) => false,
+    // feDistantLight: (props: Map<string, string>, parent: Container) => false,
+    // feDropShadow: (props: Map<string, string>, parent: Container) => false,
+    // feFlood: (props: Map<string, string>, parent: Container) => false,
+    // feFuncA: (props: Map<string, string>, parent: Container) => false,
+    // feFuncB: (props: Map<string, string>, parent: Container) => false,
+    // feFuncG: (props: Map<string, string>, parent: Container) => false,
+    // feFuncR: (props: Map<string, string>, parent: Container) => false,
+    // feGaussianBlur: (props: Map<string, string>, parent: Container) => false,
+    // feImage: (props: Map<string, string>, parent: Container) => false,
+    // feMerge: (props: Map<string, string>, parent: Container) => false,
+    // feMergeNode: (props: Map<string, string>, parent: Container) => false,
+    // feMorphology: (props: Map<string, string>, parent: Container) => false,
+    // feOffset: (props: Map<string, string>, parent: Container) => false,
+    // fePointLight: (props: Map<string, string>, parent: Container) => false,
+    // feSpecularLighting: (props: Map<string, string>, parent: Container) => false,
+    // feSpotLight: (props: Map<string, string>, parent: Container) => false,
+    // feTile: (props: Map<string, string>, parent: Container) => false,
+    // feTurbulence: (props: Map<string, string>, parent: Container) => false,
+    // filter: (props: Map<string, string>, parent: Container) => false,
+    // image: (props: Map<string, string>, parent: Container) => false,
+    // linearGradient: (props: Map<string, string>, parent: Container) => false,
+    // marker: (props: Map<string, string>, parent: Container) => false,
+    // mask: (props: Map<string, string>, parent: Container) => false,
+    // pattern: (props: Map<string, string>, parent: Container) => false,
+    // radialGradient: (props: Map<string, string>, parent: Container) => false,
+    // stop: (props: Map<string, string>, parent: Container) => false,
+    // style: (props: Map<string, string>, parent: Container) => false,
+    // switch: (props: Map<string, string>, parent: Container) => false,
+    // symbol: (props: Map<string, string>, parent: Container) => false,
+    // textPath: (props: Map<string, string>, parent: Container) => false,
+    // tref: (props: Map<string, string>, parent: Container) => false,
+    // use: (props: Map<string, string>, parent: Container) => false,
 };
 
-function walk(elem: SVGElement, parent: Container, attrs: Map<string, string>) {
+function walk(elem: SVGElement, parent: Container, attrs: { [key: string]: string }) {
     const { localName: tag } = elem;
     switch (tag) {
         case "desc":
@@ -163,7 +73,7 @@ function walk(elem: SVGElement, parent: Container, attrs: Map<string, string>) {
                 return;
             }
     }
-    const props = new Map<string, string>();
+    const props: { [key: string]: string } = {};
     function* enum_attrs(e: SVGElement) {
         for (const attr of e.attributes) {
             if (attr != undefined) {
@@ -186,32 +96,34 @@ function walk(elem: SVGElement, parent: Container, attrs: Map<string, string>) {
                         if (k && v) {
                             const m = v.match(/(.+)\s*!\s*(\w+)$/);
                             if (m) {
-                                props.set(k, m[1].trim());
+                                props[k] = m[1].trim();
                                 // this._tag[k] = { priority: m[2] };
                             } else {
-                                props.set(k, v);
+                                props[k] = v;
                             }
                         }
                     }
                 }
             }
         } else if (!(key.startsWith("aria-") || key.startsWith("-inkscape"))) {
-            props.set(key, value);
+            props[key] = value;
         }
     }
-    const make_node = TAG_DOM[tag];
-    if (make_node) {
+    const node = parent._add_element(tag)
+    if (node) {
+        node.set_attributes(props);
         // console.log(`walk-->`, tag, parent.constructor.name);
-        const node = make_node(props, parent);
+
+        // const node = make_node(props, parent);
         // console.log(`walk<-- ${node.constructor.name}`, tag);
         if (node instanceof Container) {
             // Non-propagating values
             for (const s of ['id', 'class', 'clip-path', 'viewBox', 'preserveAspectRatio']) {
-                props.delete(s);
+                delete props[s];
             }
             let prev: Item | Container | undefined = undefined;
 
-            const merged = new Map([...attrs, ...props])
+            const merged = { ...attrs, ...props };
             for (const child of elem.childNodes) {
                 switch (child.nodeType) {
                     case 1: {
@@ -231,17 +143,15 @@ function walk(elem: SVGElement, parent: Container, attrs: Map<string, string>) {
                         }
                 }
             }
-        } else if (node === false) {
-            console.log(`tag "${tag}" not implemented`);
-            return undefined;
-        } else if (node instanceof Item) {
-            //
-        } else {
+            // } else if (node === false) {
+            //     console.log(`tag "${tag}" not implemented`);
+            //     return undefined;
+        } else if (!(node instanceof Item)) {
             throw new Error(`tag "${tag}"`);
         }
         return node;
-    } else if (make_node === false) {
-        console.log(`tag "${tag}" ignored`);
+        // } else if (make_node === false) {
+        //     console.log(`tag "${tag}" ignored`);
     } else {
         throw new Error(`No processor for "${tag}"`);
     }
@@ -263,7 +173,7 @@ export async function parse_svg(
         } else if (top.localName != "svg") {
             throw new Error(`not svg tag ${top.localName}`);
         } else {
-            walk(top as unknown as SVGSVGElement, root, new Map());
+            walk(top as unknown as SVGSVGElement, root, {});
         }
     } catch (err) {
         console.error(`Failed to load "${src}"`);
@@ -282,7 +192,7 @@ function load_svg_dom(parent: Container, doc: Document) {
             throw new Error(`not svg tag ${top.localName}`);
         }
     }
-    walk(top as unknown as SVGSVGElement, parent, new Map());
+    walk(top as unknown as SVGSVGElement, parent, {});
 }
 
 async function load_svg(

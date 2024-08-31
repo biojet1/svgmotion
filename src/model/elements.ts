@@ -71,7 +71,7 @@ export class Container extends Element {
             }
         } while (cur !== end && (cur = cur._next));
     }
-    bbox_of(frame: number, ...args: Item[]) {
+    bbox_of(frame: number, ...args: Element[]) {
         const bb = BoundingBox.not();
         for (const x of args) {
             const m = transform_up_to(this, x, frame);
@@ -211,9 +211,9 @@ export abstract class Shape extends Item {
     }
 }
 
-function transform_up_to(top: Parent, desc: Item | Container, time: number) {
-    let cur: Item | Container | undefined = desc;
-    let ls: (Item | Container)[] = []
+function transform_up_to(top: Parent, desc: Element, time: number) {
+    let cur: Element | undefined = desc;
+    let ls: Element[] = []
     while (cur) {
         cur = cur.parent<Container>();
         if (cur === top) {
