@@ -10,27 +10,6 @@ import {
     TSpan, Text
 } from "../model/elements.js";
 
-const TAGS: {
-    [key: string]: (parent: Container) => Item | Container;
-} = {
-    circle: function (parent: Container) { return parent.add_circle(); },
-    ellipse: function (parent: Container) { return parent.add_ellipse(); },
-    g: function (parent: Container) { return parent.add_group(); },
-    image: function (parent: Container) { return parent.add_image(); },
-    line: function (parent: Container) { return parent.add_line(); },
-    path: function (parent: Container) { return parent.add_path(); },
-    polygon: function (parent: Container) { return parent.add_polygon(); },
-    polyline: function (parent: Container) { return parent.add_polyline(); },
-    rect: function (parent: Container) { return parent.add_rect(); },
-    symbol: function (parent: Container) { return parent.add_symbol(); },
-    use: function (parent: Container) { return parent.add_use(); },
-    svg: function (parent: Container) { return parent.add_view(); },
-    text: function (parent: Container) { return parent.add_text(); },
-    tspan: function (parent: Container) { return parent.add_tspan(); },
-};
-
-
-
 function load_properties(that: any, props: { [key: string]: PlainValue<any> }) {
     for (let [k, v] of Object.entries(props)) {
         const p = that[k];
@@ -50,9 +29,8 @@ function load_properties(that: any, props: { [key: string]: PlainValue<any> }) {
 
 function load_container(obj: PlainNode, parent: Container) {
     const { tag, nodes, ...props } = obj;
-    const make_node = TAGS[tag];
-    if (make_node) {
-        const node = make_node(parent);
+    const node = parent._add_element(tag)
+    if (node) {
         load_properties(node, props);
         if (node instanceof Container) {
             if (nodes) {

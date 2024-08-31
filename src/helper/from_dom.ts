@@ -13,39 +13,7 @@ const TAG_DOM: {
         let node = parent.add_view();
         // Properties console.info(`svg _read ${elem?.localName} ${vp.constructor.name} ${elem.viewBox.baseVal}`);
         for (const [name, value] of props.entries()) {
-            switch (name) {
-                case "version":
-                    break;
-                case "viewBox": {
-                    const v = value.split(/[\s,]+/).map(parseFloat);
-                    const u = node.view_box;
-                    u.position.set_value([v[0], v[1]]);
-                    u.size.set_value([v[2], v[3]]);
-                    // console.log("viewBox", e.id, value, v, u.size.dump())
-                }
-                    break;
-                case "preserveAspectRatio":
-                    // node.fit_view.constructor.name
-                    node.fit_view.set_parse_text(value, node);
-                    break;
-                case "zoomAndPan":
-                    node.zoom_pan.set_parse_text(value, node);
-                    break;
-                case "height":
-                    node.height.set_parse_length(value, node, name, "h");
-                    break;
-                case "width":
-                    node.width.set_parse_length(value, node, name, "w");
-                    break;
-                case "y":
-                    node.y.set_parse_length(value, node, name, "h");
-                    break;
-                case "x":
-                    node.x.set_parse_length(value, node, name, "w");
-                    break;
-                default:
-                    node.set_attribute(name, value);
-            }
+            node.set_attribute(name, value);
         }
 
         return node;
@@ -53,31 +21,8 @@ const TAG_DOM: {
     rect: function (props: Map<string, string>, parent: Container) {
         let node = parent.add_rect();
         for (const [name, value] of props.entries()) {
-            switch (name) {
-                case "height":
-                    node.height.set_parse_length(value, node, name, "h");
-                    break;
-                case "width":
-                    node.width.set_parse_length(value, node, name, "w");
-                    break;
-                case "y":
-                    node.y.set_parse_length(value, node, name, "h");
-                    break;
-                case "x":
-                    node.x.set_parse_length(value, node, name, "w");
-                    break;
-                case "ry":
-                    node.ry.set_parse_length(value, node, name, "h");
-                    break;
-                case "rx":
-                    node.rx.set_parse_length(value, node, name, "w");
-                    break;
-                default:
-                    node.set_attribute(name, value);
-
-            }
+            node.set_attribute(name, value);
         }
-
         return node;
     },
     g: function (props: Map<string, string>, parent: Container) {
@@ -85,20 +30,13 @@ const TAG_DOM: {
         // Properties
         for (const [name, value] of props.entries()) {
             node.set_attribute(name, value);
-
         }
         return node;
     },
     path: function (props: Map<string, string>, parent: Container) {
         let node = parent.add_path();
         for (const [name, value] of props.entries()) {
-            switch (name) {
-                case "d":
-                    node.d.value = value;
-                    break;
-                default:
-                    node.set_attribute(name, value);
-            }
+            node.set_attribute(name, value);
         }
         return node;
     },

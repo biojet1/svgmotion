@@ -22,111 +22,110 @@ Element.prototype.set_attributes = function (all: {
 }
 
 Element.prototype.set_attribute = function (name: string, value: string) {
-    const node = this;
     switch (name) {
         case "id":
             if (value) {
-                // console.log("_set_attr ID", node.constructor.name);
-                node.get_root().remember_id((node.id = value), node);
+                // console.log("_set_attr ID", this.constructor.name);
+                this.get_root().remember_id((this.id = value), this);
             }
             break;
 
         case "transform":
             if (value) {
-                node.transform.set_parse_transform(value);
+                this.transform.set_parse_transform(value);
             }
             break;
         case "font-size":
             if (value) {
-                node.font_size.set_parse_length(value, node, name);
+                this.font_size.set_parse_length(value, this, name);
             }
         case "font-weight":
             if (value) {
-                node.font.weight.set_parse_text(value, node);
+                this.font.weight.set_parse_text(value, this);
             }
             break;
         // case "font-size":
         //     if (value) {
-        //         node.font.size.set_parse_text(value, node);
+        //         this.font.size.set_parse_text(value, this);
         //     }
         //     break;
         case "font-family":
             if (value) {
-                node.font.family.set_parse_text(value, node);
+                this.font.family.set_parse_text(value, this);
             }
             break;
         case "line-height":// .text?
             if (value) {
-                node.line_height.set_parse_line_height(value, node);
+                this.line_height.set_parse_line_height(value, this);
             }
             break;
         case "text-align":// .text?
             if (value) {
-                node.text_align.set_parse_text(value, node);
+                this.text_align.set_parse_text(value, this);
             }
             break;
         case "white-space": // put<>
             if (value) {
-                node.white_space.set_parse_text(value, node);
+                this.white_space.set_parse_text(value, this);
             }
             break;
         case "fill":// 
             if (value) {
-                node.fill.color.set_parse_rgb(value, node);
+                this.fill.color.set_parse_rgb(value, this);
             }
             break;
         case "fill-opacity":// 
             if (value) {
-                node.fill.opacity.set_parse_percentage(value, node);
+                this.fill.opacity.set_parse_percentage(value, this);
             }
             break;
         case "stroke":// 
             if (value) {
-                node.stroke.color.set_parse_rgb(value, node);
+                this.stroke.color.set_parse_rgb(value, this);
             }
             break;
         case "stroke-opacity":// 
             if (value) {
-                node.stroke.opacity.set_parse_percentage(value, node);
+                this.stroke.opacity.set_parse_percentage(value, this);
             }
             break;
         case "stroke-width":// 
             if (value) {
-                node.stroke.width.set_parse_length(value, node, name);
+                this.stroke.width.set_parse_length(value, this, name);
             }
             break;
         case "stroke-miterlimit":// 
             if (value) {
-                node.stroke.miter_limit.set_parse_number(value, node);
+                this.stroke.miter_limit.set_parse_number(value, this);
             }
             break;
 
         case "stroke-dasharray":// 
             if (value) {
-                node.stroke.dash_array.set_parse_dashes(value, node);
+                this.stroke.dash_array.set_parse_dashes(value, this);
             }
             break;
         case "stroke-dashoffset":// 
             if (value) {
-                node.stroke.dash_offset.set_parse_length(value, node, name);
+                this.stroke.dash_offset.set_parse_length(value, this, name);
             }
         case "letter-spacing":// 
             if (value) {
-                node.letter_spacing.set_parse_length(value, node, name);
+                this.letter_spacing.set_parse_length(value, this, name);
             }
         case "word-spacing":// 
             if (value) {
-                node.word_spacing.set_parse_text(value, node);
+                this.word_spacing.set_parse_text(value, this);
             }
 
             break;
         case "transform-origin":
             if (value) {
-                // node.anchor.set_parse_anchor(value);
+                // this.anchor.set_parse_anchor(value);
             }
         case "opacity":
             if (value) {
-                node.opacity.set_parse_percentage(value, node);
+                this.opacity.set_parse_percentage(value, this);
             }
 
         case "shape-inside":
@@ -135,7 +134,7 @@ Element.prototype.set_attribute = function (name: string, value: string) {
         default:
             if (!(name.startsWith("aria-") || name.startsWith("-inkscape"))) {
                 throw new Error(
-                    `Unexpected attribute [${name}]="${value}" tag="${(node.constructor as any).tag}" node="${node.constructor.name}"`
+                    `Unexpected attribute [${name}]="${value}" tag="${(this.constructor as any).tag}" this="${this.constructor.name}"`
                 );
             }
     }
@@ -232,4 +231,84 @@ VectorValue.prototype.set_parse_anchor = function (s: string, parent: Element) {
     this.value = this.load_value(s.split(/[\s,]+/).map(function (str) {
         return parseFloat(str.trim());
     }));
+}
+
+
+import { ViewPort, Rect, Path } from "../model/elements.js";
+declare module "../model/elements" {
+    interface ViewPort {
+        set_attribute(name: string, value: string): void;
+    }
+}
+
+ViewPort.prototype.set_attribute = function (name: string, value: string) {
+    switch (name) {
+        case "version":
+            break;
+        case "viewBox": {
+            const v = value.split(/[\s,]+/).map(parseFloat);
+            const u = this.view_box;
+            u.position.set_value([v[0], v[1]]);
+            u.size.set_value([v[2], v[3]]);
+            // console.log("viewBox", e.id, value, v, u.size.dump())
+        }
+            break;
+        case "preserveAspectRatio":
+            // this.fit_view.constructor.name
+            this.fit_view.set_parse_text(value, this);
+            break;
+        case "zoomAndPan":
+            this.zoom_pan.set_parse_text(value, this);
+            break;
+        case "height":
+            this.height.set_parse_length(value, this, name, "h");
+            break;
+        case "width":
+            this.width.set_parse_length(value, this, name, "w");
+            break;
+        case "y":
+            this.y.set_parse_length(value, this, name, "h");
+            break;
+        case "x":
+            this.x.set_parse_length(value, this, name, "w");
+            break;
+        default:
+            Element.prototype.set_attribute.call(this, name, value);
+        // super.set_attribute(name, value); error TS2660: 
+    }
+}
+
+Rect.prototype.set_attribute = function (name: string, value: string) {
+    switch (name) {
+        case "height":
+            this.height.set_parse_length(value, this, name, "h");
+            break;
+        case "width":
+            this.width.set_parse_length(value, this, name, "w");
+            break;
+        case "y":
+            this.y.set_parse_length(value, this, name, "h");
+            break;
+        case "x":
+            this.x.set_parse_length(value, this, name, "w");
+            break;
+        case "ry":
+            this.ry.set_parse_length(value, this, name, "h");
+            break;
+        case "rx":
+            this.rx.set_parse_length(value, this, name, "w");
+            break;
+        default:
+            Element.prototype.set_attribute.call(this, name, value);
+    }
+}
+
+Path.prototype.set_attribute = function (name: string, value: string) {
+    switch (name) {
+        case "d":
+            this.d.value = value;
+            break;
+        default:
+            Element.prototype.set_attribute.call(this, name, value);
+    }
 }
