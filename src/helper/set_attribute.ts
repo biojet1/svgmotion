@@ -234,7 +234,12 @@ VectorValue.prototype.set_parse_anchor = function (s: string, parent: Element) {
 }
 
 
-import { ViewPort, Rect, Path } from "../model/elements.js";
+import {
+    ViewPort, Rect, Path, Line, Group,
+    Ellipse, Circle, Polyline, Polygon, Image, Symbol,
+    Use,
+    TSpan, Text
+} from "../model/elements.js";
 declare module "../model/elements" {
     interface ViewPort {
         set_attribute(name: string, value: string): void;
@@ -297,6 +302,119 @@ Rect.prototype.set_attribute = function (name: string, value: string) {
             break;
         case "rx":
             this.rx.set_parse_length(value, this, name, "w");
+            break;
+        default:
+            Element.prototype.set_attribute.call(this, name, value);
+    }
+}
+
+
+
+Circle.prototype.set_attribute = function (name: string, value: string) {
+    switch (name) {
+        case "r":
+            this.r.set_parse_length(value, this, name);
+            break;
+        case "cx":
+            this.cx.set_parse_length(value, this, name, "w");
+            break;
+        case "cy":
+            this.cy.set_parse_length(value, this, name, "h");
+            break;
+        default:
+            Element.prototype.set_attribute.call(this, name, value);
+    }
+}
+
+Ellipse.prototype.set_attribute = function (name: string, value: string) {
+    switch (name) {
+        case "rx":
+            this.rx.set_parse_length(value, this, name);
+            break;
+        case "ry":
+            this.ry.set_parse_length(value, this, name);
+            break;
+        case "cx":
+            this.cx.set_parse_length(value, this, name);
+            break;
+        case "cy":
+            this.cy.set_parse_length(value, this, name);
+            break;
+        default:
+            Element.prototype.set_attribute.call(this, name, value);
+    }
+}
+
+Polygon.prototype.set_attribute = function (name: string, value: string) {
+    switch (name) {
+        case "points":
+            this.points.set_parse_points(value, this);
+            break;
+        default:
+            Element.prototype.set_attribute.call(this, name, value);
+    }
+}
+
+Polyline.prototype.set_attribute = function (name: string, value: string) {
+    switch (name) {
+        case "points":
+            this.points.set_parse_points(value, this);
+            break;
+        default:
+            Element.prototype.set_attribute.call(this, name, value);
+    }
+}
+Line.prototype.set_attribute = function (name: string, value: string) {
+    switch (name) {
+        case "x1":
+            this.x1.set_parse_length(value, this, name,);
+            break;
+        case "x2":
+            this.x2.set_parse_length(value, this, name,);
+            break
+        case "y1":
+            this.y1.set_parse_length(value, this, name,);
+            break;
+        case "y2":
+            this.y2.set_parse_length(value, this, name,);
+            break;
+        default:
+            Element.prototype.set_attribute.call(this, name, value);
+    }
+}
+
+Text.prototype.set_attribute = function (name: string, value: string) {
+    switch (name) {
+        case "y":
+            this.y.set_parse_length(value, this, name, "h");
+            break;
+        case "x":
+            this.x.set_parse_length(value, this, name, "w");
+            break;
+        case "dy":
+            this.dy.set_parse_length(value, this, name, "h");
+            break;
+        case "dx":
+            this.dx.set_parse_length(value, this, name, "w");
+            break;
+        default:
+            Element.prototype.set_attribute.call(this, name, value);
+    }
+}
+
+TSpan.prototype.set_attribute = function (name: string, value: string) {
+    switch (name) {
+        case "y":
+            this.y.set_parse_length(value, this, name, "h");
+            break;
+        case "x":
+            this.x.set_parse_length(value, this, name, "w");
+            break;
+        case "dy":
+            this.dy.set_parse_length(value, this, name, "h");
+            break;
+        case "dx":
+            this.dx.set_parse_length(value, this, name, "w");
             break;
         default:
             Element.prototype.set_attribute.call(this, name, value);

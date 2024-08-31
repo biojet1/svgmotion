@@ -45,20 +45,7 @@ const TAG_DOM: {
         // Properties
         // console.info(`PATH`, e.getAttributeNames(), e.innerHTML);
         for (const [name, value] of props.entries()) {
-            // console.info(`PATH ATTR _ ${name} ${value}`);
-            switch (name) {
-                case "r":
-                    node.r.set_parse_length(value, node, name);
-                    break;
-                case "cx":
-                    node.cx.set_parse_length(value, node, name, "w");
-                    break;
-                case "cy":
-                    node.cy.set_parse_length(value, node, name, "h");
-                    break;
-                default:
-                    node.set_attribute(name, value);
-            }
+            node.set_attribute(name, value);
         }
         return node;
     },
@@ -67,119 +54,42 @@ const TAG_DOM: {
         // Properties
         // console.info(`PATH`, e.getAttributeNames(), e.innerHTML);
         for (const [name, value] of props.entries()) {
-            // console.info(`PATH ATTR _ ${name} ${value}`);
-            switch (name) {
-                case "rx":
-                    node.rx.set_parse_length(value, node, name);
-                    break;
-                case "ry":
-                    node.ry.set_parse_length(value, node, name);
-                    break;
-                case "cx":
-                    node.cx.set_parse_length(value, node, name);
-                    break;
-                case "cy":
-                    node.cy.set_parse_length(value, node, name);
-                    break;
-                default:
-                    node.set_attribute(name, value);
-
-            }
+            node.set_attribute(name, value);
         }
         return node;
     },
     polygon: function (props: Map<string, string>, parent: Container) {
         let node = parent.add_polygon();
         for (const [name, value] of props.entries()) {
-            switch (name) {
-                case "points":
-                    node.points.set_parse_points(value, parent);
-                    break;
-                default:
-                    node.set_attribute(name, value);
-
-            }
+            node.set_attribute(name, value);
         }
         return node;
     },
     polyline: function (props: Map<string, string>, parent: Container) {
         let node = parent.add_polyline();
         for (const [name, value] of props.entries()) {
-            switch (name) {
-                case "points":
-                    node.points.set_parse_points(value, parent);
-                    break;
-                default:
-                    node.set_attribute(name, value);
-
-            }
+            node.set_attribute(name, value);
         }
         return node;
     },
     line: function (props: Map<string, string>, parent: Container) {
         let node = parent.add_line();
         for (const [name, value] of props.entries()) {
-            switch (name) {
-                case "x1":
-                    node.x1.set_parse_length(value, node, name,);
-                    break;
-                case "x2":
-                    node.x2.set_parse_length(value, node, name,);
-                    break
-                case "y1":
-                    node.y1.set_parse_length(value, node, name,);
-                    break;
-                case "y2":
-                    node.y2.set_parse_length(value, node, name,);
-                    break;
-                default:
-                    node.set_attribute(name, value);
-
-            }
+            node.set_attribute(name, value);
         }
         return node;
     },
     text: function (props: Map<string, string>, parent: Container) {
         let node = parent.add_text();
         for (const [name, value] of props.entries()) {
-            switch (name) {
-                case "y":
-                    node.y.set_parse_length(value, node, name, "h");
-                    break;
-                case "x":
-                    node.x.set_parse_length(value, node, name, "w");
-                    break;
-                case "dy":
-                    node.dy.set_parse_length(value, node, name, "h");
-                    break;
-                case "dx":
-                    node.dx.set_parse_length(value, node, name, "w");
-                    break;
-                default:
-                    node.set_attribute(name, value);
-            }
+            node.set_attribute(name, value);
         }
         return node;
     },
     tspan: function (props: Map<string, string>, parent: Container) {
         let node = parent.add_tspan();
         for (const [name, value] of props.entries()) {
-            switch (name) {
-                case "y":
-                    node.y.set_parse_length(value, node, name, "h");
-                    break;
-                case "x":
-                    node.x.set_parse_length(value, node, name, "w");
-                    break;
-                case "dy":
-                    node.dy.set_parse_length(value, node, name, "h");
-                    break;
-                case "dx":
-                    node.dx.set_parse_length(value, node, name, "w");
-                    break;
-                default:
-                    node.set_attribute(name, value);
-            }
+            node.set_attribute(name, value);
         }
         return node;
     },
