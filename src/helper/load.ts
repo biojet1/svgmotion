@@ -29,6 +29,8 @@ const TAGS: {
     tspan: function (parent: Container) { return parent.add_tspan(); },
 };
 
+
+
 function load_properties(that: any, props: { [key: string]: PlainValue<any> }) {
     for (let [k, v] of Object.entries(props)) {
         const p = that[k];
@@ -99,8 +101,11 @@ declare module "../model/elements" {
         add_use(before?: Element): Use;
         add_view(before?: Element): ViewPort;
 
+        ////
+        _add_element(name: string): Element;
     }
 }
+
 
 export function from_json(src: PlainRoot) {
     const root = new Root();
@@ -150,3 +155,24 @@ Container.prototype.add_text = function (before?: Element) { const x = new Text(
 Container.prototype.add_tspan = function (before?: Element) { const x = new TSpan(); this.insert_before(before ?? this._end, x); return x; }
 Container.prototype.add_use = function (before?: Element) { const x = new Use(); this.insert_before(before ?? this._end, x); return x; }
 Container.prototype.add_view = function (before?: Element) { const x = new ViewPort(); this.insert_before(before ?? this._end, x); return x; }
+
+
+Container.prototype._add_element = function (name: string) {
+    switch (name) {
+        case "circle": return this.add_circle();
+        case "ellipse": return this.add_ellipse();
+        case "g": return this.add_group();
+        case "image": return this.add_image();
+        case "line": return this.add_line();
+        case "path": return this.add_path();
+        case "polygon": return this.add_polygon();
+        case "polyline": return this.add_polyline();
+        case "rect": return this.add_rect();
+        case "symbol": return this.add_symbol();
+        case "text": return this.add_text();
+        case "tspan": return this.add_tspan();
+        case "use": return this.add_use();
+        case "svg": return this.add_view();
+    }
+    throw new Error("Unexpected tag: " + name);
+}

@@ -18,9 +18,13 @@ test.test("load_svg the_quick", async (t) => {
     r.y.set_value(bb.y);
     r.width.set_value(bb.width);
     r.height.set_value(bb.height);
-    r.stroke.width.set_value(1);
-    r.stroke.color.set_value("red");
+    // r.stroke.width.set_value(1);
+    // r.stroke.color.set_value("red");
     r.fill.color.set_value("none")
+    r.set_attributes({
+        "stroke": "red",
+        "stroke-width": 1,
+    })
     // console.log(r.fill.color.value, r.fill.color.get_rgb_repr(0) + "", r.fill.color.get_value(0));
     // console.dir(r.fill);
 

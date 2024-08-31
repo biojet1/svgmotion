@@ -1,6 +1,6 @@
 import { Vector } from "../geom/index.js";
 import { Element } from "./base.js";
-import { Group, Item, ViewPort } from "./elements.js";
+import { Group, Item, ViewPort, Root } from "./elements.js";
 import { Parent } from "./linked.js";
 
 declare module "./base" {
@@ -8,13 +8,23 @@ declare module "./base" {
         owner_viewport(): ViewPort | undefined;
         farthest_viewport(): ViewPort | undefined;
         g_wrap(): Group;
+        get_root(): Root;
         get_font_size(frame: number): number;
         get_vp_width(frame: number): number;
         get_vp_height(frame: number): number;
         get_vp_size(frame: number, w?: number, h?: number): Vector;
     }
 }
-
+Element.prototype.get_root = function () {
+    for (let x of this.ancestors()) {
+        if (x instanceof Root) {
+            return x;
+        }
+    }
+    throw new Error(
+        `Unexpected ${this.constructor.name} ${this._parent?.constructor.name}`
+    );
+}
 Element.prototype.g_wrap = function () {
     const p = this.parent();
     if (p) {
