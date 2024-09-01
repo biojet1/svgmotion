@@ -1,8 +1,8 @@
-import { number } from "yargs";
-import { Vector } from "../geom/index.js";
 import { cubic_point_at } from "../keyframe/bezier.js";
-import { Animated, KeyExtra } from "../keyframe/keyframe.js";
-import { Keyframe } from "../keyframe/keyframe.js";
+import { Vector } from "../geom/index.js";
+import { Keyframe, Animated, KeyExtra } from "../keyframe/keyframe.js";
+
+
 export interface PlainKeyframe {
     t: number;
     h?: boolean;
@@ -29,6 +29,7 @@ export class Animatable<
     K extends Keyframe<V> = Keyframe<V>
 > extends Animated<V, K> {
     value: V | string;
+
 
     // static
     override initial_value(): V {
@@ -374,19 +375,6 @@ export class LengthValue extends ScalarValue {
 export class PercentageValue extends ScalarValue {
     constructor(v: number = 0) {
         super(v);
-    }
-}
-
-
-export class Point extends Vector {
-    constructor(x: number = 0, y: number = 0) {
-        super([x, y]);
-    }
-}
-
-export class Size extends Vector {
-    constructor(w: number = 0, h: number = 0) {
-        super([w, h]);
     }
 }
 

@@ -132,6 +132,7 @@ Element.prototype.set_attribute = function (name: string, value: string): Elemen
         case "paint-order":
             break;
         default:
+            // this[name] = new Tex
             if (!(name.startsWith("aria-") || name.startsWith("-inkscape"))) {
                 throw new Error(
                     `Unexpected attribute [${name}]="${value}" tag="${(this.constructor as any).tag}" this="${this.constructor.name}"`

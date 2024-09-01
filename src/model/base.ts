@@ -48,6 +48,10 @@ export class Element extends Parent {
             top = top._parent;
         }
     }
+    private _new_prop(name: string, value: ValueSet | Animatable<any>) {
+        const v = xget(this, name, value);
+        return v;
+    }
     /// fill
     get fill() {
         return xget(this, "fill", new Fill());
@@ -125,13 +129,6 @@ export class Element extends Parent {
     }
     set shape_rendering(v: ShapeRenderingValue) {
         xset(this, 'shape_rendering', v);
-    }
-    /// getset<stop-opacity>
-    get stop_opacity() {
-        return xget(this, 'stop_opacity', new PercentageValue(1));
-    }
-    set stop_opacity(v: PercentageValue) {
-        xset(this, 'stop_opacity', v);
     }
     /// getset<stroke-dashoffset>
     get stroke_dashoffset() {
@@ -349,4 +346,11 @@ export class TextAlignValue extends EnumTextValue {
 
 /// EnumTextValue ////////////
 
+
+export class LengthWValue extends ScalarValue {
+    protected _parent?: Element;
+    constructor(v: number = 0) {
+        super(v);
+    }
+}
 // TODO: dash array, path

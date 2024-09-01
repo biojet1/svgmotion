@@ -35,6 +35,8 @@ test.test("load_svg the_quick", async (t) => {
     tr.run(ZoomTo(view, [dog], { margin: 50 }))
     tr.run(ZoomTo(view, [the]))
     tr.run(ZoomTo(view, [bbo]))
+    tr.run(Rel(0.5).by(view.view_box.position, [100, 0]).at(1).by(view.view_box.position, [-100, 0]))
+
     // console.log(r.fill.color.value, r.fill.color.get_rgb_repr(0) + "", r.fill.color.get_value(0));
     // console.dir(r.fill);
     // r.fill.opacity.set_value(.4)

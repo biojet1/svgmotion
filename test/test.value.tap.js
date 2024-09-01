@@ -6,7 +6,6 @@ import {
     VectorValue,
     Vector,
     Root,
-    Size,
     Transform,
     Easing,
 } from "svgmotion";
@@ -68,8 +67,8 @@ test.test("ViewPort", (t) => {
     let r = vp.add_rect();
     // console.info(r.size);
     vp.view_box;
-    r.size.key_value(0, new Size(50, 50));
-    r.size.key_value(50, new Size(50, 100));
+    // r.size.key_value(0, new Size(50, 50));
+    // r.size.key_value(50, new Size(50, 100));
     // v.key_value(0, new Vector([3, 4]));
     // v.key_value(60, new Vector([4, 5]));
     // v[0].fun();

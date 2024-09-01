@@ -1,4 +1,4 @@
-import { PlainValue } from "../model/value.js";
+import { PlainValue, TextValue } from "../model/value.js";
 import { Animatable } from "../model/value.js";
 import { ValueSet } from "../model/valuesets.js";
 import { Element } from "../model/base.js";
@@ -10,17 +10,18 @@ import {
     TSpan, Text
 } from "../model/elements.js";
 
-function load_properties(that: any, props: { [key: string]: PlainValue<any> }) {
+function load_properties(that: Element, props: { [key: string]: PlainValue<any> }) {
     for (let [k, v] of Object.entries(props)) {
-        const p = that[k];
+        const p = (that as any)[k];
         if (p instanceof ValueSet || p instanceof Animatable) {
             p.load(v);
         } else {
             switch (k) {
                 case 'id':
-                    that[k] = v;
+                    (that as any)[k] = v;
                     break;
                 default:
+                    // (that as any)[k] = new TextValue(v);
                     throw new Error(`Unexpected property "${k}" (${v})`);
             }
         }
