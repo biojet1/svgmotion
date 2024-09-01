@@ -1,3 +1,4 @@
+import { number } from "yargs";
 import { Vector } from "../geom/index.js";
 import { cubic_point_at } from "../keyframe/bezier.js";
 import { Animated, KeyExtra } from "../keyframe/keyframe.js";
@@ -27,15 +28,11 @@ export class Animatable<
     V,
     K extends Keyframe<V> = Keyframe<V>
 > extends Animated<V, K> {
-    value: V | null;
+    value: V | string;
 
     // static
     override initial_value(): V {
-        const { value } = this;
-        if (value == null) {
-            throw new Error(`value cant be null`);
-        }
-        return value;
+        return this.check_value(this.value);
     }
 
     set_value(value: V | any) {
@@ -52,7 +49,7 @@ export class Animatable<
             return { t, o: [ox, oy], i: [ix, iy], v: value };
         }
     }
-    dump_key_value(x: V | null): any {
+    dump_key_value(x: V): any {
         return this.dump_value(x)
     }
 
@@ -87,9 +84,6 @@ export class Animatable<
         if (v != undefined) {
             this.value = this.load_value(x.v);
         }
-        if (v === null) {
-            this.value = null;
-        }
     }
 
     constructor(v: V) {
@@ -107,9 +101,6 @@ export class AnimatableD<V> extends Animatable<V> {
         const { kfs } = this;
         let p = undefined; // previous Keyframe<V>
         for (const k of kfs) {
-            // if (k.time >= frame) {
-            //     return k.value;
-            // }
             if (frame < k.time) {
                 if (p) {
                     return p.value;
@@ -122,12 +113,7 @@ export class AnimatableD<V> extends Animatable<V> {
         if (p) {
             return p.value;
         }
-        // throw new Error(`empty keyframe list`);
-        const { value } = this;
-        if (value == null) {
-            throw new Error(`value cant be null`);
-        }
-        return value;
+        return this.initial_value();
     }
     override key_value(frame: number, value: V, extra?: KeyExtra) {
         const { start, easing, add } = extra ?? {};
@@ -150,9 +136,7 @@ export class AnimatableD<V> extends Animatable<V> {
             }
         } else {
             if (start != undefined) {
-                if (this.value != null) {
-                    last = this.add_keyframe(start, this.value);
-                }
+                last = this.add_keyframe(start, this.initial_value());
             }
         }
         if (last) {
@@ -210,7 +194,13 @@ export class VectorValue<K extends Keyframe<Vector> = Keyframe<Vector>> extends 
         }
         throw new Error(`not array of numbers`);
     }
-
+    override initial_value(): Vector {
+        const { value } = this;
+        if (value instanceof Vector) {
+            return value;
+        }
+        throw Error(`Not a Vector '${this.constructor.name}' '${value}'`);
+    }
 
     constructor(v: Vector | Iterable<number>) {
         if (v instanceof Vector) {
@@ -228,6 +218,13 @@ export class PointsValue extends AnimatableD<number[][]> {
     override load_value(a: any): number[][] {
         return a as number[][];
     }
+    override initial_value(): number[][] {
+        const { value } = this;
+        if (Array.isArray(value)) {
+            return value;
+        }
+        throw Error(`Not a number[][] '${this.constructor.name}' '${value}'`);
+    }
 }
 
 export class TextValue extends AnimatableD<string> {
@@ -239,6 +236,13 @@ export class TextValue extends AnimatableD<string> {
     }
     override load_value(a: any): string {
         return a + "";
+    }
+    override initial_value(): string {
+        const { value } = this;
+        if (typeof value === 'string') {
+            return value;
+        }
+        throw Error(`Not a string '${this.constructor.name}' '${value}'`);
     }
 }
 
@@ -349,6 +353,13 @@ export class ScalarValue extends Animatable<number> {
     }
     override load_value(a: any): number {
         return a as number;
+    }
+    override initial_value(): number {
+        const { value } = this;
+        if (typeof value === 'number') {
+            return value;
+        }
+        throw Error(`Not a number '${this.constructor.name}' '${value}'`);
     }
     constructor(v: number = 0) {
         super(v);

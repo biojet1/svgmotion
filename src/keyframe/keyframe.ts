@@ -21,7 +21,7 @@ export class Animated<V, K extends Keyframe<V> = Keyframe<V>> implements Steppab
         throw Error(`Not implemented by '${this.constructor.name}'`);
     }
     // should be static
-    dump_value(_a: V | null): any {
+    dump_value(_a: V | any): any {
         throw Error(`Not implemented by '${this.constructor.name}'`);
     }
     // should be static

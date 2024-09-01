@@ -187,7 +187,7 @@ ScalarValue.prototype.set_parse_line_height = function (s: string, parent: Eleme
     if (s.endsWith('%')) {
         this.value = parseFloat(s.replaceAll('%', '')) / 100;
     } else if (s == 'normal') {
-        this.value = null;
+        this.value = s;
     } else {
         const cl = new ComputeLength(parent, 0);
         this.value = cl.parse_len(s);
@@ -196,8 +196,8 @@ ScalarValue.prototype.set_parse_line_height = function (s: string, parent: Eleme
 }
 
 RGBValue.prototype.set_parse_rgb = function (s: string, parent: Element) {
-    if (s == "none") {
-        this.value = null;
+    if (s == "none" || s == "context-fill" || s == "context-stroke" || s == "currentColor") {
+        this.value = s;
         return;
     }
     const c = parse_css_color(s);
