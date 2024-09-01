@@ -1,5 +1,5 @@
 import { Animatable } from "../model/value.js";
-import { Container, Root, Item, PlainRoot, PlainNode } from "../model/elements.js";
+import { Container, Root, PlainRoot, PlainNode } from "../model/elements.js";
 import { ValueSet } from "../model/valuesets.js";
 import { TextData, Element } from "../model/base.js";
 
@@ -35,7 +35,7 @@ Container.prototype.dump = function () {
         o.id = id;
     }
 
-    o.nodes = [...this.children<Container | Item>()].map((v) =>
+    o.nodes = [...this.children<Element>()].map((v) =>
         v.dump()
     );
     return o;

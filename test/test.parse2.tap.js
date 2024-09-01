@@ -32,7 +32,7 @@ test.test("load_svg the_quick", async (t) => {
     tr.run(Pass(1))
     const bbo = view.view_box.bbox();
     tr.run(ZoomTo(view, [lazy]))
-    tr.run(ZoomTo(view, [dog]))
+    tr.run(ZoomTo(view, [dog], { margin: 50 }))
     tr.run(ZoomTo(view, [the]))
     tr.run(ZoomTo(view, [bbo]))
     // console.log(r.fill.color.value, r.fill.color.get_rgb_repr(0) + "", r.fill.color.get_value(0));

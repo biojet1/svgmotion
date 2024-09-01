@@ -1,7 +1,6 @@
 "uses strict";
 
 import * as all from "../dist/lib.js";
-// const { Item, Container } = all;
 
 function* ptypes(class_dec) {
     let p = Object.getPrototypeOf(class_dec);
@@ -23,7 +22,7 @@ function prop_descs(class_dec) {
 if (0) {
     for (const [k, v] of Object.entries(all)) {
         const t = [...ptypes(v)];
-        if (t.includes("Item") || t.includes("Container")) {
+        if (t.includes("Element")) {
             console.log(`<<<< ${k}`, prop_descs(v));
         }
     }
@@ -33,7 +32,7 @@ function* enum1(all) {
         const q = ptypes(v);
         const t = [...q];
         // console.log("X", kind, t)
-        if (t.includes("Item") || t.includes("Container") || t.includes("Element")) {
+        if (t.includes("Element")) {
             const { tag } = v;
             // console.log("N", tag, kind)
             if (tag && /^[a-zA-Z]/.test(tag)) {

@@ -19,10 +19,6 @@ export interface PlainRoot {
     frame_rate: number;
 }
 
-export abstract class Item extends Element {
-
-}
-
 export class Container extends Element {
     *enum_values(): Generator<Animatable<any>, void, unknown> {
         for (let v of Object.values(this)) {
@@ -64,7 +60,7 @@ export class Container extends Element {
         const { _start, _end: end } = this;
         let cur: Node | undefined = _start;
         do {
-            if (cur instanceof Item || cur instanceof Container) {
+            if (cur instanceof Element) {
                 if (cur.id === id) {
                     return cur;
                 }
@@ -194,7 +190,7 @@ export class ViewPort extends Container {
     }
 }
 
-export abstract class Shape extends Item {
+export abstract class Shape extends Element {
     describe(frame: number): string {
         throw new Error(`Not implemented`);
     }
@@ -519,7 +515,7 @@ export class Polygon extends Shape {
     }
 }
 
-export class Use extends Item {
+export class Use extends Element {
     static tag = "use";
     /// href
     get href() {

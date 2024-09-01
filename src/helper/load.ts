@@ -3,7 +3,7 @@ import { Animatable } from "../model/value.js";
 import { ValueSet } from "../model/valuesets.js";
 import { Element } from "../model/base.js";
 import {
-    Container, Root, Item, PlainRoot, PlainNode,
+    Container, Root, PlainRoot, PlainNode,
     ViewPort, Rect, Path, Line, Group,
     Ellipse, Circle, Polyline, Polygon, Image, Symbol,
     Use,
@@ -48,7 +48,7 @@ function load_container(obj: PlainNode, parent: Container) {
             }
         } else if (node == undefined) {
             throw new Error(`unexpected "${tag}" `);
-        } else if (!(node instanceof Item)) {
+        } else if (!(node instanceof Element)) {
             throw new Error(`unexpected nodes in "${tag}" ${(node as any).constructor.name}`);
         }
         return node;

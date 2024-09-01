@@ -2,9 +2,7 @@ import {
     Circle,
     Container,
     Ellipse,
-    Group,
-    Item,
-    Line,
+    Group, Line,
     Path,
     Polygon,
     Polyline,
@@ -182,7 +180,7 @@ function* enum_node_type<T>(that: Container, x: { new(...args: any[]): T }) {
     const { _start, _end: end } = that;
     let cur: typeof _start | undefined = _start;
     do {
-        if (cur instanceof Item || cur instanceof Container || cur instanceof TextData) {
+        if (cur instanceof Element || cur instanceof TextData) {
             if (cur instanceof x) {
                 yield cur;
             }

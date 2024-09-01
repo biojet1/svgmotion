@@ -1,6 +1,6 @@
 import { VectorValue, ScalarValue, PointsValue, RGBValue, TextValue } from "../model/value.js";
 import { Animatable } from "../model/value.js";
-import { Container, Root, Item } from "../model/elements.js";
+import { Container, Root } from "../model/elements.js";
 import { Node } from "../model/linked.js";
 import { Transform, Fill, Box, Font, Stroke, ValueSet } from "../model/valuesets.js";
 import { Stepper } from "../track/stepper.js";
@@ -21,7 +21,7 @@ const FILL_MAP: {
 };
 
 const PROP_MAP: {
-    [key: string]: ((frame: number, elem: any, prop: any, node: Container | Item) => void);
+    [key: string]: ((frame: number, elem: any, prop: any, node: Element) => void);
 } = {
     opacity: function (frame: number, node: SVGElement, prop: ScalarValue) {
         node.setAttribute("opacity", prop.get_percentage_repr(frame));
@@ -164,7 +164,7 @@ const PROP_MAP: {
     },
 };
 
-function update_dom(frame: number, target: Item | Container) {
+function update_dom(frame: number, target: Element) {
     const { _start, _end: end } = target;
     let cur: Node | undefined = _start;
     do {
@@ -193,11 +193,7 @@ declare module "../model/elements" {
         update_dom(frame: number): void;
         stepper(): Stepper;
     }
-    interface Item {
-        // _element?: SVGElement;
-        // to_dom(doc: typeof SVGElement.prototype.ownerDocument): SVGElement;
-        update_dom(frame: number): void;
-    }
+
     interface Root {
         to_dom(doc: typeof SVGElement.prototype.ownerDocument): SVGElement;
     }
@@ -244,7 +240,7 @@ Container.prototype.to_dom = function (doc: typeof SVGElement.prototype.ownerDoc
         NS_SVG,
         (<typeof Container>this.constructor).tag
     ));
-    for (const sub of this.children<Container | Item>()) {
+    for (const sub of this.children<Element>()) {
         con.appendChild(sub.to_dom(doc));
     }
     return set_svg(con, this);
@@ -253,7 +249,7 @@ Container.prototype.to_dom = function (doc: typeof SVGElement.prototype.ownerDoc
 Element.prototype.to_dom = function (doc: typeof SVGElement.prototype.ownerDocument): SVGElement {
     const e = (this._element = doc.createElementNS(
         NS_SVG,
-        (<typeof Item>this.constructor).tag
+        (<typeof Element>this.constructor).tag
     ));
     return set_svg(e, this);
 }
@@ -277,10 +273,6 @@ Root.prototype.to_dom = function to_dom(doc: typeof SVGElement.prototype.ownerDo
 
     // element.setAttribute("version", "2.0");
     return element;
-}
-
-Item.prototype.update_dom = function (frame: number) {
-    update_dom(frame, this);
 }
 
 Container.prototype.update_dom = function (frame: number) {

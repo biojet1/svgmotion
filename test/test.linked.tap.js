@@ -3,7 +3,7 @@ import test from "tap";
 
 import { Node, Parent } from "../dist/model/linked.js";
 
-class Item extends Parent {
+class Unit extends Parent {
     constructor(v) {
         super();
         this.value = v;
@@ -37,16 +37,16 @@ function to_string_check(t, n, s) {
     t.same(to_string2(n), s);
     t.same(n.toString(), s);
 }
-test.test("Item", (t) => {
-    let A = new Item("A");
-    let B = new Item("B");
-    let C = new Item("C");
-    let D = new Item("D");
-    let E = new Item("E");
-    let F = new Item("F");
-    let G = new Item("G");
-    let H = new Item("H");
-    let I = new Item("I");
+test.test("Tree Linked3", (t) => {
+    let A = new Unit("A");
+    let B = new Unit("B");
+    let C = new Unit("C");
+    let D = new Unit("D");
+    let E = new Unit("E");
+    let F = new Unit("F");
+    let G = new Unit("G");
+    let H = new Unit("H");
+    let I = new Unit("I");
     t.same(A.first_child(), undefined);
     t.same(A.last_child(), undefined);
     t.same(A.root(), undefined);

@@ -5,32 +5,17 @@ import { Root, BoundingBox } from "svgmotion";
 function close_enough(t, a, b, threshold = 1e-6, tag) {
     t.ok(Math.abs(b - a) <= threshold, `${tag} ${a} ${b} ${threshold}`);
 }
+
 function boxf(r) {
     return `(${r.x},${r.y})<${r.width} x ${r.height}>`
 }
+
 function eqBox(t, a, b, epsilon = 0, tag) {
     t.notOk(a === b)
     t.ok(a.equals(b, epsilon), `${tag} [${boxf(a)}] vs [${boxf(b)}]`);
 }
 
-// test.Test.prototype.addAssert('sameBox', 3, function (box1, box2, epsilon = 0.0001, message, extra) {
-//     if (box1.bbox) {
-//         const { left, right, top, bottom } = box1.bbox();
-//         box1 = [left, right, top, bottom];
-//     }
-//     // console.error(box1, box2);
-//     for (const [i, k] of [`left`, `right`, `top`, `bottom`]) {
-//         if (!almostEqual(box1[i], box2[i], epsilon)) {
-//             this.fail(`BoundingBox ${k} ${box1[i]} not close to ${box2[i]} ${box1[i] - box2[i]}Δ ±${epsilon} : ${message}`);
-//             // this.end();
-//             return;
-//         }
-//     }
-//     this.pass(`BoundingBox ${box1} close to ${box2} ±${epsilon}`);
-//     // this.end();
-// });
-
-test.test("Item", async (t) => {
+test.test("load_svg", async (t) => {
     const anim = new Root();
     //
     await anim.load_svg("res/viewport.svg");

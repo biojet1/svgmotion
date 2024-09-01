@@ -1,6 +1,6 @@
 import { Matrix, MatrixMut, Vector } from "../geom/index.js";
 import { Element } from "./base.js";
-import { Group, Item, ViewPort, Root, Container } from "./elements.js";
+import { Group, ViewPort, Root, Container } from "./elements.js";
 import { Parent } from "./linked.js";
 
 declare module "./base" {
@@ -48,7 +48,7 @@ Element.prototype.owner_viewport = function () {
 }
 
 Element.prototype.farthest_viewport = function () {
-    let parent: Item | Parent | undefined = this;
+    let parent: Element | Parent | undefined = this;
     let farthest: ViewPort | undefined = undefined;
     while ((parent = parent._parent)) {
         if (parent instanceof ViewPort) {
