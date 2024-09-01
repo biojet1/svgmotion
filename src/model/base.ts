@@ -1,5 +1,5 @@
 import { Matrix, BoundingBox } from "../geom/index.js";
-import { ScalarValue, PositionValue, TextValue, EnumTextValue, LengthValue, PercentageValue } from "./value.js";
+import { ScalarValue, PositionValue, TextValue, EnumTextValue, PercentageValue } from "./value.js";
 import { Fill, Transform, xset, xget, Font, Stroke, ValueSet } from "./valuesets.js";
 import { Node, Parent } from "./linked.js";
 import { Animatable } from "./value.js";
@@ -48,208 +48,217 @@ export class Element extends Parent {
             top = top._parent;
         }
     }
-    private _new_prop(name: string, value: ValueSet | Animatable<any>) {
+    protected _new_field<T extends Animatable<any> | ValueSet>(name: string, value: T): T {
         const v = xget(this, name, value);
-        return v;
+        value._parent = this;
+        return value;
     }
     /// fill
     get fill() {
-        return xget(this, "fill", new Fill());
+        return this._new_field("fill", new Fill());
     }
     set fill(v: Fill) {
-        xset(this, "fill", v);
+        this._new_field("fill", v);
     }
     /// stroke
     get stroke() {
-        return xget(this, "stroke", new Stroke());
+        return this._new_field("stroke", new Stroke());
     }
     set stroke(v: Stroke) {
-        xset(this, "stroke", v);
+        this._new_field("stroke", v);
     }
     /// Font
     get font() {
-        return xget(this, "font", new Font());
+        return this._new_field("font", new Font());
     }
     set font(v: Font) {
-        xset(this, "font", v);
+        this._new_field("font", v);
     }
     /// transform
     get transform() {
-        return xget(this, "transform", new Transform());
+        return this._new_field("transform", new Transform());
     }
     set transform(v: Transform) {
-        xset(this, "transform", v);
+        this._new_field("transform", v);
     }
     // line_height
     get line_height() {
-        return xget(this, "line_height", new ScalarValue(1));
+        return this._new_field("line_height", new ScalarValue(1));
     }
     set line_height(v: ScalarValue) {
-        xset(this, "line_height", v);
+        this._new_field("line_height", v);
     }
     /// anchor
     get anchor() {
-        return xget(this, "anchor", new PositionValue([0, 0]));
+        return this._new_field("anchor", new PositionValue([0, 0]));
     }
     set anchor(v: TextValue | PositionValue) {
-        xset(this, "anchor", v);
+        this._new_field("anchor", v);
     }
     /// Properties ////////////
     /// getset<font-size>
     get font_size() {
-        return xget(this, 'font_size', new LengthValue(16));
+        return this._new_field('font_size', new LengthValue(16));
     }
     set font_size(v: LengthValue) {
-        xset(this, 'font_size', v);
-    }
-    /// getset<image-rendering>
-    get image_rendering() {
-        return xget(this, 'image_rendering', new ImageRenderingValue());
-    }
-    set image_rendering(v: ImageRenderingValue) {
-        xset(this, 'image_rendering', v);
-    }
-    /// getset<letter-spacing>
-    get letter_spacing() {
-        return xget(this, 'letter_spacing', new LengthValue(0));
-    }
-    set letter_spacing(v: LengthValue) {
-        xset(this, 'letter_spacing', v);
-    }
-    /// getset<opacity>
-    get opacity() {
-        return xget(this, 'opacity', new PercentageValue(1));
-    }
-    set opacity(v: PercentageValue) {
-        xset(this, 'opacity', v);
-    }
-    /// getset<shape-rendering>
-    get shape_rendering() {
-        return xget(this, 'shape_rendering', new ShapeRenderingValue());
-    }
-    set shape_rendering(v: ShapeRenderingValue) {
-        xset(this, 'shape_rendering', v);
-    }
-    /// getset<stroke-dashoffset>
-    get stroke_dashoffset() {
-        return xget(this, 'stroke_dashoffset', new LengthValue(0));
-    }
-    set stroke_dashoffset(v: LengthValue) {
-        xset(this, 'stroke_dashoffset', v);
-    }
-    /// getset<stroke-linecap>
-    get stroke_linecap() {
-        return xget(this, 'stroke_linecap', new StrokeLinecapValue());
-    }
-    set stroke_linecap(v: StrokeLinecapValue) {
-        xset(this, 'stroke_linecap', v);
-    }
-    /// getset<stroke-linejoin>
-    get stroke_linejoin() {
-        return xget(this, 'stroke_linejoin', new StrokeLinejoinValue());
-    }
-    set stroke_linejoin(v: StrokeLinejoinValue) {
-        xset(this, 'stroke_linejoin', v);
-    }
-    /// getset<stroke-miterlimit>
-    get stroke_miterlimit() {
-        return xget(this, 'stroke_miterlimit', new ScalarValue(4));
-    }
-    set stroke_miterlimit(v: ScalarValue) {
-        xset(this, 'stroke_miterlimit', v);
-    }
-    /// getset<stroke-opacity>
-    get stroke_opacity() {
-        return xget(this, 'stroke_opacity', new PercentageValue(1));
-    }
-    set stroke_opacity(v: PercentageValue) {
-        xset(this, 'stroke_opacity', v);
-    }
-    /// getset<stroke-width>
-    get stroke_width() {
-        return xget(this, 'stroke_width', new LengthValue(1));
-    }
-    set stroke_width(v: LengthValue) {
-        xset(this, 'stroke_width', v);
+        this._new_field('font_size', v);
     }
     /// getset<text-anchor>
     get text_anchor() {
-        return xget(this, 'text_anchor', new TextAnchorValue());
+        return this._new_field('text_anchor', new TextAnchorValue());
     }
     set text_anchor(v: TextAnchorValue) {
-        xset(this, 'text_anchor', v);
+        this._new_field('text_anchor', v);
     }
     /// getset<text-decoration>
     get text_decoration() {
-        return xget(this, 'text_decoration', new TextValue('none'));
+        return this._new_field('text_decoration', new TextValue('none'));
     }
     set text_decoration(v: TextValue) {
-        xset(this, 'text_decoration', v);
+        this._new_field('text_decoration', v);
     }
     /// getset<text-overflow>
     get text_overflow() {
-        return xget(this, 'text_overflow', new TextValue('clip'));
+        return this._new_field('text_overflow', new TextValue('clip'));
     }
     set text_overflow(v: TextValue) {
-        xset(this, 'text_overflow', v);
+        this._new_field('text_overflow', v);
     }
     /// getset<text-rendering>
     get text_rendering() {
-        return xget(this, 'text_rendering', new TextRenderingValue());
+        return this._new_field('text_rendering', new TextRenderingValue());
     }
     set text_rendering(v: TextRenderingValue) {
-        xset(this, 'text_rendering', v);
+        this._new_field('text_rendering', v);
+    }
+    /// getset<stop-opacity>
+    get stop_opacity() {
+        return this._new_field('stop_opacity', new PercentageValue(1));
+    }
+    set stop_opacity(v: PercentageValue) {
+        this._new_field('stop_opacity', v);
+    }
+    /// getset<image-rendering>
+    get image_rendering() {
+        return this._new_field('image_rendering', new ImageRenderingValue());
+    }
+    set image_rendering(v: ImageRenderingValue) {
+        this._new_field('image_rendering', v);
+    }
+    /// getset<letter-spacing>
+    get letter_spacing() {
+        return this._new_field('letter_spacing', new LengthValue(0));
+    }
+    set letter_spacing(v: LengthValue) {
+        this._new_field('letter_spacing', v);
+    }
+    /// getset<opacity>
+    get opacity() {
+        return this._new_field('opacity', new PercentageValue(1));
+    }
+    set opacity(v: PercentageValue) {
+        this._new_field('opacity', v);
+    }
+    /// getset<shape-rendering>
+    get shape_rendering() {
+        return this._new_field('shape_rendering', new ShapeRenderingValue());
+    }
+    set shape_rendering(v: ShapeRenderingValue) {
+        this._new_field('shape_rendering', v);
+    }
+    /// getset<stroke-dashoffset>
+    get stroke_dashoffset() {
+        return this._new_field('stroke_dashoffset', new LengthValue(0));
+    }
+    set stroke_dashoffset(v: LengthValue) {
+        this._new_field('stroke_dashoffset', v);
+    }
+    /// getset<stroke-linecap>
+    get stroke_linecap() {
+        return this._new_field('stroke_linecap', new StrokeLinecapValue());
+    }
+    set stroke_linecap(v: StrokeLinecapValue) {
+        this._new_field('stroke_linecap', v);
+    }
+    /// getset<stroke-linejoin>
+    get stroke_linejoin() {
+        return this._new_field('stroke_linejoin', new StrokeLinejoinValue());
+    }
+    set stroke_linejoin(v: StrokeLinejoinValue) {
+        this._new_field('stroke_linejoin', v);
+    }
+    /// getset<stroke-miterlimit>
+    get stroke_miterlimit() {
+        return this._new_field('stroke_miterlimit', new ScalarValue(4));
+    }
+    set stroke_miterlimit(v: ScalarValue) {
+        this._new_field('stroke_miterlimit', v);
+    }
+    /// getset<stroke-opacity>
+    get stroke_opacity() {
+        return this._new_field('stroke_opacity', new PercentageValue(1));
+    }
+    set stroke_opacity(v: PercentageValue) {
+        this._new_field('stroke_opacity', v);
+    }
+    /// getset<stroke-width>
+    get stroke_width() {
+        return this._new_field('stroke_width', new LengthValue(1));
+    }
+    set stroke_width(v: LengthValue) {
+        this._new_field('stroke_width', v);
     }
     /// getset<unicode-bidi>
     get unicode_bidi() {
-        return xget(this, 'unicode_bidi', new UnicodeBidiValue());
+        return this._new_field('unicode_bidi', new UnicodeBidiValue());
     }
     set unicode_bidi(v: UnicodeBidiValue) {
-        xset(this, 'unicode_bidi', v);
+        this._new_field('unicode_bidi', v);
     }
     /// getset<vector-effect>
     get vector_effect() {
-        return xget(this, 'vector_effect', new TextValue('none'));
+        return this._new_field('vector_effect', new TextValue('none'));
     }
     set vector_effect(v: TextValue) {
-        xset(this, 'vector_effect', v);
+        this._new_field('vector_effect', v);
     }
     /// getset<visibility>
     get visibility() {
-        return xget(this, 'visibility', new VisibilityValue());
+        return this._new_field('visibility', new VisibilityValue());
     }
     set visibility(v: VisibilityValue) {
-        xset(this, 'visibility', v);
+        this._new_field('visibility', v);
     }
     /// getset<white-space>
     get white_space() {
-        return xget(this, 'white_space', new WhiteSpaceValue());
+        return this._new_field('white_space', new WhiteSpaceValue());
     }
     set white_space(v: WhiteSpaceValue) {
-        xset(this, 'white_space', v);
+        this._new_field('white_space', v);
     }
     /// getset<word-spacing>
     get word_spacing() {
-        return xget(this, 'word_spacing', new TextValue('pre'));
+        return this._new_field('word_spacing', new TextValue('pre'));
     }
     set word_spacing(v: TextValue) {
-        xset(this, 'word_spacing', v);
+        this._new_field('word_spacing', v);
     }
     /// getset<writing-mode>
     get writing_mode() {
-        return xget(this, 'writing_mode', new WritingModeValue());
+        return this._new_field('writing_mode', new WritingModeValue());
     }
     set writing_mode(v: WritingModeValue) {
-        xset(this, 'writing_mode', v);
+        this._new_field('writing_mode', v);
     }
     /// getset<text-align>
     get text_align() {
-        return xget(this, 'text_align', new TextAlignValue());
+        return this._new_field('text_align', new TextAlignValue());
     }
     set text_align(v: TextAlignValue) {
-        xset(this, 'text_align', v);
+        this._new_field('text_align', v);
     }
     /// Properties ////////////
+
 
 
 
@@ -348,7 +357,28 @@ export class TextAlignValue extends EnumTextValue {
 
 
 export class LengthWValue extends ScalarValue {
-    protected _parent?: Element;
+    // override initial_value(): number {
+    //     const { value } = this;
+    //     if (typeof value === 'number') {
+    //         return value;
+    //     }
+    //     throw Error(`Not a number '${this.constructor.name}' '${value}'`);
+    // }
+
+}
+
+export class LengthHValue extends ScalarValue {
+    // override initial_value(): number {
+    //     const { value } = this;
+    //     if (typeof value === 'number') {
+    //         return value;
+    //     }
+    //     throw Error(`Not a number '${this.constructor.name}' '${value}'`);
+    // }
+
+}
+
+export class LengthValue extends ScalarValue {
     constructor(v: number = 0) {
         super(v);
     }

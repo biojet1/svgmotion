@@ -92,8 +92,12 @@ export class ComputeLength {
         // this.length_mode = undefined;
     }
 
+
     get font_size() {
         const n = this.node.get_font_size(this.frame);
+        if (!isFinite(n) || n <= 0) {
+            throw new Error(`Invalid font_size ${n}`);
+        }
         return xget(this, "font_size", n);
     }
     get vw() {
@@ -139,4 +143,5 @@ export class ComputeLength {
         return 0;
         // throw new Error(`Unexpected length "${value}"`);
     }
+
 }

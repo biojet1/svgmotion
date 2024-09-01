@@ -1,4 +1,5 @@
 import { BoundingBox, Matrix, MatrixMut, Vector } from "../geom/index.js";
+import { LengthValue } from "./base.js";
 import { VectorValue, ScalarValue, PositionValue, RGBValue, TextValue } from "./value.js";
 import { PlainValue } from "./value.js";
 import { Animatable } from "./value.js";
@@ -23,6 +24,12 @@ export function xset<T>(that: any, name: string, value: T) {
 }
 
 export class ValueSet {
+    _parent?: any;
+    protected _new_field<T extends Animatable<any> | ValueSet>(name: string, value: T): T {
+        const v = xget(this, name, value);
+        value._parent = this._parent;
+        return value;
+    }
 
     *enum_values(): Generator<Animatable<any>, void, unknown> {
         for (const sub of Object.values(this)) {
@@ -64,17 +71,17 @@ export class Box extends ValueSet {
     }
     /// size
     get size() {
-        return xget(this, "size", new PositionValue([100, 100]));
+        return this._new_field("size", new PositionValue([100, 100]));
     }
     set size(v: PositionValue) {
-        xset(this, "size", v);
+        this._new_field("size", v);
     }
     /// position
     get position() {
-        return xget(this, "position", new PositionValue([0, 0]));
+        return this._new_field("position", new PositionValue([0, 0]));
     }
     set position(v: PositionValue) {
-        xset(this, "position", v);
+        this._new_field("position", v);
     }
     //
     bbox(frame: number) {
@@ -92,86 +99,86 @@ export class Box extends ValueSet {
 export class Stroke extends ValueSet {
     /// width
     get width() {
-        return xget(this, "width", new ScalarValue(1));
+        return this._new_field("width", new LengthValue(1));
     }
-    set width(v: ScalarValue) {
-        xset(this, "width", v);
+    set width(v: LengthValue) {
+        this._new_field("width", v);
     }
     /// opacity
     get opacity() {
-        return xget(this, "opacity", new ScalarValue(1));
+        return this._new_field("opacity", new ScalarValue(1));
     }
     set opacity(v: ScalarValue) {
-        xset(this, "opacity", v);
+        this._new_field("opacity", v);
     }
     /// color
     get color() {
-        return xget(this, "color", new RGBValue(new Vector([0, 0, 0])));
+        return this._new_field("color", new RGBValue(new Vector([0, 0, 0])));
     }
     set color(v: RGBValue) {
-        xset(this, "color", v);
+        this._new_field("color", v);
     }
     /// stroke-miterlimit
     get miter_limit() {
-        return xget(this, "miter_limit", new ScalarValue(4));
+        return this._new_field("miter_limit", new LengthValue(4));
     }
-    set miter_limit(v: ScalarValue) {
-        xset(this, "miter_limit", v);
+    set miter_limit(v: LengthValue) {
+        this._new_field("miter_limit", v);
     }
     // stroke-dashoffset
     get dash_offset() {
-        return xget(this, "dash_offset", new ScalarValue(1));
+        return this._new_field("dash_offset", new LengthValue(1));
     }
-    set dash_offset(v: ScalarValue) {
-        xset(this, "dash_offset", v);
+    set dash_offset(v: LengthValue) {
+        this._new_field("dash_offset", v);
     }
     // stroke-array
     get dash_array() {
-        return xget(this, "dash_array", new VectorValue(new Vector([1, 1])));
+        return this._new_field("dash_array", new VectorValue(new Vector([1, 1])));
     }
     set dash_array(v: VectorValue) {
-        xset(this, "dash_array", v);
+        this._new_field("dash_array", v);
     }
 }
 
 export class Fill extends ValueSet {
     /// opacity
     get opacity() {
-        return xget(this, "opacity", new ScalarValue(1));
+        return this._new_field("opacity", new ScalarValue(1));
     }
     set opacity(v: ScalarValue) {
-        xset(this, "opacity", v);
+        this._new_field("opacity", v);
     }
     /// color
     get color() {
-        return xget(this, "color", new RGBValue(new Vector([0, 0, 0])));
+        return this._new_field("color", new RGBValue(new Vector([0, 0, 0])));
     }
     set color(v: RGBValue) {
-        xset(this, "color", v);
+        this._new_field("color", v);
     }
     //
 }
 export class Font extends ValueSet {
     /// weight
     get weight() {
-        return xget(this, "weight", new TextValue("normal"));
+        return this._new_field("weight", new TextValue("normal"));
     }
     set weight(v: TextValue) {
-        xset(this, "weight", v);
+        this._new_field("weight", v);
     }
     /// size
     get size() {
-        return xget(this, "size", new TextValue("normal"));
+        return this._new_field("size", new LengthValue());
     }
-    set size(v: TextValue) {
-        xset(this, "size", v);
+    set size(v: LengthValue) {
+        this._new_field("size", v);
     }
     /// font-family
     get family() {
-        return xget(this, "family", new TextValue("monospace"));
+        return this._new_field("family", new TextValue("monospace"));
     }
     set family(v: TextValue) {
-        xset(this, "family", v);
+        this._new_field("family", v);
     }
 }
 

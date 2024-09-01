@@ -83,6 +83,11 @@ test.test("parse_svg", async (t) => {
     const ts = anim.get_tspan(0);
     const g = anim.get_group(0);
     const c = ts.get_data(0).content;
+    // console.dir(ts.dx);
+    console.log(`get_font_size ${ts.get_font_size()}`);
+
+    console.log(ts.dx.get_value(0), ts.dx.value, ts.dx.constructor.name, ts.dx.initial_value())
+    t.same(ts.dx.get_value(0), 2 * 64)
     anim.at(0).run(Rel(1).to(ts.dx, -50).at(2).to(ts.dx, 50));
     anim.at(0).run(Rel(0).to(c, 'A').at(0.5).to(c, 'B').at(1).to(c, 'C'));
     // anim.at(0).run(Rel(0).to(ts.dx, -50).at(1).to(ts.dx, 50));

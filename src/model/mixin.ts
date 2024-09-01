@@ -106,8 +106,11 @@ Element.prototype.get_font_size = function (frame: number): number {
         return s;
     }
     if (Object.hasOwn(this, "font")) {
-        const s = this.font.size.get_value(frame);
-        return s as any as number;
+        const { font } = this;
+        if (Object.hasOwn(this, "size")) {
+            const s = font.size.get_value(frame);
+            return s as any as number;
+        }
     }
     const p = this.parent();
     if (p instanceof Element) {
@@ -115,6 +118,7 @@ Element.prototype.get_font_size = function (frame: number): number {
     }
     throw new Error(`cant get_font_size <${this.constructor.name}> <${p?.constructor.name}>`);
 }
+
 Element.prototype._transform_up_to = function (frame: number, top: Parent): Matrix {
     let cur: Element | undefined = this;
     let ls: Element[] = []

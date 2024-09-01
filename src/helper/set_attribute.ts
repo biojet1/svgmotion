@@ -2,7 +2,7 @@
 import { VectorValue, ScalarValue, PointsValue, RGB, RGBValue, TextValue } from "../model/value.js";
 import { parse_css_color } from "./parse_color.js";
 import { ComputeLength } from "./svg_length.js";
-import { Element } from "../model/base.js";
+import { Element, LengthHValue, LengthWValue, LengthValue } from "../model/base.js";
 
 declare module "../model/base" {
     interface Element {
@@ -37,7 +37,7 @@ Element.prototype.set_attribute = function (name: string, value: string): Elemen
             break;
         case "font-size":
             if (value) {
-                this.font_size.set_parse_length(value, this, name);
+                this.font_size.value = value;
             }
         case "font-weight":
             if (value) {
@@ -91,7 +91,7 @@ Element.prototype.set_attribute = function (name: string, value: string): Elemen
             break;
         case "stroke-width":// 
             if (value) {
-                this.stroke.width.set_parse_length(value, this, name);
+                this.stroke.width.value = value;
             }
             break;
         case "stroke-miterlimit":// 
@@ -107,11 +107,11 @@ Element.prototype.set_attribute = function (name: string, value: string): Elemen
             break;
         case "stroke-dashoffset":// 
             if (value) {
-                this.stroke.dash_offset.set_parse_length(value, this, name);
+                this.stroke.dash_offset.value = value;
             }
         case "letter-spacing":// 
             if (value) {
-                this.letter_spacing.set_parse_length(value, this, name);
+                this.letter_spacing.value = value;
             }
         case "word-spacing":// 
             if (value) {
@@ -173,7 +173,6 @@ ScalarValue.prototype.set_parse_length = function (s: string, parent: Element, n
     const cl = new ComputeLength(parent, 0);
     cl.length_mode = mode;
     this.value = cl.parse_len(s);
-    // this.value = parse_len(s);
 }
 
 ScalarValue.prototype.set_parse_percentage = function (s: string, parent: Element) {
@@ -267,16 +266,16 @@ ViewPort.prototype.set_attribute = function (name: string, value: string) {
             this.zoom_pan.set_parse_text(value, this);
             break;
         case "height":
-            this.height.set_parse_length(value, this, name, "h");
+            this.height.value = value;
             break;
         case "width":
-            this.width.set_parse_length(value, this, name, "w");
+            this.width.value = value;
             break;
         case "y":
-            this.y.set_parse_length(value, this, name, "h");
+            this.y.value = value;
             break;
         case "x":
-            this.x.set_parse_length(value, this, name, "w");
+            this.x.value = value;
             break;
         default:
             Element.prototype.set_attribute.call(this, name, value);
@@ -288,22 +287,22 @@ ViewPort.prototype.set_attribute = function (name: string, value: string) {
 Rect.prototype.set_attribute = function (name: string, value: string) {
     switch (name) {
         case "height":
-            this.height.set_parse_length(value, this, name, "h");
+            this.height.value = value;
             break;
         case "width":
-            this.width.set_parse_length(value, this, name, "w");
+            this.width.value = value;
             break;
         case "y":
-            this.y.set_parse_length(value, this, name, "h");
+            this.y.value = value;
             break;
         case "x":
-            this.x.set_parse_length(value, this, name, "w");
+            this.x.value = value;
             break;
         case "ry":
-            this.ry.set_parse_length(value, this, name, "h");
+            this.ry.value = value;
             break;
         case "rx":
-            this.rx.set_parse_length(value, this, name, "w");
+            this.rx.value = value;
             break;
         default:
             Element.prototype.set_attribute.call(this, name, value);
@@ -316,13 +315,13 @@ Rect.prototype.set_attribute = function (name: string, value: string) {
 Circle.prototype.set_attribute = function (name: string, value: string) {
     switch (name) {
         case "r":
-            this.r.set_parse_length(value, this, name);
+            this.r.value = value;
             break;
         case "cx":
-            this.cx.set_parse_length(value, this, name, "w");
+            this.cx.value = value;
             break;
         case "cy":
-            this.cy.set_parse_length(value, this, name, "h");
+            this.cy.value = value;
             break;
         default:
             Element.prototype.set_attribute.call(this, name, value);
@@ -332,16 +331,16 @@ Circle.prototype.set_attribute = function (name: string, value: string) {
 Ellipse.prototype.set_attribute = function (name: string, value: string) {
     switch (name) {
         case "rx":
-            this.rx.set_parse_length(value, this, name);
+            this.rx.value = value;
             break;
         case "ry":
-            this.ry.set_parse_length(value, this, name);
+            this.ry.value = value;
             break;
         case "cx":
-            this.cx.set_parse_length(value, this, name);
+            this.cx.value = value;
             break;
         case "cy":
-            this.cy.set_parse_length(value, this, name);
+            this.cy.value = value;
             break;
         default:
             Element.prototype.set_attribute.call(this, name, value);
@@ -370,16 +369,16 @@ Polyline.prototype.set_attribute = function (name: string, value: string) {
 Line.prototype.set_attribute = function (name: string, value: string) {
     switch (name) {
         case "x1":
-            this.x1.set_parse_length(value, this, name,);
+            this.x1.value = value;
             break;
         case "x2":
-            this.x2.set_parse_length(value, this, name,);
+            this.x2.value = value;
             break
         case "y1":
-            this.y1.set_parse_length(value, this, name,);
+            this.y1.value = value;
             break;
         case "y2":
-            this.y2.set_parse_length(value, this, name,);
+            this.y2.value = value;
             break;
         default:
             Element.prototype.set_attribute.call(this, name, value);
@@ -389,16 +388,17 @@ Line.prototype.set_attribute = function (name: string, value: string) {
 Text.prototype.set_attribute = function (name: string, value: string) {
     switch (name) {
         case "y":
-            this.y.set_parse_length(value, this, name, "h");
+            this.y.value = value;
             break;
         case "x":
-            this.x.set_parse_length(value, this, name, "w");
+            this.x.value = value;
             break;
         case "dy":
-            this.dy.set_parse_length(value, this, name, "h");
+            this.dy.value = value;
             break;
         case "dx":
-            this.dx.set_parse_length(value, this, name, "w");
+            this.dx.value = value;
+            // this.dx.value = value;
             break;
         default:
             Element.prototype.set_attribute.call(this, name, value);
@@ -408,16 +408,17 @@ Text.prototype.set_attribute = function (name: string, value: string) {
 TSpan.prototype.set_attribute = function (name: string, value: string) {
     switch (name) {
         case "y":
-            this.y.set_parse_length(value, this, name, "h");
+            this.y.value = value;
             break;
         case "x":
-            this.x.set_parse_length(value, this, name, "w");
+            this.x.value = value;
             break;
         case "dy":
-            this.dy.set_parse_length(value, this, name, "h");
+            this.dy.value = value;
             break;
         case "dx":
-            this.dx.set_parse_length(value, this, name, "w");
+            this.dx.value = value;
+            // this.dx.value = value;
             break;
         default:
             Element.prototype.set_attribute.call(this, name, value);
@@ -428,16 +429,16 @@ TSpan.prototype.set_attribute = function (name: string, value: string) {
 Image.prototype.set_attribute = function (name: string, value: string) {
     switch (name) {
         case "height":
-            this.height.set_parse_length(value, this, name, "h");
+            this.height.value = value;
             break;
         case "width":
-            this.width.set_parse_length(value, this, name, "w");
+            this.width.value = value;
             break;
         case "y":
-            this.y.set_parse_length(value, this, name, "h");
+            this.y.value = value;
             break;
         case "x":
-            this.x.set_parse_length(value, this, name, "w");
+            this.x.value = value;
             break;
         case "href":
             this.href.set_parse_text(value, this);
@@ -453,16 +454,16 @@ Image.prototype.set_attribute = function (name: string, value: string) {
 Use.prototype.set_attribute = function (name: string, value: string) {
     switch (name) {
         case "height":
-            this.height.set_parse_length(value, this, name, "h");
+            this.height.value = value;
             break;
         case "width":
-            this.width.set_parse_length(value, this, name, "w");
+            this.width.value = value;
             break;
         case "y":
-            this.y.set_parse_length(value, this, name, "h");
+            this.y.value = value;
             break;
         case "x":
-            this.x.set_parse_length(value, this, name, "w");
+            this.x.value = value;
             break;
         case "href":
             this.href.set_parse_text(value, this);
@@ -476,16 +477,16 @@ Use.prototype.set_attribute = function (name: string, value: string) {
 Symbol.prototype.set_attribute = function (name: string, value: string) {
     switch (name) {
         case "height":
-            this.height.set_parse_length(value, this, name, "h");
+            this.height.value = value;
             break;
         case "width":
-            this.width.set_parse_length(value, this, name, "w");
+            this.width.value = value;
             break;
         case "y":
-            this.y.set_parse_length(value, this, name, "h");
+            this.y.value = value;
             break;
         case "x":
-            this.x.set_parse_length(value, this, name, "w");
+            this.x.value = value;
             break;
         // ‘preserveAspectRatio’
         // ‘viewBox’
@@ -506,4 +507,41 @@ Path.prototype.set_attribute = function (name: string, value: string) {
         default:
             Element.prototype.set_attribute.call(this, name, value);
     }    return this;
+}
+
+LengthValue.prototype.initial_value = function () {
+    const { value, _parent } = this;
+    if (typeof value === "string") {
+        if (_parent instanceof Element) {
+            const cl = new ComputeLength(_parent, 0);
+            return cl.parse_len(value);
+        }
+    }
+    return ScalarValue.prototype.initial_value.call(this);
+}
+
+LengthWValue.prototype.initial_value = function () {
+    const { value, _parent } = this;
+    if (typeof value === "string") {
+        if (_parent instanceof Element) {
+            const cl = new ComputeLength(_parent, 0);
+            cl.length_mode = 'w';
+            // console.log(`LengthWValue.prototype.initial_value ${value}`)
+            return cl.parse_len(value);
+        }
+    }
+    return ScalarValue.prototype.initial_value.call(this);
+}
+
+LengthHValue.prototype.initial_value = function () {
+    const { value, _parent } = this;
+    if (typeof value === "string") {
+        if (_parent instanceof Element) {
+            const cl = new ComputeLength(_parent, 0);
+            cl.length_mode = 'h';
+            // console.log(`LengthHValue.prototype.initial_value ${value}`)
+            return cl.parse_len(value);
+        }
+    }
+    return ScalarValue.prototype.initial_value.call(this);
 }

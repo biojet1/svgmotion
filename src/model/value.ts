@@ -29,6 +29,7 @@ export class Animatable<
     K extends Keyframe<V> = Keyframe<V>
 > extends Animated<V, K> {
     value: V | string;
+    _parent?: any;
 
 
     // static
@@ -359,6 +360,13 @@ export class ScalarValue extends Animatable<number> {
         const { value } = this;
         if (typeof value === 'number') {
             return value;
+        } else {
+            const v = parseFloat(value);
+            if (!isNaN(v)) {
+                return v;
+
+            }
+
         }
         throw Error(`Not a number '${this.constructor.name}' '${value}'`);
     }
@@ -367,11 +375,6 @@ export class ScalarValue extends Animatable<number> {
     }
 }
 
-export class LengthValue extends ScalarValue {
-    constructor(v: number = 0) {
-        super(v);
-    }
-}
 export class PercentageValue extends ScalarValue {
     constructor(v: number = 0) {
         super(v);

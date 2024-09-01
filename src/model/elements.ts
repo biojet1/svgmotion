@@ -1,11 +1,11 @@
 import { BoundingBox, Matrix, MatrixMut, PathLC, Vector } from "../geom/index.js";
 import { Track } from "../track/track.js";
 import { Keyframe } from "../keyframe/keyframe.js";
-import { PlainValue, Animatable } from "./value.js";
-import { ScalarValue, PointsValue, PositionValue, TextValue } from "./value.js";
-import { Box, ValueSet, xget, xset } from "./valuesets.js";
+import { Animatable } from "./value.js";
+import { PointsValue, PositionValue, TextValue } from "./value.js";
+import { Box, ValueSet } from "./valuesets.js";
 import { Node, Parent } from "./linked.js";
-import { Element, TextData } from "./base.js";
+import { Element, LengthHValue, LengthWValue, TextData, LengthValue } from "./base.js";
 
 export interface PlainNode {
     tag: string;
@@ -91,54 +91,54 @@ export class ViewPort extends Container {
     ///
     get view_box() {
         const n = this.get_vp_size(0);
-        return xget(this, "view_box", new Box([0, 0], n));
+        return this._new_field("view_box", new Box([0, 0], n));
     }
     set view_box(v: Box) {
-        xset(this, "view_box", v);
+        this._new_field("view_box", v);
     }
     ///
     get width() {
         const n = this.get_vp_width(0);
-        return xget(this, "width", new ScalarValue(n));
+        return this._new_field("width", new LengthWValue(n));
     }
-    set width(v: ScalarValue) {
-        xset(this, "width", v);
+    set width(v: LengthWValue) {
+        this._new_field("width", v);
     }
     ///
     get height() {
         const n = this.get_vp_height(0);
-        return xget(this, "height", new ScalarValue(n));
+        return this._new_field("height", new LengthHValue(n));
     }
-    set height(v: ScalarValue) {
-        xset(this, "height", v);
+    set height(v: LengthHValue) {
+        this._new_field("height", v);
     }
     ///
     get x() {
-        return xget(this, "x", new ScalarValue(0));
+        return this._new_field("x", new LengthWValue(0));
     }
-    set x(v: ScalarValue) {
-        xset(this, "x", v);
+    set x(v: LengthWValue) {
+        this._new_field("x", v);
     }
     ///
     get y() {
-        return xget(this, "y", new ScalarValue(0));
+        return this._new_field("y", new LengthHValue(0));
     }
-    set y(v: ScalarValue) {
-        xset(this, "y", v);
+    set y(v: LengthHValue) {
+        this._new_field("y", v);
     }
     ///
     get fit_view() {
-        return xget(this, "fit_view", new TextValue(""));
+        return this._new_field("fit_view", new TextValue(""));
     }
     set fit_view(v: TextValue) {
-        xset(this, "fit_view", v);
+        this._new_field("fit_view", v);
     }
     ///
     get zoom_pan() {
-        return xget(this, "zoom_pan", new TextValue("disable"));
+        return this._new_field("zoom_pan", new TextValue("disable"));
     }
     set zoom_pan(v: TextValue) {
-        xset(this, "zoom_pan", v);
+        this._new_field("zoom_pan", v);
     }
     // 
     override  update_bbox(bbox: BoundingBox, frame: number, m?: Matrix) {
@@ -235,62 +235,62 @@ export class Symbol extends Container {
     static tag = "symbol";
     ///
     get view_box() {
-        return xget(this, "view_box", new Box([0, 0], [100, 100]));
+        return this._new_field("view_box", new Box([0, 0], [100, 100]));
     }
     set view_box(v: Box) {
-        xset(this, "view_box", v);
+        this._new_field("view_box", v);
     }
     ///
     get width() {
-        return xget(this, "width", new ScalarValue(100));
+        return this._new_field("width", new LengthWValue(100));
     }
-    set width(v: ScalarValue) {
-        xset(this, "width", v);
+    set width(v: LengthWValue) {
+        this._new_field("width", v);
     }
     ///
     get height() {
-        return xget(this, "height", new ScalarValue(100));
+        return this._new_field("height", new LengthHValue(100));
     }
-    set height(v: ScalarValue) {
-        xset(this, "height", v);
+    set height(v: LengthHValue) {
+        this._new_field("height", v);
     }
     ///
     get x() {
-        return xget(this, "x", new ScalarValue(0));
+        return this._new_field("x", new LengthWValue(0));
     }
-    set x(v: ScalarValue) {
-        xset(this, "x", v);
+    set x(v: LengthWValue) {
+        this._new_field("x", v);
     }
     ///
     get y() {
-        return xget(this, "y", new ScalarValue(0));
+        return this._new_field("y", new LengthHValue(0));
     }
-    set y(v: ScalarValue) {
-        xset(this, "y", v);
+    set y(v: LengthHValue) {
+        this._new_field("y", v);
     }
     ///
     get refx() {
-        return xget(this, "refx", new ScalarValue(0));
+        return this._new_field("refx", new LengthWValue(0));
     }
-    set refx(v: ScalarValue) {
-        xset(this, "refx", v);
+    set refx(v: LengthWValue) {
+        this._new_field("refx", v);
     }
     ///
     get refy() {
-        return xget(this, "refy", new ScalarValue(0));
+        return this._new_field("refy", new LengthHValue(0));
     }
-    set refy(v: ScalarValue) {
-        xset(this, "refy", v);
+    set refy(v: LengthHValue) {
+        this._new_field("refy", v);
     }
 }
 export class Path extends Shape {
     static tag = "path";
     ///
     get d() {
-        return xget(this, "d", new TextValue(""));
+        return this._new_field("d", new TextValue(""));
     }
     set d(v: TextValue) {
-        xset(this, "d", v);
+        this._new_field("d", v);
     }
     override describe(frame: number) {
         return this.d.get_value(frame);
@@ -307,54 +307,54 @@ export class Rect extends Shape {
     get width() {
         // const n = this.get_vp_width(0);
         const n = 100;
-        return xget(this, "width", new ScalarValue(n));
+        return this._new_field("width", new LengthWValue(n));
     }
-    set width(v: ScalarValue) {
-        xset(this, "width", v);
+    set width(v: LengthWValue) {
+        this._new_field("width", v);
     }
     ///
     get height() {
         // const n = this.get_vp_height(0);
         const n = 100;
-        return xget(this, "height", new ScalarValue(n));
+        return this._new_field("height", new LengthHValue(n));
     }
-    set height(v: ScalarValue) {
-        xset(this, "height", v);
+    set height(v: LengthHValue) {
+        this._new_field("height", v);
     }
     ///
     get x() {
-        return xget(this, "x", new ScalarValue(0));
+        return this._new_field("x", new LengthWValue(0));
     }
-    set x(v: ScalarValue) {
-        xset(this, "x", v);
+    set x(v: LengthWValue) {
+        this._new_field("x", v);
     }
     ///
     get y() {
-        return xget(this, "y", new ScalarValue(0));
+        return this._new_field("y", new LengthHValue(0));
     }
-    set y(v: ScalarValue) {
-        xset(this, "y", v);
+    set y(v: LengthHValue) {
+        this._new_field("y", v);
     }
     ///
     get rx() {
-        return xget(this, "rx", new ScalarValue(0));
+        return this._new_field("rx", new LengthWValue(0));
     }
-    set rx(v: ScalarValue) {
-        xset(this, "rx", v);
+    set rx(v: LengthWValue) {
+        this._new_field("rx", v);
     }
     ///
     get ry() {
-        return xget(this, "ry", new ScalarValue(0));
+        return this._new_field("ry", new LengthHValue(0));
     }
-    set ry(v: ScalarValue) {
-        xset(this, "ry", v);
+    set ry(v: LengthHValue) {
+        this._new_field("ry", v);
     }
     ///
     get size() {
-        return xget(this, "size", new PositionValue([100, 100]));
+        return this._new_field("size", new PositionValue([100, 100]));
     }
     set size(v: PositionValue) {
-        xset(this, "size", v);
+        this._new_field("size", v);
     }
     //
     override describe(frame: number) {
@@ -372,24 +372,24 @@ export class Circle extends Shape {
     static tag = "circle";
     ///
     get cx() {
-        return xget(this, "cx", new ScalarValue(0));
+        return this._new_field("cx", new LengthWValue(0));
     }
-    set cx(v: ScalarValue) {
-        xset(this, "cx", v);
+    set cx(v: LengthWValue) {
+        this._new_field("cx", v);
     }
     ///
     get cy() {
-        return xget(this, "cy", new ScalarValue(0));
+        return this._new_field("cy", new LengthHValue(0));
     }
-    set cy(v: ScalarValue) {
-        xset(this, "cy", v);
+    set cy(v: LengthHValue) {
+        this._new_field("cy", v);
     }
     ///
     get r() {
-        return xget(this, "r", new ScalarValue(0));
+        return this._new_field("r", new LengthValue(0));
     }
-    set r(v: ScalarValue) {
-        xset(this, "r", v);
+    set r(v: LengthValue) {
+        this._new_field("r", v);
     }
     ////
     override describe(frame: number) {
@@ -405,31 +405,31 @@ export class Ellipse extends Shape {
     static tag = "ellipse";
     /// cx
     get cx() {
-        return xget(this, "cx", new ScalarValue(0));
+        return this._new_field("cx", new LengthWValue(0));
     }
-    set cx(v: ScalarValue) {
-        xset(this, "cx", v);
+    set cx(v: LengthWValue) {
+        this._new_field("cx", v);
     }
     /// cy
     get cy() {
-        return xget(this, "cy", new ScalarValue(0));
+        return this._new_field("cy", new LengthHValue(0));
     }
-    set cy(v: ScalarValue) {
-        xset(this, "cy", v);
+    set cy(v: LengthHValue) {
+        this._new_field("cy", v);
     }
     /// rx
     get rx() {
-        return xget(this, "rx", new ScalarValue(0));
+        return this._new_field("rx", new LengthWValue(0));
     }
-    set rx(v: ScalarValue) {
-        xset(this, "rx", v);
+    set rx(v: LengthWValue) {
+        this._new_field("rx", v);
     }
     /// ry
     get ry() {
-        return xget(this, "ry", new ScalarValue(0));
+        return this._new_field("ry", new LengthHValue(0));
     }
-    set ry(v: ScalarValue) {
-        xset(this, "ry", v);
+    set ry(v: LengthHValue) {
+        this._new_field("ry", v);
     }
     override describe(frame: number) {
         const x = this.cx.get_value(frame);
@@ -446,31 +446,31 @@ export class Line extends Shape {
     static tag = "line";
     /// x1
     get x1() {
-        return xget(this, "x1", new ScalarValue(0));
+        return this._new_field("x1", new LengthWValue(0));
     }
-    set x1(v: ScalarValue) {
-        xset(this, "x1", v);
+    set x1(v: LengthWValue) {
+        this._new_field("x1", v);
     }
     /// y1
     get y1() {
-        return xget(this, "y1", new ScalarValue(0));
+        return this._new_field("y1", new LengthHValue(0));
     }
-    set y1(v: ScalarValue) {
-        xset(this, "y1", v);
+    set y1(v: LengthHValue) {
+        this._new_field("y1", v);
     }
     /// x2
     get x2() {
-        return xget(this, "x2", new ScalarValue(0));
+        return this._new_field("x2", new LengthWValue(0));
     }
-    set x2(v: ScalarValue) {
-        xset(this, "x2", v);
+    set x2(v: LengthWValue) {
+        this._new_field("x2", v);
     }
     /// y2
     get y2() {
-        return xget(this, "y2", new ScalarValue(0));
+        return this._new_field("y2", new LengthHValue(0));
     }
-    set y2(v: ScalarValue) {
-        xset(this, "y2", v);
+    set y2(v: LengthHValue) {
+        this._new_field("y2", v);
     }
     ////
     override describe(frame: number) {
@@ -487,10 +487,10 @@ export class Polyline extends Shape {
     static tag = "polyline";
     /// points
     get points() {
-        return xget(this, "points", new PointsValue([]));
+        return this._new_field("points", new PointsValue([]));
     }
     set points(v: PointsValue) {
-        xset(this, "points", v);
+        this._new_field("points", v);
     }
     ///
     override describe(frame: number) {
@@ -503,10 +503,10 @@ export class Polygon extends Shape {
     static tag = "polygon";
     /// points
     get points() {
-        return xget(this, "points", new PointsValue([]));
+        return this._new_field("points", new PointsValue([]));
     }
     set points(v: PointsValue) {
-        xset(this, "points", v);
+        this._new_field("points", v);
     }
     ///
     override describe(frame: number) {
@@ -519,38 +519,38 @@ export class Use extends Element {
     static tag = "use";
     /// href
     get href() {
-        return xget(this, "href", new TextValue(''));
+        return this._new_field("href", new TextValue(''));
     }
     set href(v: TextValue) {
-        xset(this, "href", v);
+        this._new_field("href", v);
     }
     ///
     get width() {
-        return xget(this, "width", new ScalarValue(100));
+        return this._new_field("width", new LengthWValue(100));
     }
-    set width(v: ScalarValue) {
-        xset(this, "width", v);
+    set width(v: LengthWValue) {
+        this._new_field("width", v);
     }
     ///
     get height() {
-        return xget(this, "height", new ScalarValue(100));
+        return this._new_field("height", new LengthHValue(100));
     }
-    set height(v: ScalarValue) {
-        xset(this, "height", v);
+    set height(v: LengthHValue) {
+        this._new_field("height", v);
     }
     ///
     get x() {
-        return xget(this, "x", new ScalarValue(0));
+        return this._new_field("x", new LengthWValue(0));
     }
-    set x(v: ScalarValue) {
-        xset(this, "x", v);
+    set x(v: LengthWValue) {
+        this._new_field("x", v);
     }
     ///
     get y() {
-        return xget(this, "y", new ScalarValue(0));
+        return this._new_field("y", new LengthHValue(0));
     }
-    set y(v: ScalarValue) {
-        xset(this, "y", v);
+    set y(v: LengthHValue) {
+        this._new_field("y", v);
     }
 }
 
@@ -562,31 +562,31 @@ export class Image extends Use {
 export class Text extends Container {
     static tag = "text";
     get x() {
-        return xget(this, "x", new ScalarValue(0));
+        return this._new_field("x", new LengthWValue(0));
     }
-    set x(v: ScalarValue) {
-        xset(this, "x", v);
+    set x(v: LengthWValue) {
+        this._new_field("x", v);
     }
     ///
     get y() {
-        return xget(this, "y", new ScalarValue(0));
+        return this._new_field("y", new LengthHValue(0));
     }
-    set y(v: ScalarValue) {
-        xset(this, "y", v);
+    set y(v: LengthHValue) {
+        this._new_field("y", v);
     }
     ///
     get dx() {
-        return xget(this, "dx", new ScalarValue(0));
+        return this._new_field("dx", new LengthWValue(0));
     }
-    set dx(v: ScalarValue) {
-        xset(this, "dx", v);
+    set dx(v: LengthWValue) {
+        this._new_field("dx", v);
     }
     ///
     get dy() {
-        return xget(this, "dy", new ScalarValue(0));
+        return this._new_field("dy", new LengthHValue(0));
     }
-    set dy(v: ScalarValue) {
-        xset(this, "dy", v);
+    set dy(v: LengthHValue) {
+        this._new_field("dy", v);
     }
     ///
     add_chars(text: string, before?: Node) {
@@ -647,10 +647,20 @@ export class Root extends Container {
         const tr = new Track();
         tr.frame_rate = this.frame_rate;
         tr.hint_dur = 1 * this.frame_rate;
-        return xget(this, "track", tr);
+        Object.defineProperty(this, "track", {
+            value: tr,
+            writable: true,
+            enumerable: true,
+            configurable: true,
+        });
+        return tr;
     }
     set track(v: Track) {
-        xset(this, "track", v);
+        Object.defineProperty(this, "track", {
+            value: v,
+            writable: true,
+            enumerable: true,
+        });
     }
 }
 
