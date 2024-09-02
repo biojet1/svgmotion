@@ -101,20 +101,16 @@ Element.prototype.get_vp_size = function (frame: number, w?: number, h?: number)
 }
 
 Element.prototype.get_font_size = function (frame: number): number {
-    if (Object.hasOwn(this, "font_size")) {
-        const s = this.font_size.get_value(frame);
-        return s;
-    }
     if (Object.hasOwn(this, "font")) {
         const { font } = this;
-        if (Object.hasOwn(this, "size")) {
+        if (Object.hasOwn(font, "size")) {
             const s = font.size.get_value(frame);
             return s as any as number;
         }
     }
     const p = this.parent();
     if (p instanceof Element) {
-        return p.get_font_size(0);
+        return p.get_font_size(frame);
     }
     throw new Error(`cant get_font_size <${this.constructor.name}> <${p?.constructor.name}>`);
 }

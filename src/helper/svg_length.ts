@@ -123,6 +123,9 @@ export class ComputeLength {
         } else if (this.length_mode.startsWith("h")) {
             const n = this.node.get_vp_size(this.frame).y;
             return xget(this, "relative_length", n);
+        } else if (this.length_mode.startsWith("f")) {
+            const n = this.node.get_font_size(this.frame);
+            return xget(this, "relative_length", n);
         } else {
             throw new Error(``);
         }

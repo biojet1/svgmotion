@@ -1,5 +1,5 @@
 import { BoundingBox, Matrix, MatrixMut, Vector } from "../geom/index.js";
-import { LengthValue } from "./base.js";
+import { FontSizeValue, LengthValue } from "./base.js";
 import { VectorValue, ScalarValue, PositionValue, RGBValue, TextValue, PercentageValue } from "./value.js";
 import { PlainValue } from "./value.js";
 import { Animatable } from "./value.js";
@@ -191,26 +191,84 @@ export class Fill extends ValueSet {
     }
 }
 export class Font extends ValueSet {
-    /// weight
-    get weight() {
-        return this._new_field("weight", new TextValue("normal"));
-    }
-    set weight(v: TextValue) {
-        this._new_field("weight", v);
-    }
-    /// size
-    get size() {
-        return this._new_field("size", new LengthValue());
-    }
-    set size(v: LengthValue) {
-        this._new_field("size", v);
-    }
     /// font-family
     get family() {
         return this._new_field("family", new TextValue("monospace"));
     }
     set family(v: TextValue) {
         this._new_field("family", v);
+    }
+    /// font-size
+    get size() {
+        return this._new_field("size", new FontSizeValue(16));
+    }
+    set size(v: FontSizeValue) {
+        this._new_field("size", v);
+    }
+    /// font-style
+    get style() {
+        return this._new_field("style", new TextValue("normal"));
+    }
+    set style(v: TextValue) {
+        this._new_field("style", v);
+    }
+    /// font-weight
+    get weight() {
+        return this._new_field("weight", new ScalarValue(400));
+    }
+    set weight(v: ScalarValue) {
+        this._new_field("weight", v);
+    }
+    /// font-variant
+    get variant() {
+        return this._new_field("variant", new TextValue("normal"));
+    }
+    set variant(v: TextValue) {
+        this._new_field("variant", v);
+    }
+    /// font-stretch
+    get stretch() {
+        return this._new_field("stretch", new TextValue("normal"));
+    }
+    set stretch(v: TextValue) {
+        this._new_field("stretch", v);
+    }
+    /// font-size-adjust
+    get size_adjust() {
+        return this._new_field("size_adjust", new ScalarValue(1));
+    }
+    set size_adjust(v: ScalarValue) {
+        this._new_field("size_adjust", v);
+    }
+
+    //////
+    *enum_attibutes(frame: number) {
+        for (let [n, _] of Object.entries(this)) {
+            switch (n) {
+                case "family":
+                    yield { name: "font-family", value: this.family.get_repr(frame) }
+                    break;
+                case "size":
+                    yield { name: "font-size", value: this.size.get_repr(frame) }
+                    break;
+                case "style":
+                    yield { name: "font-style", value: this.style.get_repr(frame) }
+                    break;
+                case "weight":
+                    yield { name: "font-weight", value: this.weight.get_repr(frame) }
+                    break;
+                case "variant":
+                    yield { name: "font-variant", value: this.variant.get_repr(frame) }
+                    break;
+                case "stretch":
+                    yield { name: "font-stretch", value: this.stretch.get_repr(frame) }
+                    break;
+                case "size-adjust":
+                    yield { name: "font-size-adjust", value: this.size_adjust.get_repr(frame) }
+                    break;
+            }
+        }
+
     }
 }
 

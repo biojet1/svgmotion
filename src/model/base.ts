@@ -96,34 +96,6 @@ export class Element extends Parent {
         this._new_field("anchor", v);
     }
     /// Properties ////////////
-    /// getset<font-family>
-    get font_family() {
-        return this._new_field('font_family', new TextValue('monospace'));
-    }
-    set font_family(v: TextValue) {
-        this._new_field('font_family', v);
-    }
-    /// getset<font-size>
-    get font_size() {
-        return this._new_field('font_size', new LengthValue(16));
-    }
-    set font_size(v: LengthValue) {
-        this._new_field('font_size', v);
-    }
-    /// getset<font-style>
-    get font_style() {
-        return this._new_field('font_style', new TextValue('normal'));
-    }
-    set font_style(v: TextValue) {
-        this._new_field('font_style', v);
-    }
-    /// getset<font-variant>
-    get font_variant() {
-        return this._new_field('font_variant', new TextValue('normal'));
-    }
-    set font_variant(v: TextValue) {
-        this._new_field('font_variant', v);
-    }
     /// getset<text-anchor>
     get text_anchor() {
         return this._new_field('text_anchor', new TextValue('start'));
@@ -235,13 +207,6 @@ export class Element extends Parent {
     }
     set color_rendering(v: TextValue) {
         this._new_field('color_rendering', v);
-    }
-    /// getset<fill-rule>
-    get fill_rule() {
-        return this._new_field('fill_rule', new TextValue('nonzero'));
-    }
-    set fill_rule(v: TextValue) {
-        this._new_field('fill_rule', v);
     }
     /// getset<color-interpolation>
     get color_interpolation() {
@@ -384,5 +349,8 @@ export class LengthHValue extends ScalarValue {
 }
 
 export class LengthValue extends ScalarValue {
+}
+export class FontSizeValue extends ScalarValue {
+
 }
 // TODO: dash array, path

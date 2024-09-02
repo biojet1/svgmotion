@@ -2,7 +2,7 @@
 import { VectorValue, ScalarValue, PointsValue, RGB, RGBValue, TextValue, UnknownValue } from "../model/value.js";
 import { parse_css_color } from "./parse_color.js";
 import { ComputeLength } from "./svg_length.js";
-import { Element, LengthHValue, LengthWValue, LengthValue } from "../model/base.js";
+import { Element, LengthHValue, LengthWValue, LengthValue, FontSizeValue } from "../model/base.js";
 
 declare module "../model/base" {
     interface Element {
@@ -34,26 +34,7 @@ Element.prototype.set_attribute = function (name: string, value: string): Elemen
                 this.transform.set_repr(value);
             }
             break;
-        case "font-size":
-            if (value) {
-                this.font_size.set_repr(value);
-            }
-            break;
-        case "font-weight":
-            if (value) {
-                this.font.weight.set_repr(value);
-            }
-            break;
-        // case "font-size":
-        //     if (value) {
-        //         this.font.size.set_repr(value);
-        //     }
-        //     break;
-        case "font-family":
-            if (value) {
-                this.font.family.set_repr(value);
-            }
-            break;
+
         case "line-height":// .text?
             if (value) {
                 this.line_height.set_parse_line_height(value, this);
@@ -67,6 +48,42 @@ Element.prototype.set_attribute = function (name: string, value: string): Elemen
         case "white-space": // put<>
             if (value) {
                 this.white_space.set_repr(value);
+            }
+            break;
+        /// FONT //////////
+        case "font-size":
+            if (value) {
+                this.font.size.set_repr(value);
+            }
+            break;
+        case "font-weight":
+            if (value) {
+                this.font.weight.set_repr(value);
+            }
+            break;
+        case "font-family":
+            if (value) {
+                this.font.family.set_repr(value);
+            }
+            break;
+        case "font-variant":
+            if (value) {
+                this.font.variant.set_repr(value);
+            }
+            break;
+        case "font-style":
+            if (value) {
+                this.font.style.set_repr(value);
+            }
+            break;
+        case "font-stretch":
+            if (value) {
+                this.font.stretch.set_repr(value);
+            }
+            break;
+        case "font-size-adjust":
+            if (value) {
+                this.font.size_adjust.set_repr(value);
             }
             break;
         /// FILL //////////
@@ -516,6 +533,19 @@ LengthHValue.prototype.initial_value = function () {
         if (_parent instanceof Element) {
             const cl = new ComputeLength(_parent, 0);
             cl.length_mode = 'h';
+            // console.log(`LengthHValue.prototype.initial_value ${value}`)
+            return cl.parse_len(value);
+        }
+    }
+    return ScalarValue.prototype.initial_value.call(this);
+}
+
+FontSizeValue.prototype.initial_value = function () {
+    const { value, _parent } = this;
+    if (typeof value === "string") {
+        if (_parent instanceof Element) {
+            const cl = new ComputeLength(_parent, 0);
+            cl.length_mode = 'f';
             // console.log(`LengthHValue.prototype.initial_value ${value}`)
             return cl.parse_len(value);
         }

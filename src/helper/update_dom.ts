@@ -113,18 +113,8 @@ const PROP_MAP: {
         }
     },
     font: function (frame: number, node: SVGSVGElement, prop: Font) {
-        for (let [n, v] of Object.entries(prop)) {
-            switch (n) {
-                case "weight":
-                    node.style.fontWeight = v.get_value(frame);
-                    break;
-                case "size":
-                    node.style.fontSize = v.get_value(frame);
-                    break;
-                case "family":
-                    node.style.fontFamily = v.get_value(frame);
-                    break;
-            }
+        for (const { name, value } of prop.enum_attibutes(frame)) {
+            node.setAttribute(name, value);
         }
     },
     line_height: function (frame: number, node: SVGElement, prop: ScalarValue) {
