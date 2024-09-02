@@ -144,31 +144,51 @@ export class Stroke extends ValueSet {
     set dash_offset(v: LengthValue) {
         this._new_field("dash_offset", v);
     }
-    // stroke-array
+    // stroke-dasharray
     get dash_array() {
         return this._new_field("dash_array", new VectorValue(new Vector([1, 1])));
     }
     set dash_array(v: VectorValue) {
         this._new_field("dash_array", v);
     }
+    // stroke-linecap
+    get linecap() {
+        return this._new_field("linecap", new TextValue('butt'));
+    }
+    set linecap(v: TextValue) {
+        this._new_field("linecap", v);
+    }
+    // stroke-linejoin
+    get linejoin() {
+        return this._new_field("linejoin", new TextValue('miter'));
+    }
+    set linejoin(v: TextValue) {
+        this._new_field("linejoin", v);
+    }
 }
 
 export class Fill extends ValueSet {
-    /// opacity
+    /// fill-opacity
     get opacity() {
         return this._new_field("opacity", new PercentageValue(1));
     }
     set opacity(v: PercentageValue) {
         this._new_field("opacity", v);
     }
-    /// color
+    /// fill
     get color() {
         return this._new_field("color", new RGBValue(new Vector([0, 0, 0])));
     }
     set color(v: RGBValue) {
         this._new_field("color", v);
     }
-    //
+    // fill-rule
+    get rule() {
+        return this._new_field("rule", new TextValue("nonzero"));
+    }
+    set rule(v: TextValue) {
+        this._new_field("rule", v);
+    }
 }
 export class Font extends ValueSet {
     /// weight

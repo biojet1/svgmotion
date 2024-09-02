@@ -29,7 +29,6 @@ Element.prototype.set_attribute = function (name: string, value: string): Elemen
                 this.get_root().remember_id((this.id = value), this);
             }
             break;
-
         case "transform":
             if (value) {
                 this.transform.set_repr(value);
@@ -39,6 +38,7 @@ Element.prototype.set_attribute = function (name: string, value: string): Elemen
             if (value) {
                 this.font_size.set_repr(value);
             }
+            break;
         case "font-weight":
             if (value) {
                 this.font.weight.set_repr(value);
@@ -69,6 +69,7 @@ Element.prototype.set_attribute = function (name: string, value: string): Elemen
                 this.white_space.set_repr(value);
             }
             break;
+        /// FILL //////////
         case "fill":// 
             if (value) {
                 this.fill.color.set_repr(value);
@@ -79,6 +80,12 @@ Element.prototype.set_attribute = function (name: string, value: string): Elemen
                 this.fill.opacity.set_repr(value);
             }
             break;
+        case "fill-rule":// 
+            if (value) {
+                this.fill.rule.set_repr(value);
+            }
+            break;
+        /// STROKE //////////
         case "stroke":// 
             if (value) {
                 this.stroke.color.set_repr(value);
@@ -109,10 +116,23 @@ Element.prototype.set_attribute = function (name: string, value: string): Elemen
             if (value) {
                 this.stroke.dash_offset.set_repr(value);
             }
+            break;
+        case "stroke-linecap":// 
+            if (value) {
+                this.stroke.linecap.set_repr(value);
+            }
+            break;
+        case "stroke-linejoin":// 
+            if (value) {
+                this.stroke.linejoin.set_repr(value);
+            }
+            break;
+        /////////////
         case "letter-spacing":// 
             if (value) {
                 this.letter_spacing.set_repr(value);
             }
+            break;
         case "word-spacing":// 
             if (value) {
                 this.word_spacing.set_repr(value);
@@ -123,11 +143,12 @@ Element.prototype.set_attribute = function (name: string, value: string): Elemen
             if (value) {
                 // this.anchor.set_parse_anchor(value);
             }
+            break;
         case "opacity":
             if (value) {
                 this.opacity.set_repr(value);
             }
-
+            break;
         case "shape-inside":
         case "paint-order":
             break;
@@ -136,7 +157,6 @@ Element.prototype.set_attribute = function (name: string, value: string): Elemen
                 (this as any)[name] = new UnknownValue(value);
                 return this;
             }
-
             throw new Error(
                 `Unexpected attribute [${name}]="${value}" tag="${(this.constructor as any).tag}" this="${this.constructor.name}"`
             );
@@ -147,7 +167,6 @@ Element.prototype.set_attribute = function (name: string, value: string): Elemen
 
 declare module "../model/value" {
     interface ScalarValue {
-        // set_parse_percentage(s: string, container: Element): void;
         set_parse_line_height(s: string, container: Element): void;
     }
     interface PointsValue {
@@ -159,15 +178,6 @@ declare module "../model/value" {
     }
 }
 
-
-
-// ScalarValue.prototype.set_parse_percentage = function (s: string, parent: Element) {
-//     if (s.endsWith('%')) {
-//         this.value = parseFloat(s.replaceAll('%', '')) / 100;
-//     } else {
-//         this.value = parseFloat(s);
-//     }
-// }
 
 ScalarValue.prototype.set_parse_line_height = function (s: string, parent: Element) {
     if (s.endsWith('%')) {

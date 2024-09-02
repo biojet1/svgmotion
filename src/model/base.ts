@@ -96,6 +96,13 @@ export class Element extends Parent {
         this._new_field("anchor", v);
     }
     /// Properties ////////////
+    /// getset<font-family>
+    get font_family() {
+        return this._new_field('font_family', new TextValue('monospace'));
+    }
+    set font_family(v: TextValue) {
+        this._new_field('font_family', v);
+    }
     /// getset<font-size>
     get font_size() {
         return this._new_field('font_size', new LengthValue(16));
@@ -103,11 +110,25 @@ export class Element extends Parent {
     set font_size(v: LengthValue) {
         this._new_field('font_size', v);
     }
+    /// getset<font-style>
+    get font_style() {
+        return this._new_field('font_style', new TextValue('normal'));
+    }
+    set font_style(v: TextValue) {
+        this._new_field('font_style', v);
+    }
+    /// getset<font-variant>
+    get font_variant() {
+        return this._new_field('font_variant', new TextValue('normal'));
+    }
+    set font_variant(v: TextValue) {
+        this._new_field('font_variant', v);
+    }
     /// getset<text-anchor>
     get text_anchor() {
-        return this._new_field('text_anchor', new TextAnchorValue());
+        return this._new_field('text_anchor', new TextValue('start'));
     }
-    set text_anchor(v: TextAnchorValue) {
+    set text_anchor(v: TextValue) {
         this._new_field('text_anchor', v);
     }
     /// getset<text-decoration>
@@ -119,17 +140,45 @@ export class Element extends Parent {
     }
     /// getset<text-overflow>
     get text_overflow() {
-        return this._new_field('text_overflow', new TextValue('clip'));
+        return this._new_field('text_overflow', new TextValue(''));
     }
     set text_overflow(v: TextValue) {
         this._new_field('text_overflow', v);
     }
-    /// getset<text-rendering>
-    get text_rendering() {
-        return this._new_field('text_rendering', new TextRenderingValue());
+    /// getset<unicode-bidi>
+    get unicode_bidi() {
+        return this._new_field('unicode_bidi', new TextValue('normal'));
     }
-    set text_rendering(v: TextRenderingValue) {
-        this._new_field('text_rendering', v);
+    set unicode_bidi(v: TextValue) {
+        this._new_field('unicode_bidi', v);
+    }
+    /// getset<white-space>
+    get white_space() {
+        return this._new_field('white_space', new TextValue('default'));
+    }
+    set white_space(v: TextValue) {
+        this._new_field('white_space', v);
+    }
+    /// getset<word-spacing>
+    get word_spacing() {
+        return this._new_field('word_spacing', new TextValue('pre'));
+    }
+    set word_spacing(v: TextValue) {
+        this._new_field('word_spacing', v);
+    }
+    /// getset<writing-mode>
+    get writing_mode() {
+        return this._new_field('writing_mode', new TextValue('horizontal-tb'));
+    }
+    set writing_mode(v: TextValue) {
+        this._new_field('writing_mode', v);
+    }
+    /// getset<text-align>
+    get text_align() {
+        return this._new_field('text_align', new TextValue('start'));
+    }
+    set text_align(v: TextValue) {
+        this._new_field('text_align', v);
     }
     /// getset<stop-opacity>
     get stop_opacity() {
@@ -138,12 +187,68 @@ export class Element extends Parent {
     set stop_opacity(v: PercentageValue) {
         this._new_field('stop_opacity', v);
     }
+    /// getset<display>
+    get display() {
+        return this._new_field('display', new TextValue());
+    }
+    set display(v: TextValue) {
+        this._new_field('display', v);
+    }
+    /// getset<overflow>
+    get overflow() {
+        return this._new_field('overflow', new TextValue('visible'));
+    }
+    set overflow(v: TextValue) {
+        this._new_field('overflow', v);
+    }
+    /// getset<visibility>
+    get visibility() {
+        return this._new_field('visibility', new TextValue('visible'));
+    }
+    set visibility(v: TextValue) {
+        this._new_field('visibility', v);
+    }
     /// getset<image-rendering>
     get image_rendering() {
-        return this._new_field('image_rendering', new ImageRenderingValue());
+        return this._new_field('image_rendering', new TextValue('auto'));
     }
-    set image_rendering(v: ImageRenderingValue) {
+    set image_rendering(v: TextValue) {
         this._new_field('image_rendering', v);
+    }
+    /// getset<shape-rendering>
+    get shape_rendering() {
+        return this._new_field('shape_rendering', new TextValue('auto'));
+    }
+    set shape_rendering(v: TextValue) {
+        this._new_field('shape_rendering', v);
+    }
+    /// getset<text-rendering>
+    get text_rendering() {
+        return this._new_field('text_rendering', new TextValue('auto'));
+    }
+    set text_rendering(v: TextValue) {
+        this._new_field('text_rendering', v);
+    }
+    /// getset<color-rendering>
+    get color_rendering() {
+        return this._new_field('color_rendering', new TextValue('auto'));
+    }
+    set color_rendering(v: TextValue) {
+        this._new_field('color_rendering', v);
+    }
+    /// getset<fill-rule>
+    get fill_rule() {
+        return this._new_field('fill_rule', new TextValue('nonzero'));
+    }
+    set fill_rule(v: TextValue) {
+        this._new_field('fill_rule', v);
+    }
+    /// getset<color-interpolation>
+    get color_interpolation() {
+        return this._new_field('color_interpolation', new TextValue('auto'));
+    }
+    set color_interpolation(v: TextValue) {
+        this._new_field('color_interpolation', v);
     }
     /// getset<letter-spacing>
     get letter_spacing() {
@@ -159,61 +264,12 @@ export class Element extends Parent {
     set opacity(v: PercentageValue) {
         this._new_field('opacity', v);
     }
-    /// getset<shape-rendering>
-    get shape_rendering() {
-        return this._new_field('shape_rendering', new ShapeRenderingValue());
+    /// getset<pointer-events>
+    get pointer_events() {
+        return this._new_field('pointer_events', new TextValue('visiblePainted'));
     }
-    set shape_rendering(v: ShapeRenderingValue) {
-        this._new_field('shape_rendering', v);
-    }
-    /// getset<stroke-dashoffset>
-    get stroke_dashoffset() {
-        return this._new_field('stroke_dashoffset', new LengthValue(0));
-    }
-    set stroke_dashoffset(v: LengthValue) {
-        this._new_field('stroke_dashoffset', v);
-    }
-    /// getset<stroke-linecap>
-    get stroke_linecap() {
-        return this._new_field('stroke_linecap', new StrokeLinecapValue());
-    }
-    set stroke_linecap(v: StrokeLinecapValue) {
-        this._new_field('stroke_linecap', v);
-    }
-    /// getset<stroke-linejoin>
-    get stroke_linejoin() {
-        return this._new_field('stroke_linejoin', new StrokeLinejoinValue());
-    }
-    set stroke_linejoin(v: StrokeLinejoinValue) {
-        this._new_field('stroke_linejoin', v);
-    }
-    /// getset<stroke-miterlimit>
-    get stroke_miterlimit() {
-        return this._new_field('stroke_miterlimit', new ScalarValue(4));
-    }
-    set stroke_miterlimit(v: ScalarValue) {
-        this._new_field('stroke_miterlimit', v);
-    }
-    /// getset<stroke-opacity>
-    get stroke_opacity() {
-        return this._new_field('stroke_opacity', new PercentageValue(1));
-    }
-    set stroke_opacity(v: PercentageValue) {
-        this._new_field('stroke_opacity', v);
-    }
-    /// getset<stroke-width>
-    get stroke_width() {
-        return this._new_field('stroke_width', new LengthValue(1));
-    }
-    set stroke_width(v: LengthValue) {
-        this._new_field('stroke_width', v);
-    }
-    /// getset<unicode-bidi>
-    get unicode_bidi() {
-        return this._new_field('unicode_bidi', new UnicodeBidiValue());
-    }
-    set unicode_bidi(v: UnicodeBidiValue) {
-        this._new_field('unicode_bidi', v);
+    set pointer_events(v: TextValue) {
+        this._new_field('pointer_events', v);
     }
     /// getset<vector-effect>
     get vector_effect() {
@@ -221,41 +277,6 @@ export class Element extends Parent {
     }
     set vector_effect(v: TextValue) {
         this._new_field('vector_effect', v);
-    }
-    /// getset<visibility>
-    get visibility() {
-        return this._new_field('visibility', new VisibilityValue());
-    }
-    set visibility(v: VisibilityValue) {
-        this._new_field('visibility', v);
-    }
-    /// getset<white-space>
-    get white_space() {
-        return this._new_field('white_space', new WhiteSpaceValue());
-    }
-    set white_space(v: WhiteSpaceValue) {
-        this._new_field('white_space', v);
-    }
-    /// getset<word-spacing>
-    get word_spacing() {
-        return this._new_field('word_spacing', new TextValue('pre'));
-    }
-    set word_spacing(v: TextValue) {
-        this._new_field('word_spacing', v);
-    }
-    /// getset<writing-mode>
-    get writing_mode() {
-        return this._new_field('writing_mode', new WritingModeValue());
-    }
-    set writing_mode(v: WritingModeValue) {
-        this._new_field('writing_mode', v);
-    }
-    /// getset<text-align>
-    get text_align() {
-        return this._new_field('text_align', new TextAlignValue());
-    }
-    set text_align(v: TextAlignValue) {
-        this._new_field('text_align', v);
     }
     /// Properties ////////////
 

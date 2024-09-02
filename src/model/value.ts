@@ -258,6 +258,9 @@ export class TextValue extends AnimatableD<string> {
         }
         throw Error(`Not a string '${this.constructor.name}' '${value}'`);
     }
+    constructor(value: string = "") {
+        super(value);
+    }
 }
 
 export class UnknownValue extends AnimatableD<string> {
@@ -290,14 +293,21 @@ export class RGBValue extends VectorValue {
     override initial_value(): Vector {
         const { value } = this;
         return this.check_value(value as RGB);
-        // if (typeof value === 'string') {
-        //     const c = parse_css_color(value);
-        //     if (c != null) {
-        //         return new RGB(c[0] / 255, c[1] / 255, c[2] / 255);
-        //     }
-        // }
-        // throw Error(`Not a color '${this.constructor.name}' '${value}'`);
     }
+    override get_repr(frame: number): string {
+        const { value, kfs } = this;
+        function format(v: Vector) {
+            return RGBValue.to_css_rgb(v);
+        }
+        if (kfs && kfs.length > 0) {
+            return format(this.get_value(frame));
+        }
+        if (value instanceof Vector) {
+            return format(value);
+        }
+        return value + '';
+    }
+
 }
 
 export interface PositionKeyframe<V> extends Keyframe<V> {
@@ -431,6 +441,16 @@ export class PercentageValue extends ScalarValue {
         }
         return super.initial_value();
     }
+    override get_repr(frame: number): string {
+        const { value, kfs } = this;
+        if (kfs && kfs.length > 0) {
+            return this.get_value(frame).toFixed(5).replace(/0$/, '');
+        }
+        if (typeof value === 'number') {
+            return value.toFixed(5).replace(/0$/, '');
+        }
+        return value + '';
+    }
 
 
 }
@@ -442,6 +462,8 @@ export class RGB extends Vector {
         }
         super([r, g, b]);
     }
+
+
 }
 
 export abstract class EnumeratedValue<V> extends AnimatableD<V> {

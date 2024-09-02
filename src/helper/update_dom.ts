@@ -6,19 +6,6 @@ import { Transform, Fill, Box, Font, Stroke, ValueSet } from "../model/valuesets
 import { Stepper } from "../track/stepper.js";
 import { Element, TextData } from "../model/base.js";
 
-const FILL_MAP: {
-    [key: string]: ((frame: number, node: SVGElement, prop: any) => void);
-} = {
-    opacity: function (frame: number, node: SVGElement, prop: ScalarValue) {
-        node.setAttribute("fill-opacity", prop.get_percentage_repr(frame));
-    },
-    color: function (frame: number, node: SVGElement, prop: RGBValue) {
-        // console.log("Set color", prop.constructor.name);
-        // console.dir(prop);
-        node.setAttribute("fill", prop.get_rgb_repr(frame));
-    },
-};
-
 const PROP_MAP: {
     [key: string]: ((frame: number, elem: any, prop: any, node: Element) => void);
 } = {
@@ -71,38 +58,58 @@ const PROP_MAP: {
     },
     fill: function (frame: number, node: SVGSVGElement, prop: Fill) {
         for (let [n, v] of Object.entries(prop)) {
-            if (v instanceof Animatable) {
-                const f = FILL_MAP[n];
-                if (f) {
-                    f(frame, node, v);
-                } else {
-                    throw new Error(`Unexpected property ${n}`);
-                }
+            let k: string, s: string;
+            switch (n) {
+                case "color":
+                    k = "fill";
+                    s = prop.color.get_repr(frame);
+                    break;
+                case "opacity":
+                    k = "fill-opacity";
+                    s = prop.opacity.get_repr(frame);
+                    break;
+                case "rule":
+                    k = "fill-rule";
+                    s = prop.rule.get_repr(frame);
+                    break;
+                default:
+                    continue;
             }
+            node.setAttribute(k, s);
         }
     },
     stroke: function (frame: number, node: SVGSVGElement, prop: Stroke) {
         for (let [n, v] of Object.entries(prop)) {
+            let k: string, s: string;
             switch (n) {
                 case "color":
-                    node.setAttribute("stroke", v.get_rgb_repr(frame));
+                    [k, s] = ["stroke", prop.color.get_repr(frame)];
                     break;
                 case "opacity":
-                    node.style.strokeOpacity = v.get_percentage_repr(frame) + '';
+                    [k, s] = ["stroke-opacity", prop.opacity.get_repr(frame)];
                     break;
                 case "width":
-                    node.setAttribute("stroke-width", v.get_repr(frame));
+                    [k, s] = ["stroke-width", prop.width.get_repr(frame)];
                     break;
                 case "miter_limit":
-                    node.style.strokeMiterlimit = v.get_value(frame);
+                    [k, s] = ["stroke-miterlimit", prop.miter_limit.get_repr(frame)];
                     break;
                 case "dash_array":
-                    node.style.strokeDasharray = v.get_value(frame);
+                    [k, s] = ["stroke-dasharray", prop.dash_array.get_repr(frame)];
                     break;
                 case "dash_offset":
-                    node.style.strokeDashoffset = v.get_value(frame);
+                    [k, s] = ["stroke-dashoffset", prop.dash_offset.get_repr(frame)];
                     break;
+                case "linecap":
+                    [k, s] = ["stroke-linecap", prop.linecap.get_repr(frame)];
+                    break;
+                case "linejoin":
+                    [k, s] = ["stroke-linejoin", prop.linejoin.get_repr(frame)];
+                    break;
+                default:
+                    continue;
             }
+            node.setAttribute(k, s);
         }
     },
     font: function (frame: number, node: SVGSVGElement, prop: Font) {
@@ -206,7 +213,7 @@ declare module "../model/base" {
 
 declare module "../model/value" {
     interface RGBValue {
-        get_rgb_repr(frame: number): string;
+        // get_rgb_repr(frame: number): string;
     }
     interface PointsValue {
         get_points_repr(frame: number): string;
@@ -296,9 +303,9 @@ Container.prototype.stepper = function () {
 }
 
 
-RGBValue.prototype.get_rgb_repr = function (frame: number) {
-    return (this.value == null || (this.value as any) == 'none') ? 'none' : RGBValue.to_css_rgb(this.get_value(frame));
-}
+// RGBValue.prototype.get_rgb_repr = function (frame: number) {
+//     return (this.value == null || (this.value as any) == 'none') ? 'none' : RGBValue.to_css_rgb(this.get_value(frame));
+// }
 
 PointsValue.prototype.get_points_repr = function (frame: number) {
     return this.get_value(frame).map(([a, b]) => `${a},${b}`).join(' ')
