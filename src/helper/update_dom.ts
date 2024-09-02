@@ -6,7 +6,6 @@ import { Transform, Fill, Box, Font, Stroke, ValueSet } from "../model/valuesets
 import { Stepper } from "../track/stepper.js";
 import { Element, TextData } from "../model/base.js";
 
-
 const FILL_MAP: {
     [key: string]: ((frame: number, node: SVGElement, prop: any) => void);
 } = {
@@ -27,49 +26,43 @@ const PROP_MAP: {
         node.setAttribute("opacity", prop.get_percentage_repr(frame));
     },
     x: function (frame: number, node: SVGRectElement | SVGSVGElement, prop: ScalarValue) {
-        node.setAttribute("x", prop.get_length_repr(frame));
+        node.setAttribute("x", prop.get_repr(frame));
     },
     y: function (frame: number, node: SVGRectElement | SVGSVGElement, prop: ScalarValue) {
-        node.setAttribute("y", prop.get_length_repr(frame));
+        node.setAttribute("y", prop.get_repr(frame));
     },
     cx: function (frame: number, node: SVGCircleElement | SVGEllipseElement, prop: ScalarValue) {
-        node.setAttribute("cx", prop.get_length_repr(frame));
+        node.setAttribute("cx", prop.get_repr(frame));
     },
     cy: function (frame: number, node: SVGCircleElement | SVGEllipseElement, prop: ScalarValue) {
-        node.setAttribute("cy", prop.get_length_repr(frame));
+        node.setAttribute("cy", prop.get_repr(frame));
     },
     r: function (frame: number, node: SVGCircleElement, prop: ScalarValue) {
-        node.setAttribute("r", prop.get_length_repr(frame));
+        node.setAttribute("r", prop.get_repr(frame));
     },
     width: function (frame: number, node: SVGRectElement | SVGSVGElement, prop: ScalarValue) {
-        node.setAttribute("width", prop.get_length_repr(frame));
+        node.setAttribute("width", prop.get_repr(frame));
     },
     height: function (frame: number, node: SVGRectElement | SVGSVGElement, prop: ScalarValue) {
-        node.setAttribute("height", prop.get_length_repr(frame));
+        node.setAttribute("height", prop.get_repr(frame));
     },
     rx: function (frame: number, node: SVGRectElement | SVGEllipseElement, prop: ScalarValue) {
-        node.setAttribute("rx", prop.get_length_repr(frame));
+        node.setAttribute("rx", prop.get_repr(frame));
     },
     ry: function (frame: number, node: SVGRectElement | SVGEllipseElement, prop: ScalarValue) {
-        node.setAttribute("ry", prop.get_length_repr(frame));
+        node.setAttribute("ry", prop.get_repr(frame));
     },
     view_box: function (frame: number, node: SVGRectElement | SVGSVGElement, prop: Box) {
-        const s = prop.size.get_value(frame);
-        const p = prop.position.get_value(frame);
-        // get_vbox_repr
-        node.setAttribute("viewBox", `${p[0]} ${p[1]} ${s[0]} ${s[1]}`);
+        node.setAttribute("viewBox", prop.get_repr(frame));
     },
     d: function (frame: number, node: SVGPathElement, prop: TextValue) {
-        const s = prop.get_value(frame);
-        node.setAttribute("d", s);
+        node.setAttribute("d", prop.get_repr(frame));
     },
     fit_view: function (frame: number, node: SVGRectElement | SVGSVGElement, prop: TextValue) {
-        const s = prop.get_value(frame);
-        // prop.format_par()
-        node.setAttribute("preserveAspectRatio", s);
+        node.setAttribute("preserveAspectRatio", prop.get_repr(frame));
     },
     transform: function (frame: number, node: SVGElement, prop: Transform) {
-        node.setAttribute("transform", prop.get_transform_repr(frame));
+        node.setAttribute("transform", prop.get_repr(frame));
     },
     anchor: function (frame: number, node: SVGElement, prop: VectorValue) {
         // node.style.transformOrigin = prop.get_anchor_repr(frame);
@@ -98,7 +91,7 @@ const PROP_MAP: {
                     node.style.strokeOpacity = v.get_percentage_repr(frame) + '';
                     break;
                 case "width":
-                    node.setAttribute("stroke-width", v.get_length_repr(frame));
+                    node.setAttribute("stroke-width", v.get_repr(frame));
                     break;
                 case "miter_limit":
                     node.style.strokeMiterlimit = v.get_value(frame);
@@ -144,23 +137,23 @@ const PROP_MAP: {
         node.setAttribute("font-size", prop.get_repr(frame));
     },
     dx: function (frame: number, node: SVGRectElement | SVGEllipseElement, prop: ScalarValue) {
-        node.setAttribute("dx", prop.get_length_repr(frame));
+        node.setAttribute("dx", prop.get_repr(frame));
     },
     dy: function (frame: number, node: SVGRectElement | SVGEllipseElement, prop: ScalarValue) {
-        node.setAttribute("dy", prop.get_length_repr(frame));
+        node.setAttribute("dy", prop.get_repr(frame));
     },
     content: function (frame: number, node: SVGRectElement | SVGEllipseElement, prop: TextValue) {
-        node.textContent = prop.get_value(frame);
+        node.textContent = prop.get_repr(frame);
     },
     href: function (frame: number, node: SVGRectElement | SVGEllipseElement, prop: TextValue) {
-        node.setAttribute("href", prop.get_value(frame));
+        node.setAttribute("href", prop.get_repr(frame));
     },
 
     letter_spacing: function (frame: number, node: SVGRectElement | SVGEllipseElement, prop: TextValue) {
         node.setAttribute("letter-spacing", prop.get_repr(frame));
     },
     word_spacing: function (frame: number, node: SVGRectElement | SVGEllipseElement, prop: TextValue) {
-        node.setAttribute("word-spacing", prop.get_value(frame).toString());
+        node.setAttribute("word-spacing", prop.get_repr(frame));
     },
 };
 

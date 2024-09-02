@@ -1,6 +1,7 @@
 import { cubic_point_at } from "../keyframe/bezier.js";
 import { Vector } from "../geom/index.js";
 import { Keyframe, Animated, KeyExtra } from "../keyframe/keyframe.js";
+import { parse_css_color } from "../helper/parse_color.js";
 
 
 export interface PlainKeyframe {
@@ -95,6 +96,10 @@ export class Animatable<
         }
         return value + '';
     }
+    set_repr(value: string) {
+        this.value = value;
+    }
+
     constructor(v: V) {
         super();
         if (v == null) {
@@ -255,6 +260,10 @@ export class TextValue extends AnimatableD<string> {
     }
 }
 
+export class UnknownValue extends AnimatableD<string> {
+
+}
+
 export class RGBValue extends VectorValue {
     static to_css_rgb([r, g, b, a]: Iterable<number>) {
         if (a == 0) {
@@ -263,6 +272,31 @@ export class RGBValue extends VectorValue {
         return `rgb(${Math.round((r * 255) % 256)}, ${Math.round(
             (g * 255) % 256
         )}, ${Math.round((b * 255) % 256)})`;
+    }
+    override check_value(x: RGB) {
+        if (x instanceof RGB) {
+            return x;
+        } else if (typeof x == "string") {
+            const c = parse_css_color(x);
+            if (c != null) {
+                return new RGB(c[0] / 255, c[1] / 255, c[2] / 255);
+            }
+        } else {
+            return new RGB(...(x as number[]));
+        }
+        throw new Error(`Invalid color "${x}"`);
+    };
+
+    override initial_value(): Vector {
+        const { value } = this;
+        return this.check_value(value as RGB);
+        // if (typeof value === 'string') {
+        //     const c = parse_css_color(value);
+        //     if (c != null) {
+        //         return new RGB(c[0] / 255, c[1] / 255, c[2] / 255);
+        //     }
+        // }
+        // throw Error(`Not a color '${this.constructor.name}' '${value}'`);
     }
 }
 
@@ -367,12 +401,14 @@ export class ScalarValue extends Animatable<number> {
         const { value } = this;
         if (typeof value === 'number') {
             return value;
-        } else {
-            if (/^\s*[-+]?[0-9]*\.?[0-9]+(?:[eE][-+]?[0-9]+)?\s*$/.test(value)) {
-                const v = parseFloat(value);
-                if (!isNaN(v)) {
-                    return v;
-                }
+        }
+        return this.parse_number(value);
+    }
+    parse_number(value: string | any) {
+        if (/^\s*[-+]?[0-9]*\.?[0-9]+(?:[eE][-+]?[0-9]+)?\s*$/.test(value)) {
+            const v = parseFloat(value);
+            if (!isNaN(v)) {
+                return v;
             }
         }
         throw Error(`Not a number '${this.constructor.name}' '${value}'`);
@@ -386,6 +422,17 @@ export class PercentageValue extends ScalarValue {
     constructor(v: number = 0) {
         super(v);
     }
+    override initial_value(): number {
+        const { value } = this;
+        if (typeof value === 'string') {
+            if (value.endsWith('%')) {
+                return this.parse_number(value.replaceAll('%', '')) / 100;
+            }
+        }
+        return super.initial_value();
+    }
+
+
 }
 
 export class RGB extends Vector {
@@ -396,11 +443,6 @@ export class RGB extends Vector {
         super([r, g, b]);
     }
 }
-// export class RGBNone extends RGB {
-//     constructor() {
-//         super(NaN, NaN, NaN);
-//     }
-// }
 
 export abstract class EnumeratedValue<V> extends AnimatableD<V> {
 

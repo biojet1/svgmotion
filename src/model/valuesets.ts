@@ -1,6 +1,6 @@
 import { BoundingBox, Matrix, MatrixMut, Vector } from "../geom/index.js";
 import { LengthValue } from "./base.js";
-import { VectorValue, ScalarValue, PositionValue, RGBValue, TextValue } from "./value.js";
+import { VectorValue, ScalarValue, PositionValue, RGBValue, TextValue, PercentageValue } from "./value.js";
 import { PlainValue } from "./value.js";
 import { Animatable } from "./value.js";
 
@@ -85,6 +85,17 @@ export class Box extends ValueSet {
         this._new_field("position", v);
     }
     //
+    get_repr(frame: number): string {
+        const s = this.size.get_value(frame);
+        const p = this.position.get_value(frame);
+        return `${p[0]} ${p[1]} ${s[0]} ${s[1]}`;
+    }
+    set_repr(value: string) {
+        const v = value.split(/[\s,]+/).map(parseFloat);
+        this.position.set_value([v[0], v[1]]);
+        this.size.set_value([v[2], v[3]]);
+    }
+
     bbox(frame: number) {
         if (Object.hasOwn(this, "size")) {
             if (Object.hasOwn(this, "position")) {
@@ -107,9 +118,9 @@ export class Stroke extends ValueSet {
     }
     /// opacity
     get opacity() {
-        return this._new_field("opacity", new ScalarValue(1));
+        return this._new_field("opacity", new PercentageValue(1));
     }
-    set opacity(v: ScalarValue) {
+    set opacity(v: PercentageValue) {
         this._new_field("opacity", v);
     }
     /// color
@@ -145,9 +156,9 @@ export class Stroke extends ValueSet {
 export class Fill extends ValueSet {
     /// opacity
     get opacity() {
-        return this._new_field("opacity", new ScalarValue(1));
+        return this._new_field("opacity", new PercentageValue(1));
     }
-    set opacity(v: ScalarValue) {
+    set opacity(v: PercentageValue) {
         this._new_field("opacity", v);
     }
     /// color
@@ -188,7 +199,7 @@ export class Transform extends ValueSet {
         const o: any = this;
         delete o["all"];
     }
-    public set_parse_transform(d: string) {
+    public set_repr(d: string) {
         this.clear();
         for (const str of d.split(/\)\s*,?\s*/).slice(0, -1)) {
             const kv = str.trim().split("(");
@@ -227,7 +238,7 @@ export class Transform extends ValueSet {
         }
     }
     ///
-    get_transform_repr(frame: number) {
+    get_repr(frame: number) {
         if ('all' in this) {
             return col1(this.all, frame);
         }

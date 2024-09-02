@@ -1,5 +1,5 @@
 
-import { VectorValue, ScalarValue, PointsValue, RGB, RGBValue, TextValue } from "../model/value.js";
+import { VectorValue, ScalarValue, PointsValue, RGB, RGBValue, TextValue, UnknownValue } from "../model/value.js";
 import { parse_css_color } from "./parse_color.js";
 import { ComputeLength } from "./svg_length.js";
 import { Element, LengthHValue, LengthWValue, LengthValue } from "../model/base.js";
@@ -32,26 +32,26 @@ Element.prototype.set_attribute = function (name: string, value: string): Elemen
 
         case "transform":
             if (value) {
-                this.transform.set_parse_transform(value);
+                this.transform.set_repr(value);
             }
             break;
         case "font-size":
             if (value) {
-                this.font_size.value = value;
+                this.font_size.set_repr(value);
             }
         case "font-weight":
             if (value) {
-                this.font.weight.set_parse_text(value, this);
+                this.font.weight.set_repr(value);
             }
             break;
         // case "font-size":
         //     if (value) {
-        //         this.font.size.set_parse_text(value, this);
+        //         this.font.size.set_repr(value);
         //     }
         //     break;
         case "font-family":
             if (value) {
-                this.font.family.set_parse_text(value, this);
+                this.font.family.set_repr(value);
             }
             break;
         case "line-height":// .text?
@@ -61,42 +61,42 @@ Element.prototype.set_attribute = function (name: string, value: string): Elemen
             break;
         case "text-align":// .text?
             if (value) {
-                this.text_align.set_parse_text(value, this);
+                this.text_align.set_repr(value);
             }
             break;
         case "white-space": // put<>
             if (value) {
-                this.white_space.set_parse_text(value, this);
+                this.white_space.set_repr(value);
             }
             break;
         case "fill":// 
             if (value) {
-                this.fill.color.set_parse_rgb(value, this);
+                this.fill.color.set_repr(value);
             }
             break;
         case "fill-opacity":// 
             if (value) {
-                this.fill.opacity.set_parse_percentage(value, this);
+                this.fill.opacity.set_repr(value);
             }
             break;
         case "stroke":// 
             if (value) {
-                this.stroke.color.set_parse_rgb(value, this);
+                this.stroke.color.set_repr(value);
             }
             break;
         case "stroke-opacity":// 
             if (value) {
-                this.stroke.opacity.set_parse_percentage(value, this);
+                this.stroke.opacity.set_repr(value);
             }
             break;
         case "stroke-width":// 
             if (value) {
-                this.stroke.width.value = value;
+                this.stroke.width.set_repr(value);
             }
             break;
         case "stroke-miterlimit":// 
             if (value) {
-                this.stroke.miter_limit.set_parse_number(value, this);
+                this.stroke.miter_limit.set_repr(value);
             }
             break;
 
@@ -107,15 +107,15 @@ Element.prototype.set_attribute = function (name: string, value: string): Elemen
             break;
         case "stroke-dashoffset":// 
             if (value) {
-                this.stroke.dash_offset.value = value;
+                this.stroke.dash_offset.set_repr(value);
             }
         case "letter-spacing":// 
             if (value) {
-                this.letter_spacing.value = value;
+                this.letter_spacing.set_repr(value);
             }
         case "word-spacing":// 
             if (value) {
-                this.word_spacing.set_parse_text(value, this);
+                this.word_spacing.set_repr(value);
             }
 
             break;
@@ -125,35 +125,30 @@ Element.prototype.set_attribute = function (name: string, value: string): Elemen
             }
         case "opacity":
             if (value) {
-                this.opacity.set_parse_percentage(value, this);
+                this.opacity.set_repr(value);
             }
 
         case "shape-inside":
         case "paint-order":
             break;
         default:
-            // this[name] = new Tex
-            if (!(name.startsWith("aria-") || name.startsWith("-inkscape"))) {
-                throw new Error(
-                    `Unexpected attribute [${name}]="${value}" tag="${(this.constructor as any).tag}" this="${this.constructor.name}"`
-                );
+            if (name === "*") {
+                (this as any)[name] = new UnknownValue(value);
+                return this;
             }
+
+            throw new Error(
+                `Unexpected attribute [${name}]="${value}" tag="${(this.constructor as any).tag}" this="${this.constructor.name}"`
+            );
+
     }
     return this;
 }
 
 declare module "../model/value" {
     interface ScalarValue {
-        set_parse_length(s: string, container: Element, name: string, mode?: string): void;
-        set_parse_number(s: string, container: Element): void;
-        set_parse_percentage(s: string, container: Element): void;
+        // set_parse_percentage(s: string, container: Element): void;
         set_parse_line_height(s: string, container: Element): void;
-    }
-    interface RGBValue {
-        set_parse_rgb(s: string, container: Element): void;
-    }
-    interface TextValue {
-        set_parse_text(s: string, container: Element): void;
     }
     interface PointsValue {
         set_parse_points(s: string, container: Element): void;
@@ -164,24 +159,15 @@ declare module "../model/value" {
     }
 }
 
-ScalarValue.prototype.set_parse_number = function (s: string, parent: Element) {
-    this.value = parseFloat(s);
-}
 
-ScalarValue.prototype.set_parse_length = function (s: string, parent: Element, name: string, mode?: string) {
-    // console.log(`set_parse_length ${s} [${(parent.constructor as any).tag}:${parent.id}] [${name}]`)
-    const cl = new ComputeLength(parent, 0);
-    cl.length_mode = mode;
-    this.value = cl.parse_len(s);
-}
 
-ScalarValue.prototype.set_parse_percentage = function (s: string, parent: Element) {
-    if (s.endsWith('%')) {
-        this.value = parseFloat(s.replaceAll('%', '')) / 100;
-    } else {
-        this.value = parseFloat(s);
-    }
-}
+// ScalarValue.prototype.set_parse_percentage = function (s: string, parent: Element) {
+//     if (s.endsWith('%')) {
+//         this.value = parseFloat(s.replaceAll('%', '')) / 100;
+//     } else {
+//         this.value = parseFloat(s);
+//     }
+// }
 
 ScalarValue.prototype.set_parse_line_height = function (s: string, parent: Element) {
     if (s.endsWith('%')) {
@@ -195,21 +181,6 @@ ScalarValue.prototype.set_parse_line_height = function (s: string, parent: Eleme
     }
 }
 
-RGBValue.prototype.set_parse_rgb = function (s: string, parent: Element) {
-    if (s == "none" || s == "context-fill" || s == "context-stroke" || s == "currentColor") {
-        this.value = s;
-        return;
-    }
-    const c = parse_css_color(s);
-    if (c == null) {
-        throw new Error(`Invalid color "${s}"`);
-    }
-    this.value = new RGB(c[0] / 255, c[1] / 255, c[2] / 255);
-}
-
-TextValue.prototype.set_parse_text = function (s: string, parent: Element) {
-    this.value = s;
-}
 
 PointsValue.prototype.set_parse_points = function (s: string, parent: Element) {
     const nums = s.split(/[\s,]+/).map(function (str) {
@@ -252,30 +223,26 @@ ViewPort.prototype.set_attribute = function (name: string, value: string) {
     switch (name) {
         case "version":
             break;
-        case "viewBox": {
-            const v = value.split(/[\s,]+/).map(parseFloat);
-            const u = this.view_box;
-            u.position.set_value([v[0], v[1]]);
-            u.size.set_value([v[2], v[3]]);
-        }
+        case "viewBox":
+            this.view_box.set_repr(value);
             break;
         case "preserveAspectRatio":
-            this.fit_view.set_parse_text(value, this);
+            this.fit_view.set_repr(value);
             break;
         case "zoomAndPan":
-            this.zoom_pan.set_parse_text(value, this);
+            this.zoom_pan.set_repr(value);
             break;
         case "height":
-            this.height.value = value;
+            this.height.set_repr(value);
             break;
         case "width":
-            this.width.value = value;
+            this.width.set_repr(value);
             break;
         case "y":
-            this.y.value = value;
+            this.y.set_repr(value);
             break;
         case "x":
-            this.x.value = value;
+            this.x.set_repr(value);
             break;
         default:
             Element.prototype.set_attribute.call(this, name, value);
@@ -287,22 +254,22 @@ ViewPort.prototype.set_attribute = function (name: string, value: string) {
 Rect.prototype.set_attribute = function (name: string, value: string) {
     switch (name) {
         case "height":
-            this.height.value = value;
+            this.height.set_repr(value);
             break;
         case "width":
-            this.width.value = value;
+            this.width.set_repr(value);
             break;
         case "y":
-            this.y.value = value;
+            this.y.set_repr(value);
             break;
         case "x":
-            this.x.value = value;
+            this.x.set_repr(value);
             break;
         case "ry":
-            this.ry.value = value;
+            this.ry.set_repr(value);
             break;
         case "rx":
-            this.rx.value = value;
+            this.rx.set_repr(value);
             break;
         default:
             Element.prototype.set_attribute.call(this, name, value);
@@ -315,13 +282,13 @@ Rect.prototype.set_attribute = function (name: string, value: string) {
 Circle.prototype.set_attribute = function (name: string, value: string) {
     switch (name) {
         case "r":
-            this.r.value = value;
+            this.r.set_repr(value);
             break;
         case "cx":
-            this.cx.value = value;
+            this.cx.set_repr(value);
             break;
         case "cy":
-            this.cy.value = value;
+            this.cy.set_repr(value);
             break;
         default:
             Element.prototype.set_attribute.call(this, name, value);
@@ -331,16 +298,16 @@ Circle.prototype.set_attribute = function (name: string, value: string) {
 Ellipse.prototype.set_attribute = function (name: string, value: string) {
     switch (name) {
         case "rx":
-            this.rx.value = value;
+            this.rx.set_repr(value);
             break;
         case "ry":
-            this.ry.value = value;
+            this.ry.set_repr(value);
             break;
         case "cx":
-            this.cx.value = value;
+            this.cx.set_repr(value);
             break;
         case "cy":
-            this.cy.value = value;
+            this.cy.set_repr(value);
             break;
         default:
             Element.prototype.set_attribute.call(this, name, value);
@@ -369,16 +336,16 @@ Polyline.prototype.set_attribute = function (name: string, value: string) {
 Line.prototype.set_attribute = function (name: string, value: string) {
     switch (name) {
         case "x1":
-            this.x1.value = value;
+            this.x1.set_repr(value);
             break;
         case "x2":
-            this.x2.value = value;
+            this.x2.set_repr(value);
             break
         case "y1":
-            this.y1.value = value;
+            this.y1.set_repr(value);
             break;
         case "y2":
-            this.y2.value = value;
+            this.y2.set_repr(value);
             break;
         default:
             Element.prototype.set_attribute.call(this, name, value);
@@ -388,17 +355,17 @@ Line.prototype.set_attribute = function (name: string, value: string) {
 Text.prototype.set_attribute = function (name: string, value: string) {
     switch (name) {
         case "y":
-            this.y.value = value;
+            this.y.set_repr(value);
             break;
         case "x":
-            this.x.value = value;
+            this.x.set_repr(value);
             break;
         case "dy":
-            this.dy.value = value;
+            this.dy.set_repr(value);
             break;
         case "dx":
-            this.dx.value = value;
-            // this.dx.value = value;
+            this.dx.set_repr(value);
+            // this.dx.set_repr(value);
             break;
         default:
             Element.prototype.set_attribute.call(this, name, value);
@@ -408,17 +375,17 @@ Text.prototype.set_attribute = function (name: string, value: string) {
 TSpan.prototype.set_attribute = function (name: string, value: string) {
     switch (name) {
         case "y":
-            this.y.value = value;
+            this.y.set_repr(value);
             break;
         case "x":
-            this.x.value = value;
+            this.x.set_repr(value);
             break;
         case "dy":
-            this.dy.value = value;
+            this.dy.set_repr(value);
             break;
         case "dx":
-            this.dx.value = value;
-            // this.dx.value = value;
+            this.dx.set_repr(value);
+            // this.dx.set_repr(value);
             break;
         default:
             Element.prototype.set_attribute.call(this, name, value);
@@ -429,19 +396,19 @@ TSpan.prototype.set_attribute = function (name: string, value: string) {
 Image.prototype.set_attribute = function (name: string, value: string) {
     switch (name) {
         case "height":
-            this.height.value = value;
+            this.height.set_repr(value);
             break;
         case "width":
-            this.width.value = value;
+            this.width.set_repr(value);
             break;
         case "y":
-            this.y.value = value;
+            this.y.set_repr(value);
             break;
         case "x":
-            this.x.value = value;
+            this.x.set_repr(value);
             break;
         case "href":
-            this.href.set_parse_text(value, this);
+            this.href.set_repr(value);
             break;
         //             ‘preserveAspectRatio’
         // ‘crossorigin’
@@ -454,19 +421,19 @@ Image.prototype.set_attribute = function (name: string, value: string) {
 Use.prototype.set_attribute = function (name: string, value: string) {
     switch (name) {
         case "height":
-            this.height.value = value;
+            this.height.set_repr(value);
             break;
         case "width":
-            this.width.value = value;
+            this.width.set_repr(value);
             break;
         case "y":
-            this.y.value = value;
+            this.y.set_repr(value);
             break;
         case "x":
-            this.x.value = value;
+            this.x.set_repr(value);
             break;
         case "href":
-            this.href.set_parse_text(value, this);
+            this.href.set_repr(value);
             break;
         default:
             Element.prototype.set_attribute.call(this, name, value);
@@ -477,16 +444,16 @@ Use.prototype.set_attribute = function (name: string, value: string) {
 Symbol.prototype.set_attribute = function (name: string, value: string) {
     switch (name) {
         case "height":
-            this.height.value = value;
+            this.height.set_repr(value);
             break;
         case "width":
-            this.width.value = value;
+            this.width.set_repr(value);
             break;
         case "y":
-            this.y.value = value;
+            this.y.set_repr(value);
             break;
         case "x":
-            this.x.value = value;
+            this.x.set_repr(value);
             break;
         // ‘preserveAspectRatio’
         // ‘viewBox’
@@ -502,7 +469,7 @@ Symbol.prototype.set_attribute = function (name: string, value: string) {
 Path.prototype.set_attribute = function (name: string, value: string) {
     switch (name) {
         case "d":
-            this.d.value = value;
+            this.d.set_repr(value);
             break;
         default:
             Element.prototype.set_attribute.call(this, name, value);

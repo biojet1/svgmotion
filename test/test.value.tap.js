@@ -112,14 +112,14 @@ test.test("TextValue", (t) => {
 test.test("Transform", (t) => {
     let x = new Transform();
     t.not("all" in x);
-    x.set_parse_transform(
+    x.set_repr(
         "translate(4,5) rotate(30) skewX(-7) scale(3, .5) translate(-2 -3) skewY(99) scale(1 , 1) matrix(1 2 3 4 5 6) rotate(2 0 4)"
     );
     t.ok("all" in x);
     // console.log(x.dump());
 
     t.equal(
-        x.get_transform_repr(0),
+        x.get_repr(0),
         "translate(4 5) rotate(30) skewX(-7) scale(3 0.5) translate(-2 -3) skewY(99) scale(1 1) matrix(1 2 3 4 5 6) rotate(2 0 4)"
     );
     t.same([...x.get_translate().get_value(0).values()], [4, 5]);

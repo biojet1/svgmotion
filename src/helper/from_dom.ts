@@ -92,7 +92,8 @@ function walk(elem: SVGElement, parent: Container, attrs: { [key: string]: strin
                     if (i > 0) {
                         const k = s.substring(0, i).trim();
                         const v = s.substring(i + 1).trim();
-                        if (k && v) {
+                        if (k && v && !k.startsWith("-")) {
+
                             const m = v.match(/(.+)\s*!\s*(\w+)$/);
                             if (m) {
                                 props[k] = m[1].trim();
@@ -104,7 +105,7 @@ function walk(elem: SVGElement, parent: Container, attrs: { [key: string]: strin
                     }
                 }
             }
-        } else if (!(key.startsWith("aria-") || key.startsWith("-inkscape"))) {
+        } else if (!(key.startsWith("aria-") || key.startsWith("-inkscape") || key.startsWith("inkscape"))) {
             props[key] = value;
         }
     }
