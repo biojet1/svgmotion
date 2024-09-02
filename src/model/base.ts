@@ -357,30 +357,11 @@ export class TextAlignValue extends EnumTextValue {
 
 
 export class LengthWValue extends ScalarValue {
-    // override initial_value(): number {
-    //     const { value } = this;
-    //     if (typeof value === 'number') {
-    //         return value;
-    //     }
-    //     throw Error(`Not a number '${this.constructor.name}' '${value}'`);
-    // }
-
 }
 
 export class LengthHValue extends ScalarValue {
-    // override initial_value(): number {
-    //     const { value } = this;
-    //     if (typeof value === 'number') {
-    //         return value;
-    //     }
-    //     throw Error(`Not a number '${this.constructor.name}' '${value}'`);
-    // }
-
 }
 
 export class LengthValue extends ScalarValue {
-    constructor(v: number = 0) {
-        super(v);
-    }
 }
 // TODO: dash array, path

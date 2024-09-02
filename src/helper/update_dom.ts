@@ -141,7 +141,7 @@ const PROP_MAP: {
         node.setAttribute("points", prop.get_points_repr(frame));
     },
     font_size: function (frame: number, node: SVGElement, prop: ScalarValue) {
-        node.setAttribute("font-size", prop.get_value(frame) + '');
+        node.setAttribute("font-size", prop.get_repr(frame));
     },
     dx: function (frame: number, node: SVGRectElement | SVGEllipseElement, prop: ScalarValue) {
         node.setAttribute("dx", prop.get_length_repr(frame));
@@ -157,7 +157,7 @@ const PROP_MAP: {
     },
 
     letter_spacing: function (frame: number, node: SVGRectElement | SVGEllipseElement, prop: TextValue) {
-        node.setAttribute("letter-spacing", prop.get_value(frame).toString());
+        node.setAttribute("letter-spacing", prop.get_repr(frame));
     },
     word_spacing: function (frame: number, node: SVGRectElement | SVGEllipseElement, prop: TextValue) {
         node.setAttribute("word-spacing", prop.get_value(frame).toString());
@@ -278,6 +278,7 @@ Root.prototype.to_dom = function to_dom(doc: typeof SVGElement.prototype.ownerDo
 Container.prototype.update_dom = function (frame: number) {
     update_dom(frame, this);
 }
+
 TextData.prototype.update_dom = function (frame: number) {
     // TODO: this function not called
     const elem: Text = (this as any)._element;
@@ -285,6 +286,7 @@ TextData.prototype.update_dom = function (frame: number) {
         elem.textContent = this.content.get_value(frame);
     }
 }
+
 Container.prototype.stepper = function () {
     let max = 0;
     let min = 0;
@@ -314,7 +316,7 @@ ScalarValue.prototype.get_percentage_repr = function (frame: number) {
 }
 
 ScalarValue.prototype.get_length_repr = function (frame: number) {
-    return this.get_value(frame) + '';
+    return this.get_repr(frame);
 }
 
 VectorValue.prototype.get_anchor_repr = function (frame: number) {

@@ -37,6 +37,7 @@ export class Animatable<
         return this.check_value(this.value);
     }
 
+
     set_value(value: V | any) {
         this.value = this.check_value(value);
     }
@@ -87,7 +88,13 @@ export class Animatable<
             this.value = this.load_value(x.v);
         }
     }
-
+    get_repr(frame: number): string {
+        const { value, kfs } = this;
+        if (kfs && kfs.length > 0) {
+            return this.get_value(frame) + '';
+        }
+        return value + '';
+    }
     constructor(v: V) {
         super();
         if (v == null) {
@@ -361,12 +368,12 @@ export class ScalarValue extends Animatable<number> {
         if (typeof value === 'number') {
             return value;
         } else {
-            const v = parseFloat(value);
-            if (!isNaN(v)) {
-                return v;
-
+            if (/^\s*[-+]?[0-9]*\.?[0-9]+(?:[eE][-+]?[0-9]+)?\s*$/.test(value)) {
+                const v = parseFloat(value);
+                if (!isNaN(v)) {
+                    return v;
+                }
             }
-
         }
         throw Error(`Not a number '${this.constructor.name}' '${value}'`);
     }

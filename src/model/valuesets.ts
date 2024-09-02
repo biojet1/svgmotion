@@ -14,6 +14,7 @@ export function xget<T>(that: any, name: string, value: T): T {
     });
     return value;
 }
+
 export function xset<T>(that: any, name: string, value: T) {
     // console.log(`_SETX ${name}`);
     Object.defineProperty(that, name, {
