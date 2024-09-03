@@ -37,7 +37,7 @@
     "c8test": "c8 npx tap -t600 --disable-coverage --reporter=terse 'test/**/*.tap.*js'",
     "try": "npm run compile && npm run test",
     "webpack": "npm run compile && npx webpack",
-    "test": "npx tap -t600 --disable-coverage 'test/**/*.tap.*js'"
+    "test": "c8 npx tap -t600 --no-coverage --reporter=terse 'test/**/*.tap.*js'"
   },
   "devDependencies": {
     "@types/probe-image-size": "^7.2.5",
