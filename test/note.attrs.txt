@@ -1,0 +1,60 @@
+Here is a comprehensive list of SVG attributes and CSS properties adopted by SVG that are numeric:
+
+### SVG Attributes (Numeric)
+
+1. **`x`** - The x-coordinate for positioning elements like `<rect>`, `<circle>`, `<text>`, etc.
+2. **`y`** - The y-coordinate for positioning elements.
+3. **`width`** - The width of elements like `<rect>`, `<image>`, etc.
+4. **`height`** - The height of elements.
+5. **`rx`** - The x-axis radius for rounded corners (`<rect>` elements).
+6. **`ry`** - The y-axis radius for rounded corners (`<rect>` elements).
+7. **`cx`** - The x-coordinate of the center (`<circle>`, `<ellipse>` elements).
+8. **`cy`** - The y-coordinate of the center (`<circle>`, `<ellipse>` elements).
+9. **`r`** - The radius (`<circle>` elements).
+10. **`stroke-width`** - The width of a stroke.
+11. **`opacity`** - The opacity of an element, ranging from 0 (fully transparent) to 1 (fully opaque).
+12. **`stroke-opacity`** - The opacity of the stroke.
+13. **`fill-opacity`** - The opacity of the fill.
+14. **`x1`**, **`x2`** - The x-coordinates for start and end points of lines and gradients (`<line>`, `<linearGradient>`).
+15. **`y1`**, **`y2`** - The y-coordinates for start and end points of lines and gradients.
+16. **`offset`** - Used in gradients to define the position of a color stop.
+17. **`points`** - A list of numeric values defining points in a polygon (`<polygon>`) or polyline (`<polyline>`).
+18. **`transform`** - Contains numeric values for transformations like `translate`, `rotate`, `scale`, etc.
+19. **`viewBox`** - A list of four numeric values defining the position and dimension in user space (min-x, min-y, width, height).
+20. **`font-size`** - The size of the font.
+21. **`letter-spacing`** - Specifies the spacing between letters.
+22. **`word-spacing`** - Specifies the spacing between words.
+23. **`kerning`** - Specifies the spacing between characters.
+24. **`pathLength`** - Specifies the total length for the path.
+25. **`stroke-dasharray`** - A list of comma- or space-separated values that specifies the pattern of dashes and gaps used to paint the outline of the shape.
+26. **`stroke-dashoffset`** - The offset into the dash pattern.
+27. **`radius`** - Used in filters like `feMorphology` and `feGaussianBlur`.
+28. **`stdDeviation`** - The standard deviation for Gaussian blur.
+29. **`baseFrequency`** - The base frequency for turbulence filters.
+30. **`numOctaves`** - The number of octaves for turbulence filters.
+31. **`scale`** - Scale value for certain filters (like `feDisplacementMap`).
+
+### CSS Properties Adopted by SVG (Numeric)
+
+1. **`opacity`** - Controls the transparency of the element.
+2. **`stroke-width`** - Specifies the width of the stroke.
+3. **`stroke-opacity`** - Controls the opacity of the stroke.
+4. **`fill-opacity`** - Controls the opacity of the fill color.
+5. **`font-size`** - Specifies the size of the font.
+6. **`line-height`** - Specifies the height of a line box.
+7. **`letter-spacing`** - Controls the spacing between letters.
+8. **`word-spacing`** - Controls the spacing between words.
+9. **`kerning`** - Adjusts the space between characters.
+10. **`clip-path`** - Defines a clipping path that can be used to clip (i.e., hide parts of) elements.
+11. **`mask`** - Applies a mask to an element.
+12. **`flex`** - Flex grow and shrink properties can have numeric values.
+13. **`order`** - Specifies the order of a flex item within a flex container.
+14. **`z-index`** - Specifies the stack level of an element.
+15. **`transition-duration`** - Specifies the duration of a transition effect.
+16. **`animation-duration`** - Specifies the duration of an animation cycle.
+17. **`transform`** - Contains numeric values for transformations like `translate`, `rotate`, `scale`, etc.
+18. **`stroke-dasharray`** - Defines the pattern of dashes and gaps used to paint the outline.
+19. **`stroke-dashoffset`** - Specifies the distance into the dash pattern to start the dash.
+20. **`stroke-miterlimit`** - Specifies the limit on the ratio of the miter length to the stroke width.
+
+These numeric attributes and properties play a vital role in defining the graphical and visual behavior of SVG elements, allowing for precise control over positioning, dimensions, styling, and animations.

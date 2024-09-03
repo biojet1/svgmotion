@@ -49,12 +49,12 @@ const PROP_MAP: {
         node.setAttribute("preserveAspectRatio", prop.get_repr(frame));
     },
     transform: function (frame: number, node: SVGElement, prop: Transform) {
-        node.setAttribute("transform", prop.get_repr(frame));
+        for (const { name, value } of prop.enum_attibutes(frame)) {
+            node.setAttribute(name, value);
+        }
     },
     anchor: function (frame: number, node: SVGElement, prop: VectorValue) {
-        // node.style.transformOrigin = prop.get_anchor_repr(frame);
         node.setAttribute("transform-origin", prop.get_anchor_repr(frame));
-
     },
     fill: function (frame: number, node: SVGSVGElement, prop: Fill) {
         for (let [n, v] of Object.entries(prop)) {
@@ -118,7 +118,7 @@ const PROP_MAP: {
         }
     },
     line_height: function (frame: number, node: SVGElement, prop: ScalarValue) {
-        node.style.lineHeight = prop.get_value(frame) + '';
+        node.style.lineHeight = prop.get_repr(frame);
     },
     text_align: function (frame: number, node: SVGElement, prop: TextValue) {
         node.style.textAlign = prop.get_value(frame) + '';
@@ -130,9 +130,7 @@ const PROP_MAP: {
     points: function (frame: number, node: SVGElement, prop: PointsValue) {
         node.setAttribute("points", prop.get_points_repr(frame));
     },
-    font_size: function (frame: number, node: SVGElement, prop: ScalarValue) {
-        node.setAttribute("font-size", prop.get_repr(frame));
-    },
+
     dx: function (frame: number, node: SVGRectElement | SVGEllipseElement, prop: ScalarValue) {
         node.setAttribute("dx", prop.get_repr(frame));
     },

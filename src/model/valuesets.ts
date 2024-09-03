@@ -315,12 +315,16 @@ export class Transform extends ValueSet {
             }
         }
     }
-    ///
     get_repr(frame: number) {
         if ('all' in this) {
             return col1(this.all, frame);
         }
         return '';
+    }
+    *enum_attibutes(frame: number) {
+        if ('all' in this) {
+            yield { name: "transform", value: col1(this.all, frame) }
+        }
     }
     cat_transform(frame: number, n: Matrix) {
         if (Object.hasOwn(this, "all")) {
@@ -464,6 +468,7 @@ export class Transform extends ValueSet {
                 }
             });
         } else {
+            // u.all
             throw new Error(`Expected array not ${JSON.stringify(u)} ('${this.constructor.name}')`)
         }
     }

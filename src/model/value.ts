@@ -215,7 +215,19 @@ export class VectorValue<K extends Keyframe<Vector> = Keyframe<Vector>> extends 
         }
         throw Error(`Not a Vector '${this.constructor.name}' '${value}'`);
     }
-
+    // override get_repr(frame: number): string {
+    //     const { value, kfs } = this;
+    //     function format(v: Vector) {
+    //         return RGBValue.to_css_rgb(v);
+    //     }
+    //     if (kfs && kfs.length > 0) {
+    //         return format(this.get_value(frame));
+    //     }
+    //     if (value instanceof Vector) {
+    //         return format(value);
+    //     }
+    //     return value + '';
+    // }
     constructor(v: Vector | Iterable<number>) {
         if (v instanceof Vector) {
             super(v);

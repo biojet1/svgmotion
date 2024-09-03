@@ -29,25 +29,21 @@ Element.prototype.set_attribute = function (name: string, value: string): Elemen
                 this.get_root().remember_id((this.id = value), this);
             }
             break;
+        case "opacity":
+            if (value) {
+                this.opacity.set_repr(value);
+            }
+            break;
+        /// transform //////////   
         case "transform":
             if (value) {
                 this.transform.set_repr(value);
             }
             break;
 
-        case "line-height":// .text?
+        case "transform-origin":
             if (value) {
-                this.line_height.set_parse_line_height(value, this);
-            }
-            break;
-        case "text-align":// .text?
-            if (value) {
-                this.text_align.set_repr(value);
-            }
-            break;
-        case "white-space": // put<>
-            if (value) {
-                this.white_space.set_repr(value);
+                // this.anchor.set_parse_anchor(value);
             }
             break;
         /// FONT //////////
@@ -123,7 +119,6 @@ Element.prototype.set_attribute = function (name: string, value: string): Elemen
                 this.stroke.miter_limit.set_repr(value);
             }
             break;
-
         case "stroke-dasharray":// 
             if (value) {
                 this.stroke.dash_array.set_parse_dashes(value, this);
@@ -144,7 +139,7 @@ Element.prototype.set_attribute = function (name: string, value: string): Elemen
                 this.stroke.linejoin.set_repr(value);
             }
             break;
-        /////////////
+        /// TEXT //////////
         case "letter-spacing":// 
             if (value) {
                 this.letter_spacing.set_repr(value);
@@ -154,18 +149,25 @@ Element.prototype.set_attribute = function (name: string, value: string): Elemen
             if (value) {
                 this.word_spacing.set_repr(value);
             }
+            break;
+        case "line-height":// .text?
+            if (value) {
+                this.line_height.set_repr(value);
+            }
+            break;
+        case "text-align":// .text?
+            if (value) {
+                this.text_align.set_repr(value);
+            }
+            break;
+        case "white-space": // put<>
+            if (value) {
+                this.white_space.set_repr(value);
+            }
+            break;
+        /// ETC //////////
 
-            break;
-        case "transform-origin":
-            if (value) {
-                // this.anchor.set_parse_anchor(value);
-            }
-            break;
-        case "opacity":
-            if (value) {
-                this.opacity.set_repr(value);
-            }
-            break;
+
         case "shape-inside":
         case "paint-order":
             break;
@@ -183,9 +185,6 @@ Element.prototype.set_attribute = function (name: string, value: string): Elemen
 }
 
 declare module "../model/value" {
-    interface ScalarValue {
-        set_parse_line_height(s: string, container: Element): void;
-    }
     interface PointsValue {
         set_parse_points(s: string, container: Element): void;
     }
@@ -194,20 +193,6 @@ declare module "../model/value" {
         set_parse_anchor(s: string, container: Element): void;
     }
 }
-
-
-ScalarValue.prototype.set_parse_line_height = function (s: string, parent: Element) {
-    if (s.endsWith('%')) {
-        this.value = parseFloat(s.replaceAll('%', '')) / 100;
-    } else if (s == 'normal') {
-        this.value = s;
-    } else {
-        const cl = new ComputeLength(parent, 0);
-        this.value = cl.parse_len(s);
-        // this.value = parse_len(s);
-    }
-}
-
 
 PointsValue.prototype.set_parse_points = function (s: string, parent: Element) {
     const nums = s.split(/[\s,]+/).map(function (str) {

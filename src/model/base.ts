@@ -53,21 +53,21 @@ export class Element extends Parent {
         value._parent = this;
         return value;
     }
-    /// fill
+    /// FILL
     get fill() {
         return this._new_field("fill", new Fill());
     }
     set fill(v: Fill) {
         this._new_field("fill", v);
     }
-    /// stroke
+    /// STROKE
     get stroke() {
         return this._new_field("stroke", new Stroke());
     }
     set stroke(v: Stroke) {
         this._new_field("stroke", v);
     }
-    /// Font
+    /// FONT
     get font() {
         return this._new_field("font", new Font());
     }
@@ -81,20 +81,13 @@ export class Element extends Parent {
     set transform(v: Transform) {
         this._new_field("transform", v);
     }
-    // line_height
-    get line_height() {
-        return this._new_field("line_height", new ScalarValue(1));
-    }
-    set line_height(v: ScalarValue) {
-        this._new_field("line_height", v);
-    }
     /// anchor
-    get anchor() {
-        return this._new_field("anchor", new PositionValue([0, 0]));
-    }
-    set anchor(v: TextValue | PositionValue) {
-        this._new_field("anchor", v);
-    }
+    // get anchor() {
+    //     return this._new_field("anchor", new PositionValue([0, 0]));
+    // }
+    // set anchor(v: TextValue | PositionValue) {
+    //     this._new_field("anchor", v);
+    // }
     /// Properties ////////////
     /// getset<text-anchor>
     get text_anchor() {
@@ -151,6 +144,13 @@ export class Element extends Parent {
     }
     set text_align(v: TextValue) {
         this._new_field('text_align', v);
+    }
+    /// getset<line-height>
+    get line_height() {
+        return this._new_field('line_height', new FontSizeValue(1));
+    }
+    set line_height(v: FontSizeValue) {
+        this._new_field('line_height', v);
     }
     /// getset<stop-opacity>
     get stop_opacity() {
@@ -215,6 +215,13 @@ export class Element extends Parent {
     set color_interpolation(v: TextValue) {
         this._new_field('color_interpolation', v);
     }
+    /// getset<filter>
+    get filter() {
+        return this._new_field('filter', new TextValue());
+    }
+    set filter(v: TextValue) {
+        this._new_field('filter', v);
+    }
     /// getset<letter-spacing>
     get letter_spacing() {
         return this._new_field('letter_spacing', new LengthValue(0));
@@ -244,7 +251,6 @@ export class Element extends Parent {
         this._new_field('vector_effect', v);
     }
     /// Properties ////////////
-
 
 
 
