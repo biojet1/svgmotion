@@ -31,6 +31,7 @@ jobs:
             - run: npm i codecov c8 typescript eslint prettier opentype.js --no-save
             - run: npm run build --if-present
             - run: npm run compile
+            - run: npx webpack
             - run: npm run test
 
             - name: tsc strict
