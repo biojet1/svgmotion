@@ -1,6 +1,6 @@
 {
   "name": "svgmotion",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "",
   "main": "index.js",
   "type": "module",
@@ -47,7 +47,7 @@
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
-    "domspec": "github:biojet1/domspec#release",
+    "domspec": "https://github.com/biojet1/domspec/tarball/release",
     "probe-image-size": "^7.2.3",
     "puppeteer": "^22.6.0",
     "tap": "^18.7.1",
