@@ -47,7 +47,6 @@
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
-    "domspec": "https://github.com/biojet1/domspec/tarball/release",
     "probe-image-size": "^7.2.3",
     "puppeteer": "^22.6.0",
     "tap": "^18.7.1",
