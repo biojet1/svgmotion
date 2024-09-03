@@ -275,7 +275,15 @@ export class Font extends ValueSet {
 export class Transform extends ValueSet {
     clear() {
         const o: any = this;
-        delete o["all"];
+        if (Object.hasOwn(o, "all")) {
+            delete o["all"];
+        }
+        if (Object.hasOwn(o, "box")) {
+            delete o["box"];
+        }
+        if (Object.hasOwn(o, "origin")) {
+            delete o["origin"];
+        }
     }
     public set_repr(d: string) {
         this.clear();
@@ -344,6 +352,20 @@ export class Transform extends ValueSet {
     }
     set all(v: Array<MT>) {
         xset(this, "all", v);
+    }
+    ///
+    get box() {
+        return xget(this, "box", new TextValue('view-box'));
+    }
+    set box(v: TextValue) {
+        xset(this, "box", v);
+    }
+    ///
+    get origin() {
+        return xget(this, "origin", new TextValue('50% 50%'));
+    }
+    set origin(v: TextValue) {
+        xset(this, "origin", v);
     }
     ///
     add_translate(x: number = 0, y: number = 0) {
@@ -415,16 +437,29 @@ export class Transform extends ValueSet {
     }
     //
     override dump() {
-        // if ("all" in this) {
-        if (Object.hasOwn(this, "all")) {
-            return this.all.map((x) => x.dump());
+        if (Object.hasOwn(this, "box") || Object.hasOwn(this, "origin")) {
+            const o: any = {}
+            if (Object.hasOwn(this, "box")) {
+                o.box = this.box.dump()
+            }
+            if (Object.hasOwn(this, "origin")) {
+                o.origin = this.origin.dump()
+            }
+            if (Object.hasOwn(this, "all")) {
+                o.all = this.all.map((x) => x.dump());
+            }
+            return o;
         } else {
-            return [];
+            if (Object.hasOwn(this, "all")) {
+                return this.all.map((x) => x.dump());
+            } else {
+                return [];
+            }
         }
     }
     override load(u: PlainValue<any>) {
         this.clear();
-        if (Array.isArray(u)) {
+        const load = (u: Array<any>) => {
             u.forEach((v) => {
                 switch (v._) {
                     case "t":
@@ -467,10 +502,29 @@ export class Transform extends ValueSet {
                         throw new Error(`Unexpected transform ${v._}`);
                 }
             });
-        } else {
-            // u.all
-            throw new Error(`Expected array not ${JSON.stringify(u)} ('${this.constructor.name}')`)
         }
+        if (Array.isArray(u)) {
+            return load(u);
+        } else {
+            const { all, box, origin } = u as any;
+            if (box) {
+                this.box.load(box);
+            }
+            if (origin) {
+                this.origin.load(origin);
+            }
+            if (all) {
+                if (Array.isArray(all)) {
+                    load(all);
+                } else {
+                    throw new Error(`Expected array not ${JSON.stringify(u)} ('${this.constructor.name}')`)
+                }
+            }
+            if (Object.hasOwn(this, "box") || Object.hasOwn(this, "origin") || Object.hasOwn(this, "all")) {
+                return;
+            }
+        }
+        throw new Error(`Invalid transform object ${JSON.stringify(u)} ('${this.constructor.name}')`)
     }
     ///
     override *enum_values(): Generator<Animatable<any>, void, unknown> {

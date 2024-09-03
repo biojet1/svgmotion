@@ -135,6 +135,68 @@ test.test("Transform", (t) => {
     t.throws(() => x.get_translate(5));
     t.throws(() => x.get_translate(2));
     t.throws(() => x.set_parse_transform("skewU(-7)"));
+    {
+        x = new Transform();
+        x.origin.set_value("center center");
+        t.same(x.dump(), { origin: { v: "center center" } });
+    }
+    {
+        x = new Transform();
+        x.box.set_value("fill-box");
+        t.same(x.dump(), { box: { v: "fill-box" } });
+    }
+    {
+        x = new Transform();
+        x.add_translate(3, 5)
+        t.same(x.dump(), [{ _: 't', v: [3, 5] }]);
+    }
+    {
+        x = new Transform();
+        t.same(x.dump(), []);
+    }
+    {
+        x = new Transform();
+        x.box.set_value("stroke-box");
+        x.add_scale(3, 4)
+        t.same(x.dump(), {
+            box: { v: "stroke-box" }, all: [
+                { _: "s", v: [3, 4] }
+            ]
+        });
+    }
+    {
+        x = new Transform();
+        x.origin.set_value("right top");
+        x.add_rotate(-30, -4, -5)
+        t.same(x.dump(), {
+            origin: { v: "right top" }, all: [
+                { _: "R", v: [-30, -4, -5] }
+            ]
+        });
+        x.load([]);
+        t.same(x.dump(), []);
+    }
+    {
+        x = new Transform();
+        x.origin.set_value("left bottom");
+        x.box.set_value("content-box");
+        x.add_rotate(-30, -4, -5)
+        t.same(x.dump(), {
+            origin: { v: "left bottom" },
+            box: { v: "content-box" },
+            all: [
+                { _: "R", v: [-30, -4, -5] }
+            ]
+        });
+        x.load([]);
+        t.same(x.dump(), []);
+    }
+    {
+        x = new Transform();
+        const d = { origin: { v: "left bottom" } }
+        x.load(d);
+        t.same(x.dump(), d);
+    }
     t.end();
 });
 

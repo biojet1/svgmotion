@@ -81,13 +81,6 @@ export class Element extends Parent {
     set transform(v: Transform) {
         this._new_field("transform", v);
     }
-    /// anchor
-    // get anchor() {
-    //     return this._new_field("anchor", new PositionValue([0, 0]));
-    // }
-    // set anchor(v: TextValue | PositionValue) {
-    //     this._new_field("anchor", v);
-    // }
     /// Properties ////////////
     /// getset<text-anchor>
     get text_anchor() {

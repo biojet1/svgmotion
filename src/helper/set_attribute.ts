@@ -34,16 +34,20 @@ Element.prototype.set_attribute = function (name: string, value: string): Elemen
                 this.opacity.set_repr(value);
             }
             break;
-        /// transform //////////   
+        /// TRANSFORM //////////   
         case "transform":
             if (value) {
                 this.transform.set_repr(value);
             }
             break;
-
         case "transform-origin":
             if (value) {
-                // this.anchor.set_parse_anchor(value);
+                this.transform.origin.set_repr(value);
+            }
+            break;
+        case "transform-box":
+            if (value) {
+                this.transform.box.set_repr(value);
             }
             break;
         /// FONT //////////
@@ -166,8 +170,6 @@ Element.prototype.set_attribute = function (name: string, value: string): Elemen
             }
             break;
         /// ETC //////////
-
-
         case "shape-inside":
         case "paint-order":
             break;
