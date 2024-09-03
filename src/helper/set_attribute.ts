@@ -429,17 +429,17 @@ Image.prototype.set_attribute = function (name: string, value: string) {
 
 Use.prototype.set_attribute = function (name: string, value: string) {
     switch (name) {
-        case "height":
-            this.height.set_repr(value);
-            break;
-        case "width":
-            this.width.set_repr(value);
-            break;
         case "y":
             this.y.set_repr(value);
             break;
         case "x":
             this.x.set_repr(value);
+            break;
+        case "height":
+            this.height.set_repr(value);
+            break;
+        case "width":
+            this.width.set_repr(value);
             break;
         case "href":
             this.href.set_repr(value);
@@ -452,23 +452,30 @@ Use.prototype.set_attribute = function (name: string, value: string) {
 
 Symbol.prototype.set_attribute = function (name: string, value: string) {
     switch (name) {
-        case "height":
-            this.height.set_repr(value);
-            break;
-        case "width":
-            this.width.set_repr(value);
-            break;
         case "y":
             this.y.set_repr(value);
             break;
         case "x":
             this.x.set_repr(value);
             break;
-        // ‘preserveAspectRatio’
-        // ‘viewBox’
-        // ‘refX’
-        // ‘refY’
-
+        case "height":
+            this.height.set_repr(value);
+            break;
+        case "width":
+            this.width.set_repr(value);
+            break;
+        case "viewBox":
+            this.view_box.set_repr(value);
+            break;
+        case "preserveAspectRatio":
+            this.fit_view.set_repr(value);
+            break;
+        case "refX":
+            this.ref_x.set_repr(value);
+            break;
+        case "refY":
+            this.ref_y.set_repr(value);
+            break;
         default:
             Element.prototype.set_attribute.call(this, name, value);
     }

@@ -1,11 +1,10 @@
-import { BoundingBox, Matrix, MatrixMut, PathLC, Vector } from "../geom/index.js";
+import { BoundingBox, Matrix, MatrixMut, PathLC } from "../geom/index.js";
+import { Node, Parent } from "./linked.js";
 import { Track } from "../track/track.js";
 import { Keyframe } from "../keyframe/keyframe.js";
-import { Animatable } from "./value.js";
-import { PointsValue, PositionValue, TextValue } from "./value.js";
-import { Box, ValueSet } from "./valuesets.js";
-import { Node, Parent } from "./linked.js";
 import { Element, LengthHValue, LengthWValue, TextData, LengthValue } from "./base.js";
+import { Animatable, PointsValue, PositionValue, TextValue } from "./value.js";
+import { Box, ValueSet } from "./valuesets.js";
 
 export interface PlainNode {
     tag: string;
@@ -89,12 +88,18 @@ export class Container extends Element {
 export class ViewPort extends Container {
     static tag = "svg";
     ///
-    get view_box() {
-        const n = this.get_vp_size(0);
-        return this._new_field("view_box", new Box([0, 0], n));
+    get x() {
+        return this._new_field("x", new LengthWValue(0));
     }
-    set view_box(v: Box) {
-        this._new_field("view_box", v);
+    set x(v: LengthWValue) {
+        this._new_field("x", v);
+    }
+    ///
+    get y() {
+        return this._new_field("y", new LengthHValue(0));
+    }
+    set y(v: LengthHValue) {
+        this._new_field("y", v);
     }
     ///
     get width() {
@@ -113,18 +118,12 @@ export class ViewPort extends Container {
         this._new_field("height", v);
     }
     ///
-    get x() {
-        return this._new_field("x", new LengthWValue(0));
+    get view_box() {
+        const n = this.get_vp_size(0);
+        return this._new_field("view_box", new Box([0, 0], n));
     }
-    set x(v: LengthWValue) {
-        this._new_field("x", v);
-    }
-    ///
-    get y() {
-        return this._new_field("y", new LengthHValue(0));
-    }
-    set y(v: LengthHValue) {
-        this._new_field("y", v);
+    set view_box(v: Box) {
+        this._new_field("view_box", v);
     }
     ///
     get fit_view() {
@@ -141,7 +140,7 @@ export class ViewPort extends Container {
         this._new_field("zoom_pan", v);
     }
     // 
-    override  update_bbox(bbox: BoundingBox, frame: number, m?: Matrix) {
+    override update_bbox(bbox: BoundingBox, frame: number, m?: Matrix) {
         const width = this.width.get_value(frame);
         const height = this.height.get_value(frame);
         const x = this.x.get_value(frame);
@@ -186,7 +185,6 @@ export class ViewPort extends Container {
                 }
             }
         }
-
     }
 }
 
@@ -228,7 +226,6 @@ function transform_up_to(top: Parent, desc: Element, time: number) {
 
 export class Group extends Container {
     static tag = "g";
-
 }
 
 export class Symbol extends Container {
@@ -269,18 +266,25 @@ export class Symbol extends Container {
         this._new_field("y", v);
     }
     ///
-    get refx() {
-        return this._new_field("refx", new LengthWValue(0));
+    get ref_x() {
+        return this._new_field("ref_x", new LengthWValue(0));
     }
-    set refx(v: LengthWValue) {
-        this._new_field("refx", v);
+    set ref_x(v: LengthWValue) {
+        this._new_field("ref_x", v);
     }
     ///
-    get refy() {
-        return this._new_field("refy", new LengthHValue(0));
+    get ref_y() {
+        return this._new_field("ref_y", new LengthHValue(0));
     }
-    set refy(v: LengthHValue) {
-        this._new_field("refy", v);
+    set ref_y(v: LengthHValue) {
+        this._new_field("ref_y", v);
+    }
+    //
+    get fit_view() {
+        return this._new_field("fit_view", new TextValue(""));
+    }
+    set fit_view(v: TextValue) {
+        this._new_field("fit_view", v);
     }
 }
 export class Path extends Shape {
@@ -295,13 +299,23 @@ export class Path extends Shape {
     override describe(frame: number) {
         return this.d.get_value(frame);
     }
-
 }
 
 export class Rect extends Shape {
     static tag = "rect";
-    new_x_length(n: number) {
-
+    ///
+    get x() {
+        return this._new_field("x", new LengthWValue(0));
+    }
+    set x(v: LengthWValue) {
+        this._new_field("x", v);
+    }
+    ///
+    get y() {
+        return this._new_field("y", new LengthHValue(0));
+    }
+    set y(v: LengthHValue) {
+        this._new_field("y", v);
     }
     ///
     get width() {
@@ -320,20 +334,6 @@ export class Rect extends Shape {
     }
     set height(v: LengthHValue) {
         this._new_field("height", v);
-    }
-    ///
-    get x() {
-        return this._new_field("x", new LengthWValue(0));
-    }
-    set x(v: LengthWValue) {
-        this._new_field("x", v);
-    }
-    ///
-    get y() {
-        return this._new_field("y", new LengthHValue(0));
-    }
-    set y(v: LengthHValue) {
-        this._new_field("y", v);
     }
     ///
     get rx() {
@@ -431,6 +431,7 @@ export class Ellipse extends Shape {
     set ry(v: LengthHValue) {
         this._new_field("ry", v);
     }
+    ///
     override describe(frame: number) {
         const x = this.cx.get_value(frame);
         const y = this.cy.get_value(frame);
@@ -439,7 +440,6 @@ export class Ellipse extends Shape {
         return `M ${x - rx} ${y} A ${rx} ${ry} 0 0 0 ${x + rx
             } ${y} A ${rx} ${ry} 0 0 0 ${x - rx} ${y}`;
     }
-
 }
 
 export class Line extends Shape {
@@ -480,7 +480,6 @@ export class Line extends Shape {
         const y2 = this.y2.get_value(frame);
         return `M ${x1} ${y1} L ${x2} ${y2}`;
     }
-
 }
 
 export class Polyline extends Shape {
@@ -517,12 +516,19 @@ export class Polygon extends Shape {
 
 export class Use extends Element {
     static tag = "use";
-    /// href
-    get href() {
-        return this._new_field("href", new TextValue(''));
+    ///
+    get x() {
+        return this._new_field("x", new LengthWValue(0));
     }
-    set href(v: TextValue) {
-        this._new_field("href", v);
+    set x(v: LengthWValue) {
+        this._new_field("x", v);
+    }
+    ///
+    get y() {
+        return this._new_field("y", new LengthHValue(0));
+    }
+    set y(v: LengthHValue) {
+        this._new_field("y", v);
     }
     ///
     get width() {
@@ -538,25 +544,24 @@ export class Use extends Element {
     set height(v: LengthHValue) {
         this._new_field("height", v);
     }
-    ///
-    get x() {
-        return this._new_field("x", new LengthWValue(0));
+    /// href
+    get href() {
+        return this._new_field("href", new TextValue(''));
     }
-    set x(v: LengthWValue) {
-        this._new_field("x", v);
-    }
-    ///
-    get y() {
-        return this._new_field("y", new LengthHValue(0));
-    }
-    set y(v: LengthHValue) {
-        this._new_field("y", v);
+    set href(v: TextValue) {
+        this._new_field("href", v);
     }
 }
 
-
 export class Image extends Use {
     static tag = "image";
+    //
+    get fit_view() {
+        return this._new_field("fit_view", new TextValue(""));
+    }
+    set fit_view(v: TextValue) {
+        this._new_field("fit_view", v);
+    }
 }
 
 export class Text extends Container {
