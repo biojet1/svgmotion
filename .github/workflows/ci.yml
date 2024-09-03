@@ -32,6 +32,8 @@ jobs:
             - run: npm run build --if-present
             - run: npm run compile
             - run: npx webpack
+            - run: ls dist
+            - run: ls
             - run: npm run test
 
             - name: tsc strict
