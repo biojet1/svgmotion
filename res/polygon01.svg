@@ -10,7 +10,7 @@
   <polygon id="POLY1" fill="red" stroke="blue" stroke-width="10" 
             points="350,75  379,161 469,161 397,215
                     423,301 350,250 277,301 303,215
-                    231,161 321,161" />
+                    231,161 321,161" stroke-dasharray="20 4"/>
 
                     
   <polygon id="POLY2" fill="lime" stroke="blue" stroke-width="10" 

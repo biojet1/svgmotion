@@ -14,10 +14,10 @@ test.test("Keyframe", (t) => {
         // console.log(v);
     }
 
-    x.stroke.dash_array.set_parse_dashes("4 5 6");
-
-    // console.log("x.stroke.dash_array", x.stroke.dash_array.dump());
-    t.same(x.stroke.dash_array.dump(), { v: [4, 5, 6] });
+    x.stroke.dash_array.set_repr("4 5 6");
+    t.same(x.stroke.dash_array.dump(), { v: "4 5 6" });
+    let v = x.stroke.dash_array.get_value(0);
+    console.log(v);
 
     t.end();
 

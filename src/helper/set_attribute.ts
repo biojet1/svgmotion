@@ -125,7 +125,7 @@ Element.prototype.set_attribute = function (name: string, value: string): Elemen
             break;
         case "stroke-dasharray":// 
             if (value) {
-                this.stroke.dash_array.set_parse_dashes(value, this);
+                this.stroke.dash_array.set_repr(value);
             }
             break;
         case "stroke-dashoffset":// 
@@ -191,8 +191,7 @@ declare module "../model/value" {
         set_parse_points(s: string, container: Element): void;
     }
     interface VectorValue {
-        set_parse_dashes(s: string, container: Element): void;
-        set_parse_anchor(s: string, container: Element): void;
+        // set_parse_dashes(s: string, container: Element): void;
     }
 }
 
@@ -207,17 +206,12 @@ PointsValue.prototype.set_parse_points = function (s: string, parent: Element) {
     this.value = points;
 }
 
-VectorValue.prototype.set_parse_dashes = function (s: string, parent: Element) {
-    this.value = this.load_value(s.split(/[\s,]+/).map(function (str) {
-        return parseFloat(str.trim());
-    }));
-}
+// VectorValue.prototype.set_parse_dashes = function (s: string, parent: Element) {
+//     this.value = this.load_value(s.split(/[\s,]+/).map(function (str) {
+//         return parseFloat(str.trim());
+//     }));
+// }
 
-VectorValue.prototype.set_parse_anchor = function (s: string, parent: Element) {
-    this.value = this.load_value(s.split(/[\s,]+/).map(function (str) {
-        return parseFloat(str.trim());
-    }));
-}
 
 
 import {
@@ -341,12 +335,14 @@ Polygon.prototype.set_attribute = function (name: string, value: string) {
 Polyline.prototype.set_attribute = function (name: string, value: string) {
     switch (name) {
         case "points":
+
             this.points.set_parse_points(value, this);
             break;
         default:
             Element.prototype.set_attribute.call(this, name, value);
     }    return this;
 }
+
 Line.prototype.set_attribute = function (name: string, value: string) {
     switch (name) {
         case "x1":
@@ -405,7 +401,6 @@ TSpan.prototype.set_attribute = function (name: string, value: string) {
             Element.prototype.set_attribute.call(this, name, value);
     }    return this;
 }
-
 
 Image.prototype.set_attribute = function (name: string, value: string) {
     switch (name) {

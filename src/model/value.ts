@@ -35,7 +35,8 @@ export class Animatable<
 
     // static
     override initial_value(): V {
-        return this.check_value(this.value);
+        const v = this.check_value(this.value);
+        return this.value = v;
     }
 
 
@@ -175,6 +176,11 @@ export class VectorValue<K extends Keyframe<Vector> = Keyframe<Vector>> extends 
     override check_value(x: any): Vector {
         if (x instanceof Vector) {
             return x;
+        } else if (typeof x == "string") {
+            return this.load_value(x.split(/[\s,]+/).map(function (str) {
+                return parseFloat(str.trim());
+            }));
+
         } else {
             return new Vector(x);
         }
@@ -213,21 +219,25 @@ export class VectorValue<K extends Keyframe<Vector> = Keyframe<Vector>> extends 
         if (value instanceof Vector) {
             return value;
         }
-        throw Error(`Not a Vector '${this.constructor.name}' '${value}'`);
+        const v = this.check_value(value);
+        return this.value = v;
+        // throw Error(`Not a Vector '${this.constructor.name}' '${value}'`);
     }
-    // override get_repr(frame: number): string {
-    //     const { value, kfs } = this;
-    //     function format(v: Vector) {
-    //         return RGBValue.to_css_rgb(v);
-    //     }
-    //     if (kfs && kfs.length > 0) {
-    //         return format(this.get_value(frame));
-    //     }
-    //     if (value instanceof Vector) {
-    //         return format(value);
-    //     }
-    //     return value + '';
-    // }
+
+    override get_repr(frame: number): string {
+        const { value, kfs } = this;
+        function format(v: Vector) {
+            return Array.prototype.map.call(v, x => x.toString()).join(' ')
+        }
+        if (kfs && kfs.length > 0) {
+            return format(this.get_value(frame));
+        }
+        if (value instanceof Vector) {
+            return format(value);
+        }
+        return value + '';
+    }
+
     constructor(v: Vector | Iterable<number>) {
         if (v instanceof Vector) {
             super(v);
@@ -249,8 +259,38 @@ export class PointsValue extends AnimatableD<number[][]> {
         if (Array.isArray(value)) {
             return value;
         }
-        throw Error(`Not a number[][] '${this.constructor.name}' '${value}'`);
+        return this.check_value(value);
     }
+    override check_value(x: any): number[][] {
+        if (Array.isArray(x)) {
+            return x;
+        } else if (typeof x == "string") {
+            const nums = x.split(/[\s,]+/).map(function (str) {
+                return parseFloat(str.trim());
+            });
+            const points: number[][] = [];
+            for (let n = nums.length - 1; n-- > 0; n--) {
+                points.push([nums.shift()!, nums.shift()!]);
+            }
+            return points;
+        } else {
+            throw Error(`Not a number[][] '${this.constructor.name}' '${x}'`);
+        }
+    }
+    override get_repr(frame: number): string {
+        const { value, kfs } = this;
+        function format(v: number[][]) {
+            return v.map(([a, b]) => `${a},${b}`).join(' ')
+        }
+        if (kfs && kfs.length > 0) {
+            return format(this.get_value(frame));
+        }
+        if (Array.isArray(value)) {
+            return format(value);
+        }
+        return value + '';
+    }
+
 }
 
 export class TextValue extends AnimatableD<string> {
@@ -512,15 +552,3 @@ export abstract class EnumTextValue extends TextValue {
         this.check_value(x)
     }
 }
-//////////
-// export class UnicodeBidiValue extends EnumTextValue {
-//     static _values = ["normal", "embed", "isolate", "bidi-override", "isolate-override", "plaintext"]
-//     // constructor(x: string) {
-//     //     super(x)
-//     //     this.check_value(x)
-//     // }
-// }
-
-// export class WritingModeValue extends MatchTextValue {
-//     static _re = /^horizontal-tb|vertical-rl|vertical-lr$/;
-// }

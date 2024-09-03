@@ -86,12 +86,12 @@ export class ComputeLength {
     node: Element;
     frame: number;
     length_mode: string | undefined;
+
     constructor(node: Element, frame: number) {
         this.node = node;
         this.frame = frame;
         // this.length_mode = undefined;
     }
-
 
     get font_size() {
         const n = this.node.get_font_size(this.frame);
@@ -100,6 +100,7 @@ export class ComputeLength {
         }
         return xget(this, "font_size", n);
     }
+
     get vw() {
         const n = this.node.get_vp_width(this.frame);
         return xget(this, "vw", n);
@@ -109,6 +110,7 @@ export class ComputeLength {
         const n = this.node.get_vp_height(this.frame);
         return xget(this, "vh", n);
     }
+
     get relative_length() {
         if (!this.length_mode) {
             const { x, y } = this.node.get_vp_size(this.frame);
@@ -146,5 +148,4 @@ export class ComputeLength {
         return 0;
         // throw new Error(`Unexpected length "${value}"`);
     }
-
 }

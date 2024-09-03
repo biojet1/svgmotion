@@ -397,69 +397,6 @@ test.test("PositionValue", (t) => {
     t.end();
 });
 
-// test.test("UnicodeBidiValue", (t) => {
-//     const { UnicodeBidiValue, Rect } = svgmotion;
-//     {
-//         let v = new UnicodeBidiValue();
-//         t.same(v.value, "normal");
-//     }
-//     {
-//         let v = new UnicodeBidiValue("embed");
-//         t.same(v.value, "embed");
-//         v.set_value("plaintext")
-//         // t.same(
-//         //     [...v.enum_values(0, 2)],
-//         //     [
-//         //         "plaintext",
-//         //         "plaintext",
-//         //         "plaintext",
-//         //     ],
-//         // )
-//     }
-//     //
-//     let e = new Rect();
-//     t.not(Object.hasOwn(e, 'unicode_bidi'))
-//     t.ok(e.unicode_bidi instanceof UnicodeBidiValue);
-//     t.ok(Object.hasOwn(e, 'unicode_bidi'))
-//     t.same(e.unicode_bidi.value, "normal");
-//     e.unicode_bidi.key_value(0, "plaintext")
-//     e.unicode_bidi.key_value(3, "isolate-override")
-//     e.unicode_bidi.key_value(5, "bidi-override")
-//     e.unicode_bidi.key_value(7, "isolate")
-//     e.unicode_bidi.key_value(9, "embed")
-//     t.same(
-//         [...e.unicode_bidi.enum_values(0, 8)],
-//         [
-//             "plaintext",
-//             "plaintext",
-//             "plaintext",
-//             "isolate-override",
-//             "isolate-override",
-//             "bidi-override",
-//             "bidi-override",
-//             "isolate",
-//             "isolate",
-//         ],
-//     )
-//     t.same(e.unicode_bidi.get_value(-1), "plaintext")
-//     t.same(e.unicode_bidi.get_value(7.1), "isolate")
-//     t.same(e.unicode_bidi.get_value(15), "embed")
-//     t.end();
-// });
-
-// test.test("WritingModeValue", (t) => {
-//     const { Circle, WritingModeValue } = svgmotion;
-//     let e = new Circle();
-//     t.ok(e.writing_mode instanceof WritingModeValue);
-//     t.same(e.writing_mode.value, 'horizontal-tb');
-//     e.writing_mode.set_value('vertical-rl')
-//     t.same(e.writing_mode.value, 'vertical-rl');
-//     t.throws(() => {
-//         e.writing_mode.set_value('diagonal-rl')
-//     })
-//     t.end();
-// });
-
 test.test("Vector", (t) => {
     const { Vector } = svgmotion;
     let e = new Vector([1, -2, 3, -4]);

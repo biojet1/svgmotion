@@ -93,7 +93,6 @@ function walk(elem: SVGElement, parent: Container, attrs: { [key: string]: strin
                         const k = s.substring(0, i).trim();
                         const v = s.substring(i + 1).trim();
                         if (k && v && !k.startsWith("-")) {
-
                             const m = v.match(/(.+)\s*!\s*(\w+)$/);
                             if (m) {
                                 props[k] = m[1].trim();
@@ -113,7 +112,6 @@ function walk(elem: SVGElement, parent: Container, attrs: { [key: string]: strin
     if (node) {
         node.set_attributes(props);
         // console.log(`walk-->`, tag, parent.constructor.name);
-
         // const node = make_node(props, parent);
         // console.log(`walk<-- ${node.constructor.name}`, tag);
         if (node instanceof Container) {
@@ -143,15 +141,10 @@ function walk(elem: SVGElement, parent: Container, attrs: { [key: string]: strin
                         }
                 }
             }
-            // } else if (node === false) {
-            //     console.log(`tag "${tag}" not implemented`);
-            //     return undefined;
         } else if (!(node instanceof Element)) {
             throw new Error(`tag "${tag}"`);
         }
         return node;
-        // } else if (make_node === false) {
-        //     console.log(`tag "${tag}" ignored`);
     } else {
         throw new Error(`No processor for "${tag}"`);
     }

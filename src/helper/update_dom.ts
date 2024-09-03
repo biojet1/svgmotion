@@ -1,16 +1,15 @@
-import { VectorValue, ScalarValue, PointsValue, RGBValue, TextValue } from "../model/value.js";
-import { Animatable } from "../model/value.js";
+import { Stepper } from "../track/stepper.js";
+import { ScalarValue, PointsValue, TextValue, Animatable } from "../model/value.js";
 import { Container, Root } from "../model/elements.js";
 import { Node } from "../model/linked.js";
 import { Transform, Fill, Box, Font, Stroke, ValueSet } from "../model/valuesets.js";
-import { Stepper } from "../track/stepper.js";
 import { Element, TextData } from "../model/base.js";
 
 const PROP_MAP: {
     [key: string]: ((frame: number, elem: any, prop: any, node: Element) => void);
 } = {
     opacity: function (frame: number, node: SVGElement, prop: ScalarValue) {
-        node.setAttribute("opacity", prop.get_percentage_repr(frame));
+        node.setAttribute("opacity", prop.get_repr(frame));
     },
     x: function (frame: number, node: SVGRectElement | SVGSVGElement, prop: ScalarValue) {
         node.setAttribute("x", prop.get_repr(frame));
@@ -52,9 +51,6 @@ const PROP_MAP: {
         for (const { name, value } of prop.enum_attibutes(frame)) {
             node.setAttribute(name, value);
         }
-    },
-    anchor: function (frame: number, node: SVGElement, prop: VectorValue) {
-        node.setAttribute("transform-origin", prop.get_anchor_repr(frame));
     },
     fill: function (frame: number, node: SVGSVGElement, prop: Fill) {
         for (let [n, v] of Object.entries(prop)) {
@@ -124,11 +120,10 @@ const PROP_MAP: {
         node.style.textAlign = prop.get_value(frame) + '';
     },
     white_space: function (frame: number, node: SVGElement, prop: TextValue) {
-        /// update<white-space>
         node.style.whiteSpace = prop.get_value(frame) + '';
     },
     points: function (frame: number, node: SVGElement, prop: PointsValue) {
-        node.setAttribute("points", prop.get_points_repr(frame));
+        node.setAttribute("points", prop.get_repr(frame));
     },
 
     dx: function (frame: number, node: SVGRectElement | SVGEllipseElement, prop: ScalarValue) {
@@ -174,19 +169,6 @@ function update_dom(frame: number, target: Element) {
 
 const NS_SVG = "http://www.w3.org/2000/svg";
 
-declare module "../model/elements" {
-    interface Container {
-        // _element?: SVGElement;
-        to_dom(doc: typeof SVGElement.prototype.ownerDocument): SVGElement;
-        update_dom(frame: number): void;
-        stepper(): Stepper;
-    }
-
-    interface Root {
-        to_dom(doc: typeof SVGElement.prototype.ownerDocument): SVGElement;
-    }
-}
-
 declare module "../model/base" {
     interface TextData {
         _element?: Text;
@@ -199,21 +181,13 @@ declare module "../model/base" {
     }
 }
 
-declare module "../model/value" {
-    interface RGBValue {
-        // get_rgb_repr(frame: number): string;
-    }
-    interface PointsValue {
-        get_points_repr(frame: number): string;
-    }
-    interface ScalarValue {
-        get_percentage_repr(frame: number): string;
-        get_length_repr(frame: number): string;
-    }
-    interface VectorValue {
-        get_anchor_repr(frame: number): string;
+declare module "../model/elements" {
+    interface Container {
+        update_dom(frame: number): void;
+        stepper(): Stepper;
     }
 }
+
 
 function set_svg(elem: SVGElement, node: Element): SVGElement {
     const { id } = node;
@@ -289,27 +263,3 @@ Container.prototype.stepper = function () {
     }
     return Stepper.create((n) => update_dom(n, this), min, max);
 }
-
-
-// RGBValue.prototype.get_rgb_repr = function (frame: number) {
-//     return (this.value == null || (this.value as any) == 'none') ? 'none' : RGBValue.to_css_rgb(this.get_value(frame));
-// }
-
-PointsValue.prototype.get_points_repr = function (frame: number) {
-    return this.get_value(frame).map(([a, b]) => `${a},${b}`).join(' ')
-}
-
-ScalarValue.prototype.get_percentage_repr = function (frame: number) {
-    return this.get_value(frame).toFixed(4).replace(/0$/, '');
-}
-
-ScalarValue.prototype.get_length_repr = function (frame: number) {
-    return this.get_repr(frame);
-}
-
-VectorValue.prototype.get_anchor_repr = function (frame: number) {
-    const [x, y] = this.get_value(frame);
-    return `${x}px, ${y}px`;
-}
-
-// dump_rgb, get_rgb_rep, get_points_repr
