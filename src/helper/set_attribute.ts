@@ -186,34 +186,6 @@ Element.prototype.set_attribute = function (name: string, value: string): Elemen
     return this;
 }
 
-declare module "../model/value" {
-    interface PointsValue {
-        set_parse_points(s: string, container: Element): void;
-    }
-    interface VectorValue {
-        // set_parse_dashes(s: string, container: Element): void;
-    }
-}
-
-PointsValue.prototype.set_parse_points = function (s: string, parent: Element) {
-    const nums = s.split(/[\s,]+/).map(function (str) {
-        return parseFloat(str.trim());
-    });
-    const points: number[][] = [];
-    for (let n = nums.length - 1; n-- > 0; n--) {
-        points.push([nums.shift()!, nums.shift()!]);
-    }
-    this.value = points;
-}
-
-// VectorValue.prototype.set_parse_dashes = function (s: string, parent: Element) {
-//     this.value = this.load_value(s.split(/[\s,]+/).map(function (str) {
-//         return parseFloat(str.trim());
-//     }));
-// }
-
-
-
 import {
     ViewPort, Rect, Path, Line, Group,
     Ellipse, Circle, Polyline, Polygon, Image, Symbol,
@@ -285,8 +257,6 @@ Rect.prototype.set_attribute = function (name: string, value: string) {
     return this;
 }
 
-
-
 Circle.prototype.set_attribute = function (name: string, value: string) {
     switch (name) {
         case "r":
@@ -325,7 +295,7 @@ Ellipse.prototype.set_attribute = function (name: string, value: string) {
 Polygon.prototype.set_attribute = function (name: string, value: string) {
     switch (name) {
         case "points":
-            this.points.set_parse_points(value, this);
+            this.points.set_repr(value);
             break;
         default:
             Element.prototype.set_attribute.call(this, name, value);
@@ -335,8 +305,7 @@ Polygon.prototype.set_attribute = function (name: string, value: string) {
 Polyline.prototype.set_attribute = function (name: string, value: string) {
     switch (name) {
         case "points":
-
-            this.points.set_parse_points(value, this);
+            this.points.set_repr(value);
             break;
         default:
             Element.prototype.set_attribute.call(this, name, value);
@@ -375,7 +344,6 @@ Text.prototype.set_attribute = function (name: string, value: string) {
             break;
         case "dx":
             this.dx.set_repr(value);
-            // this.dx.set_repr(value);
             break;
         default:
             Element.prototype.set_attribute.call(this, name, value);
@@ -419,8 +387,12 @@ Image.prototype.set_attribute = function (name: string, value: string) {
         case "href":
             this.href.set_repr(value);
             break;
-        //             ‘preserveAspectRatio’
-        // ‘crossorigin’
+        case "preserveAspectRatio":
+            this.fit_view.set_repr(value);
+            break;
+        // case "crossorigin":
+        //     this.crossorigin.set_repr(value);
+        //     break;
         default:
             Element.prototype.set_attribute.call(this, name, value);
     }
