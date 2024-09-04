@@ -32,6 +32,8 @@ jobs:
             - run: npm run build --if-present
             - run: npm run compile
             - run: npx webpack
+            - run: |
+                  [ -f svgmotion.web.js ] && mv -v -t dist svgmotion.web.js
             - run: ls dist
             - run: ls
             - run: npm run test
