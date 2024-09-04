@@ -361,6 +361,7 @@ export class Rect extends Shape {
         const y = this.y.get_value(frame);
         const rx = this.rx.get_value(frame);
         const ry = this.ry.get_value(frame);
+        // TODO: rx, ry
         return `M ${x} ${y} h ${width} v ${height} h ${-width} Z`;
     }
 }

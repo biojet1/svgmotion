@@ -1,5 +1,5 @@
 import { Matrix, BoundingBox } from "../geom/index.js";
-import { ScalarValue, PositionValue, TextValue, EnumTextValue, PercentageValue } from "./value.js";
+import { ScalarValue, TextValue, PercentageValue } from "./value.js";
 import { Fill, Transform, xset, xget, Font, Stroke, ValueSet } from "./valuesets.js";
 import { Node, Parent } from "./linked.js";
 import { Animatable } from "./value.js";
@@ -249,96 +249,96 @@ export class Element extends Parent {
 
 };
 
-/// EnumTextValue ////////////
-export class ImageRenderingValue extends EnumTextValue {
-    static _values = ['auto', 'smooth', 'high-quality', 'pixelated', 'crisp-edges'];
-    constructor(x: string = 'auto') {
-        super(x)
-        this.check_value(x)
-    }
-}
+// /// EnumTextValue ////////////
+// export class ImageRenderingValue extends EnumTextValue {
+//     static _values = ['auto', 'smooth', 'high-quality', 'pixelated', 'crisp-edges'];
+//     constructor(x: string = 'auto') {
+//         super(x)
+//         this.check_value(x)
+//     }
+// }
 
-export class ShapeRenderingValue extends EnumTextValue {
-    static _values = ['auto', 'optimizeSpeed', 'crispEdges', 'geometricPrecision'];
-    constructor(x: string = 'auto') {
-        super(x)
-        this.check_value(x)
-    }
-}
+// export class ShapeRenderingValue extends EnumTextValue {
+//     static _values = ['auto', 'optimizeSpeed', 'crispEdges', 'geometricPrecision'];
+//     constructor(x: string = 'auto') {
+//         super(x)
+//         this.check_value(x)
+//     }
+// }
 
-export class StrokeLinecapValue extends EnumTextValue {
-    static _values = ['butt', 'round', 'square'];
-    constructor(x: string = 'butt') {
-        super(x)
-        this.check_value(x)
-    }
-}
+// export class StrokeLinecapValue extends EnumTextValue {
+//     static _values = ['butt', 'round', 'square'];
+//     constructor(x: string = 'butt') {
+//         super(x)
+//         this.check_value(x)
+//     }
+// }
 
-export class StrokeLinejoinValue extends EnumTextValue {
-    static _values = ['miter', 'miter-clip', 'round', 'bevel', 'arcs'];
-    constructor(x: string = 'miter') {
-        super(x)
-        this.check_value(x)
-    }
-}
+// export class StrokeLinejoinValue extends EnumTextValue {
+//     static _values = ['miter', 'miter-clip', 'round', 'bevel', 'arcs'];
+//     constructor(x: string = 'miter') {
+//         super(x)
+//         this.check_value(x)
+//     }
+// }
 
-export class TextAnchorValue extends EnumTextValue {
-    static _values = ['start', 'middle', 'end'];
-    constructor(x: string = 'start') {
-        super(x)
-        this.check_value(x)
-    }
-}
+// export class TextAnchorValue extends EnumTextValue {
+//     static _values = ['start', 'middle', 'end'];
+//     constructor(x: string = 'start') {
+//         super(x)
+//         this.check_value(x)
+//     }
+// }
 
-export class TextRenderingValue extends EnumTextValue {
-    static _values = ['auto', 'optimizeSpeed', 'optimizeLegibility', 'geometricPrecision'];
-    constructor(x: string = 'auto') {
-        super(x)
-        this.check_value(x)
-    }
-}
+// export class TextRenderingValue extends EnumTextValue {
+//     static _values = ['auto', 'optimizeSpeed', 'optimizeLegibility', 'geometricPrecision'];
+//     constructor(x: string = 'auto') {
+//         super(x)
+//         this.check_value(x)
+//     }
+// }
 
-export class UnicodeBidiValue extends EnumTextValue {
-    static _values = ['normal', 'embed', 'isolate', 'bidi-override', 'isolate-override', 'plaintext'];
-    constructor(x: string = 'normal') {
-        super(x)
-        this.check_value(x)
-    }
-}
+// export class UnicodeBidiValue extends EnumTextValue {
+//     static _values = ['normal', 'embed', 'isolate', 'bidi-override', 'isolate-override', 'plaintext'];
+//     constructor(x: string = 'normal') {
+//         super(x)
+//         this.check_value(x)
+//     }
+// }
 
-export class VisibilityValue extends EnumTextValue {
-    static _values = ['visible', 'hidden', 'collapse'];
-    constructor(x: string = 'visible') {
-        super(x)
-        this.check_value(x)
-    }
-}
+// export class VisibilityValue extends EnumTextValue {
+//     static _values = ['visible', 'hidden', 'collapse'];
+//     constructor(x: string = 'visible') {
+//         super(x)
+//         this.check_value(x)
+//     }
+// }
 
-export class WhiteSpaceValue extends EnumTextValue {
-    static _values = ['normal', 'pre', 'nowrap', 'pre-wrap', 'pre-line'];
-    constructor(x: string = 'normal') {
-        super(x)
-        this.check_value(x)
-    }
-}
+// export class WhiteSpaceValue extends EnumTextValue {
+//     static _values = ['normal', 'pre', 'nowrap', 'pre-wrap', 'pre-line'];
+//     constructor(x: string = 'normal') {
+//         super(x)
+//         this.check_value(x)
+//     }
+// }
 
-export class WritingModeValue extends EnumTextValue {
-    static _values = ['horizontal-tb', 'vertical-rl', 'vertical-lr'];
-    constructor(x: string = 'horizontal-tb') {
-        super(x)
-        this.check_value(x)
-    }
-}
+// export class WritingModeValue extends EnumTextValue {
+//     static _values = ['horizontal-tb', 'vertical-rl', 'vertical-lr'];
+//     constructor(x: string = 'horizontal-tb') {
+//         super(x)
+//         this.check_value(x)
+//     }
+// }
 
-export class TextAlignValue extends EnumTextValue {
-    static _values = ['start', 'end', 'left', 'right', 'center', 'justify', 'match-parent', 'justify-all'];
-    constructor(x: string = 'start') {
-        super(x)
-        this.check_value(x)
-    }
-}
+// export class TextAlignValue extends EnumTextValue {
+//     static _values = ['start', 'end', 'left', 'right', 'center', 'justify', 'match-parent', 'justify-all'];
+//     constructor(x: string = 'start') {
+//         super(x)
+//         this.check_value(x)
+//     }
+// }
 
-/// EnumTextValue ////////////
+// /// EnumTextValue ////////////
 
 
 export class LengthWValue extends ScalarValue {

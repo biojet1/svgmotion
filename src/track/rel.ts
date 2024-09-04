@@ -12,8 +12,6 @@ class RelOp {
     }
 }
 class RelInit extends RelOp {
-
-
     override apply(k: IProperty<any>, e: RelEntry2, i: number, a: RelEntry2[]) {
         k.key_value(e.to, k.initial_value(), this.extra);
     }

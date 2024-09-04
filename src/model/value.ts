@@ -518,37 +518,35 @@ export class RGB extends Vector {
 
 }
 
-export abstract class EnumeratedValue<V> extends AnimatableD<V> {
+// export abstract class EnumeratedValue<V> extends AnimatableD<V> {
+// }
 
+// export abstract class MatchTextValue extends TextValue {
+//     static _re = /.*/;
 
-}
+//     override check_value(x: any): string {
+//         if ((this.constructor as typeof MatchTextValue)._re.exec(x) == null) {
+//             throw Error(`Unexpected value ${x}`)
+//         }
+//         return x as string;
+//     }
+//     constructor(x: string) {
+//         super(x)
+//         this.check_value(x)
+//     }
+// }
 
-export abstract class MatchTextValue extends TextValue {
-    static _re = /.*/;
+// export abstract class EnumTextValue extends TextValue {
+//     static _values: string[] = [];
 
-    override check_value(x: any): string {
-        if ((this.constructor as typeof MatchTextValue)._re.exec(x) == null) {
-            throw Error(`Unexpected value ${x}`)
-        }
-        return x as string;
-    }
-    constructor(x: string) {
-        super(x)
-        this.check_value(x)
-    }
-}
-
-export abstract class EnumTextValue extends TextValue {
-    static _values: string[] = [];
-
-    override check_value(x: any): string {
-        if ((this.constructor as typeof EnumTextValue)._values.indexOf(x) < 0) {
-            throw Error(`Unexpected value ${x}`)
-        }
-        return x as string;
-    }
-    constructor(x: string) {
-        super(x)
-        this.check_value(x)
-    }
-}
+//     override check_value(x: any): string {
+//         if ((this.constructor as typeof EnumTextValue)._values.indexOf(x) < 0) {
+//             throw Error(`Unexpected value ${x}`)
+//         }
+//         return x as string;
+//     }
+//     constructor(x: string) {
+//         super(x)
+//         this.check_value(x)
+//     }
+// }
