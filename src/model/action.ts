@@ -66,7 +66,7 @@ export function ZoomTo(view: ViewPort, items: Element[], params: KeyExtra & { du
                 if (x instanceof BoundingBox) {
                     bb.merge_self(x);
                 } else {
-                    x.update_bbox(bb, frame, x._transform_up_to(frame, view));
+                    x.update_bbox(bb, frame, x.transform_under(frame, view));
                 }
             }
             if (_dur == undefined) {

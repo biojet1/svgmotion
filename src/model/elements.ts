@@ -69,7 +69,7 @@ export class Container extends Element {
     bbox_of(frame: number, ...args: Element[]) {
         const bb = BoundingBox.not();
         for (const x of args) {
-            const m = transform_up_to(this, x, frame);
+            const m = x.transform_under(frame, this);
             x.update_bbox(bb, frame, m);
         }
         return bb;
@@ -117,8 +117,7 @@ export class ViewPort extends Container {
     }
     ///
     get view_box() {
-        const n = this.get_vp_size(0);
-        return this._new_field("view_box", new Box([0, 0], n));
+        return this._new_field("view_box", new Box([0, 0], [100, 100]));
     }
     set view_box(v: Box) {
         this._new_field("view_box", v);
@@ -201,24 +200,24 @@ export abstract class Shape extends Element {
     }
 }
 
-function transform_up_to(top: Parent, desc: Element, time: number) {
-    let cur: Element | undefined = desc;
-    let ls: Element[] = []
-    while (cur) {
-        cur = cur.parent<Container>();
-        if (cur === top) {
-            let m = MatrixMut.identity();
-            ls.reverse();
-            for (const x of ls) {
-                x.cat_transform(time, m)
-            }
-            return m;
-        } else if (cur) {
-            ls.push(cur);
-        }
-    }
-    throw new Error(`No parent`);
-}
+// function transform_up_to(top: Parent, desc: Element, time: number) {
+//     let cur: Element | undefined = desc;
+//     let ls: Element[] = []
+//     while (cur) {
+//         cur = cur.parent<Container>();
+//         if (cur === top) {
+//             let m = MatrixMut.identity();
+//             ls.reverse();
+//             for (const x of ls) {
+//                 x.cat_transform(time, m)
+//             }
+//             return m;
+//         } else if (cur) {
+//             ls.push(cur);
+//         }
+//     }
+//     throw new Error(`No parent`);
+// }
 
 export class Group extends Container {
     static tag = "g";
