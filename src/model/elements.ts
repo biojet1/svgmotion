@@ -2,7 +2,7 @@ import { BoundingBox, Matrix, MatrixMut, PathLC } from "../geom/index.js";
 import { Node, Parent } from "./linked.js";
 import { Track } from "../track/track.js";
 import { Keyframe } from "../keyframe/keyframe.js";
-import { Element, LengthHValue, LengthWValue, TextData, LengthValue } from "./base.js";
+import { Element, LengthYValue, LengthXValue, TextData, LengthValue } from "./base.js";
 import { Animatable, PointsValue, PositionValue, TextValue } from "./value.js";
 import { Box, ValueSet, xget, xset } from "./valuesets.js";
 
@@ -87,32 +87,32 @@ export class ViewPort extends Container {
     static tag = "svg";
     ///
     get x() {
-        return this._new_field("x", new LengthWValue(0));
+        return this._new_field("x", new LengthXValue(0));
     }
-    set x(v: LengthWValue) {
+    set x(v: LengthXValue) {
         this._new_field("x", v);
     }
     ///
     get y() {
-        return this._new_field("y", new LengthHValue(0));
+        return this._new_field("y", new LengthYValue(0));
     }
-    set y(v: LengthHValue) {
+    set y(v: LengthYValue) {
         this._new_field("y", v);
     }
     ///
     get width() {
         const n = this.get_vp_width(0);
-        return this._new_field("width", new LengthWValue(n));
+        return this._new_field("width", new LengthXValue(n));
     }
-    set width(v: LengthWValue) {
+    set width(v: LengthXValue) {
         this._new_field("width", v);
     }
     ///
     get height() {
         const n = this.get_vp_height(0);
-        return this._new_field("height", new LengthHValue(n));
+        return this._new_field("height", new LengthYValue(n));
     }
-    set height(v: LengthHValue) {
+    set height(v: LengthYValue) {
         this._new_field("height", v);
     }
     ///
@@ -228,30 +228,30 @@ export class Symbol extends Container {
     static tag = "symbol";
     ///
     get x() {
-        return this._new_field("x", new LengthWValue(0));
+        return this._new_field("x", new LengthXValue(0));
     }
-    set x(v: LengthWValue) {
+    set x(v: LengthXValue) {
         this._new_field("x", v);
     }
     ///
     get y() {
-        return this._new_field("y", new LengthHValue(0));
+        return this._new_field("y", new LengthYValue(0));
     }
-    set y(v: LengthHValue) {
+    set y(v: LengthYValue) {
         this._new_field("y", v);
     }
     ///
     get width() {
-        return this._new_field("width", new LengthWValue(100));
+        return this._new_field("width", new LengthXValue(100));
     }
-    set width(v: LengthWValue) {
+    set width(v: LengthXValue) {
         this._new_field("width", v);
     }
     ///
     get height() {
-        return this._new_field("height", new LengthHValue(100));
+        return this._new_field("height", new LengthYValue(100));
     }
-    set height(v: LengthHValue) {
+    set height(v: LengthYValue) {
         this._new_field("height", v);
     }
     ///
@@ -270,16 +270,16 @@ export class Symbol extends Container {
     }
     ///
     get ref_x() {
-        return this._new_field("ref_x", new LengthWValue(0));
+        return this._new_field("ref_x", new LengthXValue(0));
     }
-    set ref_x(v: LengthWValue) {
+    set ref_x(v: LengthXValue) {
         this._new_field("ref_x", v);
     }
     ///
     get ref_y() {
-        return this._new_field("ref_y", new LengthHValue(0));
+        return this._new_field("ref_y", new LengthYValue(0));
     }
-    set ref_y(v: LengthHValue) {
+    set ref_y(v: LengthYValue) {
         this._new_field("ref_y", v);
     }
 }
@@ -302,48 +302,46 @@ export class Rect extends Shape {
     static tag = "rect";
     ///
     get x() {
-        return this._new_field("x", new LengthWValue(0));
+        return this._new_field("x", new LengthXValue(0));
     }
-    set x(v: LengthWValue) {
+    set x(v: LengthXValue) {
         this._new_field("x", v);
     }
     ///
     get y() {
-        return this._new_field("y", new LengthHValue(0));
+        return this._new_field("y", new LengthYValue(0));
     }
-    set y(v: LengthHValue) {
+    set y(v: LengthYValue) {
         this._new_field("y", v);
     }
     ///
     get width() {
-        // const n = this.get_vp_width(0);
         const n = 100;
-        return this._new_field("width", new LengthWValue(n));
+        return this._new_field("width", new LengthXValue(n));
     }
-    set width(v: LengthWValue) {
+    set width(v: LengthXValue) {
         this._new_field("width", v);
     }
     ///
     get height() {
-        // const n = this.get_vp_height(0);
         const n = 100;
-        return this._new_field("height", new LengthHValue(n));
+        return this._new_field("height", new LengthYValue(n));
     }
-    set height(v: LengthHValue) {
+    set height(v: LengthYValue) {
         this._new_field("height", v);
     }
     ///
     get rx() {
-        return this._new_field("rx", new LengthWValue(0));
+        return this._new_field("rx", new LengthXValue(0));
     }
-    set rx(v: LengthWValue) {
+    set rx(v: LengthXValue) {
         this._new_field("rx", v);
     }
     ///
     get ry() {
-        return this._new_field("ry", new LengthHValue(0));
+        return this._new_field("ry", new LengthYValue(0));
     }
-    set ry(v: LengthHValue) {
+    set ry(v: LengthYValue) {
         this._new_field("ry", v);
     }
     ///
@@ -369,16 +367,16 @@ export class Rect extends Shape {
 class EllipseBase extends Shape {
     ///
     get cx() {
-        return this._new_field("cx", new LengthWValue(0));
+        return this._new_field("cx", new LengthXValue(0));
     }
-    set cx(v: LengthWValue) {
+    set cx(v: LengthXValue) {
         this._new_field("cx", v);
     }
     ///
     get cy() {
-        return this._new_field("cy", new LengthHValue(0));
+        return this._new_field("cy", new LengthYValue(0));
     }
-    set cy(v: LengthHValue) {
+    set cy(v: LengthYValue) {
         this._new_field("cy", v);
     }
 }
@@ -406,16 +404,16 @@ export class Ellipse extends EllipseBase {
     static tag = "ellipse";
     /// rx
     get rx() {
-        return this._new_field("rx", new LengthWValue(0));
+        return this._new_field("rx", new LengthXValue(0));
     }
-    set rx(v: LengthWValue) {
+    set rx(v: LengthXValue) {
         this._new_field("rx", v);
     }
     /// ry
     get ry() {
-        return this._new_field("ry", new LengthHValue(0));
+        return this._new_field("ry", new LengthYValue(0));
     }
-    set ry(v: LengthHValue) {
+    set ry(v: LengthYValue) {
         this._new_field("ry", v);
     }
     ///
@@ -433,30 +431,30 @@ export class Line extends Shape {
     static tag = "line";
     /// x1
     get x1() {
-        return this._new_field("x1", new LengthWValue(0));
+        return this._new_field("x1", new LengthXValue(0));
     }
-    set x1(v: LengthWValue) {
+    set x1(v: LengthXValue) {
         this._new_field("x1", v);
     }
     /// y1
     get y1() {
-        return this._new_field("y1", new LengthHValue(0));
+        return this._new_field("y1", new LengthYValue(0));
     }
-    set y1(v: LengthHValue) {
+    set y1(v: LengthYValue) {
         this._new_field("y1", v);
     }
     /// x2
     get x2() {
-        return this._new_field("x2", new LengthWValue(0));
+        return this._new_field("x2", new LengthXValue(0));
     }
-    set x2(v: LengthWValue) {
+    set x2(v: LengthXValue) {
         this._new_field("x2", v);
     }
     /// y2
     get y2() {
-        return this._new_field("y2", new LengthHValue(0));
+        return this._new_field("y2", new LengthYValue(0));
     }
-    set y2(v: LengthHValue) {
+    set y2(v: LengthYValue) {
         this._new_field("y2", v);
     }
     ////
@@ -501,30 +499,30 @@ export class Use extends Element {
     static tag = "use";
     ///
     get x() {
-        return this._new_field("x", new LengthWValue(0));
+        return this._new_field("x", new LengthXValue(0));
     }
-    set x(v: LengthWValue) {
+    set x(v: LengthXValue) {
         this._new_field("x", v);
     }
     ///
     get y() {
-        return this._new_field("y", new LengthHValue(0));
+        return this._new_field("y", new LengthYValue(0));
     }
-    set y(v: LengthHValue) {
+    set y(v: LengthYValue) {
         this._new_field("y", v);
     }
     ///
     get width() {
-        return this._new_field("width", new LengthWValue(100));
+        return this._new_field("width", new LengthXValue(100));
     }
-    set width(v: LengthWValue) {
+    set width(v: LengthXValue) {
         this._new_field("width", v);
     }
     ///
     get height() {
-        return this._new_field("height", new LengthHValue(100));
+        return this._new_field("height", new LengthYValue(100));
     }
-    set height(v: LengthHValue) {
+    set height(v: LengthYValue) {
         this._new_field("height", v);
     }
     /// href
@@ -550,30 +548,30 @@ export class Image extends Use {
 export class Text extends Container {
     static tag = "text";
     get x() {
-        return this._new_field("x", new LengthWValue(0));
+        return this._new_field("x", new LengthXValue(0));
     }
-    set x(v: LengthWValue) {
+    set x(v: LengthXValue) {
         this._new_field("x", v);
     }
     ///
     get y() {
-        return this._new_field("y", new LengthHValue(0));
+        return this._new_field("y", new LengthYValue(0));
     }
-    set y(v: LengthHValue) {
+    set y(v: LengthYValue) {
         this._new_field("y", v);
     }
     ///
     get dx() {
-        return this._new_field("dx", new LengthWValue(0));
+        return this._new_field("dx", new LengthXValue(0));
     }
-    set dx(v: LengthWValue) {
+    set dx(v: LengthXValue) {
         this._new_field("dx", v);
     }
     ///
     get dy() {
-        return this._new_field("dy", new LengthHValue(0));
+        return this._new_field("dy", new LengthYValue(0));
     }
-    set dy(v: LengthHValue) {
+    set dy(v: LengthYValue) {
         this._new_field("dy", v);
     }
     ///

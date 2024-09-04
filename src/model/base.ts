@@ -341,10 +341,10 @@ export class Element extends Parent {
 // /// EnumTextValue ////////////
 
 
-export class LengthWValue extends ScalarValue {
+export class LengthXValue extends ScalarValue {
 }
 
-export class LengthHValue extends ScalarValue {
+export class LengthYValue extends ScalarValue {
 }
 
 export class LengthValue extends ScalarValue {

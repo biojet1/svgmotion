@@ -1,7 +1,7 @@
 
 import { ScalarValue, UnknownValue } from "../model/value.js";
 import { ComputeLength } from "./svg_length.js";
-import { Element, LengthHValue, LengthWValue, LengthValue, FontSizeValue } from "../model/base.js";
+import { Element, LengthYValue, LengthXValue, LengthValue, FontSizeValue } from "../model/base.js";
 
 declare module "../model/base" {
     interface Element {
@@ -471,7 +471,7 @@ LengthValue.prototype.initial_value = function () {
     return ScalarValue.prototype.initial_value.call(this);
 }
 
-LengthWValue.prototype.initial_value = function () {
+LengthXValue.prototype.initial_value = function () {
     const { value, _parent } = this;
     if (typeof value === "string") {
         if (_parent instanceof Element) {
@@ -484,13 +484,13 @@ LengthWValue.prototype.initial_value = function () {
     return ScalarValue.prototype.initial_value.call(this);
 }
 
-LengthHValue.prototype.initial_value = function () {
+LengthYValue.prototype.initial_value = function () {
     const { value, _parent } = this;
     if (typeof value === "string") {
         if (_parent instanceof Element) {
             const cl = new ComputeLength(_parent, 0);
             cl.length_mode = 'h';
-            // console.log(`LengthHValue.prototype.initial_value ${value}`)
+            // console.log(`LengthYValue.prototype.initial_value ${value}`)
             return cl.parse_len(value);
         }
     }

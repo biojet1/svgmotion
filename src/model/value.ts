@@ -3,7 +3,6 @@ import { Vector } from "../geom/index.js";
 import { Keyframe, Animated, KeyExtra } from "../keyframe/keyframe.js";
 import { parse_css_color } from "../helper/parse_color.js";
 
-
 export interface PlainKeyframe {
     t: number;
     h?: boolean;
@@ -31,18 +30,14 @@ export class Animatable<
 > extends Animated<V, K> {
     value: V | string;
     _parent?: any;
-
-
     // static
     override initial_value(): V {
-        const v = this.check_value(this.value);
-        return this.value = v;
+        return this.value = this.check_value(this.value);
     }
-
-
     set_value(value: V | any) {
         this.value = this.check_value(value);
     }
+    //  dump
     dump_keyframe(kfe: K, value: any): PlainKeyframeV<V> {
         const { time: t, easing } = kfe;
         if (!easing) {
@@ -54,6 +49,7 @@ export class Animatable<
             return { t, o: [ox, oy], i: [ix, iy], v: value };
         }
     }
+
     dump_key_value(x: V): any {
         return this.dump_value(x)
     }
@@ -66,6 +62,7 @@ export class Animatable<
         }
         return o;
     }
+    // load
     load_keyframe(x: PlainKeyframe, value: V): K {
         const { t: time, h, o, i } = x;
         if (h) {
@@ -90,24 +87,29 @@ export class Animatable<
             this.value = this.load_value(x.v);
         }
     }
+    // repr
     get_repr(frame: number): string {
         const { value, kfs } = this;
         if (kfs && kfs.length > 0) {
-            return this.get_value(frame) + '';
+            return this.value_repr(this.get_value(frame));
+        } else if (typeof value == "string") {
+            return value;
         }
-        return value + '';
+        return this.value_repr(value);
     }
     set_repr(value: string) {
         this.value = value;
     }
-
+    value_repr(value: V) {
+        return value + '';
+    }
+    // new
     constructor(v: V) {
         super();
         if (v == null) {
             throw new Error(`unexpected value=${v}`);
-        } else {
-            this.value = v;
         }
+        this.value = v;
     }
 }
 
@@ -514,39 +516,4 @@ export class RGB extends Vector {
         }
         super([r, g, b]);
     }
-
-
 }
-
-// export abstract class EnumeratedValue<V> extends AnimatableD<V> {
-// }
-
-// export abstract class MatchTextValue extends TextValue {
-//     static _re = /.*/;
-
-//     override check_value(x: any): string {
-//         if ((this.constructor as typeof MatchTextValue)._re.exec(x) == null) {
-//             throw Error(`Unexpected value ${x}`)
-//         }
-//         return x as string;
-//     }
-//     constructor(x: string) {
-//         super(x)
-//         this.check_value(x)
-//     }
-// }
-
-// export abstract class EnumTextValue extends TextValue {
-//     static _values: string[] = [];
-
-//     override check_value(x: any): string {
-//         if ((this.constructor as typeof EnumTextValue)._values.indexOf(x) < 0) {
-//             throw Error(`Unexpected value ${x}`)
-//         }
-//         return x as string;
-//     }
-//     constructor(x: string) {
-//         super(x)
-//         this.check_value(x)
-//     }
-// }
