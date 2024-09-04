@@ -10,7 +10,7 @@ test.test("load_svg polygon01", async (t) => {
     // console.log(anim.view);
     const pg1 = anim.get_polygon(1);
     const c = anim.view.add_circle();
-    console.dir(pg1.points.get_repr());
+    // console.dir(pg1.points.get_repr());
     c.r.key_value(0, 10);
     c.cx.key_value(0, 850);
     c.cy.key_value(0, 200);
@@ -27,7 +27,7 @@ test.test("load_svg polygon01", async (t) => {
             .d(1).to(R, -30).to(S, [1, 1])
             .d(1).first(R)
     );
-    console.dir(anim.dump(), { depth: 100 });
+    // console.dir(anim.dump(), { depth: 100 });
 
 
     anim.save_html("/tmp/polygon01.html");

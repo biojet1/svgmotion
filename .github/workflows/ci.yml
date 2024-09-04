@@ -31,6 +31,11 @@ jobs:
             - run: npm i codecov c8 typescript eslint prettier opentype.js --no-save
             - run: npm run build --if-present
             - run: npm run compile
+            - run: npx webpack
+            - run: |
+                  [ -f svgmotion.web.js ] && mv -v -t dist svgmotion.web.js
+            # - run: ls dist
+            # - run: ls
             - run: npm run test
 
             - name: tsc strict
@@ -40,8 +45,3 @@ jobs:
             - name: eslint
               run: |
                   eslint test/**/*.*js || true
-
-            - run: |
-                  mkdir -p coverage
-                  npm run c8report
-                  # cat coverage/lcov.info

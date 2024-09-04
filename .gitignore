@@ -132,3 +132,5 @@ out
 .tap/
 .task/
 dist/
+
+package-lock.json
