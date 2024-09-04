@@ -4,7 +4,7 @@ import { Track } from "../track/track.js";
 import { Keyframe } from "../keyframe/keyframe.js";
 import { Element, LengthHValue, LengthWValue, TextData, LengthValue } from "./base.js";
 import { Animatable, PointsValue, PositionValue, TextValue } from "./value.js";
-import { Box, ValueSet } from "./valuesets.js";
+import { Box, ValueSet, xget, xset } from "./valuesets.js";
 
 export interface PlainNode {
     tag: string;
@@ -76,9 +76,7 @@ export class Container extends Element {
     }
     override update_bbox(bbox: BoundingBox, frame: number, m?: Matrix) {
         let w = this.transform.get_transform(frame);
-        if (m) {
-            m = m.cat(w)
-        }
+        m = m ? m.cat(w) : w;
         for (const x of this.children<Element>()) {
             x.update_bbox(bbox, frame, m)
         }
@@ -197,9 +195,7 @@ export abstract class Shape extends Element {
     }
     override update_bbox(bbox: BoundingBox, frame: number, m?: Matrix) {
         let w = this.transform.get_transform(frame);
-        if (m) {
-            m = m.cat(w)
-        }
+        m = m ? m.cat(w) : w;
         const p = this.get_path(frame);
         bbox.merge_self((m ? p.transform(m) : p).bbox());
     }
@@ -231,11 +227,18 @@ export class Group extends Container {
 export class Symbol extends Container {
     static tag = "symbol";
     ///
-    get view_box() {
-        return this._new_field("view_box", new Box([0, 0], [100, 100]));
+    get x() {
+        return this._new_field("x", new LengthWValue(0));
     }
-    set view_box(v: Box) {
-        this._new_field("view_box", v);
+    set x(v: LengthWValue) {
+        this._new_field("x", v);
+    }
+    ///
+    get y() {
+        return this._new_field("y", new LengthHValue(0));
+    }
+    set y(v: LengthHValue) {
+        this._new_field("y", v);
     }
     ///
     get width() {
@@ -252,18 +255,18 @@ export class Symbol extends Container {
         this._new_field("height", v);
     }
     ///
-    get x() {
-        return this._new_field("x", new LengthWValue(0));
+    get view_box() {
+        return this._new_field("view_box", new Box([0, 0], [100, 100]));
     }
-    set x(v: LengthWValue) {
-        this._new_field("x", v);
+    set view_box(v: Box) {
+        this._new_field("view_box", v);
     }
-    ///
-    get y() {
-        return this._new_field("y", new LengthHValue(0));
+    //
+    get fit_view() {
+        return this._new_field("fit_view", new TextValue(""));
     }
-    set y(v: LengthHValue) {
-        this._new_field("y", v);
+    set fit_view(v: TextValue) {
+        this._new_field("fit_view", v);
     }
     ///
     get ref_x() {
@@ -279,14 +282,8 @@ export class Symbol extends Container {
     set ref_y(v: LengthHValue) {
         this._new_field("ref_y", v);
     }
-    //
-    get fit_view() {
-        return this._new_field("fit_view", new TextValue(""));
-    }
-    set fit_view(v: TextValue) {
-        this._new_field("fit_view", v);
-    }
 }
+
 export class Path extends Shape {
     static tag = "path";
     ///
@@ -350,12 +347,12 @@ export class Rect extends Shape {
         this._new_field("ry", v);
     }
     ///
-    get size() {
-        return this._new_field("size", new PositionValue([100, 100]));
-    }
-    set size(v: PositionValue) {
-        this._new_field("size", v);
-    }
+    // get size() {
+    //     return this._new_field("size", new PositionValue([100, 100]));
+    // }
+    // set size(v: PositionValue) {
+    //     this._new_field("size", v);
+    // }
     //
     override describe(frame: number) {
         const width = this.width.get_value(frame);
@@ -368,8 +365,7 @@ export class Rect extends Shape {
     }
 }
 
-export class Circle extends Shape {
-    static tag = "circle";
+class EllipseBase extends Shape {
     ///
     get cx() {
         return this._new_field("cx", new LengthWValue(0));
@@ -384,6 +380,10 @@ export class Circle extends Shape {
     set cy(v: LengthHValue) {
         this._new_field("cy", v);
     }
+}
+
+export class Circle extends EllipseBase {
+    static tag = "circle";
     ///
     get r() {
         return this._new_field("r", new LengthValue(0));
@@ -401,22 +401,8 @@ export class Circle extends Shape {
     }
 }
 
-export class Ellipse extends Shape {
+export class Ellipse extends EllipseBase {
     static tag = "ellipse";
-    /// cx
-    get cx() {
-        return this._new_field("cx", new LengthWValue(0));
-    }
-    set cx(v: LengthWValue) {
-        this._new_field("cx", v);
-    }
-    /// cy
-    get cy() {
-        return this._new_field("cy", new LengthHValue(0));
-    }
-    set cy(v: LengthHValue) {
-        this._new_field("cy", v);
-    }
     /// rx
     get rx() {
         return this._new_field("rx", new LengthWValue(0));
@@ -482,8 +468,7 @@ export class Line extends Shape {
     }
 }
 
-export class Polyline extends Shape {
-    static tag = "polyline";
+class PointBase extends Shape {
     /// points
     get points() {
         return this._new_field("points", new PointsValue([]));
@@ -491,6 +476,10 @@ export class Polyline extends Shape {
     set points(v: PointsValue) {
         this._new_field("points", v);
     }
+}
+
+export class Polyline extends PointBase {
+    static tag = "polyline";
     ///
     override describe(frame: number) {
         const s = this.points.get_value(frame).map(v => `${v[0]},${v[1]}`).join(' ');
@@ -498,15 +487,8 @@ export class Polyline extends Shape {
     }
 }
 
-export class Polygon extends Shape {
+export class Polygon extends PointBase {
     static tag = "polygon";
-    /// points
-    get points() {
-        return this._new_field("points", new PointsValue([]));
-    }
-    set points(v: PointsValue) {
-        this._new_field("points", v);
-    }
     ///
     override describe(frame: number) {
         const s = this.points.get_value(frame).map(v => `${v[0]},${v[1]}`).join(' ');
@@ -652,20 +634,10 @@ export class Root extends Container {
         const tr = new Track();
         tr.frame_rate = this.frame_rate;
         tr.hint_dur = 1 * this.frame_rate;
-        Object.defineProperty(this, "track", {
-            value: tr,
-            writable: true,
-            enumerable: true,
-            configurable: true,
-        });
-        return tr;
+        return xget(this, "track", tr);
     }
     set track(v: Track) {
-        Object.defineProperty(this, "track", {
-            value: v,
-            writable: true,
-            enumerable: true,
-        });
+        xset(this, "track", v)
     }
 }
 

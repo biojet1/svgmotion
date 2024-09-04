@@ -33,11 +33,8 @@ jobs:
             - run: npm run compile
             - run: npx webpack
             - run: |
-                  [ -f svgmotion.web.js ] && mv -v -t dist svgmotion.web.js
-            # - run: ls dist
-            # - run: ls
+                  [ ! -f dist/svgmotion.web.js ] && [ -f svgmotion.web.js ] && mv -v -t dist svgmotion.web.js
             - run: npm run test
-
             - name: tsc strict
               run: |
                   tsc -d --sourceMap --strict --noUnusedLocals --noUnusedParameters --noImplicitOverride || true

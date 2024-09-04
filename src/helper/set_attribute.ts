@@ -1,6 +1,5 @@
 
-import { VectorValue, ScalarValue, PointsValue, RGB, RGBValue, TextValue, UnknownValue } from "../model/value.js";
-import { parse_css_color } from "./parse_color.js";
+import { ScalarValue, UnknownValue } from "../model/value.js";
 import { ComputeLength } from "./svg_length.js";
 import { Element, LengthHValue, LengthWValue, LengthValue, FontSizeValue } from "../model/base.js";
 
@@ -25,7 +24,6 @@ Element.prototype.set_attribute = function (name: string, value: string): Elemen
     switch (name) {
         case "id":
             if (value) {
-                // console.log("_set_attr ID", this.constructor.name);
                 this.get_root().remember_id((this.id = value), this);
             }
             break;
@@ -187,8 +185,7 @@ Element.prototype.set_attribute = function (name: string, value: string): Elemen
 }
 
 import {
-    ViewPort, Rect, Path, Line, Group,
-    Ellipse, Circle, Polyline, Polygon, Image, Symbol,
+    ViewPort, Rect, Path, Line, Ellipse, Circle, Polyline, Polygon, Image, Symbol,
     Use,
     TSpan, Text
 } from "../model/elements.js";
@@ -363,7 +360,6 @@ TSpan.prototype.set_attribute = function (name: string, value: string) {
             break;
         case "dx":
             this.dx.set_repr(value);
-            // this.dx.set_repr(value);
             break;
         default:
             Element.prototype.set_attribute.call(this, name, value);
