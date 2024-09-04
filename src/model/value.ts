@@ -225,20 +225,22 @@ export class VectorValue<K extends Keyframe<Vector> = Keyframe<Vector>> extends 
         return this.value = v;
         // throw Error(`Not a Vector '${this.constructor.name}' '${value}'`);
     }
-
-    override get_repr(frame: number): string {
-        const { value, kfs } = this;
-        function format(v: Vector) {
-            return Array.prototype.map.call(v, x => x.toString()).join(' ')
-        }
-        if (kfs && kfs.length > 0) {
-            return format(this.get_value(frame));
-        }
-        if (value instanceof Vector) {
-            return format(value);
-        }
-        return value + '';
+    override value_repr(value: Vector): string {
+        return Array.prototype.map.call(value, x => x.toString()).join(' ');
     }
+    // override get_repr(frame: number): string {
+    //     const { value, kfs } = this;
+    //     function format(v: Vector) {
+    //         return Array.prototype.map.call(v, x => x.toString()).join(' ')
+    //     }
+    //     if (kfs && kfs.length > 0) {
+    //         return format(this.get_value(frame));
+    //     }
+    //     if (value instanceof Vector) {
+    //         return format(value);
+    //     }
+    //     return value + '';
+    // }
 
     constructor(v: Vector | Iterable<number>) {
         if (v instanceof Vector) {
@@ -279,19 +281,23 @@ export class PointsValue extends AnimatableD<number[][]> {
             throw Error(`Not a number[][] '${this.constructor.name}' '${x}'`);
         }
     }
-    override get_repr(frame: number): string {
-        const { value, kfs } = this;
-        function format(v: number[][]) {
-            return v.map(([a, b]) => `${a},${b}`).join(' ')
-        }
-        if (kfs && kfs.length > 0) {
-            return format(this.get_value(frame));
-        }
-        if (Array.isArray(value)) {
-            return format(value);
-        }
-        return value + '';
+    override value_repr(value: number[][]): string {
+        return value.map(([a, b]) => `${a},${b}`).join(' ')
     }
+
+    // override get_repr(frame: number): string {
+    //     const { value, kfs } = this;
+    //     function format(v: number[][]) {
+    //         return v.map(([a, b]) => `${a},${b}`).join(' ')
+    //     }
+    //     if (kfs && kfs.length > 0) {
+    //         return format(this.get_value(frame));
+    //     }
+    //     if (Array.isArray(value)) {
+    //         return format(value);
+    //     }
+    //     return value + '';
+    // }
 
 }
 
@@ -348,19 +354,23 @@ export class RGBValue extends VectorValue {
         const { value } = this;
         return this.check_value(value as RGB);
     }
-    override get_repr(frame: number): string {
-        const { value, kfs } = this;
-        function format(v: Vector) {
-            return RGBValue.to_css_rgb(v);
-        }
-        if (kfs && kfs.length > 0) {
-            return format(this.get_value(frame));
-        }
-        if (value instanceof Vector) {
-            return format(value);
-        }
-        return value + '';
+    override value_repr(value: Vector): string {
+        return RGBValue.to_css_rgb(value);
     }
+
+    // override get_repr(frame: number): string {
+    //     const { value, kfs } = this;
+    //     function format(v: Vector) {
+    //         return RGBValue.to_css_rgb(v);
+    //     }
+    //     if (kfs && kfs.length > 0) {
+    //         return format(this.get_value(frame));
+    //     }
+    //     if (value instanceof Vector) {
+    //         return format(value);
+    //     }
+    //     return value + '';
+    // }
 
 }
 
@@ -495,16 +505,20 @@ export class PercentageValue extends ScalarValue {
         }
         return super.initial_value();
     }
-    override get_repr(frame: number): string {
-        const { value, kfs } = this;
-        if (kfs && kfs.length > 0) {
-            return this.get_value(frame).toFixed(5).replace(/0$/, '');
-        }
-        if (typeof value === 'number') {
-            return value.toFixed(5).replace(/0$/, '');
-        }
-        return value + '';
+    override value_repr(value: number): string {
+        return value.toFixed(5).replace(/0$/, '');
     }
+
+    // override get_repr(frame: number): string {
+    //     const { value, kfs } = this;
+    //     if (kfs && kfs.length > 0) {
+    //         return this.get_value(frame).toFixed(5).replace(/0$/, '');
+    //     }
+    //     if (typeof value === 'number') {
+    //         return value.toFixed(5).replace(/0$/, '');
+    //     }
+    //     return value + '';
+    // }
 
 
 }
