@@ -2,7 +2,7 @@ import { Stepper } from "../track/stepper.js";
 import { ScalarValue, PointsValue, TextValue, Animatable } from "../model/value.js";
 import { Container, Root } from "../model/elements.js";
 import { Node } from "../model/linked.js";
-import { Transform, Fill, Box, Font, Stroke, ValueSet } from "../model/valuesets.js";
+import { Transform, Fill, ViewBox, Font, Stroke, ValueSet } from "../model/valuesets.js";
 import { Element, TextData } from "../model/base.js";
 
 const PROP_MAP: {
@@ -38,7 +38,7 @@ const PROP_MAP: {
     ry: function (frame: number, node: SVGRectElement | SVGEllipseElement, prop: ScalarValue) {
         node.setAttribute("ry", prop.get_repr(frame));
     },
-    view_box: function (frame: number, node: SVGRectElement | SVGSVGElement, prop: Box) {
+    view_box: function (frame: number, node: SVGRectElement | SVGSVGElement, prop: ViewBox) {
         node.setAttribute("viewBox", prop.get_repr(frame));
     },
     d: function (frame: number, node: SVGPathElement, prop: TextValue) {

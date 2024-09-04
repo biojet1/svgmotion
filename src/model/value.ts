@@ -104,7 +104,7 @@ export class Animatable<
         return value + '';
     }
     // new
-    constructor(v: V) {
+    constructor(v: V | string) {
         super();
         if (v == null) {
             throw new Error(`unexpected value=${v}`);
@@ -487,7 +487,7 @@ export class ScalarValue extends Animatable<number> {
         }
         throw Error(`Not a number '${this.constructor.name}' '${value}'`);
     }
-    constructor(v: number = 0) {
+    constructor(v: number | string = 0) {
         super(v);
     }
 }

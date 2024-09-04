@@ -4,7 +4,7 @@ import { Track } from "../track/track.js";
 import { Keyframe } from "../keyframe/keyframe.js";
 import { Element, LengthYValue, LengthXValue, TextData, LengthValue } from "./base.js";
 import { Animatable, PointsValue, PositionValue, TextValue } from "./value.js";
-import { Box, ValueSet, xget, xset } from "./valuesets.js";
+import { ViewBox, ValueSet, xget, xset } from "./valuesets.js";
 
 export interface PlainNode {
     tag: string;
@@ -101,25 +101,25 @@ export class ViewPort extends Container {
     }
     ///
     get width() {
-        const n = this.get_vp_width(0);
-        return this._new_field("width", new LengthXValue(n));
+        // const n = this.get_vp_width(0);
+        return this._new_field("width", new LengthXValue('100%'));
     }
     set width(v: LengthXValue) {
         this._new_field("width", v);
     }
     ///
     get height() {
-        const n = this.get_vp_height(0);
-        return this._new_field("height", new LengthYValue(n));
+        // const n = this.get_vp_height(0);
+        return this._new_field("height", new LengthYValue('100%'));
     }
     set height(v: LengthYValue) {
         this._new_field("height", v);
     }
     ///
     get view_box() {
-        return this._new_field("view_box", new Box([0, 0], [100, 100]));
+        return this._new_field("view_box", new ViewBox([0, 0], [100, 100]));
     }
-    set view_box(v: Box) {
+    set view_box(v: ViewBox) {
         this._new_field("view_box", v);
     }
     ///
@@ -200,25 +200,6 @@ export abstract class Shape extends Element {
     }
 }
 
-// function transform_up_to(top: Parent, desc: Element, time: number) {
-//     let cur: Element | undefined = desc;
-//     let ls: Element[] = []
-//     while (cur) {
-//         cur = cur.parent<Container>();
-//         if (cur === top) {
-//             let m = MatrixMut.identity();
-//             ls.reverse();
-//             for (const x of ls) {
-//                 x.cat_transform(time, m)
-//             }
-//             return m;
-//         } else if (cur) {
-//             ls.push(cur);
-//         }
-//     }
-//     throw new Error(`No parent`);
-// }
-
 export class Group extends Container {
     static tag = "g";
 }
@@ -255,9 +236,9 @@ export class Symbol extends Container {
     }
     ///
     get view_box() {
-        return this._new_field("view_box", new Box([0, 0], [100, 100]));
+        return this._new_field("view_box", new ViewBox([0, 0], [100, 100]));
     }
-    set view_box(v: Box) {
+    set view_box(v: ViewBox) {
         this._new_field("view_box", v);
     }
     //
@@ -315,16 +296,14 @@ export class Rect extends Shape {
     }
     ///
     get width() {
-        const n = 100;
-        return this._new_field("width", new LengthXValue(n));
+        return this._new_field("width", new LengthXValue(100));
     }
     set width(v: LengthXValue) {
         this._new_field("width", v);
     }
     ///
     get height() {
-        const n = 100;
-        return this._new_field("height", new LengthYValue(n));
+        return this._new_field("height", new LengthYValue(100));
     }
     set height(v: LengthYValue) {
         this._new_field("height", v);

@@ -60,7 +60,7 @@ export class ValueSet {
     }
 }
 
-export class Box extends ValueSet {
+export class ViewBox extends ValueSet {
     constructor(position: Iterable<number>, size: Iterable<number>) {
         super();
         if (size) {

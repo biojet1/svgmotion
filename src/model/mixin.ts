@@ -116,7 +116,6 @@ Element.prototype.get_font_size = function (frame: number): number {
 }
 
 Element.prototype.transform_under = function (frame: number, top: Parent): Matrix {
-    // return transform_up_to(top, this, frame)
     let cur: Element | undefined = this;
     let ls: Element[] = []
     while (cur) {
@@ -134,23 +133,3 @@ Element.prototype.transform_under = function (frame: number, top: Parent): Matri
     }
     throw new Error(`No parent`);
 }
-
-
-// function transform_up_to(top: Parent, desc: Element, time: number) {
-//     let cur: Element | undefined = desc;
-//     let ls: Element[] = []
-//     while (cur) {
-//         cur = cur.parent<Container>();
-//         if (cur === top) {
-//             let m = MatrixMut.identity();
-//             ls.reverse();
-//             for (const x of ls) {
-//                 x.cat_transform(time, m)
-//             }
-//             return m;
-//         } else if (cur) {
-//             ls.push(cur);
-//         }
-//     }
-//     throw new Error(`No parent`);
-// }
