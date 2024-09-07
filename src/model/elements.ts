@@ -101,7 +101,6 @@ export class ViewPort extends Container {
     }
     ///
     get width() {
-        // const n = this.get_vp_width(0);
         return this._new_field("width", new LengthXValue('100%'));
     }
     set width(v: LengthXValue) {
@@ -109,7 +108,6 @@ export class ViewPort extends Container {
     }
     ///
     get height() {
-        // const n = this.get_vp_height(0);
         return this._new_field("height", new LengthYValue('100%'));
     }
     set height(v: LengthYValue) {
@@ -333,12 +331,26 @@ export class Rect extends Shape {
     override describe(frame: number) {
         const width = this.width.get_value(frame);
         const height = this.height.get_value(frame);
-        const x = this.x.get_value(frame);
-        const y = this.y.get_value(frame);
+        const left = this.x.get_value(frame);
+        const top = this.y.get_value(frame);
         const rx = this.rx.get_value(frame);
         const ry = this.ry.get_value(frame);
+        if (rx && ry) {
+            const right = left + width;
+            const bottom = top + height;
+            const cpts = [left + rx, right - rx, top + ry, bottom - ry]
+            return `M ${cpts[0]},${self.top}` +
+                `L ${cpts[1]},${top} ` +
+                `A ${rx},${ry} 0 0 1 ${right},${cpts[2]}` +
+                `L ${right},${cpts[3]} ` +
+                `A ${rx},${ry} 0 0 1 ${cpts[1]},${bottom}` +
+                `L ${cpts[0]},${bottom} ` +
+                `A ${rx},${ry} 0 0 1 ${left},${cpts[3]}` +
+                `L ${left},${cpts[2]} ` +
+                `A ${rx},${ry} 0 0 1 ${cpts[0]},${top} z`;
+        }
         // TODO: rx, ry
-        return `M ${x} ${y} h ${width} v ${height} h ${-width} Z`;
+        return `M ${left} ${top} h ${width} v ${height} h ${-width} Z`;
     }
 }
 

@@ -6,7 +6,7 @@ export default {
     },
     // .... other webpack, like output, etc.
     optimization: {
-        minimize: true
+        minimize: false
     },
     // experiments: {
     //     outputModule: true,

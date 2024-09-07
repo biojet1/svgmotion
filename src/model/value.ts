@@ -49,9 +49,15 @@ export class Animatable<
             return { t, o: [ox, oy], i: [ix, iy], v: value };
         }
     }
-
+    dump_value(a: V | string): any {
+        if (typeof a == "string") {
+            return a;
+        } else {
+            return this.dump_key_value(a);
+        }
+    }
     dump_key_value(x: V): any {
-        return this.dump_value(x)
+        throw Error(`Not implemented by '${this.constructor.name}'`);
     }
 
     dump(): PlainValue<V> {
@@ -74,17 +80,24 @@ export class Animatable<
         }
         return { time, value } as K;
     }
-    load_key_value(x: any): V {
-        return this.load_value(x);
+    load_value(v: any): V | string {
+        return typeof v == "string" ? v : this.load_key_value(v);
+    }
+    load_key_value(_: any): V {
+        // converts plain value to V
+        throw Error(`Not implemented by '${this.constructor.name}'`);
     }
     load(x: PlainValue<any>) {
         const { k, v } = x;
         if (k != undefined) {
-            const { r, b } = x;
             this.kfs = k.map((x) => this.load_keyframe(x, this.load_key_value(x.v)));
+        } else {
+            this.kfs = [];
         }
         if (v != undefined) {
             this.value = this.load_value(x.v);
+        } else {
+            // this.value;
         }
     }
     // repr
@@ -169,6 +182,26 @@ export class AnimatableD<V> extends Animatable<V> {
 }
 
 export class VectorValue<K extends Keyframe<Vector> = Keyframe<Vector>> extends Animatable<Vector, K> {
+    // dump
+    override dump_key_value(a: Vector): any {
+        if (a instanceof Vector) {
+            return Array.from(a); // NaN -> null
+        } else {
+            throw new Error(`not a Vector`);
+        }
+    }
+    // load
+    override load_key_value(a: any): Vector {
+        if (Array.isArray(a)) {
+            return new Vector(a);
+        }
+        throw new Error(`not array of numbers`);
+    }
+    // repr
+    override value_repr(value: Vector): string {
+        return Array.prototype.map.call(value, x => x.toString()).join(' ');
+    }
+    // keyframe
     override lerp_value(r: number, a: Vector, b: Vector): Vector {
         return a.lerp(b, r);
     }
@@ -179,69 +212,17 @@ export class VectorValue<K extends Keyframe<Vector> = Keyframe<Vector>> extends 
         if (x instanceof Vector) {
             return x;
         } else if (typeof x == "string") {
-            return this.load_value(x.split(/[\s,]+/).map(function (str) {
-                return parseFloat(str.trim());
-            }));
-
+            return this.parse_value(x);
         } else {
             return new Vector(x);
         }
     }
-    override dump_value(a: Vector): any {
-        if (a == null || typeof a == "string") {
-            return a;
-        } else {
-            return this.dump_key_value(a);
-        }
+    parse_value(v: string): Vector {
+        return this.load_key_value(v.split(/[\s,]+/).map(function (s) {
+            return parseFloat(s.trim())
+        }))
     }
-    override dump_key_value(a: Vector): any {
-        if (a instanceof Vector) {
-            return Array.from(a); // NaN -> null
-        } else {
-            throw new Error(`not a Vector`);
-        }
-    }
-
-    override load_value(a: any): Vector {
-        if (a == null || typeof a == "string") {
-            return a;
-        } else {
-            return this.load_key_value(a);
-        }
-
-    }
-    override load_key_value(a: any): Vector {
-        if (Array.isArray(a)) {
-            return new Vector(a);
-        }
-        throw new Error(`not array of numbers`);
-    }
-    override initial_value(): Vector {
-        const { value } = this;
-        if (value instanceof Vector) {
-            return value;
-        }
-        const v = this.check_value(value);
-        return this.value = v;
-        // throw Error(`Not a Vector '${this.constructor.name}' '${value}'`);
-    }
-    override value_repr(value: Vector): string {
-        return Array.prototype.map.call(value, x => x.toString()).join(' ');
-    }
-    // override get_repr(frame: number): string {
-    //     const { value, kfs } = this;
-    //     function format(v: Vector) {
-    //         return Array.prototype.map.call(v, x => x.toString()).join(' ')
-    //     }
-    //     if (kfs && kfs.length > 0) {
-    //         return format(this.get_value(frame));
-    //     }
-    //     if (value instanceof Vector) {
-    //         return format(value);
-    //     }
-    //     return value + '';
-    // }
-
+    //
     constructor(v: Vector | Iterable<number>) {
         if (v instanceof Vector) {
             super(v);
@@ -252,71 +233,48 @@ export class VectorValue<K extends Keyframe<Vector> = Keyframe<Vector>> extends 
 }
 
 export class PointsValue extends AnimatableD<number[][]> {
-    override dump_value(s: number[][]) {
+    // dump
+    override dump_key_value(s: number[][]) {
         return s;
     }
-    override load_value(a: any): number[][] {
-        return a as number[][];
-    }
-    override initial_value(): number[][] {
-        const { value } = this;
-        if (Array.isArray(value)) {
-            return value;
-        }
-        return this.check_value(value);
-    }
+    // keyframe
     override check_value(x: any): number[][] {
         if (Array.isArray(x)) {
             return x;
         } else if (typeof x == "string") {
-            const nums = x.split(/[\s,]+/).map(function (str) {
-                return parseFloat(str.trim());
-            });
-            const points: number[][] = [];
-            for (let n = nums.length - 1; n-- > 0; n--) {
-                points.push([nums.shift()!, nums.shift()!]);
-            }
-            return points;
+            return this.parse_value(x);
         } else {
             throw Error(`Not a number[][] '${this.constructor.name}' '${x}'`);
         }
     }
+    parse_value(v: string): number[][] {
+        const nums = v.split(/[\s,]+/).map(function (str) {
+            return parseFloat(str.trim());
+        });
+        const points: number[][] = [];
+        for (let n = nums.length - 1; n-- > 0; n--) {
+            points.push([nums.shift()!, nums.shift()!]);
+        }
+        return points;
+    }
+    // repr
     override value_repr(value: number[][]): string {
         return value.map(([a, b]) => `${a},${b}`).join(' ')
     }
-
-    // override get_repr(frame: number): string {
-    //     const { value, kfs } = this;
-    //     function format(v: number[][]) {
-    //         return v.map(([a, b]) => `${a},${b}`).join(' ')
-    //     }
-    //     if (kfs && kfs.length > 0) {
-    //         return format(this.get_value(frame));
-    //     }
-    //     if (Array.isArray(value)) {
-    //         return format(value);
-    //     }
-    //     return value + '';
-    // }
-
 }
 
 export class TextValue extends AnimatableD<string> {
-    override add_value(a: string, b: string): string {
-        return a + "" + b;
+    // dump
+    override dump_key_value(v: string): any {
+        return v;
     }
-    override dump_value(s: string) {
-        return s;
-    }
-    override load_value(a: any): string {
+    // load
+    override load_key_value(a: any): string {
         return a + "";
     }
-    override initial_value(): string {
-        const { value } = this;
-        if (typeof value === 'string') {
-            return value;
-        }
-        throw Error(`Not a string '${this.constructor.name}' '${value}'`);
+    // keyframe
+    override add_value(a: string, b: string): string {
+        return a + "" + b;
     }
     constructor(value: string = "") {
         super(value);
@@ -350,28 +308,9 @@ export class RGBValue extends VectorValue {
         throw new Error(`Invalid color "${x}"`);
     };
 
-    override initial_value(): Vector {
-        const { value } = this;
-        return this.check_value(value as RGB);
-    }
     override value_repr(value: Vector): string {
         return RGBValue.to_css_rgb(value);
     }
-
-    // override get_repr(frame: number): string {
-    //     const { value, kfs } = this;
-    //     function format(v: Vector) {
-    //         return RGBValue.to_css_rgb(v);
-    //     }
-    //     if (kfs && kfs.length > 0) {
-    //         return format(this.get_value(frame));
-    //     }
-    //     if (value instanceof Vector) {
-    //         return format(value);
-    //     }
-    //     return value + '';
-    // }
-
 }
 
 export interface PositionKeyframe<V> extends Keyframe<V> {
@@ -453,32 +392,43 @@ export class PositionValue extends VectorValue<PositionKeyframe<Vector>> {
                 }
             }
         }
-
         return kf;
     }
 }
 
 export class ScalarValue extends Animatable<number> {
+
+    // dump
+
+    override dump_key_value(v: number): any {
+        return v;
+    }
+
+    // load
+    override load_key_value(v: any): number {
+        if (typeof v === 'number') {
+            return v;
+        }
+        throw new TypeError(`Not a number ${v}`);
+    }
+    // keyframe
+
+    override check_value(x: any): number {
+        if (typeof x === "number") {
+            return x;
+        } else {
+            return this.parse_number(x);
+        }
+    }
+
     override lerp_value(r: number, a: number, b: number): number {
         return a * (1 - r) + b * r;
     }
     override add_value(a: number, b: number): number {
         return a + b;
     }
-    override dump_value(v: number): any {
-        return v;
-    }
-    override load_value(a: any): number {
-        return a as number;
-    }
-    override initial_value(): number {
-        const { value } = this;
-        if (typeof value === 'number') {
-            return value;
-        }
-        return this.parse_number(value);
-    }
-    parse_number(value: string | any) {
+
+    protected parse_number(value: string | any) {
         if (/^\s*[-+]?[0-9]*\.?[0-9]+(?:[eE][-+]?[0-9]+)?\s*$/.test(value)) {
             const v = parseFloat(value);
             if (!isNaN(v)) {
@@ -487,6 +437,7 @@ export class ScalarValue extends Animatable<number> {
         }
         throw Error(`Not a number '${this.constructor.name}' '${value}'`);
     }
+    //
     constructor(v: number | string = 0) {
         super(v);
     }
@@ -496,31 +447,16 @@ export class PercentageValue extends ScalarValue {
     constructor(v: number = 0) {
         super(v);
     }
-    override initial_value(): number {
-        const { value } = this;
-        if (typeof value === 'string') {
-            if (value.endsWith('%')) {
-                return this.parse_number(value.replaceAll('%', '')) / 100;
-            }
+    protected override parse_number(value: string | any): number {
+        if (value.endsWith('%')) {
+            return super.parse_number(value.replaceAll('%', '')) / 100;
         }
-        return super.initial_value();
+        return super.parse_number(value);
     }
+
     override value_repr(value: number): string {
         return value.toFixed(5).replace(/0$/, '');
     }
-
-    // override get_repr(frame: number): string {
-    //     const { value, kfs } = this;
-    //     if (kfs && kfs.length > 0) {
-    //         return this.get_value(frame).toFixed(5).replace(/0$/, '');
-    //     }
-    //     if (typeof value === 'number') {
-    //         return value.toFixed(5).replace(/0$/, '');
-    //     }
-    //     return value + '';
-    // }
-
-
 }
 
 export class RGB extends Vector {

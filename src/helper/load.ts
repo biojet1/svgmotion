@@ -28,7 +28,7 @@ function load_properties(that: Element, props: { [key: string]: PlainValue<any> 
     }
 }
 
-function load_container(obj: PlainNode, parent: Container) {
+function load_node(obj: PlainNode, parent: Container) {
     const { tag, nodes, ...props } = obj;
     const node = parent._add_element(tag)
     if (node) {
@@ -43,19 +43,16 @@ function load_container(obj: PlainNode, parent: Container) {
                             throw new Error(`"${tag}"`);
                         }
                     } else {
-                        load_container(child, node);
+                        load_node(child, node);
                     }
                 }
             }
-        } else if (node == undefined) {
-            throw new Error(`unexpected "${tag}" `);
         } else if (!(node instanceof Element)) {
             throw new Error(`unexpected nodes in "${tag}" ${(node as any).constructor.name}`);
         }
         return node;
-    } else {
-        throw new Error(`No node factory for "${tag}"`);
     }
+    throw new Error(`No node factory for "${tag}"`);
 }
 
 declare module "../model/elements" {
@@ -79,7 +76,6 @@ declare module "../model/elements" {
         add_tspan(before?: Element): TSpan;
         add_use(before?: Element): Use;
         add_view(before?: Element): ViewPort;
-
         ////
         _add_element(name: string): Element;
     }
@@ -103,7 +99,7 @@ Root.prototype.load = function (src: PlainRoot) {
     } else if (!frame_rate) {
         throw new Error("No frame_rate");
     }
-    const vp = load_container(view, this);
+    const vp = load_node(view, this);
     if (!(vp instanceof ViewPort)) {
         throw new Error("ViewPort expected");
     }
@@ -112,7 +108,7 @@ Root.prototype.load = function (src: PlainRoot) {
     this.set_view(vp);
     if (defs) {
         Object.entries(defs).map(([k, v]) => {
-            this.defs[k] = load_container(v, this);
+            this.defs[k] = load_node(v, this);
         });
     }
 }
