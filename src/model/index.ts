@@ -4,3 +4,4 @@ export * from './valuesets.js';
 export * from './elements.js';
 export * from './base.js';
 export * from './action.js';
+export * from './align.js';

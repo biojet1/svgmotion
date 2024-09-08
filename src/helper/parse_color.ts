@@ -1,5 +1,3 @@
-import { RGB, RGBValue } from "../model/value.js";
-
 export type RGBA = [number, number, number, number];
 
 // http://www.w3.org/TR/css3-color/

@@ -7,7 +7,7 @@ export interface DescParams {
 }
 
 
-export function tCheck(t: number) {
+export function check_t(t: number) {
 	if (t > 1) {
 		return 1;
 	} else if (t < 0) {
@@ -19,7 +19,7 @@ export function tCheck(t: number) {
 	return t;
 }
 
-export function tNorm(t: number) {
+export function normalize_t(t: number) {
 	if (t < 0) {
 		t = 1 + (t % 1);
 	} else if (t > 1) {

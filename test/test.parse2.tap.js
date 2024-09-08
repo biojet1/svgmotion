@@ -1,6 +1,6 @@
 "uses strict";
 import test from "tap";
-import { Vector, RGB, Root, Rel, ZoomTo, Pass, Easing } from "svgmotion";
+import { Vector, RGB, Root, Rel, ZoomTo, Pass, Easing, align_to, AlignTo } from "svgmotion";
 
 test.test("load_svg the_quick", async (t) => {
     const anim = new Root();
@@ -10,6 +10,7 @@ test.test("load_svg the_quick", async (t) => {
     view.height.set_value(216);
     let the = view.get_group("The");
     let dog = view.get_group("dog");
+    let fox = view.get_group("fox");
     let quick = view.get_group("quick");
     let lazy = view.get_group("lazy");
     let bb = view.bbox_of(0, dog, the);
@@ -35,7 +36,12 @@ test.test("load_svg the_quick", async (t) => {
     tr.run(ZoomTo(view, [dog], { margin: 50 }))
     tr.run(ZoomTo(view, [the]))
     tr.run(ZoomTo(view, [bbo]))
+    // align_to(tr.end_frame, tr.end_frame += 30, view, fox, [the, lazy], { v: 'bb' })
+    tr.run(AlignTo(view, fox, [the, dog], { v: 'bb', easing: Easing.inoutback }))
+
     tr.run(Rel(0.5).by(view.view_box.position, [100, 0]).at(1).by(view.view_box.position, [-100, 0]))
+
+
 
     // console.log(r.fill.color.value, r.fill.color.get_rgb_repr(0) + "", r.fill.color.get_value(0));
     // console.dir(r.fill);

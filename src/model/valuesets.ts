@@ -1,8 +1,8 @@
 import { BoundingBox, Matrix, MatrixMut, Vector } from "../geom/index.js";
+import { KeyExtra } from "../keyframe/keyframe.js";
 import { FontSizeValue, LengthValue } from "./base.js";
 import { VectorValue, ScalarValue, PositionValue, RGBValue, TextValue, PercentageValue } from "./value.js";
-import { PlainValue } from "./value.js";
-import { Animatable } from "./value.js";
+import { PlainValue, Animatable } from "./value.js";
 
 export function xget<T>(that: any, name: string, value: T): T {
     // console.log(`_GETX ${name}`);
@@ -72,9 +72,9 @@ export class ViewBox extends ValueSet {
     }
     /// size
     get size() {
-        return this._new_field("size", new PositionValue([100, 100]));
+        return this._new_field("size", new VectorValue([100, 100]));
     }
-    set size(v: PositionValue) {
+    set size(v: VectorValue) {
         this._new_field("size", v);
     }
     /// position
@@ -84,7 +84,7 @@ export class ViewBox extends ValueSet {
     set position(v: PositionValue) {
         this._new_field("position", v);
     }
-    //
+    // repr
     get_repr(frame: number): string {
         const s = this.size.get_value(frame);
         const p = this.position.get_value(frame);
@@ -95,7 +95,7 @@ export class ViewBox extends ValueSet {
         this.position.set_value([v[0], v[1]]);
         this.size.set_value([v[2], v[3]]);
     }
-
+    // geom
     bbox(frame: number) {
         if (Object.hasOwn(this, "size")) {
             if (Object.hasOwn(this, "position")) {
@@ -125,7 +125,7 @@ export class Stroke extends ValueSet {
     }
     /// color
     get color() {
-        return this._new_field("color", new RGBValue(new Vector([0, 0, 0])));
+        return this._new_field("color", new RGBValue([0, 0, 0]));
     }
     set color(v: RGBValue) {
         this._new_field("color", v);
@@ -146,7 +146,7 @@ export class Stroke extends ValueSet {
     }
     // stroke-dasharray
     get dash_array() {
-        return this._new_field("dash_array", new VectorValue(new Vector([1, 1])));
+        return this._new_field("dash_array", new VectorValue([1, 1]));
     }
     set dash_array(v: VectorValue) {
         this._new_field("dash_array", v);
@@ -177,7 +177,7 @@ export class Fill extends ValueSet {
     }
     /// fill
     get color() {
-        return this._new_field("color", new RGBValue(new Vector([0, 0, 0])));
+        return this._new_field("color", new RGBValue([0, 0, 0]));
     }
     set color(v: RGBValue) {
         this._new_field("color", v);
@@ -325,13 +325,13 @@ export class Transform extends ValueSet {
     }
     get_repr(frame: number) {
         if ('all' in this) {
-            return col1(this.all, frame);
+            return _get_repr(this.all, frame);
         }
         return '';
     }
     *enum_attibutes(frame: number) {
         if ('all' in this) {
-            yield { name: "transform", value: col1(this.all, frame) }
+            yield { name: "transform", value: _get_repr(this.all, frame) }
         }
     }
     cat_transform(frame: number, n: Matrix) {
@@ -369,19 +369,19 @@ export class Transform extends ValueSet {
     }
     ///
     add_translate(x: number = 0, y: number = 0) {
-        const q = new MTranslate(new Vector([x, y]));
+        const q = new MTranslate([x, y]);
         this.all.push(q);
         return q;
     }
     add_scale(x: number = 1, y: number = 1) {
-        const q = new MScale(new Vector([x, y]));
+        const q = new MScale([x, y]);
         this.all.push(q);
         return q;
     }
     add_rotate(deg: number = 0, x?: number, y?: number) {
         if (x != undefined) {
             if (y != undefined) {
-                const q = new MRotateAt(new Vector([deg, x, y]));
+                const q = new MRotateAt([deg, x, y]);
                 this.all.push(q);
                 return q;
             }
@@ -409,7 +409,7 @@ export class Transform extends ValueSet {
         e: number = 0,
         f: number = 0
     ) {
-        const q = new MHexad(new Vector([a, b, c, d, e, f]));
+        const q = new MHexad([a, b, c, d, e, f]);
         this.all.push(q);
         return q;
     }
@@ -457,6 +457,7 @@ export class Transform extends ValueSet {
             }
         }
     }
+    // load
     override load(u: PlainValue<any>) {
         this.clear();
         const load = (u: Array<any>) => {
@@ -480,7 +481,7 @@ export class Transform extends ValueSet {
 
                     case "R":
                         {
-                            const q = new MRotateAt(new Vector([0, 0, 0]));
+                            const q = new MRotateAt([0, 0, 0]);
                             q.load(v);
                             this.all.push(q);
                         }
@@ -534,13 +535,27 @@ export class Transform extends ValueSet {
             }
         }
     }
+    //
+    prefix_hexad() {
+        const m = this.all[0];
+        if (!m) {
+            return this.add_hexad();
+        } else if (m instanceof MHexad) {
+            return m;
+        } else {
+            const q = new MHexad([1, 0, 0, 1, 0, 0]);
+            this.all.unshift(q);
+            return q;
+        }
+    }
+
 }
 
 type MT = MTranslate | MScale | MRotateAt | MSkewX | MSkewY;
 
 
-function col1(that: Array<MT>, frame: number) {
-    return that.map((x) => x.get_transform_repr(frame)).join(" ");
+function _get_repr(that: Array<MT>, frame: number) {
+    return that.map((x) => x.get_repr(frame)).join(" ");
 }
 
 function get1<T>(
@@ -570,7 +585,7 @@ function find1<T>(
 }
 
 class MTranslate extends PositionValue {
-    get_transform_repr(frame: number) {
+    get_repr(frame: number) {
         const [x, y] = this.get_value(frame);
         return `translate(${x} ${y})`;
     }
@@ -584,8 +599,9 @@ class MTranslate extends PositionValue {
         return o;
     }
 }
+
 class MScale extends VectorValue {
-    get_transform_repr(frame: number) {
+    get_repr(frame: number) {
         const [x, y] = this.get_value(frame);
         return `scale(${x} ${y})`;
     }
@@ -601,7 +617,7 @@ class MScale extends VectorValue {
 }
 
 class MRotateAt extends VectorValue {
-    get_transform_repr(frame: number) {
+    get_repr(frame: number) {
         const [a, x, y] = this.get_value(frame);
         if (x || y) {
             return `rotate(${a} ${x} ${y})`;
@@ -620,7 +636,7 @@ class MRotateAt extends VectorValue {
 }
 
 class MRotation extends ScalarValue {
-    get_transform_repr(frame: number) {
+    get_repr(frame: number) {
         const a = this.get_value(frame);
         return `rotate(${a})`;
     }
@@ -636,7 +652,7 @@ class MRotation extends ScalarValue {
 }
 
 class MSkewX extends ScalarValue {
-    get_transform_repr(frame: number) {
+    get_repr(frame: number) {
         const a = this.get_value(frame);
         return `skewX(${a})`;
     }
@@ -652,7 +668,7 @@ class MSkewX extends ScalarValue {
 }
 
 class MSkewY extends ScalarValue {
-    get_transform_repr(frame: number) {
+    get_repr(frame: number) {
         const a = this.get_value(frame);
         return `skewY(${a})`;
     }
@@ -667,14 +683,23 @@ class MSkewY extends ScalarValue {
     }
 }
 
-class MHexad extends VectorValue {
-    get_transform_repr(frame: number) {
+export class MHexad extends VectorValue {
+    get_repr(frame: number) {
         const [a, b, c, d, e, f] = this.get_value(frame);
         return `matrix(${a} ${b} ${c} ${d} ${e} ${f})`;
     }
     cat_transform(frame: number, m: Matrix) {
         const [a, b, c, d, e, f] = this.get_value(frame);
         m.cat_self(Matrix.hexad(a, b, c, d, e, f));
+    }
+    get_matrix(frame: number) {
+        const [a, b, c, d, e, f] = this.get_value(frame);
+        return Matrix.hexad(a, b, c, d, e, f)
+    }
+    set_matrix(frame: number, m: Matrix, extra?: KeyExtra) {
+        const [a, b, c, d, e, f] = m.dump_hexad();
+        console.log('set_matrix', extra)
+        this.key_value(frame, new Vector([a, b, c, d, e, f]), extra)
     }
     override dump() {
         const o = super.dump();

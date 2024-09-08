@@ -66,57 +66,7 @@ function unit_vector_angle(
 	return sign * acos(dot);
 }
 
-const LENGTH_MIN_DEPTH = 17;
-const LENGTH_ERROR = 1e-12;
-interface PointAt {
-	point_at(f: number): Vector;
-}
 
-export function segment_length(
-	curve: PointAt,
-	start: number,
-	end: number,
-	start_point: Vector,
-	end_point: Vector,
-	error = LENGTH_ERROR,
-	min_depth = LENGTH_MIN_DEPTH,
-	depth = 0
-): number {
-	const mid = (start + end) / 2;
-	const mid_point = curve.point_at(mid);
-	const length = end_point.subtract(start_point).abs();
-	const first_half = mid_point.subtract(start_point).abs();
-	const second_half = end_point.subtract(mid_point).abs();
-	const length2 = first_half + second_half;
-	if (length2 - length > error || depth < min_depth) {
-		// Calculate the length of each segment:
-		depth += 1;
-		return (
-			segment_length(
-				curve,
-				start,
-				mid,
-				start_point,
-				mid_point,
-				error,
-				min_depth,
-				depth
-			) +
-			segment_length(
-				curve,
-				mid,
-				end,
-				mid_point,
-				end_point,
-				error,
-				min_depth,
-				depth
-			)
-		);
-	}
-	// This is accurate enough.
-	return length2;
-}
 
 export function arc_params(
 	x1: number,
@@ -280,7 +230,10 @@ export function arc_to_curve(
 
 		return curve;
 	});
-} export interface IArc {
+}
+
+
+export interface IArc {
 	readonly from: Vector;
 	readonly to: Vector;
 	//
@@ -352,7 +305,57 @@ export function arc_bbox(arc: IArc) {
 	}
 	return BoundingBox.extrema([min(...xtrema), max(...xtrema)], [min(...ytrema), max(...ytrema)]);
 }
+const LENGTH_MIN_DEPTH = 17;
+const LENGTH_ERROR = 1e-12;
+interface PointAt {
+	point_at(f: number): Vector;
+}
 
+export function segment_length(
+	curve: PointAt,
+	start: number,
+	end: number,
+	start_point: Vector,
+	end_point: Vector,
+	error = LENGTH_ERROR,
+	min_depth = LENGTH_MIN_DEPTH,
+	depth = 0
+): number {
+	const mid = (start + end) / 2;
+	const mid_point = curve.point_at(mid);
+	const length = end_point.subtract(start_point).abs();
+	const first_half = mid_point.subtract(start_point).abs();
+	const second_half = end_point.subtract(mid_point).abs();
+	const length2 = first_half + second_half;
+	if (length2 - length > error || depth < min_depth) {
+		// Calculate the length of each segment:
+		depth += 1;
+		return (
+			segment_length(
+				curve,
+				start,
+				mid,
+				start_point,
+				mid_point,
+				error,
+				min_depth,
+				depth
+			) +
+			segment_length(
+				curve,
+				mid,
+				end,
+				mid_point,
+				end_point,
+				error,
+				min_depth,
+				depth
+			)
+		);
+	}
+	// This is accurate enough.
+	return length2;
+}
 export function arc_length(arc: IArc) {
 	const { from, to } = arc;
 	if (from.equals(to)) return 0;

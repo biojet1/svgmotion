@@ -1,6 +1,6 @@
 import { BoundingBox } from "../bbox.js";
 import { BaseLC, MoveLC } from "./command.js";
-import { DescParams, tNorm } from "./index.js";
+import { DescParams, normalize_t } from "./index.js";
 
 export class PathLC {
     static Unit = BaseLC;
@@ -219,8 +219,8 @@ export class PathLC {
         return T < 0 ? this.split_at(1 + T)[1] : this.split_at(T)[0];
     }
     crop_at(T0: number, T1: number = 1): PathLC {
-        T0 = tNorm(T0);
-        T1 = tNorm(T1);
+        T0 = normalize_t(T0);
+        T1 = normalize_t(T1);
         if (T0 <= 0) {
             if (T1 >= 1) {
                 return this; // TODO: use clone

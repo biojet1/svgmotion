@@ -1,4 +1,4 @@
-import { DescParams, tCheck, tNorm } from './index.js';
+import { DescParams, check_t, normalize_t } from './index.js';
 import { BoundingBox } from "../bbox.js";
 import { Vector } from "../vector.js";
 import { quad_split_at, quad_slope_at, quad_point_at, quad_bbox } from './quadhelp.js';
@@ -86,8 +86,8 @@ export abstract class BaseLC extends Command {
         return t < 0 ? this.split_at(1 + t)[1] : this.split_at(t)[0];
     }
     crop_at(t0: number, t1: number): BaseLC | undefined {
-        t0 = tNorm(t0);
-        t1 = tNorm(t1);
+        t0 = normalize_t(t0);
+        t1 = normalize_t(t1);
         if (t0 <= 0) {
             if (t1 >= 1) {
                 return this;
@@ -361,10 +361,7 @@ export abstract class BaseLC extends Command {
 
 export class LineCL extends BaseLC {
     override bbox() {
-        const {
-            to: [x2, y2],
-            _prev,
-        } = this;
+        const { to: [x2, y2], _prev } = this;
         if (_prev) {
             const [x1, y1] = _prev.to;
             return BoundingBox.extrema([min(x1, x2), max(x1, x2)], [min(y1, y2), max(y1, y2)]);
@@ -377,7 +374,7 @@ export class LineCL extends BaseLC {
     }
     override point_at(t: number) {
         const { from, to } = this;
-        return to.subtract(from).multiply(tCheck(t)).post_add(from);
+        return to.subtract(from).multiply(check_t(t)).post_add(from);
     }
     override slope_at(_: number) {
         const { from, to } = this;
@@ -532,13 +529,13 @@ export class QuadLC extends BaseLC {
         return quad_length(this._qpts);
     }
     override slope_at(t: number): Vector {
-        return quad_slope_at(this._qpts, tCheck(t));
+        return quad_slope_at(this._qpts, check_t(t));
     }
     override point_at(t: number) {
-        return quad_point_at(this._qpts, tCheck(t));
+        return quad_point_at(this._qpts, check_t(t));
     }
     override split_at(t: number): [BaseLC, BaseLC] {
-        const [a, b] = quad_split_at(this._qpts, tCheck(t));
+        const [a, b] = quad_split_at(this._qpts, check_t(t));
         return [new QuadLC(this._prev, a[1], a[2]), new QuadLC(new MoveLC(undefined, b[0]), b[1], b[2])];
     }
     override bbox() {
@@ -597,18 +594,18 @@ export class CubicLC extends BaseLC {
     }
     /////
     override point_at(t: number) {
-        return Vector.new(cubic_point_at(this._cpts, tCheck(t)));
+        return Vector.new(cubic_point_at(this._cpts, check_t(t)));
     }
     override bbox() {
         const { _prev } = this;
         return _prev ? cubic_box(this._cpts) : BoundingBox.not();
     }
     override slope_at(t: number): Vector {
-        return cubic_slope_at(this._cpts, tCheck(t));
+        return cubic_slope_at(this._cpts, check_t(t));
     }
     override split_at(t: number): [BaseLC, BaseLC] {
         const { _prev, _cpts } = this;
-        const [a, b] = cubic_split_at(_cpts, tCheck(t));
+        const [a, b] = cubic_split_at(_cpts, check_t(t));
         return [
             new CubicLC(_prev, Vector.new(a[1]), Vector.new(a[2]), Vector.new(a[3])),
             new CubicLC(new MoveLC(undefined, Vector.new(b[0])), Vector.new(b[1]), Vector.new(b[2]), Vector.new(b[3]))
@@ -707,15 +704,15 @@ export class ArcLC extends BaseLC {
         return arc_length(this);
     }
     override point_at(t: number) {
-        return arc_point_at(this, tCheck(t));
+        return arc_point_at(this, check_t(t));
     }
     override slope_at(t: number): Vector {
-        return arc_slope_at(this, tCheck(t));
+        return arc_slope_at(this, check_t(t));
     }
     override split_at(t: number): [BaseLC, BaseLC] {
         const { rx, ry, phi, sweep, rdelta, to, _prev } = this;
         const deltaA = abs(rdelta);
-        const mid = arc_point_at(this, tCheck(t));
+        const mid = arc_point_at(this, check_t(t));
         return [
             new ArcLC(_prev, rx, ry, phi, deltaA * t > PI, sweep, mid),
             new ArcLC(new MoveLC(undefined, mid), rx, ry, phi, deltaA * (1 - t) > PI, sweep, to),
