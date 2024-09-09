@@ -13,7 +13,7 @@ export interface AlignParams {
     v?: string;
 }
 
-export function align_to(frame: number, end: number, parent: Container, ref: Element, items: Element[], params: KeyExtra & AlignParams = {}) {
+function align_to(frame: number, end: number, parent: Container, ref: Element, items: Element[], params: KeyExtra & AlignParams = {}) {
     const { h, v, hgap = 0, vgap = 0, ...extra } = params;
     const ref_box = parent.bbox_of(frame, ref);
     let xOAnchor: string,

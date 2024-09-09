@@ -22,7 +22,6 @@ export function ZoomTo(view: ViewPort, items: Element[], params: KeyExtra & { du
         let { position, size } = view.view_box;
         function supply(that: Track) {
             let b2 = bb.clone();
-
             if (margin) {
                 if (Array.isArray(margin)) {
                     const n = margin.length;
