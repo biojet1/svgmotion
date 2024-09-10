@@ -196,6 +196,9 @@ export abstract class Shape extends Element {
         const p = this.get_path(frame);
         bbox.merge_self((m ? p.transform(m) : p).bbox());
     }
+    override object_bbox(frame: number) {
+        return this.get_path(frame).bbox();
+    }
 }
 
 export class Group extends Container {

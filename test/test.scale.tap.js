@@ -78,23 +78,37 @@ export function HeartBeat(parent, items, params) {
         let sx = 0.1;
         let sy = 0.1;
         let rot = 300;
+        const speed = track.to_frame(0.2);
+        const times = 3;
+        dur = 2 * speed * times;
+        // let m0 = Matrix.identity();
+        // console.log(`HeartBeat ${speed} ${times}`);
+        function beat(node, start, end) {
+            const h = node.transform.prefix_hexad();
+            let t = start;
+            let s = times;
+            let m0 = h.get_matrix(t);
+            let m1 = Matrix.scale(1.3).multiply(m0);
+            h.set_matrix(t, m0, { start });
+            for (; s-- > 0;) {
+                // console.log(`set_matrix t=${t} ${start}-${end}`);
+                h.set_matrix(t += speed, m1, { easing: Easing.inoutsine });
+                h.set_matrix(t += speed, m0, { easing: Easing.inoutsine });
+            }
+            if (t !== end) {
+                console.log(`Beat end ${t} ${end}`);
+            }
+        }
 
         function supply(that) {
             const { start, end } = supply;
-            const [cx, cy] = bb.center;
-            let m = Matrix.translate(cx, cy)
-            m = m.rotate(rot);
-            m = m.scale(sx, sy);
-            m = m.translate(-cx, -cy);
             for (const e of items) {
                 if (e instanceof BoundingBox) {
                     //
                 } else {
-                    scale(e, m, start, end)
+                    beat(e, start, end)
                 }
             }
-
-
         };
         supply.start = -Infinity;
         supply.end = -Infinity;
@@ -102,17 +116,8 @@ export function HeartBeat(parent, items, params) {
             if (_dur == undefined) {
                 _dur = hint_dur;
             }
-            bb = BoundingBox.not();
-            for (const x of items) {
-                if (x instanceof BoundingBox) {
-                    bb.merge_self(x);
-                } else {
-                    x.update_bbox(bb, frame, x.transform_under(frame, parent));
-                }
-            }
-
             supply.start = frame;
-            supply.end = frame + _dur;
+            supply.end = frame + dur;
             return supply
         };
     };
@@ -133,9 +138,10 @@ test.test("load_svg the_quick", async (t) => {
 
     const tr = anim.at(0);
     // tr.run(Pass(1))
-    tr.run(ZoomTo(view, [lazy, dog]))
+    // tr.run(ZoomTo(view, [lazy, dog]))
     tr.run(ScaleOut(view, [dog, fox], { easing: Easing.linear }))
-    tr.run(ZoomTo(view, [the, dog], { easing: Easing.outexpo }))
+    tr.sub().run(HeartBeat(view, [lazy]));
+    // tr.run(ZoomTo(view, [the, dog], { easing: Easing.outexpo }))
     tr.run(Pass(1))
 
     anim.save_json('/tmp/scale.json')

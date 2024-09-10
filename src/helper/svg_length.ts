@@ -3,84 +3,84 @@ import { Element } from "../model/base.js";
 const BOTH_MATCH =
     /^\s*(([-+]?[0-9]+(\.[0-9]*)?|[-+]?\.[0-9]+)([eE][-+]?[0-9]+)?)\s*(in|pt|px|mm|cm|m|km|Q|pc|yd|ft||%|em|ex|ch|rem|vw|vh|vmin|vmax|deg|grad|rad|turn|s|ms|Hz|kHz|dpi|dpcm|dppx)\s*$/i;
 
-export function parse_svg_length(amount: number, units: string | undefined, ctx: { relative_length?: number, ppi?: number, vw?: number, vh?: number, font_size?: number, font_height?: number }) {
-    // console.log(`parse_svg_length ${amount} ${units}`)
-    switch (units) {
-        case "%": {
-            const { relative_length } = ctx;
-            if (relative_length == undefined) {
-                throw Error(`No relative_length`);
-            }
-            return amount * relative_length / 100.0;
-        }
-        case "mm": {
-            const { ppi = 96 } = ctx;
-            return amount * ppi * 0.0393701
-        }
-        case "cm": {
-            const { ppi = 96 } = ctx;
-            return amount * ppi * 0.393701
-        }
-        case "in": {
-            const { ppi = 96 } = ctx;
-            return amount * ppi
-        }
-        case "vw": {
-            const { vw } = ctx;
-            if (vw == undefined) {
-                throw Error(`No vw`);
-            }
-            return amount * vw / 100.0
-        }
-        case "vh": {
-            const { vh } = ctx;
-            if (vh == undefined) {
-                throw Error(`No vh`);
-            }
-            return amount * vh / 100.0
-        }
-        case "vmin": {
-            const { vh, vw } = ctx;
-            if (vh == undefined || vw == undefined) {
-                throw Error(`No vh/vw`);
-            }
-            return amount * Math.min(vw, vh) / 100.0
-        }
-        case "vmax": {
-            const { vh, vw } = ctx;
-            if (vh == undefined || vw == undefined) {
-                throw Error(`No vh/vw`);
-            }
-            return amount * Math.max(vw, vh) / 100.0
-        }
-        case "pt": {
-            return amount * 4.0 / 3.0
-        }
-        case "pc": {
-            return amount * 16.0
-        }
-        case "em": {
-            const { font_size } = ctx;
-            if (font_size == undefined) {
-                throw Error(`No font_size`);
-            }
-            return amount * font_size;
-        }
-        case "em": {
-            const { font_height } = ctx;
-            if (font_height == undefined) {
-                throw Error(`No font_height`);
-            }
-            return amount * font_height;
-        }
-        case undefined:
-        case "px":
-        case "": {
-            return amount
-        }
-    }
-    throw Error(`Unexpected unit "${units}"`);
-}
+// export function parse_svg_length(amount: number, units: string | undefined, ctx: { relative_length?: number, ppi?: number, vw?: number, vh?: number, font_size?: number, font_height?: number }) {
+//     // console.log(`parse_svg_length ${amount} ${units}`)
+//     switch (units) {
+//         case "%": {
+//             const { relative_length } = ctx;
+//             if (relative_length == undefined) {
+//                 throw Error(`No relative_length`);
+//             }
+//             return amount * relative_length / 100.0;
+//         }
+//         case "mm": {
+//             const { ppi = 96 } = ctx;
+//             return amount * ppi * 0.0393701
+//         }
+//         case "cm": {
+//             const { ppi = 96 } = ctx;
+//             return amount * ppi * 0.393701
+//         }
+//         case "in": {
+//             const { ppi = 96 } = ctx;
+//             return amount * ppi
+//         }
+//         case "vw": {
+//             const { vw } = ctx;
+//             if (vw == undefined) {
+//                 throw Error(`No vw`);
+//             }
+//             return amount * vw / 100.0
+//         }
+//         case "vh": {
+//             const { vh } = ctx;
+//             if (vh == undefined) {
+//                 throw Error(`No vh`);
+//             }
+//             return amount * vh / 100.0
+//         }
+//         case "vmin": {
+//             const { vh, vw } = ctx;
+//             if (vh == undefined || vw == undefined) {
+//                 throw Error(`No vh/vw`);
+//             }
+//             return amount * Math.min(vw, vh) / 100.0
+//         }
+//         case "vmax": {
+//             const { vh, vw } = ctx;
+//             if (vh == undefined || vw == undefined) {
+//                 throw Error(`No vh/vw`);
+//             }
+//             return amount * Math.max(vw, vh) / 100.0
+//         }
+//         case "pt": {
+//             return amount * 4.0 / 3.0
+//         }
+//         case "pc": {
+//             return amount * 16.0
+//         }
+//         case "em": {
+//             const { font_size } = ctx;
+//             if (font_size == undefined) {
+//                 throw Error(`No font_size`);
+//             }
+//             return amount * font_size;
+//         }
+//         case "em": {
+//             const { font_height } = ctx;
+//             if (font_height == undefined) {
+//                 throw Error(`No font_height`);
+//             }
+//             return amount * font_height;
+//         }
+//         case undefined:
+//         case "px":
+//         case "": {
+//             return amount
+//         }
+//     }
+//     throw Error(`Unexpected unit "${units}"`);
+// }
 
 export class ComputeLength {
     node: Element;
@@ -100,7 +100,9 @@ export class ComputeLength {
         }
         return xget(this, "font_size", n);
     }
-
+    get ppi() {
+        return 96
+    }
     get vw() {
         const n = this.node.get_vp_width(this.frame);
         return xget(this, "vw", n);
@@ -140,12 +142,97 @@ export class ComputeLength {
             const num = parseFloat(m[1]);
             const suf = m.pop();
             // console.log(`parse_len ${value} ${this.node.id} ${this.node.constructor.name} ${[num, suf]}`)
-            const n = parse_svg_length(num, suf, this);
+            // const n = parse_svg_length(num, suf, this);
+            const n = this._parse(num, suf);
             // console.log(`parse_svg_length OK ${value} ${n} [${this.node.constructor.name}]`);
             return n;
         }
         console.log(`Unexpected length "${value}" ${this.node.id}`);
         return 0;
         // throw new Error(`Unexpected length "${value}"`);
+    }
+    protected _parse(amount: number, units: string | undefined) {
+        switch (units) {
+            case "%": {
+                const { relative_length } = this;
+                if (relative_length == undefined) {
+                    throw Error(`No relative_length`);
+                }
+                return amount * relative_length / 100.0;
+            }
+            case "mm": {
+                const { ppi = 96 } = this;
+                return amount * ppi * 0.0393701
+            }
+            case "cm": {
+                const { ppi = 96 } = this;
+                return amount * ppi * 0.393701
+            }
+            case "in": {
+                const { ppi = 96 } = this;
+                return amount * ppi
+            }
+            case "vw": {
+                const { vw } = this;
+                if (vw == undefined) {
+                    throw Error(`No vw`);
+                }
+                return amount * vw / 100.0
+            }
+            case "vh": {
+                const { vh } = this;
+                if (vh == undefined) {
+                    throw Error(`No vh`);
+                }
+                return amount * vh / 100.0
+            }
+            case "vmin": {
+                const { vh, vw } = this;
+                if (vh == undefined || vw == undefined) {
+                    throw Error(`No vh/vw`);
+                }
+                return amount * Math.min(vw, vh) / 100.0
+            }
+            case "vmax": {
+                const { vh, vw } = this;
+                if (vh == undefined || vw == undefined) {
+                    throw Error(`No vh/vw`);
+                }
+                return amount * Math.max(vw, vh) / 100.0
+            }
+            case "pt": {
+                return amount * 4.0 / 3.0
+            }
+            case "pc": {
+                return amount * 16.0
+            }
+            case "em": {
+                const { font_size } = this;
+                if (font_size == undefined) {
+                    throw Error(`No font_size`);
+                }
+                return amount * font_size;
+            }
+            // case "em": {
+            //     const { font_height } = this;
+            //     if (font_height == undefined) {
+            //         throw Error(`No font_height`);
+            //     }
+            //     return amount * font_height;
+            // }
+            case undefined:
+            case "px":
+            case "": {
+                return amount
+            }
+        }
+        throw Error(`Unexpected unit "${units}"`);
+    }
+}
+
+
+export class ComputeLengthBox extends ComputeLength {
+    protected override _parse(amount: number, units: string | undefined): number {
+        return super._parse(amount, units);
     }
 }

@@ -1,8 +1,8 @@
 import { Matrix, BoundingBox } from "../geom/index.js";
-import { ScalarValue, TextValue, PercentageValue } from "./value.js";
-import { Fill, Transform, xset, xget, Font, Stroke, ValueSet } from "./valuesets.js";
 import { Node, Parent } from "./linked.js";
+import { ScalarValue, TextValue, PercentageValue, VectorValue } from "./value.js";
 import { Animatable } from "./value.js";
+import { Fill, Transform, xset, xget, Font, Stroke, ValueSet } from "./valuesets.js";
 /// @@@ //////////
 export class TextData extends Node {
     id?: string;
@@ -39,6 +39,11 @@ export class Element extends Parent {
     bounding_box(frame: number, m?: Matrix) {
         const bb = BoundingBox.not();
         this.update_bbox(bb, frame, m);
+        return bb
+    }
+    object_bbox(frame: number, m?: Matrix) {
+        const bb = BoundingBox.not();
+        // TODO:
         return bb
     }
     *ancestors() {
@@ -257,7 +262,11 @@ export class LengthYValue extends ScalarValue {
 
 export class LengthValue extends ScalarValue {
 }
+
 export class FontSizeValue extends ScalarValue {
 
+}
+
+export class OriginValue extends VectorValue {
 }
 // TODO: dash array, path

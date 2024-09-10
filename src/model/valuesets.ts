@@ -3,7 +3,7 @@ import { KeyExtra } from "../keyframe/keyframe.js";
 import { FontSizeValue, LengthValue } from "./base.js";
 import { VectorValue, ScalarValue, PositionValue, RGBValue, TextValue, PercentageValue } from "./value.js";
 import { PlainValue, Animatable } from "./value.js";
-
+import { Element } from "./base.js";
 export function xget<T>(that: any, name: string, value: T): T {
     // console.log(`_GETX ${name}`);
     Object.defineProperty(that, name, {
@@ -548,7 +548,55 @@ export class Transform extends ValueSet {
             return q;
         }
     }
+    //
+    ref_box(frame: number) {
+        if (Object.hasOwn(this, "box")) {
+            switch (this.box.get_value(frame)) {
+                case "view-box":
+                    {
+                        const { _parent } = this;
+                        if (_parent instanceof Element) {
+                            const [w, h] = _parent.get_vp_size(frame);
+                            BoundingBox.rect(0, 0, w, h);
+                        }
+                        break;
+                    }
+                case "content-box":
+                case "border-box":
+                case "fill-box":
+                case "stroke-box":
 
+
+
+            }
+
+        }
+        throw new Error(``);
+    }
+    get_origin(frame: number, origin: string) {
+        // https://drafts.csswg.org/css-transforms/#transform-origin-property
+        let [x, y = 'center', z = 0] = origin.split(/[\s,]+/);
+        [x, y] = [x, y].map(v => {
+            switch (v) {
+                case 'center':
+                    return '50%';
+                case 'left':
+                    return '0%';
+                case 'right':
+                    return '100%';
+                case 'top':
+                    return '0%';
+                case 'bottom':
+                    return '100%';
+            }
+            return v;
+        });
+
+        if (x.endsWith('%')) {
+            x.replaceAll('%', '')
+        }
+
+    }
 }
 
 type MT = MTranslate | MScale | MRotateAt | MSkewX | MSkewY;
@@ -698,7 +746,7 @@ export class MHexad extends VectorValue {
     }
     set_matrix(frame: number, m: Matrix, extra?: KeyExtra) {
         const [a, b, c, d, e, f] = m.dump_hexad();
-        console.log('set_matrix', extra)
+        // console.log('set_matrix', extra)
         this.key_value(frame, new Vector([a, b, c, d, e, f]), extra)
     }
     override dump() {
