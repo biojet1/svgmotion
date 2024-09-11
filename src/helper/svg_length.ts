@@ -42,6 +42,9 @@ export class CalcLength {
     get relative_length_y(): number {
         throw new Error(`Not implemented`)
     }
+    get relative_length_f(): number {
+        throw new Error(`Not implemented`)
+    }
     parse_len(value: string, dir?: string) {
         const m = BOTH_MATCH.exec(value);
         if (m) {
@@ -75,6 +78,11 @@ export class CalcLength {
                     case 'y':
                         {
                             n = this.relative_length_y;
+                            break;
+                        }
+                    case 'f':
+                        {
+                            n = this.relative_length_f;
                             break;
                         }
                     default:
@@ -155,35 +163,48 @@ export class CalcLength {
 
 export class ComputeLength extends CalcLength {
 
-    length_mode: string | undefined;
+    // length_mode: string | undefined;
 
     constructor(node: Element, frame: number) {
         super();
         this._node = node;
         this.frame = frame;
     }
-
-
+    override  get relative_length_x(): number {
+        const n = this.node.get_vp_size(this.frame).x;
+        return xget(this, "relative_length_x", n);
+    }
+    override get relative_length_y(): number {
+        const n = this.node.get_vp_size(this.frame).y;
+        return xget(this, "relative_length_y", n);
+    }
+    override get relative_length_f(): number {
+        const n = this.node.get_font_size(this.frame);
+        return xget(this, "relative_length", n);
+    }
     override get relative_length() {
-        if (!this.length_mode) {
-            const { x, y } = this.node.get_vp_size(this.frame);
-            // const n = Math.sqrt((x ** 2 + y ** 2)c
-            // const n = Math.sqrt(((x + y) * (x + y) - 2 * x * y) / 2)
-            const n = Math.hypot(x, y) / Math.sqrt(2)
-            //  * Math.SQRT1_2
-            return xget(this, "relative_length", n);
-        } else if (this.length_mode.startsWith("w")) {
-            const n = this.node.get_vp_size(this.frame).x;
-            return xget(this, "relative_length", n);
-        } else if (this.length_mode.startsWith("h")) {
-            const n = this.node.get_vp_size(this.frame).y;
-            return xget(this, "relative_length", n);
-        } else if (this.length_mode.startsWith("f")) {
-            const n = this.node.get_font_size(this.frame);
-            return xget(this, "relative_length", n);
-        } else {
-            throw new Error(``);
-        }
+        const { x, y } = this.node.get_vp_size(this.frame);
+        const n = Math.hypot(x, y) / Math.sqrt(2)
+        return xget(this, "relative_length", n);
+        // if (!this.length_mode) {
+        //     const { x, y } = this.node.get_vp_size(this.frame);
+        //     // const n = Math.sqrt((x ** 2 + y ** 2)c
+        //     // const n = Math.sqrt(((x + y) * (x + y) - 2 * x * y) / 2)
+        //     const n = Math.hypot(x, y) / Math.sqrt(2)
+        //     //  * Math.SQRT1_2
+        //     return xget(this, "relative_length", n);
+        // } else if (this.length_mode.startsWith("w")) {
+        //     const n = this.node.get_vp_size(this.frame).x;
+        //     return xget(this, "relative_length", n);
+        // } else if (this.length_mode.startsWith("h")) {
+        //     const n = this.node.get_vp_size(this.frame).y;
+        //     return xget(this, "relative_length", n);
+        // } else if (this.length_mode.startsWith("f")) {
+        //     const n = this.node.get_font_size(this.frame);
+        //     return xget(this, "relative_length", n);
+        // } else {
+        //     throw new Error(``);
+        // }
     }
 }
 

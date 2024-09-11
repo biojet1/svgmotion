@@ -280,11 +280,11 @@ export class Matrix {
 		return this.skew(0, deg);
 	}
 
-	cat_self(m: Matrix): this {
+	cat_self(_m: Matrix): this {
 		throw new Error(`Not implemented`);
 	}
 
-	post_cat_self(m: Matrix): this {
+	post_cat_self(_m: Matrix): this {
 		throw new Error(`Not implemented`);
 	}
 	// Static methods
@@ -394,7 +394,7 @@ export class Matrix {
 	static interpolate(
 		A: number[] | string | Matrix | ElementLike,
 		B: number[] | string | Matrix | ElementLike,
-		opt?: any
+		_opt?: any
 	) {
 		const a = this.new(A).dump_hexad();
 		const b = this.new(B).dump_hexad();

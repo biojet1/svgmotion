@@ -71,10 +71,7 @@ export class Node {
         return this;
     }
     _attach(prev: Node, next: Node, parent: Parent) {
-        const { _start, _end, _parent } = this;
-        // if (_parent || _start._prev || _end._next) {
-        //     throw new Error(`Detach first`);
-        // }
+        const { _start, _end } = this;
         this._parent = parent;
         prev._link_next(_start);
         _end._link_next(next);
@@ -205,7 +202,7 @@ export class Parent extends Node {
 }
 
 export class End extends Node {
-    _parent: Parent;
+    override _parent: Parent;
     constructor(parent: Parent) {
         super();
         this._parent = this._prev = parent;

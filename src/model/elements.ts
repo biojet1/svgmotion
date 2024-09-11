@@ -93,7 +93,7 @@ export class Container extends Element {
 }
 
 export class ViewPort extends Container {
-    static tag = "svg";
+    static override tag = "svg";
     ///
     get x() {
         return this._new_field("x", new LengthXValue(0));
@@ -211,11 +211,11 @@ export abstract class Shape extends Element {
 }
 
 export class Group extends Container {
-    static tag = "g";
+    static override tag = "g";
 }
 
 export class Symbol extends Container {
-    static tag = "symbol";
+    static override tag = "symbol";
     ///
     get x() {
         return this._new_field("x", new LengthXValue(0));
@@ -275,7 +275,7 @@ export class Symbol extends Container {
 }
 
 export class Path extends Shape {
-    static tag = "path";
+    static override tag = "path";
     ///
     get d() {
         return this._new_field("d", new TextValue(""));
@@ -289,7 +289,7 @@ export class Path extends Shape {
 }
 
 export class Rect extends Shape {
-    static tag = "rect";
+    static override tag = "rect";
     ///
     get x() {
         return this._new_field("x", new LengthXValue(0));
@@ -384,7 +384,7 @@ class EllipseBase extends Shape {
 }
 
 export class Circle extends EllipseBase {
-    static tag = "circle";
+    static override tag = "circle";
     ///
     get r() {
         return this._new_field("r", new LengthValue(0));
@@ -403,7 +403,7 @@ export class Circle extends EllipseBase {
 }
 
 export class Ellipse extends EllipseBase {
-    static tag = "ellipse";
+    static override tag = "ellipse";
     /// rx
     get rx() {
         return this._new_field("rx", new LengthXValue(0));
@@ -430,7 +430,7 @@ export class Ellipse extends EllipseBase {
 }
 
 export class Line extends Shape {
-    static tag = "line";
+    static override tag = "line";
     /// x1
     get x1() {
         return this._new_field("x1", new LengthXValue(0));
@@ -480,7 +480,7 @@ class PointBase extends Shape {
 }
 
 export class Polyline extends PointBase {
-    static tag = "polyline";
+    static override tag = "polyline";
     ///
     override describe(frame: number) {
         const s = this.points.get_value(frame).map(v => `${v[0]},${v[1]}`).join(' ');
@@ -489,7 +489,7 @@ export class Polyline extends PointBase {
 }
 
 export class Polygon extends PointBase {
-    static tag = "polygon";
+    static override tag = "polygon";
     ///
     override describe(frame: number) {
         const s = this.points.get_value(frame).map(v => `${v[0]},${v[1]}`).join(' ');
@@ -498,7 +498,7 @@ export class Polygon extends PointBase {
 }
 
 export class Use extends Element {
-    static tag = "use";
+    static override tag = "use";
     ///
     get x() {
         return this._new_field("x", new LengthXValue(0));
@@ -537,7 +537,7 @@ export class Use extends Element {
 }
 
 export class Image extends Use {
-    static tag = "image";
+    static override tag = "image";
     //
     get fit_view() {
         return this._new_field("fit_view", new TextValue(""));
@@ -565,7 +565,7 @@ export class Image extends Use {
 
 
 export class Text extends Container {
-    static tag = "text";
+    static override tag = "text";
     get x() {
         return this._new_field("x", new LengthXValue(0));
     }
@@ -608,7 +608,7 @@ export class Text extends Container {
 }
 
 export class TSpan extends Text {
-    static tag = "tspan";
+    static override tag = "tspan";
 }
 
 export class Root extends Container {

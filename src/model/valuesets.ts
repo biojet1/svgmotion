@@ -56,8 +56,8 @@ export class ValueSet {
     _parent?: any;
     protected _new_field<T extends Animatable<any> | ValueSet>(name: string, value: T): T {
         const v = xget(this, name, value);
-        value._parent = this;
-        return value;
+        v._parent = this;
+        return v;
     }
 
     *enum_values(): Generator<Animatable<any>, void, unknown> {
@@ -599,27 +599,26 @@ export class Transform extends ValueSet {
         }
         throw new Error(``);
     }
-    get_origin(frame: number, origin: string) {
-        // https://drafts.csswg.org/css-transforms/#transform-origin-property
-        let [x, y = 'center', z = 0] = origin.split(/[\s,]+/);
-        const len = new RefBoxLength(this, frame);
-        return [x, y].map((v, i) => {
-            switch (v) {
-                case 'center':
-                    v = '50%'; break;
-                case 'left':
-                    v = '0%'; break;
-                case 'right':
-                    v = '100%'; break;
-                case 'top':
-                    v = '0%'; break;
-                case 'bottom':
-                    v = '100%'; break;
-            }
-            return len.parse_len(v, i > 0 ? "y" : "x")
-        });
-
-    }
+    // get_origin(frame: number, origin: string) {
+    //     // https://drafts.csswg.org/css-transforms/#transform-origin-property
+    //     let [x, y = 'center', _z = 0] = origin.split(/[\s,]+/);
+    //     const len = new RefBoxLength(this, frame);
+    //     return [x, y].map((v, i) => {
+    //         switch (v) {
+    //             case 'center':
+    //                 v = '50%'; break;
+    //             case 'left':
+    //                 v = '0%'; break;
+    //             case 'right':
+    //                 v = '100%'; break;
+    //             case 'top':
+    //                 v = '0%'; break;
+    //             case 'bottom':
+    //                 v = '100%'; break;
+    //         }
+    //         return len.parse_len(v, i > 0 ? "y" : "x")
+    //     });
+    // }
 }
 
 export class RefBoxLength extends CalcLength {
@@ -627,8 +626,9 @@ export class RefBoxLength extends CalcLength {
     constructor(transform: Transform, frame: number) {
         super();
         this.transform = transform;
+        this.frame = frame;
     }
-    get node() {
+    override  get node() {
         return xget(this, "node", get_element(this.transform));
     }
 
@@ -654,17 +654,17 @@ export class RefBoxLength extends CalcLength {
         }
         throw new Error(``);
     }
-    get relative_length_x(): number {
+    override   get relative_length_x(): number {
         return this.ref_box.width;
     }
-    get relative_length_y(): number {
+    override  get relative_length_y(): number {
         return this.ref_box.height;
     }
 }
 
 class OriginValue extends VectorValue {
     override parse_value(v: string): Vector {
-        let [x, y = 'center', z = 0] = v.split(/[\s,]+/);
+        let [x, y = 'center', _z = 0] = v.split(/[\s,]+/);
         const len = new RefBoxLength(get_parent(this, Transform), 0);
         return new Vector([x, y].map((v, i) => {
             switch (v) {
@@ -719,7 +719,7 @@ function find1<T>(
 }
 
 class MTranslate extends PositionValue {
-    get_repr(frame: number) {
+    override   get_repr(frame: number) {
         const [x, y] = this.get_value(frame);
         return `translate(${x} ${y})`;
     }
@@ -735,7 +735,7 @@ class MTranslate extends PositionValue {
 }
 
 class MScale extends VectorValue {
-    get_repr(frame: number) {
+    override  get_repr(frame: number) {
         const [x, y] = this.get_value(frame);
         return `scale(${x} ${y})`;
     }
@@ -751,7 +751,7 @@ class MScale extends VectorValue {
 }
 
 class MRotateAt extends VectorValue {
-    get_repr(frame: number) {
+    override  get_repr(frame: number) {
         const [a, x, y] = this.get_value(frame);
         if (x || y) {
             return `rotate(${a} ${x} ${y})`;
@@ -770,7 +770,7 @@ class MRotateAt extends VectorValue {
 }
 
 class MRotation extends ScalarValue {
-    get_repr(frame: number) {
+    override   get_repr(frame: number) {
         const a = this.get_value(frame);
         return `rotate(${a})`;
     }
@@ -786,7 +786,7 @@ class MRotation extends ScalarValue {
 }
 
 class MSkewX extends ScalarValue {
-    get_repr(frame: number) {
+    override  get_repr(frame: number) {
         const a = this.get_value(frame);
         return `skewX(${a})`;
     }
@@ -802,7 +802,7 @@ class MSkewX extends ScalarValue {
 }
 
 class MSkewY extends ScalarValue {
-    get_repr(frame: number) {
+    override get_repr(frame: number) {
         const a = this.get_value(frame);
         return `skewY(${a})`;
     }
@@ -818,7 +818,7 @@ class MSkewY extends ScalarValue {
 }
 
 export class MHexad extends VectorValue {
-    get_repr(frame: number) {
+    override get_repr(frame: number) {
         const [a, b, c, d, e, f] = this.get_value(frame);
         return `matrix(${a} ${b} ${c} ${d} ${e} ${f})`;
     }
