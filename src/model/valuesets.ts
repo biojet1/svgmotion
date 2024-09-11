@@ -364,14 +364,22 @@ export class Transform extends ValueSet {
     }
     cat_transform(frame: number, n: Matrix) {
         if (Object.hasOwn(this, "all")) {
-            return this.all.map((x) => x.cat_transform(frame, n));
+            const { all } = this;
+            if (Object.hasOwn(this, "origin")) {
+                const [x, y] = this.origin.get_value(frame);
+                n.cat_self(Matrix.translate(x, y));
+                for (const q of all) {
+                    q.cat_transform(frame, n)
+                }
+                n.cat_self(Matrix.translate(-x, -y))
+            } else {
+                all.map((x) => x.cat_transform(frame, n));
+            }
         }
     }
     get_transform(frame: number): Matrix {
         const m = MatrixMut.identity();
-        if (Object.hasOwn(this, "all")) {
-            this.all.map((x) => x.cat_transform(frame, m));
-        }
+        this.cat_transform(frame, m);
         return m;
     }
     ///

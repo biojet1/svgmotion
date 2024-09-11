@@ -476,8 +476,6 @@ LengthXValue.prototype.initial_value = function () {
     if (typeof value === "string") {
         if (_parent instanceof Element) {
             const cl = new ComputeLength(_parent, 0);
-            // cl.length_mode = 'w';
-            // console.log(`LengthWValue.prototype.initial_value ${value}`)
             return cl.parse_len(value, "x");
         }
     }
@@ -489,8 +487,6 @@ LengthYValue.prototype.initial_value = function () {
     if (typeof value === "string") {
         if (_parent instanceof Element) {
             const cl = new ComputeLength(_parent, 0);
-            // cl.length_mode = 'h';
-            // console.log(`LengthYValue.prototype.initial_value ${value}`)
             return cl.parse_len(value, "y");
         }
     }
@@ -502,8 +498,6 @@ FontSizeValue.prototype.initial_value = function () {
     if (typeof value === "string") {
         if (_parent instanceof Element) {
             const cl = new ComputeLength(_parent, 0);
-            // cl.length_mode = 'f';
-            // console.log(`LengthHValue.prototype.initial_value ${value}`)
             return cl.parse_len(value, 'f');
         }
     }

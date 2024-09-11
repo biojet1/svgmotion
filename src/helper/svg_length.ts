@@ -8,11 +8,7 @@ export class CalcLength {
     public get node(): Element {
         return this._node;
     }
-    frame!: number;
-    // constructor(node: Element, frame: number) {
-    //     // this.node = node;
-    //     // this.frame = frame;
-    // }
+    frame: number = 0;
 
     get font_size() {
         const n = this.node.get_font_size(this.frame);
@@ -86,7 +82,7 @@ export class CalcLength {
                             break;
                         }
                     default:
-                        throw Error(``);
+                        throw Error(`Unexpected dir ${dir}`);
                 }
                 if (n == undefined) {
                     throw Error(`No relative_length`);
@@ -163,8 +159,6 @@ export class CalcLength {
 
 export class ComputeLength extends CalcLength {
 
-    // length_mode: string | undefined;
-
     constructor(node: Element, frame: number) {
         super();
         this._node = node;
@@ -186,31 +180,5 @@ export class ComputeLength extends CalcLength {
         const { x, y } = this.node.get_vp_size(this.frame);
         const n = Math.hypot(x, y) / Math.sqrt(2)
         return xget(this, "relative_length", n);
-        // if (!this.length_mode) {
-        //     const { x, y } = this.node.get_vp_size(this.frame);
-        //     // const n = Math.sqrt((x ** 2 + y ** 2)c
-        //     // const n = Math.sqrt(((x + y) * (x + y) - 2 * x * y) / 2)
-        //     const n = Math.hypot(x, y) / Math.sqrt(2)
-        //     //  * Math.SQRT1_2
-        //     return xget(this, "relative_length", n);
-        // } else if (this.length_mode.startsWith("w")) {
-        //     const n = this.node.get_vp_size(this.frame).x;
-        //     return xget(this, "relative_length", n);
-        // } else if (this.length_mode.startsWith("h")) {
-        //     const n = this.node.get_vp_size(this.frame).y;
-        //     return xget(this, "relative_length", n);
-        // } else if (this.length_mode.startsWith("f")) {
-        //     const n = this.node.get_font_size(this.frame);
-        //     return xget(this, "relative_length", n);
-        // } else {
-        //     throw new Error(``);
-        // }
     }
 }
-
-
-// export class ComputeLengthBox extends ComputeLength {
-//     override get relative_length() {
-
-//     }
-// }
