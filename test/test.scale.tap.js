@@ -87,8 +87,11 @@ export function HeartBeat(parent, items, params) {
             const h = node.transform.prefix_hexad();
             let t = start;
             let s = times;
+            let bb = node.bounding_box(start);
+            const [cx, cy] = bb.center;
             let m0 = h.get_matrix(t);
-            let m1 = Matrix.scale(1.3).multiply(m0);
+            let m1 = Matrix.translate(cx, cy).scale(1.3).translate(-cx, -cy).multiply(m0);
+            // let m1 = Matrix.scale(1.3).multiply(m0);
             h.set_matrix(t, m0, { start });
             for (; s-- > 0;) {
                 // console.log(`set_matrix t=${t} ${start}-${end}`);

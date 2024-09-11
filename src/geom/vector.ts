@@ -95,7 +95,7 @@ export class Vector extends Float64Array {
             while (1) {
                 if (a.done && b.done) {
                     return true;
-                } else if (!b.done && (epsilon ? close_enough(a.value, b.value, epsilon) : (a.value == b.value))) {
+                } else if (!b.done && !a.done && (epsilon ? close_enough(a.value, b.value, epsilon) : (a.value == b.value))) {
                     a = A.next();
                     b = B.next();
                 } else {

@@ -81,6 +81,15 @@ export class Container extends Element {
             x.update_bbox(bbox, frame, m)
         }
     }
+    override object_bbox(frame: number) {
+        const bb = BoundingBox.not();
+        for (const x of this.children<Element>()) {
+            const m = x.transform_under(frame, this);
+            x.update_bbox(bb, frame, m);
+        }
+        return bb;
+    }
+
 }
 
 export class ViewPort extends Container {
@@ -536,7 +545,24 @@ export class Image extends Use {
     set fit_view(v: TextValue) {
         this._new_field("fit_view", v);
     }
+    //
+
+    //
+    override object_bbox(frame: number): BoundingBox {
+        const width = this.width.get_value(frame);
+        const height = this.height.get_value(frame);
+        const left = this.x.get_value(frame);
+        const top = this.y.get_value(frame);
+        return BoundingBox.rect(left, top, width, height);
+    }
+    override update_bbox(bbox: BoundingBox, frame: number, m?: Matrix) {
+        let w = this.transform.get_transform(frame);
+        const bb = this.object_bbox(frame);
+        m = m ? m.cat(w) : w;
+        bbox.merge_self(bb.transform(m));
+    }
 }
+
 
 export class Text extends Container {
     static tag = "text";

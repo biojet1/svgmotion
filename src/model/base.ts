@@ -41,7 +41,7 @@ export class Element extends Parent {
         this.update_bbox(bb, frame, m);
         return bb
     }
-    object_bbox(frame: number, m?: Matrix) {
+    object_bbox(frame: number) {
         const bb = BoundingBox.not();
         // TODO:
         return bb

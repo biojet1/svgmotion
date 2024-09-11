@@ -4,6 +4,7 @@ import { FontSizeValue, LengthValue } from "./base.js";
 import { VectorValue, ScalarValue, PositionValue, RGBValue, TextValue, PercentageValue } from "./value.js";
 import { PlainValue, Animatable } from "./value.js";
 import { Element } from "./base.js";
+import { CalcLength } from "../helper/svg_length.js";
 export function xget<T>(that: any, name: string, value: T): T {
     // console.log(`_GETX ${name}`);
     Object.defineProperty(that, name, {
@@ -24,11 +25,38 @@ export function xset<T>(that: any, name: string, value: T) {
     });
 }
 
+function find_parent<T>(
+    that: Animatable<any> | ValueSet,
+    K: { new(...args: any[]): T }
+): T | void {
+    let o = that;
+    while (o = o._parent) {
+        if (o instanceof K) {
+            return o;
+        }
+    }
+}
+
+function get_parent<T>(
+    that: Animatable<any> | ValueSet,
+    K: { new(...args: any[]): T }
+): T {
+    const n = find_parent(that, K)
+    if (n) {
+        return n;
+    }
+    throw new Error(`not found ${K.name}`);
+}
+
+function get_element(that: Animatable<any> | ValueSet): Element {
+    return get_parent(that, Element)
+}
+
 export class ValueSet {
     _parent?: any;
     protected _new_field<T extends Animatable<any> | ValueSet>(name: string, value: T): T {
         const v = xget(this, name, value);
-        value._parent = this._parent;
+        value._parent = this;
         return value;
     }
 
@@ -355,17 +383,17 @@ export class Transform extends ValueSet {
     }
     ///
     get box() {
-        return xget(this, "box", new TextValue('view-box'));
+        return this._new_field("box", new TextValue('view-box'));
     }
     set box(v: TextValue) {
-        xset(this, "box", v);
+        this._new_field("box", v);
     }
     ///
     get origin() {
-        return xget(this, "origin", new TextValue('50% 50%'));
+        return this._new_field("origin", new OriginValue([0, 0]));
     }
-    set origin(v: TextValue) {
-        xset(this, "origin", v);
+    set origin(v: OriginValue) {
+        this._new_field("origin", v);
     }
     ///
     add_translate(x: number = 0, y: number = 0) {
@@ -554,19 +582,17 @@ export class Transform extends ValueSet {
             switch (this.box.get_value(frame)) {
                 case "view-box":
                     {
-                        const { _parent } = this;
-                        if (_parent instanceof Element) {
-                            const [w, h] = _parent.get_vp_size(frame);
-                            BoundingBox.rect(0, 0, w, h);
-                        }
-                        break;
+                        const [w, h] = get_element(this).get_vp_size(frame);
+                        return BoundingBox.rect(0, 0, w, h);
+
                     }
                 case "content-box":
                 case "border-box":
                 case "fill-box":
                 case "stroke-box":
-
-
+                    {
+                        return get_element(this).object_bbox(frame);
+                    }
 
             }
 
@@ -576,26 +602,86 @@ export class Transform extends ValueSet {
     get_origin(frame: number, origin: string) {
         // https://drafts.csswg.org/css-transforms/#transform-origin-property
         let [x, y = 'center', z = 0] = origin.split(/[\s,]+/);
-        [x, y] = [x, y].map(v => {
+        const len = new RefBoxLength(this, frame);
+        return [x, y].map((v, i) => {
             switch (v) {
                 case 'center':
-                    return '50%';
+                    v = '50%'; break;
                 case 'left':
-                    return '0%';
+                    v = '0%'; break;
                 case 'right':
-                    return '100%';
+                    v = '100%'; break;
                 case 'top':
-                    return '0%';
+                    v = '0%'; break;
                 case 'bottom':
-                    return '100%';
+                    v = '100%'; break;
             }
-            return v;
+            return len.parse_len(v, i > 0 ? "y" : "x")
         });
 
-        if (x.endsWith('%')) {
-            x.replaceAll('%', '')
-        }
+    }
+}
 
+export class RefBoxLength extends CalcLength {
+    transform: Transform;
+    constructor(transform: Transform, frame: number) {
+        super();
+        this.transform = transform;
+    }
+    get node() {
+        return xget(this, "node", get_element(this.transform));
+    }
+
+    get ref_box() {
+        const that = this.transform;
+
+        if (Object.hasOwn(that, "box")) {
+            const { frame } = this;
+            switch (that.box.get_value(frame)) {
+                case "view-box":
+                    {
+                        const [w, h] = this.node.get_vp_size(frame);
+                        return xget(this, "ref_box", BoundingBox.rect(0, 0, w, h));
+                    }
+                case "content-box":
+                case "border-box":
+                case "fill-box":
+                case "stroke-box":
+                    {
+                        return xget(this, "ref_box", this.node.object_bbox(frame));
+                    }
+            }
+        }
+        throw new Error(``);
+    }
+    get relative_length_x(): number {
+        return this.ref_box.width;
+    }
+    get relative_length_y(): number {
+        return this.ref_box.height;
+    }
+}
+
+class OriginValue extends VectorValue {
+    override parse_value(v: string): Vector {
+        let [x, y = 'center', z = 0] = v.split(/[\s,]+/);
+        const len = new RefBoxLength(get_parent(this, Transform), 0);
+        return new Vector([x, y].map((v, i) => {
+            switch (v) {
+                case 'center':
+                    v = '50%'; break;
+                case 'left':
+                    v = '0%'; break;
+                case 'right':
+                    v = '100%'; break;
+                case 'top':
+                    v = '0%'; break;
+                case 'bottom':
+                    v = '100%'; break;
+            }
+            return len.parse_len(v, i > 0 ? "y" : "x")
+        }));
+        // return super.parse_value(v);
     }
 }
 

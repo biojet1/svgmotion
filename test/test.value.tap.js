@@ -137,7 +137,7 @@ test.test("Transform", (t) => {
     t.throws(() => x.set_parse_transform("skewU(-7)"));
     {
         x = new Transform();
-        x.origin.set_value("center center");
+        x.origin.set_repr("center center");
         t.same(x.dump(), { origin: { v: "center center" } });
     }
     {
@@ -166,7 +166,7 @@ test.test("Transform", (t) => {
     }
     {
         x = new Transform();
-        x.origin.set_value("right top");
+        x.origin.set_repr("right top");
         x.add_rotate(-30, -4, -5)
         t.same(x.dump(), {
             origin: { v: "right top" }, all: [
@@ -178,7 +178,7 @@ test.test("Transform", (t) => {
     }
     {
         x = new Transform();
-        x.origin.set_value("left bottom");
+        x.origin.set_repr("left bottom");
         x.box.set_value("content-box");
         x.add_rotate(-30, -4, -5)
         t.same(x.dump(), {
