@@ -21,7 +21,10 @@ function load_properties(that: Element, props: { [key: string]: PlainValue<any> 
                     (that as any)[k] = v;
                     break;
                 default:
-                    // (that as any)[k] = new TextValue(v);
+                    if (k.startsWith("data-")) {
+                        (that as any)[k] = new TextValue(v as any as string);
+                        return;
+                    }
                     throw new Error(`Unexpected property "${k}" (${v})`);
             }
         }

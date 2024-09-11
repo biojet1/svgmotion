@@ -158,6 +158,8 @@ function update_dom(frame: number, target: Element) {
                     const f = PROP_MAP[n];
                     if (f) {
                         f(frame, elem, v, target);
+                    } else if (n.startsWith("data-")) {
+                        // TODO
                     } else {
                         throw new Error(`Unexpected property ${n}`);
                     }

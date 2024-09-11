@@ -172,7 +172,8 @@ Element.prototype.set_attribute = function (name: string, value: string): Elemen
         case "paint-order":
             break;
         default:
-            if (name === "*") {
+
+            if (name.startsWith("data-")) {
                 (this as any)[name] = new UnknownValue(value);
                 return this;
             }

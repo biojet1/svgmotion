@@ -97,12 +97,16 @@ test.test("parse_svg", async (t) => {
     // anim.at(0).run(Rel(0).to(ts.dx, -50).at(1).to(ts.dx, 50));
     // anim.calc_time_range();
     // console.dir(c, { depth: 100 })
-    // const im = anim.view.add_image(g);
-    // const src = `/mnt/C1/media/Tabby_cat_with_blue_eyes-3336579.jpg`;
-    // await im.image_blob(src);
-    // im.x.set_value(5);
-    // im.y.set_value(5);
+    // {
+    //     const im = anim.view.add_image(g);
+    //     const src = `/mnt/C1/media/Tabby_cat_with_blue_eyes-3336579.jpg`;
+    //     await im.image_blob(src);
+    //     im.href.set_value(`file://${src}`);
+    //     im.x.set_value(5);
+    //     im.y.set_value(5);
+    // }
     // console.dir(im.href, { depth: 100 })
+    anim.save_json('/tmp/parse1.json')
     anim.save_html('/tmp/parse1.html');
     t.end();
 });

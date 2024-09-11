@@ -271,7 +271,13 @@ export class Matrix {
 	skew(x: number, y: number) {
 		return this._cat(Matrix.matrix(1, tan(radians(y)), tan(radians(x)), 1, 0, 0));
 	}
+	skew_x(deg: number) {
+		return this.skew(deg, 0);
+	}
 
+	skew_y(deg: number) {
+		return this.skew(0, deg);
+	}
 	skewX(deg: number) {
 		return this.skew(deg, 0);
 	}
@@ -423,6 +429,7 @@ export class Matrix {
 	static skewX(x: number) {
 		return this.skew(x, 0);
 	}
+
 	static skewY(y: number) {
 		return this.skew(0, y);
 	}

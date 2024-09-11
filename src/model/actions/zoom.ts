@@ -1,9 +1,9 @@
-import { BoundingBox, Vector } from "../geom/index.js";
-import { Element } from "./base.js";
-import { ViewPort } from "./elements.js";
-import { Track } from "../track/index.js";
-import { Proxy } from "../track/action.js";
-import { KeyExtra } from "../keyframe/keyframe.js";
+import { BoundingBox, Vector } from "../../geom/index.js";
+import { Element } from "../base.js";
+import { ViewPort } from "../elements.js";
+import { Track } from "../../track/index.js";
+import { Proxy } from "../../track/action.js";
+import { KeyExtra } from "../../keyframe/keyframe.js";
 
 export interface BoxParams extends KeyExtra {
     center: Vector;

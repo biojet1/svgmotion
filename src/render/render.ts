@@ -1,7 +1,8 @@
 import { Browser, BrowserLaunchArgumentOptions, LaunchOptions, ScreenshotOptions, launch } from "puppeteer";
 import { Root } from "../model/elements.js";
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { Writable } from 'stream';
+import { tmpdir } from "node:os";
 import fs from "node:fs/promises";
 import { ffcmd, VideoOutParams } from "./ffmpeg.js";
 import { spawn, StdioOptions } from 'child_process';
@@ -28,19 +29,17 @@ export async function render_root(root: Root, {
     puppeteer_options, browser, video_params = {}, sink,
     bgcolor, fps
 }: RenderParams) {
-
-
     if (!browser) {
         if (!puppeteer_options) {
             puppeteer_options = {
-                args: ["--no-sandbox", "--disable-setuid-sandbox"],
+                args: ["--no-sandbox", "--disable-setuid-sandbox", "--allow-file-access-from-files", "--disable-web-security", '--enable-local-file-accesses'],
                 timeout: 10000,
+                //  headless: false,
+                userDataDir: '/tmp'
             };
         }
         browser = await launch(puppeteer_options);
     }
-
-
 
     const [start, end] = root.calc_time_range();
     const frames = end - start;
@@ -68,17 +67,30 @@ export async function render_root(root: Root, {
             height = H;
         }
     }
+    width = Math.floor(width);
+    height = Math.floor(height);
     root.view.id = 'root';
     root.view.width.value = width;
     root.view.height.value = height;
+
+    if (!uri) {
+        uri = pathToFileURL(`${tmpdir()}/anim.html`).toString();
+    }
+
     try {
 
         const page = await browser.newPage();
-        await page.setContent(
-            `<!DOCTYPE html><html><head><meta charset="UTF-8">`
+        const data = `<!DOCTYPE html><html><head><meta charset="UTF-8">`
             + `<style>*{box-sizing:border-box;margin:0;padding:0}body{background:0 0;overflow:hidden}</style>`
             + `<script>${await fs.readFile(fileURLToPath(import.meta.resolve("../svgmotion.web.js")))}</script>`
-            + `</head><body></body></html>`);
+            + `</head><body></body></html>`
+
+        if (uri) {
+            await fs.writeFile(fileURLToPath(uri), data);
+            await page.goto(uri);
+        } else {
+            await page.setContent(data);
+        }
 
         await page.evaluate(`const root = svgmotion.from_json(${JSON.stringify(root.dump())});`
             + `const svg = root.to_dom(document);`
