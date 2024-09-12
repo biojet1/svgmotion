@@ -1,7 +1,7 @@
 "uses strict";
 import test from "tap";
 import { Matrix, Vector, BoundingBox, Root, Rel, ZoomTo, Pass, Easing, AlignTo } from "svgmotion";
-
+import * as svgmo from "svgmotion";
 export function ScaleOut(parent, items, params) {
     let { dur, ...extra } = params ?? {};
     return function (track) {
@@ -204,6 +204,8 @@ test.test("load_svg the_quick", async (t) => {
     let dog = view.get_group("dog");
     let fox = view.get_group("fox");
     let quick = view.get_group("quick");
+    let jumps = view.get_group("jumps");
+    let brown = view.get_group("brown");
     let lazy = view.get_group("lazy");
     let bb = view.bbox_of(0, dog, the);
     // console.log(bb.dump_rect());
@@ -211,9 +213,12 @@ test.test("load_svg the_quick", async (t) => {
     const tr = anim.at(0);
     // tr.run(Pass(1))
     // tr.run(ZoomTo(view, [lazy, dog]))
+
     tr.run(ScaleOut(view, [dog, fox], { easing: Easing.linear }))
     tr.sub().run(HeartBeat(view, [lazy]));
     tr.sub().run(StretchOut(view, [quick]));
+    tr.sub().run(svgmo.ScaleOut(jumps));
+    tr.sub().run(svgmo.ScaleIn(brown));
 
     // tr.run(ZoomTo(view, [the, dog], { easing: Easing.outexpo }))
     tr.run(Pass(1))

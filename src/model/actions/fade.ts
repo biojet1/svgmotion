@@ -3,8 +3,8 @@ import { Track } from "../../track/index.js";
 import { Proxy } from "../../track/action.js";
 import { KeyExtra } from "../../keyframe/keyframe.js";
 
-export function FadeOut(items: Element[], params: KeyExtra & { dur: number }): Proxy {
-    let { dur, ...extra } = params ?? {};
+export function FadeOut(items: Element[], params: KeyExtra & { dur?: number } = {}): Proxy {
+    let { dur, ...extra } = params;
     return function (track: Track) {
         let _dur = dur == undefined ? undefined : track.to_frame(dur);
         function supply(that: Track) {
@@ -23,8 +23,8 @@ export function FadeOut(items: Element[], params: KeyExtra & { dur: number }): P
     };
 }
 
-export function FadeIn(items: Element[], params: KeyExtra & { dur: number }): Proxy {
-    let { dur, ...extra } = params ?? {};
+export function FadeIn(items: Element[], params: KeyExtra & { dur?: number } = {}): Proxy {
+    let { dur, ...extra } = params;
     return function (track: Track) {
         let _dur = dur == undefined ? undefined : track.to_frame(dur);
         function supply(that: Track) {

@@ -1,8 +1,7 @@
 "uses strict";
 import test from "tap";
-import { SVGDocument, XMLSerializer } from "domspec";
-import { Vector, RGB, Root, Rel } from "svgmotion";
-import { Matrix, BoundingBox, ZoomTo, Pass, Easing, AlignTo } from "svgmotion";
+import { Root, Rel } from "svgmotion";
+import { Matrix, BoundingBox, Pass, Easing } from "svgmotion";
 import * as svgm from "svgmotion";
 
 export function StretchOut(parent, items, params) {
@@ -94,7 +93,6 @@ test.test("parse_svg", async (t) => {
     const imvp = anim.get_view("imvp");
     const p = imvp.view_box.position;
     const g = imvp.g_wrap();
-    // g.transform.add_skewx(50)
 
     {
         const bb = imvp.bounding_box(0);
@@ -103,7 +101,6 @@ test.test("parse_svg", async (t) => {
         r1.y.set_value(bb.top);
         r1.width.set_value(bb.width);
         r1.height.set_value(bb.height);
-
     }
 
     tr.run(Rel(0).by(p, [0, 0])
@@ -115,10 +112,11 @@ test.test("parse_svg", async (t) => {
     tr.run(StretchOut(anim.view, [g]))
 
     tr.run(Pass(0.4));
-    tr.run(svgm.FadeIn([g]))
+    tr.run(svgm.FadeIn([g], { easing: Easing.inoutexpo }))
     tr.run(Rel(1).by(p, [200, 200]));
     tr.run(svgm.FadeOut([g]));
     tr.run(Pass(0.4));
+
     anim.save_json('/tmp/image.json')
     anim.save_html('/tmp/image.html');
     t.end();

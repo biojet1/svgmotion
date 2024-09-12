@@ -51,7 +51,6 @@ export function ZoomTo(view: ViewPort, items: Element[], params: KeyExtra & { du
                     b2 = b2.inflated(margin);
                 }
             }
-
             const { start, end } = supply;
             const { left, top, width, height } = b2;
             size.key_value(end, new Vector([width, height]), { start, ...extra });
@@ -68,11 +67,8 @@ export function ZoomTo(view: ViewPort, items: Element[], params: KeyExtra & { du
                     x.update_bbox(bb, frame, x.transform_under(frame, view));
                 }
             }
-            if (_dur == undefined) {
-                _dur = hint_dur;
-            }
             supply.start = frame;
-            supply.end = frame + _dur;
+            supply.end = frame + (_dur ?? (_dur = hint_dur));
             return supply
         };
     };

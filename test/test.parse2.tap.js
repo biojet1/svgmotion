@@ -1,6 +1,6 @@
 "uses strict";
 import test from "tap";
-import { Vector, RGB, Root, Rel, ZoomTo, Pass, Easing, AlignTo } from "svgmotion";
+import { Root, Rel, ZoomTo, Pass, Easing, AlignTo } from "svgmotion";
 
 test.test("load_svg the_quick", async (t) => {
     const anim = new Root();
@@ -38,7 +38,10 @@ test.test("load_svg the_quick", async (t) => {
     tr.run(ZoomTo(view, [bbo]))
     tr.run(AlignTo(view, fox, [the, dog], { v: 'bb', easing: Easing.inoutback }))
 
-    tr.run(Rel(0.5).by(view.view_box.position, [100, 0]).at(1).by(view.view_box.position, [-100, 0]))
+    {
+        tr.run(Rel(0.5).by(view.view_box.position, [100, 0]).at(1).by(view.view_box.position, [-100, 0]))
+    }
+
 
 
 

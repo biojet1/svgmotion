@@ -145,6 +145,20 @@ const PROP_MAP: {
     word_spacing: function (frame: number, node: SVGRectElement | SVGEllipseElement, prop: TextValue) {
         node.setAttribute("word-spacing", prop.get_repr(frame));
     },
+    shape_rendering: function (frame: number, node: SVGRectElement | SVGEllipseElement, prop: TextValue) {
+        node.setAttribute("shape-rendering", prop.get_repr(frame));
+    },
+    color_rendering: function (frame: number, node: SVGRectElement | SVGEllipseElement, prop: TextValue) {
+        node.setAttribute("color-rendering", prop.get_repr(frame));
+    },
+    text_rendering: function (frame: number, node: SVGRectElement | SVGEllipseElement, prop: TextValue) {
+        node.setAttribute("text-rendering", prop.get_repr(frame));
+    },
+    color_interpolation: function (frame: number, node: SVGRectElement | SVGEllipseElement, prop: TextValue) {
+        node.setAttribute("color-rendering", prop.get_repr(frame));
+    },
+
+
 };
 
 function update_dom(frame: number, target: Element) {

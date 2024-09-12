@@ -1,9 +1,8 @@
 import { Matrix } from "../../geom/index.js";
-import { Element } from "../base.js";
-import { Container, ViewPort } from "../elements.js";
-import { Track } from "../../track/index.js";
-import { Proxy } from "../../track/action.js";
+import { Track, Proxy } from "../../track/index.js";
 import { KeyExtra } from "../../keyframe/keyframe.js";
+import { Element } from "../base.js";
+import { Container } from "../elements.js";
 
 export interface AlignParams {
     hgap?: number;
@@ -57,8 +56,6 @@ function align_to(frame: number, end: number, parent: Container, ref: Element, i
         }
     }
 
-
-
     function transalte_of(arg: Element): [number, number] {
         let x = 0; // current x translate
         let y = 0; // current y translate
@@ -109,8 +106,8 @@ function align_to(frame: number, end: number, parent: Container, ref: Element, i
         const [x, y] = transalte_of(arg);
         translate(arg, x, y);
     }
-
 }
+
 export function AlignTo(parent: Container, ref: Element, items: Element[], params: KeyExtra & { dur: number } & AlignParams): Proxy {
     let { dur, ...extra } = params ?? {};
     return function (track: Track) {
@@ -122,12 +119,8 @@ export function AlignTo(parent: Container, ref: Element, items: Element[], param
         supply.start = -Infinity;
         supply.end = -Infinity;
         return function (frame: number, base_frame: number, hint_dur: number) {
-
-            if (_dur == undefined) {
-                _dur = hint_dur;
-            }
             supply.start = frame;
-            supply.end = frame + _dur;
+            supply.end = frame + (_dur ?? (_dur = hint_dur));
             return supply
         };
     };
