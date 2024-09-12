@@ -1,5 +1,6 @@
 import { xget } from "../model/valuesets.js";
 import { Element } from "../model/base.js";
+import { BoundingBox } from "../lib.js";
 const BOTH_MATCH =
     /^\s*(([-+]?[0-9]+(\.[0-9]*)?|[-+]?\.[0-9]+)([eE][-+]?[0-9]+)?)\s*(in|pt|px|mm|cm|m|km|Q|pc|yd|ft||%|em|ex|ch|rem|vw|vh|vmin|vmax|deg|grad|rad|turn|s|ms|Hz|kHz|dpi|dpcm|dppx)\s*$/i;
 
@@ -210,3 +211,30 @@ export class ComputeLength extends CalcLength {
         return xget(this, "relative_length", n);
     }
 }
+export class BoxLength extends CalcLength {
+    get ref_box(): BoundingBox {
+        throw new Error(`Not implemented`);
+    }
+    override get relative_length_x(): number {
+        return xget(this, "relative_length_x", this.ref_box.width);
+    }
+    override get relative_length_y(): number {
+        return xget(this, "relative_length_y", this.ref_box.height);
+    }
+    override get relative_min_x(): number {
+        return xget(this, "relative_min_x", this.ref_box.min_x);
+    }
+    override get relative_min_y(): number {
+        return xget(this, "relative_min_y", this.ref_box.min_y);
+    }
+    get_anchor(anchor?: [number | string, number | string]) {
+        const a = anchor ?? ['center', 'center'];
+        return a.map((v, i) => {
+            if (typeof v === "number") {
+                return v;
+            }
+            return this.parse_len(v, i > 0 ? "y" : "x");
+        });
+    }
+}
+

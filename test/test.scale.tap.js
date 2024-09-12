@@ -2,128 +2,7 @@
 import test from "tap";
 import { Matrix, Vector, BoundingBox, Root, Rel, ZoomTo, Pass, Easing, AlignTo } from "svgmotion";
 import * as svgmo from "svgmotion";
-export function ScaleOut(parent, items, params) {
-    let { dur, ...extra } = params ?? {};
-    return function (track) {
-        let _dur = dur == undefined ? undefined : track.to_frame(dur);
-        let bb = BoundingBox.not();
-        let sx = 0.1;
-        let sy = 0.1;
-        let rot = 300;
 
-        function scale(node, t, start, end) {
-            const p = node.transform_under(start, parent);
-            const h = node.transform.prefix_hexad();
-            const u = h.get_matrix(start)
-            h.set_matrix(end, p.inverse().cat(t).cat(p).cat(u), { start, ...extra })
-        }
-
-        function supply(that) {
-            const { start, end } = supply;
-            const [cx, cy] = bb.center;
-            let m = Matrix.translate(cx, cy)
-            m = m.rotate(rot);
-            m = m.scale(sx, sy);
-            m = m.translate(-cx, -cy);
-            for (const e of items) {
-                if (e instanceof BoundingBox) {
-                    //
-                } else {
-                    scale(e, m, start, end)
-                }
-            }
-
-        };
-        supply.start = -Infinity;
-        supply.end = -Infinity;
-        return function (frame, base_frame, hint_dur) {
-            if (_dur == undefined) {
-                _dur = hint_dur;
-            }
-            bb = BoundingBox.not();
-            for (const x of items) {
-                if (x instanceof BoundingBox) {
-                    bb.merge_self(x);
-                } else {
-                    x.update_bbox(bb, frame, x.transform_under(frame, parent));
-                }
-            }
-
-            supply.start = frame;
-            supply.end = frame + _dur;
-            return supply
-        };
-    };
-}
-
-export function StretchOut(parent, items, params) {
-    let { dur, ...extra } = params ?? {};
-    return function (track) {
-        let _dur = dur == undefined ? undefined : track.to_frame(dur);
-        let bb = BoundingBox.not();
-        let sx = 0.1;
-        let sy = 0.1;
-        let rot = 300;
-        const speed = track.to_frame(0.5);
-        const times = 3;
-        dur = 2 * speed * times;
-        // let m0 = Matrix.identity();
-        // console.log(`HeartBeat ${speed} ${times}`);
-        function beat(node, start, end) {
-            const h = node.transform.prefix_hexad();
-            let t = start;
-            let s = times;
-            let bb = node.bounding_box(start);
-            let op = node.opacity
-            const { center_x: cx, bottom: cy, height: H, width: W } = bb;
-            let m0 = h.get_matrix(t);
-            // let m1 = Matrix.translate(cx, cy).scale(1, 2).translate(-cx, -cy).multiply(m0);
-            // let m2 = Matrix.translate(0, -H * .8).translate(cx, cy).scale(1, 2).translate(-cx, -cy).multiply(m0);
-            // let m3 = Matrix.translate(0, -H * 1.6).translate(cx, cy).scale(1, 1).translate(-cx, -cy).multiply(m0);
-
-            let m2 = Matrix.translate(W, 0).translate(cx, cy).skew(60, 0).translate(-cx, -cy).multiply(m0);
-            let m3 = Matrix.translate(W * 2, 0).translate(cx, cy).skew(0, 0).translate(-cx, -cy).multiply(m0);
-
-
-            h.set_matrix(t, m0, { start });
-            op.key_value(t, 1, { start });
-            // for (; s-- > 0;) {
-            // console.log(`set_matrix t=${t} ${start}-${end}`);
-            // h.set_matrix(t += speed, m1, { easing: Easing.inexpo });
-
-
-            h.set_matrix(t += speed, m2, { easing: Easing.inexpo });
-            h.set_matrix(t += speed, m3, { easing: Easing.outexpo });
-            op.key_value(t, 0, { easing: Easing.inoutexpo });
-
-            // }
-            // if (t !== end) {
-            //     console.log(`Beat end ${t} ${end}`);
-            // }
-        }
-
-        function supply(that) {
-            const { start, end } = supply;
-            for (const e of items) {
-                if (e instanceof BoundingBox) {
-                    //
-                } else {
-                    beat(e, start, end)
-                }
-            }
-        };
-        supply.start = -Infinity;
-        supply.end = -Infinity;
-        return function (frame, base_frame, hint_dur) {
-            if (_dur == undefined) {
-                _dur = hint_dur;
-            }
-            supply.start = frame;
-            supply.end = frame + dur;
-            return supply
-        };
-    };
-}
 
 export function HeartBeat(parent, items, params) {
     let { dur, ...extra } = params ?? {};
@@ -200,9 +79,9 @@ test.test("load_svg the_quick", async (t) => {
     // tr.run(Pass(1))
     // tr.run(ZoomTo(view, [lazy, dog]))
 
-    tr.run(ScaleOut(view, [dog, fox], { easing: Easing.linear }))
+    tr.run(svgmo.ScaleOut([dog, fox], { easing: Easing.linear, parent: view }))
     tr.sub().run(HeartBeat(view, [lazy]));
-    tr.sub().run(StretchOut(view, [quick]));
+    tr.sub().run(svgmo.StretchOut([quick]));
     tr.sub().run(svgmo.ScaleOut(jumps, { anchor: ['left', 'center'] }));
     tr.sub().run(svgmo.ScaleIn(brown));
 

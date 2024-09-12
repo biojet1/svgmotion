@@ -4,7 +4,7 @@ import { FontSizeValue, LengthValue } from "./base.js";
 import { VectorValue, ScalarValue, PositionValue, RGBValue, TextValue, PercentageValue } from "./value.js";
 import { PlainValue, Animatable } from "./value.js";
 import { Element } from "./base.js";
-import { CalcLength } from "../helper/svg_length.js";
+import { BoxLength, CalcLength } from "../helper/svg_length.js";
 export function xget<T>(that: any, name: string, value: T): T {
     // console.log(`_GETX ${name}`);
     Object.defineProperty(that, name, {
@@ -586,87 +586,36 @@ export class Transform extends ValueSet {
     }
     //
     ref_box(frame: number) {
-        if (Object.hasOwn(this, "box")) {
-            switch (this.box.get_value(frame)) {
-                case "view-box":
-                    {
-                        const [w, h] = get_element(this).get_vp_size(frame);
-                        return BoundingBox.rect(0, 0, w, h);
-
-                    }
-                case "content-box":
-                case "border-box":
-                case "fill-box":
-                case "stroke-box":
-                    {
-                        return get_element(this).object_bbox(frame);
-                    }
-
-            }
-
+        const a = Object.hasOwn(this, "box") ? this.box.get_value(frame) : "";
+        switch (a) {
+            case "":
+            case "view-box":
+                {
+                    const [w, h] = get_element(this).get_vp_size(frame);
+                    return BoundingBox.rect(0, 0, w, h);
+                }
+            case "content-box":
+            case "border-box":
+            case "fill-box":
+            case "stroke-box":
+                return get_element(this).object_bbox(frame);
         }
         throw new Error(``);
     }
-    // get_origin(frame: number, origin: string) {
-    //     // https://drafts.csswg.org/css-transforms/#transform-origin-property
-    //     let [x, y = 'center', _z = 0] = origin.split(/[\s,]+/);
-    //     const len = new RefBoxLength(this, frame);
-    //     return [x, y].map((v, i) => {
-    //         switch (v) {
-    //             case 'center':
-    //                 v = '50%'; break;
-    //             case 'left':
-    //                 v = '0%'; break;
-    //             case 'right':
-    //                 v = '100%'; break;
-    //             case 'top':
-    //                 v = '0%'; break;
-    //             case 'bottom':
-    //                 v = '100%'; break;
-    //         }
-    //         return len.parse_len(v, i > 0 ? "y" : "x")
-    //     });
-    // }
 }
 
-export class RefBoxLength extends CalcLength {
+export class RefBoxLength extends BoxLength {
     transform: Transform;
     constructor(transform: Transform, frame: number) {
         super();
         this.transform = transform;
         this.frame = frame;
     }
-    override  get node() {
+    override get node() {
         return xget(this, "node", get_element(this.transform));
     }
-
-    get ref_box() {
-        const that = this.transform;
-
-        if (Object.hasOwn(that, "box")) {
-            const { frame } = this;
-            switch (that.box.get_value(frame)) {
-                case "view-box":
-                    {
-                        const [w, h] = this.node.get_vp_size(frame);
-                        return xget(this, "ref_box", BoundingBox.rect(0, 0, w, h));
-                    }
-                case "content-box":
-                case "border-box":
-                case "fill-box":
-                case "stroke-box":
-                    {
-                        return xget(this, "ref_box", this.node.object_bbox(frame));
-                    }
-            }
-        }
-        throw new Error(``);
-    }
-    override   get relative_length_x(): number {
-        return this.ref_box.width;
-    }
-    override  get relative_length_y(): number {
-        return this.ref_box.height;
+    override get ref_box() {
+        return xget(this, "ref_box", this.transform.ref_box(this.frame));
     }
 }
 
