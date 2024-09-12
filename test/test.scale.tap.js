@@ -72,6 +72,8 @@ test.test("load_svg the_quick", async (t) => {
     let jumps = view.get_group("jumps");
     let brown = view.get_group("brown");
     let lazy = view.get_group("lazy");
+    let the2 = view.get_group("the");
+    let over = view.get_group("over");
     let bb = view.bbox_of(0, dog, the);
     // console.log(bb.dump_rect());
 
@@ -84,7 +86,9 @@ test.test("load_svg the_quick", async (t) => {
     tr.sub().run(svgmo.StretchOut([quick]));
     tr.sub().run(svgmo.ScaleOut(jumps, { anchor: ['left', 'center'] }));
     tr.sub().run(svgmo.ScaleIn(brown));
-
+    tr.sub().run(svgmo.Bounce(the2, { mode: 'out' }));
+    tr.sub().run(svgmo.Bounce(over, { mode: 'in' }));
+    tr.sub().run(svgmo.Bounce(the, { mode: '' }));
     // tr.run(ZoomTo(view, [the, dog], { easing: Easing.outexpo }))
     tr.run(Pass(1))
     view.shape_rendering.set_value("geometricPrecision")

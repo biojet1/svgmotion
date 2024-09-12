@@ -7,3 +7,4 @@ export * from './actions/align.js';
 export * from './actions/fade.js';
 export * from './actions/scale.js';
 export * from './actions/stretch.js';
+export * from './actions/bounce.js';

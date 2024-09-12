@@ -40,7 +40,7 @@ test.test("parse_svg", async (t) => {
         .at(3).by(p, [0, 100])
     );
 
-    tr.run(svgm.StretchOut(g, { dir: "bottom" }))
+    tr.run(svgm.StretchOut(g, { dir: "down" }))
 
     tr.run(Pass(0.4));
     tr.run(svgm.FadeIn([g], { easing: Easing.inoutexpo }))

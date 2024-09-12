@@ -38,11 +38,10 @@ export function StretchOut(items: Element[] | Element, params: StretchParams = {
             let mSB: Matrix = Matrix.identity();
             //
             switch (dir) {
-                case "top": {
+                case "up": {
 
                 }
-                case "bottom": {
-                    // dir = "bottom";
+                case "down": {
                     const d = bb.height;
                     mTA = Matrix.translate(0, d);
                     mTB = Matrix.translate(0, d * 2);
@@ -65,8 +64,8 @@ export function StretchOut(items: Element[] | Element, params: StretchParams = {
                 const { skew } = params;
                 if (skew) {
                     switch (dir) {
-                        case "top":
-                        case "bottom": {
+                        case "up":
+                        case "down": {
                             mSA = Matrix.skew(0, skew);
                             mSB = Matrix.skew(0, 0);
                             break;
@@ -89,13 +88,11 @@ export function StretchOut(items: Element[] | Element, params: StretchParams = {
                         default: {
                             mSA = Matrix.scale(scale, 1);
                             mSB = Matrix.scale(0, 1);
-                            // mSB =  Matrix.translate(cx, bb.center_y).cat(mSA).translate(-cx, -cy)
                             break;
                         }
                     }
                 }
             }
-
             //
             let m2 = mTA.translate(cx, cy).cat(mSA).translate(-cx, -cy).multiply(m0);
             let m3 = mTB.translate(cx, cy).cat(mSB).translate(-cx, -cy).multiply(m0);
@@ -116,7 +113,6 @@ export function StretchOut(items: Element[] | Element, params: StretchParams = {
             } else {
                 for (const e of nodes) {
                     apply(e, start, end);
-
                 }
             }
         };
