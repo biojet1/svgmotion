@@ -125,20 +125,6 @@ export function StretchOut(parent, items, params) {
     };
 }
 
-// function HeartBeat(shape, opt) {
-//     const speed = 0.2;
-//     return new TweenA(
-//         [shape],
-//         [
-//             {scale: 1, t: 0, fillOpacity: 1, fill: null, ease: 'sine.inOut'},
-//             {scale: 1.3, dur: speed, fillOpacity: 0.5, fill: 'red', ease: 'sine.inOut'},
-//             {scale: 1, dur: speed, fillOpacity: 1, fill: 'pink', ease: 'sine.inOut'},
-//             {scale: 1.3, dur: speed, fillOpacity: 0.5, fill: 'red', ease: 'sine.inOut'},
-//             {scale: 1, dur: speed, fillOpacity: 1, fill: null, ease: 'sine.inOut'},
-//         ]
-//     );
-// }
-
 export function HeartBeat(parent, items, params) {
     let { dur, ...extra } = params ?? {};
     return function (track) {
@@ -217,7 +203,7 @@ test.test("load_svg the_quick", async (t) => {
     tr.run(ScaleOut(view, [dog, fox], { easing: Easing.linear }))
     tr.sub().run(HeartBeat(view, [lazy]));
     tr.sub().run(StretchOut(view, [quick]));
-    tr.sub().run(svgmo.ScaleOut(jumps));
+    tr.sub().run(svgmo.ScaleOut(jumps, { anchor: ['left', 'center'] }));
     tr.sub().run(svgmo.ScaleIn(brown));
 
     // tr.run(ZoomTo(view, [the, dog], { easing: Easing.outexpo }))

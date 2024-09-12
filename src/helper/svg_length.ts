@@ -1,4 +1,4 @@
-import { xget } from "../model/index.js";
+import { xget } from "../model/valuesets.js";
 import { Element } from "../model/base.js";
 const BOTH_MATCH =
     /^\s*(([-+]?[0-9]+(\.[0-9]*)?|[-+]?\.[0-9]+)([eE][-+]?[0-9]+)?)\s*(in|pt|px|mm|cm|m|km|Q|pc|yd|ft||%|em|ex|ch|rem|vw|vh|vmin|vmax|deg|grad|rad|turn|s|ms|Hz|kHz|dpi|dpcm|dppx)\s*$/i;
@@ -38,6 +38,12 @@ export class CalcLength {
     get relative_length_y(): number {
         throw new Error(`Not implemented`)
     }
+    get relative_min_x(): number {
+        return xget(this, "relative_min_x", 0);
+    }
+    get relative_min_y(): number {
+        return xget(this, "relative_min_y", 0);
+    }
     get relative_length_f(): number {
         throw new Error(`Not implemented`)
     }
@@ -51,44 +57,66 @@ export class CalcLength {
             const n = this._parse(num, suf, dir);
             // console.log(`parse_svg_length OK ${value} ${n} [${this.node.constructor.name}]`);
             return n;
+        } else {
+            switch (value) {
+                case 'center':
+                    return this._parse(50, '%', dir);
+                case 'left':
+                    return this._parse(0, '%', dir);
+                case 'right':
+                    return this._parse(100, '%', dir);
+                case 'top':
+                    return this._parse(0, '%', dir);
+                case 'bottom':
+                    return this._parse(100, '%', dir);
+            }
         }
+
         console.log(`Unexpected length "${value}" ${this.node.id}`);
         return 0;
         // throw new Error(`Unexpected length "${value}"`);
     }
-    protected _parse(amount: number, units: string | undefined, dir?: string) {
+    protected _parse(amount: number, units: string | undefined, dir?: string): number {
         switch (units) {
             case "%": {
                 let n: number;
+                let o: number = 0;
                 switch (dir) {
                     case undefined:
-                        {
-                            n = this.relative_length;
-                            break;
-                        }
+
+                        n = this.relative_length;
+                        break;
+
                     case 'x':
-                        {
-                            n = this.relative_length_x;
-                            break;
-                        }
+
+                        n = this.relative_length_x;
+                        o = this.relative_min_x
+                        break;
+
                     case 'y':
-                        {
-                            n = this.relative_length_y;
-                            break;
-                        }
+
+                        n = this.relative_length_y;
+                        o = this.relative_min_y;
+                        break;
+
                     case 'f':
-                        {
-                            n = this.relative_length_f;
-                            break;
-                        }
+
+                        n = this.relative_length_f;
+                        break;
+
                     default:
                         throw Error(`Unexpected dir ${dir}`);
                 }
                 if (n == undefined) {
                     throw Error(`No relative_length`);
                 }
-                return amount * n / 100.0;
+                return o + (amount * n / 100.0);
             }
+
+
+
+
+
             case "mm": {
                 return amount * this.ppi * 0.0393701
             }
