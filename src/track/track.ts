@@ -49,6 +49,7 @@ export class Track implements Steppable {
             I += D;
         }
         this.end_frame = I;
+        return this;
     }
     sub(offset: number = 0) {
         const tr = new Track();
@@ -96,7 +97,6 @@ export class Track implements Steppable {
     check_stepper<U>(stepper: Stepper<U>) {
         return stepper;
     }
-
 }
 
 function feed(track: Track, cur: Resolver, frame: number, base_frame: number) {

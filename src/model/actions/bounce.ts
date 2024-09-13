@@ -1,4 +1,3 @@
-import { BoundingBox, Matrix } from "../../geom/index.js";
 import { Easing, Track } from "../../track/index.js";
 import { Proxy } from "../../track/action.js";
 import { KeyExtra } from "../../keyframe/keyframe.js";
@@ -12,8 +11,8 @@ export interface BounceParams extends KeyExtra {
     times?: number;
     dur?: number;
     dist?: number;
-    // ease1?: EaseFun;
-    // ease2?: EaseFun;
+    ease1?: Easing;
+    ease2?: Easing;
 }
 
 export function Bounce(items: Element[] | Element, params: BounceParams = {}): Proxy {
@@ -26,11 +25,8 @@ export function Bounce(items: Element[] | Element, params: BounceParams = {}): P
         const anims = times * 2 + (show || hide ? 1 : 0);
         // const speed = _speed == null ? Math.max(1 / anims, 3 / FPS) : _speed / anims;
         const speed = dur ? Math.ceil(track.to_frame(dur / anims)) : Math.max(Math.ceil(track.frame_rate / anims), 3);
-
-        const ease0 = Easing.outquad;
-        const ease1 = Easing.inquad;
-
-        let bb = BoundingBox.not();
+        const ease0 = params.ease1 ?? Easing.outquad;
+        const ease1 = params.ease2 ?? Easing.inquad;
 
         function apply(node: Element, start: number, end: number) {
             const h = node.transform.prefix_hexad();
@@ -71,19 +67,66 @@ export function Bounce(items: Element[] | Element, params: BounceParams = {}): P
                 node.opacity.key_value(e, 0, { easing: ease0, start: t });
             }
             //
-
-
         }
 
         function supply(that: Track) {
             const { start, end } = supply;
-            // if (bb.is_valid()) {
-            //     throw new Error(`Todo`)
-            // } else {
             for (const e of nodes) {
                 apply(e, start, end);
             }
-            // }
+        };
+        supply.start = -Infinity;
+        supply.end = -Infinity;
+        return function (frame: number, base_frame: number, hint_dur: number) {
+            supply.start = frame;
+            supply.end = frame + (anims * speed);
+            return supply
+        };
+    };
+}
+
+export function Pulsate(items: Element[] | Element, params: BounceParams = {}): Proxy {
+    const nodes = Array.isArray(items) ? items : [items];
+    return function (track: Track) {
+        let { mode = 'show', times = 5, dur, ...extra } = params;
+        const show = mode === 'show' || mode === 'in';
+        const hide = mode === 'hide' || mode === 'out';
+        const anims = times * 2 + (show || hide ? 1 : 0);
+        // const speed = _speed == null ? Math.max(1 / anims, 3 / FPS) : _speed / anims;
+        const speed = dur ? Math.ceil(track.to_frame(dur / anims)) : Math.max(Math.ceil(track.frame_rate / anims), 3);
+        const ease1 = params.ease1 ?? Easing.outexpo;
+        const ease2 = params.ease2 ?? Easing.inexpo;
+
+        function apply(node: Element, start: number, end: number) {
+            const steps: any[] = [];
+            let animateTo = show ? 1 : 0;
+            let i = 1;
+            let t = start;
+            if (animateTo == 0) {
+                node.opacity.key_value(t, 1);
+            } else {
+                node.opacity.key_value(t, 0);
+            }
+            for (; i < anims; i++) {
+                if (animateTo == 0) {
+                    node.opacity.key_value(t += speed, 0, { easing: ease1 });
+                    // steps.push({ dur: speed, ease: ease1, opacity: 0 });
+                } else {
+                    // steps.push({ dur: speed, ease: ease2, opacity: 1 });
+                    node.opacity.key_value(t += speed, 1, { easing: ease2 });
+                }
+                animateTo = 1 - animateTo;
+            }
+            // steps.push({ dur: speed, ease: ease2, opacity: animateTo });
+            node.opacity.key_value(t += speed, animateTo, { easing: ease2 });
+            // yield Tween(nodes, steps).with({ t: 0 });
+        }
+
+        function supply(that: Track) {
+            const { start, end } = supply;
+            for (const e of nodes) {
+                apply(e, start, end);
+            }
         };
         supply.start = -Infinity;
         supply.end = -Infinity;

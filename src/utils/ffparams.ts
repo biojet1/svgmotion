@@ -31,10 +31,10 @@ interface FFCommand {
 	input?: Input | Iterable<Input> | string;
 	graph?: Iterable<FilterChain>;
 	output?: Output | Iterable<Output> | string;
-	filterComplexScript?: (g: string) => string;
+	filter_complex_script?: (g: string) => string;
 }
 
-export function ffGraph(fg: Iterable<FilterChain>) {
+export function ff_graph(fg: Iterable<FilterChain>) {
 	function* link(fc: FilterChain) {
 		const { input, output, filters } = fc;
 		if (input) {
@@ -79,7 +79,7 @@ export function ffGraph(fg: Iterable<FilterChain>) {
 	return Array.from(fg, (fc) => Array.from(link(fc)).join('')).join(';');
 }
 
-export function* flattenArgs(
+export function* flatten_args(
 	args: Iterable<string | [string, Value] | string[]> | { [key: string]: Value },
 ) {
 	for (const v of Array.isArray(args) ? args : Object.entries(args)) {
@@ -108,7 +108,7 @@ export function* flattenArgs(
 	}
 }
 
-export function ffParams(opt: FFCommand): Array<string> {
+export function ff_params(opt: FFCommand): Array<string> {
 	function* checkInput<V>(src: V | string | Iterable<V | string>): IterableIterator<V> {
 		switch (typeof src) {
 			case 'function':
@@ -131,19 +131,19 @@ export function ffParams(opt: FFCommand): Array<string> {
 		}
 	} // inputs
 	function* collect() {
-		const { input, output, graph, bin, args, filterComplexScript } = opt;
+		const { input, output, graph, bin, args, filter_complex_script } = opt;
 		if (bin) {
 			yield bin;
 		}
 		if (args) {
-			yield* flattenArgs(args);
+			yield* flatten_args(args);
 		}
 		if (input) {
 			const inputs = Array.from(checkInput<Input>(input));
 			for (const v of inputs) {
 				const { path, loop, args } = v;
 				if (args) {
-					yield* flattenArgs(args);
+					yield* flatten_args(args);
 				}
 				if (loop && (loop > 1 || loop < 0)) {
 					yield '-stream_loop';
@@ -156,11 +156,11 @@ export function ffParams(opt: FFCommand): Array<string> {
 			}
 		}
 		if (graph) {
-			const g = ffGraph(graph);
+			const g = ff_graph(graph);
 			if (g) {
-				if (filterComplexScript) {
+				if (filter_complex_script) {
 					yield '-filter_complex_script';
-					yield filterComplexScript(g);
+					yield filter_complex_script(g);
 				} else {
 					yield '-filter_complex';
 					yield g;
@@ -172,7 +172,7 @@ export function ffParams(opt: FFCommand): Array<string> {
 			for (const v of outputs) {
 				const { path, args } = v;
 				if (args) {
-					yield* flattenArgs(args);
+					yield* flatten_args(args);
 				}
 				if (path) {
 					yield path;

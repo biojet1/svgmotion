@@ -31,8 +31,8 @@ export class ElementAndBBoxLength extends BoxLength {
     private _bbox: any;
     constructor(node: Element, frame: number, bbox: BoundingBox) {
         super();
-        this._node = node;
         this.frame = frame;
+        this._node = node;
         this._bbox = bbox;
     }
     override get ref_box() {
@@ -45,12 +45,10 @@ export function ScaleOut(items: Element[] | Element, params: ScaleParams = {}): 
     const nodes = Array.isArray(items) ? items : [items];
     return function (track: Track) {
         let _dur = dur == undefined ? undefined : track.to_frame(dur);
-
         let sx = 0.001;
         let sy = 0.001;
         function supply(that: Track) {
             const { start, end } = supply;
-
             function* each() {
                 if (parent) {
                     let bb = BoundingBox.not();
@@ -98,7 +96,6 @@ export function ScaleOut(items: Element[] | Element, params: ScaleParams = {}): 
                     h.set_matrix(end, m.cat(u), { start, easing: Easing.inexpo, ...extra })
                 }
             }
-
         };
         supply.start = -Infinity;
         supply.end = -Infinity;

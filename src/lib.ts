@@ -11,6 +11,8 @@ export * from "./helper/parse_color.js";
 export * from "./helper/find_node.js";
 export * from "./helper/update_dom.js";
 export * from "./helper/image.js";
+export * from "./tts/watsontts.js";
+export * from "./tts/gtts.js";
 import { Root } from "./model/elements.js";
 declare module "./model/elements" {
     interface Root {

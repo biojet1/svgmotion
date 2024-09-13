@@ -42,12 +42,13 @@
   "devDependencies": {
     "@types/probe-image-size": "^7.2.5",
     "@types/yargs": "^17.0.32",
+    "ibm-watson": "^9.1.0",
     "typescript": "^5.4.3",
     "webpack": "^5.91.0",
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
-    "domspec": "https://github.com/biojet1/domspec/tarball/release",
+    "domspec": "github:biojet1/domspec#release",
     "probe-image-size": "^7.2.3",
     "puppeteer": "^22.6.0",
     "tap": "^18.7.1",

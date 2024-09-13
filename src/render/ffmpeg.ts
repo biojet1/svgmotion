@@ -1,4 +1,4 @@
-import { ffParams, Output, Input } from "./ffparams.js";
+import { ff_params, Output, Input } from "../utils/ffparams.js";
 
 
 export interface VideoOutParams {
@@ -100,7 +100,7 @@ export async function ffcmd(
         ],
         path: '-'
     }
-    return ffParams({
+    return ff_params({
         bin: 'ffmpeg',
         args: ['-hide_banner',
             '-v', 'warning',

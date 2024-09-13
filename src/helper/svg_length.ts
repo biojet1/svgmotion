@@ -1,6 +1,7 @@
+import { BoundingBox } from "../geom/index.js";
 import { xget } from "../model/valuesets.js";
 import { Element } from "../model/base.js";
-import { BoundingBox } from "../lib.js";
+
 const BOTH_MATCH =
     /^\s*(([-+]?[0-9]+(\.[0-9]*)?|[-+]?\.[0-9]+)([eE][-+]?[0-9]+)?)\s*(in|pt|px|mm|cm|m|km|Q|pc|yd|ft||%|em|ex|ch|rem|vw|vh|vmin|vmax|deg|grad|rad|turn|s|ms|Hz|kHz|dpi|dpcm|dppx)\s*$/i;
 
@@ -10,7 +11,6 @@ export class CalcLength {
         return this._node;
     }
     frame: number = 0;
-
     get font_size() {
         const n = this.node.get_font_size(this.frame);
         if (!isFinite(n) || n <= 0) {
@@ -25,7 +25,6 @@ export class CalcLength {
         const n = this.node.get_vp_width(this.frame);
         return xget(this, "vw", n);
     }
-
     get vh() {
         const n = this.node.get_vp_height(this.frame);
         return xget(this, "vh", n);
@@ -72,7 +71,6 @@ export class CalcLength {
                     return this._parse(100, '%', dir);
             }
         }
-
         console.log(`Unexpected length "${value}" ${this.node.id}`);
         return 0;
         // throw new Error(`Unexpected length "${value}"`);
@@ -83,28 +81,20 @@ export class CalcLength {
                 let n: number;
                 let o: number = 0;
                 switch (dir) {
-                    case undefined:
-
-                        n = this.relative_length;
-                        break;
-
                     case 'x':
-
                         n = this.relative_length_x;
                         o = this.relative_min_x
                         break;
-
                     case 'y':
-
                         n = this.relative_length_y;
                         o = this.relative_min_y;
                         break;
-
                     case 'f':
-
                         n = this.relative_length_f;
                         break;
-
+                    case undefined:
+                        n = this.relative_length;
+                        break;
                     default:
                         throw Error(`Unexpected dir ${dir}`);
                 }
@@ -113,20 +103,12 @@ export class CalcLength {
                 }
                 return o + (amount * n / 100.0);
             }
-
-
-
-
-
-            case "mm": {
-                return amount * this.ppi * 0.0393701
-            }
-            case "cm": {
-                return amount * this.ppi * 0.393701
-            }
-            case "in": {
+            case "mm":
+                return amount * this.ppi * 0.0393701;
+            case "cm":
+                return amount * this.ppi * 0.393701;
+            case "in":
                 return amount * this.ppi;
-            }
             case "vw": {
                 const { vw } = this;
                 if (vw == undefined) {
@@ -155,12 +137,10 @@ export class CalcLength {
                 }
                 return amount * Math.max(vw, vh) / 100.0
             }
-            case "pt": {
+            case "pt":
                 return amount * 4.0 / 3.0
-            }
-            case "pc": {
+            case "pc":
                 return amount * 16.0
-            }
             case "em": {
                 const { font_size } = this;
                 if (font_size == undefined) {
@@ -177,17 +157,14 @@ export class CalcLength {
             // }
             case undefined:
             case "px":
-            case "": {
+            case "":
                 return amount
-            }
         }
         throw Error(`Unexpected unit "${units}"`);
     }
-
 }
 
 export class ComputeLength extends CalcLength {
-
     constructor(node: Element, frame: number) {
         super();
         this._node = node;
@@ -211,6 +188,7 @@ export class ComputeLength extends CalcLength {
         return xget(this, "relative_length", n);
     }
 }
+
 export class BoxLength extends CalcLength {
     get ref_box(): BoundingBox {
         throw new Error(`Not implemented`);
@@ -237,4 +215,3 @@ export class BoxLength extends CalcLength {
         });
     }
 }
-

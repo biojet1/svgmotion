@@ -82,13 +82,15 @@ test.test("load_svg the_quick", async (t) => {
     // tr.run(ZoomTo(view, [lazy, dog]))
 
     tr.run(svgmo.ScaleOut([dog, fox], { easing: Easing.linear, parent: view }))
-    tr.sub().run(HeartBeat(view, [lazy]));
+    tr.sub().run(HeartBeat(view, [lazy])).run(svgmo.Pulsate(the, { mode: '' }));
     tr.sub().run(svgmo.StretchOut([quick]));
     tr.sub().run(svgmo.ScaleOut(jumps, { anchor: ['left', 'center'] }));
     tr.sub().run(svgmo.ScaleIn(brown));
     tr.sub().run(svgmo.Bounce(the2, { mode: 'out' }));
     tr.sub().run(svgmo.Bounce(over, { mode: 'in' }));
     tr.sub().run(svgmo.Bounce(the, { mode: '' }));
+
+
     // tr.run(ZoomTo(view, [the, dog], { easing: Easing.outexpo }))
     tr.run(Pass(1))
     view.shape_rendering.set_value("geometricPrecision")
