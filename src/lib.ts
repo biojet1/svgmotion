@@ -13,6 +13,8 @@ export * from "./helper/update_dom.js";
 export * from "./helper/image.js";
 export * from "./tts/watsontts.js";
 export * from "./tts/gtts.js";
+export * from './model/actions/audio.js';
+
 import { Root } from "./model/elements.js";
 declare module "./model/elements" {
     interface Root {

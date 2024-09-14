@@ -1,7 +1,7 @@
 import { Track } from "../../track/index.js";
 import { Proxy } from "../../track/action.js";
-import { AudioEntry, cut_duration_of } from "../../utils/audio.js";
 import { Root } from "../elements.js";
+import { AudioEntry, cut_duration_of } from "../../utils/audio.js";
 
 export function Audio(src: string | AudioEntry, opt?: AudioEntry): Proxy {
     return function (track: Track) {

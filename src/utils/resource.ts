@@ -2,9 +2,33 @@
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
+
 export class Resource {
 
-    get_cache_dir() {
+    protected _new_field<T>(name: string, value: T): T {
+        Object.defineProperty(this, name, {
+            value,
+            writable: true,
+            enumerable: true,
+            configurable: true,
+        });
+        return value;
+    }
+
+    protected _get_file(dir: string, k: string, sub?: string): string {
+        let file;
+        if (sub) {
+            file = path.join(dir, sub, k);
+        } else {
+            file = path.join(dir, k);
+        }
+        if (file) {
+            return file;
+        }
+        throw new Error(`No file ${k}`);
+    }
+
+    get cache_dir() {
         for (const dir of (function* () {
             const { env, cwd } = process;
             yield env[`CACHE_DIR`] ?? '';
@@ -14,38 +38,39 @@ export class Resource {
             if (dir) {
                 fs.mkdirSync(dir, { recursive: true });
                 if (fs.existsSync(dir)) {
-                    return dir;
+                    return this._new_field("cache_dir", dir);
                 }
             }
         }
         throw new Error(`No cache dir`);
     }
 
-    get cache_dir() {
-        const value = this.get_cache_dir();
-        Object.defineProperty(this, "cache_dir", {
-            value,
-            writable: true,
-            enumerable: true,
-            configurable: true,
-        });
-        return value;
+    get build_dir() {
+        for (const dir of (function* () {
+            const { env, cwd } = process;
+            yield env[`BUILD_DIR`] ?? '';
+            yield path.join(os.tmpdir(), 'build');
+            yield cwd();
+        })()) {
+            if (dir) {
+                fs.mkdirSync(dir, { recursive: true });
+                if (fs.existsSync(dir)) {
+                    return this._new_field("build_dir", dir);
+                }
+            }
+        }
+        throw new Error(`No cache dir`);
     }
 
     get_cache_file(k: string, sub?: string): string {
-        let { cache_dir } = this;
-        let dir, file;
-        if (sub) {
-            file = path.join(cache_dir, sub, k);
-        } else {
-            file = path.join(cache_dir, k);
-        }
-        if (file) {
-            return file;
-        }
-        throw new Error(`cache file ${k}`);
+        let { cache_dir: dir } = this;
+        return this._get_file(dir, k, sub);
     }
 
+    get_build_file(k: string, sub?: string): string {
+        let { build_dir: dir } = this;
+        return this._get_file(dir, k, sub);
+    }
 }
 
 export abstract class Sluggable {

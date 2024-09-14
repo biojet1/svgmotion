@@ -37,6 +37,7 @@ export async function ffcmd(
     {
         // verbosity > 0 && console.dir({ input, graph, audioMix }, { depth: 7 });
         if (audio_mix && audio_mix.streams && audio_mix.streams.length > 0) {
+            console.dir(audio_mix);
             audio_graph(audio_mix, duration, input, graph);
             if (output_params.acodec) {
                 output_params.acodec = 'aac';
@@ -116,7 +117,12 @@ export async function ffcmd(
         path: output_file
 
     }
-
+    function fcs(g: string) {
+        const res = new Resource();
+        const file = res.get_build_file(`fcs.txt`);
+        writeFileSync(file, g);
+        return file;
+    }
 
     return ff_params({
         bin: 'ffmpeg',
@@ -124,6 +130,9 @@ export async function ffcmd(
             '-v', 'warning',
             '-stats',
             '-y'],
-        output, input
+        filter_complex_script: fcs,
+        output, input, graph
     });
 }
+import { createWriteStream, writeFileSync, WriteStream } from 'fs';
+import { Resource } from "../utils/resource.js";

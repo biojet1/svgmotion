@@ -298,4 +298,4 @@ export function audio_graph(
     return filters;
 }
 import { FilterChain, Input } from './ffparams.js';
-import { spawnSync } from 'child_process';
+import { spawnSync } from 'node:child_process';

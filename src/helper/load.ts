@@ -92,7 +92,7 @@ export function from_json(src: PlainRoot) {
 }
 
 Root.prototype.load = function (src: PlainRoot) {
-    const { version, view, defs, frame_rate } = src;
+    const { version, view, defs, frame_rate, sounds } = src;
     if (!version) {
         throw new Error("No version {${Object.keys(src)}}");
     } else if (!/^\d+\.\d+\.\d+$/.test(version)) {
@@ -108,6 +108,9 @@ Root.prototype.load = function (src: PlainRoot) {
     }
     this.version = version;
     this.defs = {};
+    if (sounds) {
+        this.sounds = sounds;
+    }
     this.set_view(vp);
     if (defs) {
         Object.entries(defs).map(([k, v]) => {
