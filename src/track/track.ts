@@ -51,16 +51,16 @@ export class Track implements Steppable {
         this.end_frame = I;
         return this;
     }
-    sub(offset: number = 0) {
-        const tr = new Track();
-        tr.frame_rate = this.frame_rate;
-        tr.hint_dur = this.hint_dur;
-        tr.easing = this.easing;
-        tr.end_frame = this.end_frame;
-        tr.steppers = this.steppers;
-        tr.start_frame = this.start_frame;
-        tr.end_frame = this.end_frame + this.to_frame(offset);
-        return tr;
+
+    clone(): this {
+        const copy = new (this.constructor as typeof Track)();
+        Object.assign(copy, this);
+        return copy as this;
+    }
+    sub(offset: number = 0): this {
+        const that = this.clone();
+        that.end_frame = this.end_frame + this.to_frame(offset);
+        return that;
     }
     pass(sec: number) {
         this.end_frame += this.to_frame(sec);

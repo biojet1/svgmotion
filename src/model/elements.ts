@@ -5,6 +5,7 @@ import { Keyframe } from "../keyframe/keyframe.js";
 import { Element, LengthYValue, LengthXValue, TextData, LengthValue } from "./base.js";
 import { Animatable, PointsValue, PositionValue, TextValue } from "./value.js";
 import { ViewBox, ValueSet, xget, xset } from "./valuesets.js";
+import { AudioEntry } from "../utils/audio.js";
 
 export interface PlainNode {
     tag: string;
@@ -16,6 +17,7 @@ export interface PlainRoot {
     view: PlainNode;
     defs: { [key: string]: PlainNode };
     frame_rate: number;
+    sounds?: AudioEntry[];
 }
 
 export class Container extends Element {
@@ -611,12 +613,26 @@ export class TSpan extends Text {
     static override tag = "tspan";
 }
 
+export class AnimTrack extends Track {
+    root!: Root;
+
+}
+
+export class Asset {
+    id?: string;
+}
+
+export class FileAsset extends Asset {
+    src?: string;
+}
+
 export class Root extends Container {
     defs: { [key: string]: Element } = {};
     all: { [key: string]: Element } = {};
     frame_rate: number = 60;
     version: string = "0.0.1";
     working_dir?: string;
+    sounds: AudioEntry[] = [];
     // view
     get view() {
         let x = this.first_child();
@@ -649,12 +665,13 @@ export class Root extends Container {
     }
     //
     get track() {
-        const tr = new Track();
+        const tr = new AnimTrack();
         tr.frame_rate = this.frame_rate;
         tr.hint_dur = 1 * this.frame_rate;
+        tr.root = this;
         return xget(this, "track", tr);
     }
-    set track(v: Track) {
+    set track(v: AnimTrack) {
         xset(this, "track", v)
     }
 }

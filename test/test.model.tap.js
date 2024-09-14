@@ -1,7 +1,20 @@
 "uses strict";
 import test from "tap";
 
-import { ScalarValue, Rect, Transform } from "svgmotion";
+import { ScalarValue, Rect, Transform, Track } from "svgmotion";
+
+class Track2 extends Track {
+
+}
+
+test.test("Track2", (t) => {
+    let x = new Track2();
+
+    t.ok(x.sub() instanceof Track2);
+
+    t.end();
+
+});
 
 test.test("Keyframe", (t) => {
     let x = new Rect();

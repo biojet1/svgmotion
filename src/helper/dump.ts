@@ -56,10 +56,10 @@ Element.prototype.dump = function (): PlainNode {
 }
 
 Root.prototype.dump = function (): PlainRoot {
-    const { version, view, defs, frame_rate } = this;
+    const { version, view, defs, frame_rate, sounds } = this;
     return {
         version, frame_rate,
-        view: view.dump(),
+        view: view.dump(), sounds,
         defs: Object.fromEntries(
             Object.entries(defs).map(([k, v]) => [k, v.dump()])
         ),

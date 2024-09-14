@@ -95,6 +95,12 @@ test.test("load_svg the_quick", async (t) => {
     tr.run(Pass(1))
     view.shape_rendering.set_value("geometricPrecision")
     view.color_rendering.set_value("optimizeQuality")
+    {
+        const trc = tr.clone();
+        t.ok(tr.root === anim);
+        t.ok(trc.root === anim);
+        t.not(trc === tr);
+    }
 
     anim.save_json('/tmp/scale.json')
     anim.save_html('/tmp/scale.html');

@@ -6,6 +6,7 @@ import { tmpdir } from "node:os";
 import fs from "node:fs/promises";
 import { ffcmd, VideoOutParams } from "./ffmpeg.js";
 import { spawn, StdioOptions } from 'child_process';
+import { AudioMix } from "../utils/audio.js";
 
 interface RenderParams {
     uri?: string,
@@ -44,6 +45,7 @@ export async function render_root(root: Root, {
     const [start, end] = root.calc_time_range();
     const frames = end - start;
     const frame_rate = root.frame_rate;
+    const duration = frames / frame_rate;
     const view = root.view;
     const W = view.width.get_value(0);
     const H = view.height.get_value(0);
@@ -112,7 +114,8 @@ export async function render_root(root: Root, {
 
         // SINK ////////////////
         if (!sink) {
-            let ffproc = await ffcmd(fps, [width, height], false, output, { lossless: true, ...video_params }).then((cmd) => {
+            const audio_mix: AudioMix = { output_filters: [], streams: root.sounds };
+            let ffproc = await ffcmd(fps, [width, height], duration, false, audio_mix, output, { lossless: true, ...video_params }).then((cmd) => {
                 let [bin, ...args] = cmd;
                 console.log(`${bin} `, ...args);
                 return spawn(bin, args, {

@@ -1,4 +1,5 @@
-import { ff_params, Output, Input } from "../utils/ffparams.js";
+import { audio_graph, AudioMix } from "../utils/audio.js";
+import { ff_params, Output, Input, FilterChain } from "../utils/ffparams.js";
 
 
 export interface VideoOutParams {
@@ -15,12 +16,33 @@ export interface VideoOutParams {
 export async function ffcmd(
     fps: number,
     size: [number, number],
+    duration: number,
     alpha: boolean,
+    audio_mix: AudioMix | null,
     output_file: string,
     output_params: VideoOutParams,
     input_params: any = {},
 ) {
-
+    let graph = new Array<FilterChain>();
+    let input: Input[] = [{
+        args: [
+            ['f', 'image2pipe'],
+            ['s', `${size[0]}x${size[1]}`],
+            ['vcodec', 'png'],
+            ['r', `${fps}`],
+            '-an',
+        ],
+        path: '-'
+    }]
+    {
+        // verbosity > 0 && console.dir({ input, graph, audioMix }, { depth: 7 });
+        if (audio_mix && audio_mix.streams && audio_mix.streams.length > 0) {
+            audio_graph(audio_mix, duration, input, graph);
+            if (output_params.acodec) {
+                output_params.acodec = 'aac';
+            }
+        }
+    }
     let output: Output = {
         args: Array.from(
             (function* () {
@@ -82,24 +104,20 @@ export async function ffcmd(
                 }
 
                 if (pix_fmt) yield ['pix_fmt', pix_fmt];
+
                 // if (tune) yield ['tune', tune];
                 // if (bitrate) yield ['b', bitrate];
                 // if (threads) yield ['threads', threads];
+                if (acodec) {
+                    yield ['acodec', acodec];
+                }
             })()
         ),
         path: output_file
 
     }
-    let input: Input = {
-        args: [
-            ['f', 'image2pipe'],
-            ['s', `${size[0]}x${size[1]}`],
-            ['vcodec', 'png'],
-            ['r', `${fps}`],
-            '-an',
-        ],
-        path: '-'
-    }
+
+
     return ff_params({
         bin: 'ffmpeg',
         args: ['-hide_banner',

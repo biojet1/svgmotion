@@ -1,4 +1,5 @@
 export type AudioEntry = {
+    ref?: string;
     path?: string;
     duration?: number; // full duration of this audio
     start?: number; // global playtime in seconds
@@ -6,7 +7,7 @@ export type AudioEntry = {
     cut_to?: number; // end offset in seconds in audio (defaults to full duration)
     loop?: number; // repeat many times
     anchor?: number; // shifts the playtime in seconds
-    mixVolume?: number;
+    mix_volume?: number;
     volume?: string;
     _tag?: string;
     track?: string;
@@ -17,22 +18,23 @@ export type AudioEntry = {
 
 type Track = {
     name?: number;
-    mixVolume?: number;
+    mix_volume?: number;
 };
 
 type AudioNorm = {
-    gaussSize?: number;
-    maxGain?: number;
+    gauss_size?: number;
+    max_gain?: number;
 };
-export interface MixOption {
+
+export interface AudioMix {
     streams?: AudioEntry[] | false;
-    outputFilters: any[];
-    audioNorm?: AudioNorm;
-    outputVolume?: number;
+    output_filters: any[];
+    audio_norm?: AudioNorm;
+    output_volume?: number;
     normalize?: boolean;
-    fadeOut?: { duration: number; curve: string };
-    fadeIn?: { duration: number; curve: string };
-    dropoutTransition?: number;
+    fade_out?: { duration: number; curve: string };
+    fade_in?: { duration: number; curve: string };
+    dropout_transition?: number;
     tracks?: Track[];
 }
 
@@ -73,12 +75,12 @@ function duration_of(audio: AudioEntry) {
 const { floor, max, min } = Math;
 
 export function cut_duration_of(audio: AudioEntry) {
-    let { cut_from: cutFrom, cut_to: cutTo } = audio;
+    let { cut_from, cut_to } = audio;
     const dur = duration_of(audio);
-    if (cutTo) {
-        return min(dur, cutTo) - (cutFrom ?? 0);
-    } else if (cutFrom) {
-        return dur - cutFrom;
+    if (cut_to) {
+        return min(dur, cut_to) - (cut_from ?? 0);
+    } else if (cut_from) {
+        return dur - cut_from;
     } else {
         return dur;
     }
@@ -89,8 +91,8 @@ function fixNum(n: number) {
     return v.indexOf('.') < 0 ? v : v.replace(/0+$/g, '').replace(/\.$/g, '');
 }
 
-export function audioGraph(
-    opt: MixOption,
+export function audio_graph(
+    opt: AudioMix,
     durTotal: number,
     inputs: Array<Input>,
     filters: Array<FilterChain>,
@@ -117,7 +119,7 @@ export function audioGraph(
     // find total duration
     if (!durTotal || durTotal <= 0) {
         const ends = streams.map((audio /*, i*/) => {
-            let { start = 0, loop = 0 /*, cutFrom, cutTo*/ } = audio;
+            let { start = 0, loop = 0 /*, cut_from, cut_to*/ } = audio;
             if (loop < 0) {
                 return -Infinity;
             }
@@ -136,7 +138,7 @@ export function audioGraph(
     const DURATION = durTotal;
     // remove out of range
     streams = streams.filter((audio /*, i*/) => {
-        let { start = 0, anchor = 0, cut_from: cutFrom = 0 } = audio;
+        let { start = 0, anchor = 0, cut_from: cut_from = 0 } = audio;
 
         if (anchor) {
             audio.anchor = 0;
@@ -146,7 +148,7 @@ export function audioGraph(
                 if (end < 0) {
                     return false;
                 }
-                audio.cut_from = cutFrom = -anchored_start;
+                audio.cut_from = cut_from = -anchored_start;
                 audio.start = start = 0;
             } else {
                 audio.start = start = anchored_start;
@@ -156,7 +158,7 @@ export function audioGraph(
             if (end < 0) {
                 return false;
             }
-            audio.cut_from = cutFrom = -start;
+            audio.cut_from = cut_from = -start;
             audio.start = start = 0;
         }
 
@@ -169,7 +171,7 @@ export function audioGraph(
         }
         const end = start + dur;
         if (end > DURATION) {
-            audio.cut_to = cutFrom + (DURATION - start);
+            audio.cut_to = cut_from + (DURATION - start);
         }
         return true;
     });
@@ -178,7 +180,7 @@ export function audioGraph(
     filters.push(
         ...streams
             .map((audio /*, i*/): FilterChain => {
-                const { cut_from: cutFrom = 0, cut_to: cutTo, start, volume, fade_in: fadeIn, fade_out: fadeOut } = audio;
+                const { cut_from = 0, cut_to, start, volume, fade_in, fade_out } = audio;
                 // const filter_chain = [];
                 const begin = start ?? 0;
                 const curDur = cut_duration_of(audio);
@@ -188,12 +190,12 @@ export function audioGraph(
                 }
                 const filters = [
                     ...(function* () {
-                        if (cutTo) {
-                            yield { name: 'atrim', start: cutFrom, end: cutTo };
-                        } else if (cutFrom) {
-                            yield { name: 'atrim', start: cutFrom, end: duration_of(audio) };
+                        if (cut_to) {
+                            yield { name: 'atrim', start: cut_from, end: cut_to };
+                        } else if (cut_from) {
+                            yield { name: 'atrim', start: cut_from, end: duration_of(audio) };
                         }
-                        if (cutFrom) {
+                        if (cut_from) {
                             // https://stackoverflow.com/questions/57972761/ffmpeg-afade-not-being-applied-to-atrim
                             yield { name: 'asetpts', expr: 'PTS-STARTPTS' };
                         }
@@ -204,13 +206,13 @@ export function audioGraph(
                         if (begin > 0) {
                             yield { name: 'adelay', delays: floor(begin * 1000), all: 1 };
                         } else {
-                            if (fadeIn) {
-                                const { duration: fadeDur = 1, curve } = fadeIn;
+                            if (fade_in) {
+                                const { duration: fade_dur = 1, curve } = fade_in;
                                 yield {
                                     name: 'afade',
                                     t: 'in',
                                     // st: 0,
-                                    d: fadeDur,
+                                    d: fade_dur,
                                     curve,
                                 };
                             }
@@ -220,14 +222,14 @@ export function audioGraph(
                             // https://stackoverflow.com/questions/35509147/ffmpeg-amix-filter-volume-issue-with-inputs-of-different-duration
                             yield { name: 'apad', pad_dur: fixNum(pad_sec) };
                         } else {
-                            if (fadeOut) {
-                                const { duration: fadeDur = 1, curve } = fadeOut;
+                            if (fade_out) {
+                                const { duration: fade_dur = 1, curve } = fade_out;
 
                                 yield {
                                     name: 'afade',
                                     t: 'out',
-                                    st: curDur - fadeDur,
-                                    d: fadeDur,
+                                    st: curDur - fade_dur,
+                                    d: fade_dur,
                                     curve,
                                 };
                             }
@@ -249,12 +251,12 @@ export function audioGraph(
             input: streams.map((audio /*, i*/) => `${audio._tag}`),
             filters: (function* () {
                 const {
-                    fadeOut,
-                    fadeIn,
-                    outputFilters,
-                    outputVolume,
-                    audioNorm,
-                    dropoutTransition = 0,
+                    fade_out: fade_out,
+                    fade_in: fade_in,
+                    output_filters: outputFilters,
+                    output_volume: outputVolume,
+                    audio_norm: audioNorm,
+                    dropout_transition: dropoutTransition = 0,
                 } = opt;
                 yield {
                     name: 'amix',
@@ -263,12 +265,12 @@ export function audioGraph(
                     normalize: 0,
                     // weights: streams.map((audio) => audio.mixVolume ?? 10),
                 };
-                if (fadeIn) {
-                    const { duration: fadeDur = 1, curve } = fadeIn;
+                if (fade_in) {
+                    const { duration: fade_dur = 1, curve } = fade_in;
                     yield {
                         name: 'afade',
                         t: 'in',
-                        d: fadeDur,
+                        d: fade_dur,
                         curve,
                     };
                 }
@@ -277,12 +279,12 @@ export function audioGraph(
                     yield { name: 'volume', volume: outputVolume };
                 }
                 if (audioNorm) {
-                    const { gaussSize, maxGain } = audioNorm;
+                    const { gauss_size: gaussSize, max_gain: maxGain } = audioNorm;
                     yield { name: 'dynaudnorm', g: gaussSize ?? 5, maxgain: maxGain ?? 30 };
                 }
-                if (fadeOut) {
-                    const { duration: fadeDur = 1, curve } = fadeOut;
-                    yield { name: 'afade', t: 'out', st: DURATION - fadeDur, d: fadeDur, curve };
+                if (fade_out) {
+                    const { duration: fade_dur = 1, curve } = fade_out;
+                    yield { name: 'afade', t: 'out', st: DURATION - fade_dur, d: fade_dur, curve };
                 }
 
                 if (outputFilters) {
