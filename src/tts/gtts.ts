@@ -1,10 +1,9 @@
 import path from 'path';
 import fs from 'fs';
 import { spawn, spawnSync } from 'child_process';
-import { Sluggable } from '../utils/resource.js';
-import { AudioEntryTTS, cache } from './core.js';
+import { AudioEntryTTS, cache, Voice } from './core.js';
 
-export class GTTS extends Sluggable {
+export class GTTS extends Voice {
     slow?: boolean;
     language?: string;
     domain?: string;
@@ -17,7 +16,7 @@ export class GTTS extends Sluggable {
         const { language, slow } = this;
         return this.hash_string_plus(text, ...[language ?? '', slow ? 'slow' : ''].filter(v => !!v));
     }
-    save(path: string, text: string) {
+    override save(path: string, text: string) {
         const { language, domain, slow } = this;
         const args = Array.from(
             (function* () {

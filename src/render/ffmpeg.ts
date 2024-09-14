@@ -37,7 +37,7 @@ export async function ffcmd(
     {
         // verbosity > 0 && console.dir({ input, graph, audioMix }, { depth: 7 });
         if (audio_mix && audio_mix.streams && audio_mix.streams.length > 0) {
-            console.dir(audio_mix);
+            // console.dir(audio_mix);
             audio_graph(audio_mix, duration, input, graph);
             if (output_params.acodec) {
                 output_params.acodec = 'aac';

@@ -71,6 +71,17 @@ export class Resource {
         let { build_dir: dir } = this;
         return this._get_file(dir, k, sub);
     }
+
+    private static _instance: Resource;
+
+    // private constructor()
+    // {
+    // }
+
+    public static get() {
+        return this._instance || (this._instance = new this());
+    }
+
 }
 
 export abstract class Sluggable {

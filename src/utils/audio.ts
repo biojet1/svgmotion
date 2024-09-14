@@ -175,7 +175,7 @@ export function audio_graph(
         }
         return true;
     });
-    // console.warn('streams', streams);
+    console.warn('streams', streams);
 
     filters.push(
         ...streams

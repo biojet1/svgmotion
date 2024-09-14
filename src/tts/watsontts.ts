@@ -1,9 +1,8 @@
 import path from 'path';
 import fs from 'fs';
-import { Sluggable } from '../utils/resource.js';
-import { AudioEntryTTS, cache } from './core.js';
+import { AudioEntryTTS, cache, Voice } from './core.js';
 
-export class WatsonTTS extends Sluggable {
+export class WatsonTTS extends Voice {
 
     accept: string;
     voice: string;
@@ -23,9 +22,7 @@ export class WatsonTTS extends Sluggable {
         const { accept, voice } = this;
         return this.hash_string_plus(text, ...[accept, voice].filter((v) => !!v));
     }
-    override save(path: string, text: string) {
 
-    }
     async say(text: string) {
         // file in cache
         const f = cache.get_cache_file(this.slug_id(text), 'tts');
