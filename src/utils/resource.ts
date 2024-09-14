@@ -62,6 +62,51 @@ export class Resource {
         throw new Error(`No cache dir`);
     }
 
+    get shared_dirs() {
+        const dirs = Array.from(
+            (function* () {
+                const { env, cwd } = process;
+                yield env[`SHARE_DIR`] ?? '';
+                yield path.join(os.homedir(), '.local', 'share');
+                yield cwd();
+            })(),
+        ).filter((v) => v && fs.existsSync(v))
+
+        return this._new_field("shared_dirs", dirs);
+    }
+    // get sharedDirs() {
+    // 	return (
+    // 		this._foundShareDirs ??
+    // (this._foundShareDirs = Array.from(
+    // 	(function* () {
+    // 		const { env, cwd } = process;
+    // 		yield env[`${PREFIX}_SHARE_DIR`] ?? '';
+    // 		yield env.ANIMATIONS_SHARE_DIR ?? '';
+    // 		yield cwd();
+    // 		yield path.join(os.homedir(), '.local', 'share', 'animations');
+    // 	})(),
+    // ).filter((v) => v && fs.existsSync(v)))
+    // 	);
+    // }
+    find_file(src: string) {
+        if (path.isAbsolute(src)) {
+            return src;
+        }
+        for (const dir of this.shared_dirs) {
+            const f = path.join(dir, src);
+            if (fs.existsSync(f)) {
+                return f;
+            }
+        }
+    }
+    locate_file(src: string) {
+        const f = this.find_file(src);
+        if (f) {
+            return f;
+        }
+        throw new Error(`Not found ${src} in ${this.shared_dirs.join(',')}`);
+    }
+
     get_cache_file(k: string, sub?: string): string {
         let { cache_dir: dir } = this;
         return this._get_file(dir, k, sub);
