@@ -6,10 +6,22 @@ import { Element, LengthYValue, LengthXValue, TextData, LengthValue } from "./ba
 import { Animatable, PointsValue, PositionValue, TextValue } from "./value.js";
 import { ViewBox, ValueSet, xget, xset } from "./valuesets.js";
 import { AudioEntry } from "../utils/audio.js";
+import { AudioFilter } from "../utils/sound.js";
 
 export interface PlainNode {
     tag: string;
     nodes: PlainNode[];
+}
+
+export interface PlainAsset {
+    path?: string;
+    blob?: string;
+    url?: string;
+}
+
+export interface PlainSound {
+    ref: string;
+    filters?: any[];
 }
 
 export interface PlainRoot {
@@ -18,6 +30,8 @@ export interface PlainRoot {
     defs: { [key: string]: PlainNode };
     frame_rate: number;
     sounds?: AudioEntry[];
+    assets?: { [key: string]: PlainAsset };
+    audios: any[];
 }
 
 export class Container extends Element {
@@ -615,15 +629,33 @@ export class TSpan extends Text {
 
 export class AnimTrack extends Track {
     root!: Root;
-
 }
 
 export class Asset {
-    id?: string;
+    _parent: any;
+    id!: string;
+    [key: string]: any;
+    constructor(id: string) {
+        this.id = id;
+    }
+    dump() {
+        return Object.fromEntries(Object.entries(this).filter(([k, v]) => /^[A-Za-z]+/.test(k) && k != 'id'));
+    }
+    static load(x: any) {
+        const a = new Asset(``);
+        for (const [k, v] of Object.entries(x)) {
+            a[k] = v;
+        }
+        return a;
+    }
 }
 
 export class FileAsset extends Asset {
-    src?: string;
+    src: string;
+    constructor(id: string, src: string) {
+        super(id);
+        this.src = src;
+    }
 }
 
 export class Root extends Container {
@@ -633,6 +665,8 @@ export class Root extends Container {
     version: string = "0.0.1";
     working_dir?: string;
     sounds: AudioEntry[] = [];
+    audios: AudioFilter[] = [];
+    assets: { [key: string]: Asset } = {};
     // view
     get view() {
         let x = this.first_child();
@@ -673,6 +707,13 @@ export class Root extends Container {
     }
     set track(v: AnimTrack) {
         xset(this, "track", v)
+    }
+    //
+    add_file_asset(path: string) {
+        const id = crypto.randomUUID();
+        const a = new FileAsset(id, path);
+        a._parent = this;
+        return this.assets[id] = a;
     }
 }
 

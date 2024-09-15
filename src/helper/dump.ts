@@ -56,13 +56,23 @@ Element.prototype.dump = function (): PlainNode {
 }
 
 Root.prototype.dump = function (): PlainRoot {
-    const { version, view, defs, frame_rate, sounds } = this;
+    const { version, view, defs, frame_rate, sounds, assets, audios } = this;
+
     return {
-        version, frame_rate,
-        view: view.dump(), sounds,
+        version, frame_rate, sounds,
+        view: view.dump(),
+        audios: audios.map(v => v.dump()),
+        // audios: [],
         defs: Object.fromEntries(
             Object.entries(defs).map(([k, v]) => [k, v.dump()])
         ),
+        assets: Object.fromEntries(Object.entries(assets).map(([k, a]) => {
+            if (!k || a.id !== k) {
+                throw new Error(`assert ${k}`);
+            }
+            return [k, a.dump()];
+        }
+        ))
     };
 }
 

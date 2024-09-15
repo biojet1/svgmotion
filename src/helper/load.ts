@@ -7,7 +7,8 @@ import {
     ViewPort, Rect, Path, Line, Group,
     Ellipse, Circle, Polyline, Polygon, Image, Symbol,
     Use,
-    TSpan, Text
+    TSpan, Text,
+    Asset
 } from "../model/elements.js";
 
 function load_properties(that: Element, props: { [key: string]: PlainValue<any> }) {
@@ -92,7 +93,7 @@ export function from_json(src: PlainRoot) {
 }
 
 Root.prototype.load = function (src: PlainRoot) {
-    const { version, view, defs, frame_rate, sounds } = src;
+    const { version, view, defs, frame_rate, sounds, assets, audios } = src;
     if (!version) {
         throw new Error("No version {${Object.keys(src)}}");
     } else if (!/^\d+\.\d+\.\d+$/.test(version)) {
@@ -102,20 +103,32 @@ Root.prototype.load = function (src: PlainRoot) {
     } else if (!frame_rate) {
         throw new Error("No frame_rate");
     }
-    const vp = load_node(view, this);
-    if (!(vp instanceof ViewPort)) {
-        throw new Error("ViewPort expected");
+    {
+        this.assets = {};
+        if (assets) {
+            for (const [k, v] of Object.entries(assets)) {
+                this.assets[k] = Asset.load(v);
+            }
+        }
+    }
+    {
+        this.defs = {};
+        if (defs) {
+            Object.entries(defs).map(([k, v]) => {
+                this.defs[k] = load_node(v, this);
+            });
+        }
     }
     this.version = version;
-    this.defs = {};
     if (sounds) {
         this.sounds = sounds;
     }
-    this.set_view(vp);
-    if (defs) {
-        Object.entries(defs).map(([k, v]) => {
-            this.defs[k] = load_node(v, this);
-        });
+    {
+        const vp = load_node(view, this);
+        if (!(vp instanceof ViewPort)) {
+            throw new Error("ViewPort expected");
+        }
+        this.set_view(vp);
     }
 }
 

@@ -109,7 +109,7 @@ export function* flatten_args(
 }
 
 export function ff_params(opt: FFCommand): Array<string> {
-	function* checkInput<V>(src: V | string | Iterable<V | string>): IterableIterator<V> {
+	function* enum_inputs<V>(src: V | string | Iterable<V | string>): IterableIterator<V> {
 		switch (typeof src) {
 			case 'function':
 			case 'undefined':
@@ -118,7 +118,7 @@ export function ff_params(opt: FFCommand): Array<string> {
 			case 'object':
 				if (Array.isArray(src)) {
 					for (const s of src) {
-						for (const t of checkInput(s)) {
+						for (const t of enum_inputs(s)) {
 							if (t) yield t;
 						}
 					}
@@ -139,7 +139,7 @@ export function ff_params(opt: FFCommand): Array<string> {
 			yield* flatten_args(args);
 		}
 		if (input) {
-			const inputs = Array.from(checkInput<Input>(input));
+			const inputs = Array.from(enum_inputs<Input>(input));
 			for (const v of inputs) {
 				const { path, loop, args } = v;
 				if (args) {
@@ -168,7 +168,7 @@ export function ff_params(opt: FFCommand): Array<string> {
 			}
 		}
 		if (output) {
-			const outputs = Array.from(checkInput<Output>(output));
+			const outputs = Array.from(enum_inputs<Output>(output));
 			for (const v of outputs) {
 				const { path, args } = v;
 				if (args) {

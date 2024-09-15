@@ -1,3 +1,4 @@
+
 export type AudioEntry = {
     ref?: string;
     path?: string;
@@ -97,13 +98,7 @@ export function audio_graph(
     inputs: Array<Input>,
     filters: Array<FilterChain>,
 ) {
-    function getIndex(entry: AudioEntry) {
-        const index = inputs.length;
-        const { loop, path } = entry;
-        inputs.push({ path, loop, args: [] });
-        return index;
-    }
-    function getMixVolume(entry: AudioEntry) {
+    function get_index(entry: AudioEntry) {
         const index = inputs.length;
         const { loop, path } = entry;
         inputs.push({ path, loop, args: [] });
@@ -138,7 +133,7 @@ export function audio_graph(
     const DURATION = durTotal;
     // remove out of range
     streams = streams.filter((audio /*, i*/) => {
-        let { start = 0, anchor = 0, cut_from: cut_from = 0 } = audio;
+        let { start = 0, anchor = 0, cut_from = 0 } = audio;
 
         if (anchor) {
             audio.anchor = 0;
@@ -224,7 +219,6 @@ export function audio_graph(
                         } else {
                             if (fade_out) {
                                 const { duration: fade_dur = 1, curve } = fade_out;
-
                                 yield {
                                     name: 'afade',
                                     t: 'out',
@@ -236,7 +230,7 @@ export function audio_graph(
                         }
                     })(),
                 ];
-                const I = getIndex(audio);
+                const I = get_index(audio);
                 if (filters.length > 0) {
                     return { input: `${I}:a`, output: (audio._tag = `a${I}`), filters };
                 } else {
@@ -251,17 +245,17 @@ export function audio_graph(
             input: streams.map((audio /*, i*/) => `${audio._tag}`),
             filters: (function* () {
                 const {
-                    fade_out: fade_out,
-                    fade_in: fade_in,
-                    output_filters: outputFilters,
-                    output_volume: outputVolume,
-                    audio_norm: audioNorm,
-                    dropout_transition: dropoutTransition = 0,
+                    fade_out,
+                    fade_in,
+                    output_filters,
+                    output_volume,
+                    audio_norm,
+                    dropout_transition = 0,
                 } = opt;
                 yield {
                     name: 'amix',
                     inputs: streams.length,
-                    dropout_transition: dropoutTransition,
+                    dropout_transition: dropout_transition,
                     normalize: 0,
                     // weights: streams.map((audio) => audio.mixVolume ?? 10),
                 };
@@ -275,11 +269,11 @@ export function audio_graph(
                     };
                 }
 
-                if (outputVolume) {
-                    yield { name: 'volume', volume: outputVolume };
+                if (output_volume) {
+                    yield { name: 'volume', volume: output_volume };
                 }
-                if (audioNorm) {
-                    const { gauss_size: gaussSize, max_gain: maxGain } = audioNorm;
+                if (audio_norm) {
+                    const { gauss_size: gaussSize, max_gain: maxGain } = audio_norm;
                     yield { name: 'dynaudnorm', g: gaussSize ?? 5, maxgain: maxGain ?? 30 };
                 }
                 if (fade_out) {
@@ -287,8 +281,8 @@ export function audio_graph(
                     yield { name: 'afade', t: 'out', st: DURATION - fade_dur, d: fade_dur, curve };
                 }
 
-                if (outputFilters) {
-                    for (const f of outputFilters) {
+                if (output_filters) {
+                    for (const f of output_filters) {
                         yield f;
                     }
                 }
@@ -297,5 +291,7 @@ export function audio_graph(
     );
     return filters;
 }
+
+
 import { FilterChain, Input } from './ffparams.js';
 import { spawnSync } from 'node:child_process';

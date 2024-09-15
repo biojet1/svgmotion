@@ -1,5 +1,5 @@
 import { Resource, Sluggable } from '../utils/resource.js';
-export const cache = new Resource();
+// export const cache = new Resource();
 
 type MarkEntry = [tag: string, start: number, end: number];
 export interface AudioEntryTTS {

@@ -18,7 +18,7 @@ export interface BounceParams extends KeyExtra {
 export function Bounce(items: Element[] | Element, params: BounceParams = {}): Proxy {
     const nodes = Array.isArray(items) ? items : [items];
     return function (track: Track) {
-        let { mode = 'show', times = 5, dur, dir = 'down', dist: span, ...extra } = params;
+        let { mode = '', times = 5, dur, dir = 'down', dist: span, ...extra } = params;
         const show = mode === 'show' || mode === 'in';
         const hide = mode === 'hide' || mode === 'out';
         const motion = dir === 'up' || dir === 'left' ? -1 : 1;

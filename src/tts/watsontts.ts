@@ -1,6 +1,7 @@
 import path from 'path';
 import fs from 'fs';
-import { AudioEntryTTS, cache, Voice } from './core.js';
+import { AudioEntryTTS, Voice } from './core.js';
+import { Resource } from '../utils/resource.js';
 
 export class WatsonTTS extends Voice {
 
@@ -25,7 +26,7 @@ export class WatsonTTS extends Voice {
 
     async say(text: string) {
         // file in cache
-        const f = cache.get_cache_file(this.slug_id(text), 'tts');
+        const f = Resource.get().get_cache_file(this.slug_id(text), 'tts');
         const j = `${f}.json`; // metadata file in cache
         return import('fs/promises')
             .then((fsp) => {
@@ -78,38 +79,38 @@ export class WatsonTTS extends Voice {
                 timings: ['words', 'marks'],
             };
             // synthesizeUsingWebSocket returns a Readable Stream that can be piped or listened to
-            const ttsWs = tts.synthesizeUsingWebSocket(params);
+            const sock = tts.synthesizeUsingWebSocket(params);
             const words: Array<[string, number, number]> = [];
             const marks: Array<[string, number, number]> = [];
             if (sink) {
                 // the output of the stream can be piped to any writable stream, like an audio file
                 if (typeof sink === 'string') {
-                    ttsWs.pipe(fs.createWriteStream(sink));
+                    sock.pipe(fs.createWriteStream(sink));
                 } else {
-                    ttsWs.pipe(sink);
+                    sock.pipe(sink);
                 }
             } else {
                 // !!!!! IMPORTANT !!!!!
                 // if the stream is not being piped anywhere and is only being listened to, the stream needs
                 //   to be explicitly set to flowing mode by uncommenting the following line:
-                ttsWs.resume();
+                sock.resume();
             }
-            ttsWs.on('words', (message, data: { words: Array<[string, number, number]> }) => {
+            sock.on('words', (message, data: { words: Array<[string, number, number]> }) => {
                 words.push(...data.words);
             });
-            ttsWs.on('marks', (message, data: { marks: Array<[string, number, number]> }) => {
+            sock.on('marks', (message, data: { marks: Array<[string, number, number]> }) => {
                 marks.push(...data.marks);
             });
             return new Promise<AudioEntryTTS>((resolve, reject) => {
                 // the 'error' event is emitted if there is an error during the connection
                 // 'err' is the Error object describing the error
-                ttsWs.on('error', (err) => {
+                sock.on('error', (err) => {
                     reject(err);
                 });
                 // the 'close' event is emitted once, when the connection is terminated by the service
                 // the 'code' parameter is the status code. 1000 is the code for a normal termination
                 // the 'reason' parameter provides a string description of how the connection closed
-                ttsWs.on('close', (code: number, reason: string) => {
+                sock.on('close', (code: number, reason: string) => {
                     if (1000 == code) {
                         resolve({ words, marks });
                     } else {

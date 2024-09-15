@@ -99,6 +99,7 @@ export class Resource {
             }
         }
     }
+
     locate_file(src: string) {
         const f = this.find_file(src);
         if (f) {
@@ -119,9 +120,8 @@ export class Resource {
 
     private static _instance: Resource;
 
-    // private constructor()
-    // {
-    // }
+    private constructor() {
+    }
 
     public static get() {
         return this._instance || (this._instance = new this());

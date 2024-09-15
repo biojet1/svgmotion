@@ -81,6 +81,7 @@ test.test("load_svg the_quick", async (t) => {
     // tr.run(Pass(1))
     // tr.run(ZoomTo(view, [lazy, dog]))
 
+
     tr.run(svgmo.ScaleOut([dog, fox], { easing: Easing.linear, parent: view }))
     // tr.run(svgmo.Audio(`/mnt/C1/media/Adobe_Sound_Effects-Transitions/Production Element Title Transition Bell Element 06.wav`))
     tr.sub().run(HeartBeat(view, [lazy])).run(svgmo.Pulsate(the, { mode: '' }));

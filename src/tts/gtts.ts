@@ -1,7 +1,8 @@
 import path from 'path';
 import fs from 'fs';
 import { spawn, spawnSync } from 'child_process';
-import { AudioEntryTTS, cache, Voice } from './core.js';
+import { AudioEntryTTS, Voice } from './core.js';
+import { Resource } from '../utils/resource.js';
 
 export class GTTS extends Voice {
     slow?: boolean;
@@ -45,7 +46,7 @@ export class GTTS extends Voice {
     }
     async say(text: string) {
         // file in cache
-        const f = cache.get_cache_file(this.slug_id(text), 'tts');
+        const f = Resource.get().get_cache_file(this.slug_id(text), 'tts');
         const j = `${f}.json`; // metadata json file in cache
         return import('fs/promises').then(fsp => {
             return fsp

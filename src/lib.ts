@@ -14,6 +14,7 @@ export * from "./helper/image.js";
 export * from "./tts/watsontts.js";
 export * from "./tts/gtts.js";
 export * from './model/actions/audio.js';
+export * from './utils/sound.js';
 
 import { Root } from "./model/elements.js";
 declare module "./model/elements" {

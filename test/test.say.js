@@ -23,13 +23,30 @@ test.test("Say the_quick", async (t) => {
     // console.log(bb.dump_rect());
 
     const tr = anim.at(0);
-    const voc = new svgmo.WatsonTTS();
+    // const voc = new svgmo.WatsonTTS();
+    const voc = new svgmo.GTTS();
     tr.run(svgmo.Bounce(dog));
     tr.run(svgmo.Audio(await voc.say(`Hello`)));
 
     tr.run(Par([svgmo.Bounce(brown), svgmo.Audio(await voc.say(`Goodbye`))]));
 
     tr.run(svgmo.Bounce(the));
+    {
+        const snd1 = anim.add_file_asset(`/mnt/C1/media/AudioLib/Loop_Caught.mp3`);
+        let s = snd1.as_sound();
+
+        console.log("duration", s.get_duration());
+        s = s.slice(10, 20)
+        console.log("duration", s.get_duration());
+        s = s.start_at(100)
+        console.log("duration", s.get_duration());
+        console.dir(s, { depth: 100 });
+        console.dir(s.dump(), { depth: 100 });
+
+        anim.audios.push(s);
+
+        //    tr.run(svgmo.Audio(snd1.slice(4).anchor(2).fade_in()));
+    }
 
 
     anim.save_json('/tmp/say.json')

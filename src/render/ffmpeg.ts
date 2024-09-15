@@ -118,8 +118,7 @@ export async function ffcmd(
 
     }
     function fcs(g: string) {
-        const res = new Resource();
-        const file = res.get_build_file(`fcs.txt`);
+        const file = Resource.get().get_build_file(`fcs.txt`);
         writeFileSync(file, g);
         return file;
     }
