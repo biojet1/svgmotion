@@ -2,7 +2,7 @@
 import test from "tap";
 import { Matrix, Vector, BoundingBox, Root, Rel, ZoomTo, Pass, Easing, Par } from "svgmotion";
 import * as svgmo from "svgmotion";
-
+import { FFRun, AMix } from "../dist/utils/sound.js";
 
 test.test("Say the_quick", async (t) => {
     const anim = new Root();
@@ -32,19 +32,49 @@ test.test("Say the_quick", async (t) => {
 
     tr.run(svgmo.Bounce(the));
     {
-        const snd1 = anim.add_file_asset(`/mnt/C1/media/AudioLib/Loop_Caught.mp3`);
+        const snd1 = anim.add_file_asset(`/mnt/META/opt/animations/music/Follow_Me.mp3`);
+        const snd2 = anim.add_file_asset(`/mnt/META/opt/animations/Adobe_Sound_Effects-Transitions/Production Element Title Transition Bell Chime 02.wav`);
         let s = snd1.as_sound();
-
+        let t = snd2.as_sound();
         console.log("duration", s.get_duration());
-        s = s.slice(10, 20)
+        s = s.slice(11, 17)
         console.log("duration", s.get_duration());
-        s = s.start_at(100)
+        s = s.start_at(4)
         console.log("duration", s.get_duration());
+        s = s.fade_out(2, 'tri')
+        // s = s.pad_start(1)
         console.dir(s, { depth: 100 });
-        console.dir(s.dump(), { depth: 100 });
+        // console.dir(s.dump(), { depth: 100 });
+        // s = s.(2, 'tri')
+        t = t.start_at(3);
+        console.dir(t, { depth: 100 });
+        {
+            let ff = new FFRun();
+
+            let mix = new AMix([s, t]);
+            mix.feed_ff(ff);
+
+            // s.feed_ff(ff);
+            console.dir(ff, { depth: 100 });
+            ff.output = "/tmp/test.mp3";
+            const cmd = ff.ff_params();
+            console.dir(cmd);
+            console.dir(cmd.join(' '));
+            await import('node:child_process').then(cp => {
+                let [bin, ...args] = cmd;
+                return cp.spawn(bin, args, { stdio: 'inherit' });
+            })
+        }
 
         anim.audios.push(s);
 
+        // {
+        //     let [bin, ...args] = ff;
+        //     console.log(`${bin} `, ...args);
+        //     return spawn(bin, args, {
+        //         stdio: ['pipe', 'inherit', 'inherit'],
+        //     });
+        // }
         //    tr.run(svgmo.Audio(snd1.slice(4).anchor(2).fade_in()));
     }
 

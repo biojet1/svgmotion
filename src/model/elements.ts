@@ -6,7 +6,7 @@ import { Element, LengthYValue, LengthXValue, TextData, LengthValue } from "./ba
 import { Animatable, PointsValue, PositionValue, TextValue } from "./value.js";
 import { ViewBox, ValueSet, xget, xset } from "./valuesets.js";
 import { AudioEntry } from "../utils/audio.js";
-import { AudioFilter } from "../utils/sound.js";
+import { AudioFilterable } from "../utils/sound.js";
 
 export interface PlainNode {
     tag: string;
@@ -665,7 +665,7 @@ export class Root extends Container {
     version: string = "0.0.1";
     working_dir?: string;
     sounds: AudioEntry[] = [];
-    audios: AudioFilter[] = [];
+    audios: AudioFilterable[] = [];
     assets: { [key: string]: Asset } = {};
     // view
     get view() {

@@ -35,7 +35,7 @@ function* enum1(all) {
 if (1) {
     const col = [...enum1(all)];
     for (const { kind, tag } of col) {
-        console.log(`case "${tag}": return ${kind}.load(d);`);
+        console.log(`case "${tag}": return ${kind}._load(d, prev);`);
     }
 
 

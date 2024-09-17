@@ -2,19 +2,14 @@ export interface Filter {
 	name: any;
 }
 
-export interface FilterChain {
-	input?: Iterable<number | string> | number | string;
-	output?: Iterable<number | string> | number | string;
-	filters?: Iterable<Filter>;
-}
-
 type Value = string | number | boolean;
 
 interface Stream {
 	path?: string;
-	args: (string | [string, Value] | string[])[] /*| { [key: string]: Value }*/;
+	args?: (string | [string, Value] | string[])[] /*| { [key: string]: Value }*/;
 	tag?: string;
 	index?: number;
+	id?: string;
 }
 
 export interface Input extends Stream {
@@ -24,6 +19,44 @@ export interface Input extends Stream {
 export interface Output extends Stream {
 	format?: string;
 }
+
+export class Source implements Input {
+	path?: string | undefined;
+	args?: (string | [string, Value] | string[])[];
+	tag?: string | undefined;
+	index?: number | undefined;
+	id?: string | undefined;
+	loop?: number;
+}
+
+export class Sink implements Output {
+}
+
+export class StreamRef {
+	stream!: Stream;
+	suffix!: string;
+	toString() {
+		return `${this.stream.index ?? 0}:${this.suffix}`
+	}
+	static audio(s: Stream, index?: number) {
+		const r = new StreamRef()
+		r.stream = s;
+		if (index == null) {
+			r.suffix = `a`;
+		} else {
+			r.suffix = `a:${index}`;
+		}
+		return r;
+	}
+}
+
+export interface FilterChain {
+	input?: Array<number | string | String | Stream | StreamRef> | number | string | Stream | StreamRef;
+	output?: Iterable<number | string> | number | string;
+	filters?: Iterable<Filter>;
+}
+
+
 
 interface FFCommand {
 	bin?: string;
@@ -38,7 +71,7 @@ export function ff_graph(fg: Iterable<FilterChain>) {
 	function* link(fc: FilterChain) {
 		const { input, output, filters } = fc;
 		if (input) {
-			if (typeof input === 'object') {
+			if (Array.isArray(input)) {
 				for (const s of input) {
 					yield `[${s.toString()}]`;
 				}
