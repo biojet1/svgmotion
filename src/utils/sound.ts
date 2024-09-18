@@ -18,20 +18,34 @@ function media_duration(path: string) {
 }
 
 export class AudioChain {
-
-}
-
-export class AudioFilterable extends AudioChain {
-    _tag?: string;
-    _prev?: AudioFilterable;
+    _graph_name?: string;
+    static tag = '';
     get_duration() {
         return this.end - this.start;
     }
     get start(): number {
-        return this._prev?.start ?? NaN;
+        return NaN;
     }
     get end(): number {
-        return this._prev?.end ?? NaN;
+        return NaN;
+    }
+    get prev(): AudioChain | undefined {
+        return undefined
+    }
+    _dump(): any {
+        throw new Error(`Not implemented`);
+    }
+    graph_name(): string {
+        const { _graph_name } = this;
+        if (_graph_name) {
+            return _graph_name;
+        }
+        throw new Error(`No name`);
+    }
+    static _load(d: any, prev: AFilter | ASource) {
+    }
+    feed_ff(ff: FFRun, parent?: AudioChain) {
+        throw new Error(`Not implemented in ${this.constructor.name}`);
     }
     slice(from?: number, to?: number) {
         return new Slice(this, from, to);
@@ -55,26 +69,18 @@ export class AudioFilterable extends AudioChain {
         return new APad(this, sec);
     }
     *walk() {
-        for (let cur: AudioFilterable | undefined = this; cur; cur = cur._prev) {
+        for (let cur: AudioChain | undefined = this; cur; cur = cur.prev) {
             yield cur;
         }
     }
     dump(): any {
         let a: any[] = [];
-        for (let cur: AudioFilterable | undefined = this; cur; cur = cur._prev) {
+        for (let cur: AFilter | ASource | undefined = this; cur; cur = cur.prev) {
             a.push(cur._dump());
         }
         return a.reverse();
     }
-    *enum_filter(): Generator<{ name: string;[key: string]: any; }, void, unknown> {
-        throw new Error(`Not implemented`);
-    }
-
-    _dump(): any {
-        throw new Error(`Not implemented`);
-    }
-
-    static load(d: { $: string;[key: string]: any; }, prev: AudioFilterable): AudioFilterable {
+    static load(d: { $: string;[key: string]: any; }, prev: AFilter | ASource): AFilter | ASource {
         switch (d.$) {
             case "adelay": return ADelay._load(d, prev);
             case "fade_in": return AFadeIn._load(d, prev);
@@ -87,54 +93,55 @@ export class AudioFilterable extends AudioChain {
         }
         throw new Error(`Unexpected $ = '${d.$}'`);
     }
-    static tag = '';
+}
 
-    feed_ff(ff: FFRun, parent?: AudioFilterable): string {
-        const es = [...this.walk()].reverse();
-        const inp = es.at(0);
-        let input: Input;
-        if (inp instanceof AudioSource) {
-            input = inp;
-        } else {
-            throw new Error(`Unexpected ${es.constructor.name}`);
-        }
-        // input
-        // output
-        // filters
+export class ASource extends AudioChain {
 
-        // let I: Input;
-        // if (last instanceof AudioSource) {
-        //     I = get_index(last.id)
-        // } else {
-        //     throw new Error(`Unexpected`);
-        // }
+}
+
+export class AFilter extends AudioChain {
+    _prev?: AudioChain;
+    get start(): number {
+        return this._prev?.start ?? NaN;
+    }
+    get end(): number {
+        return this._prev?.end ?? NaN;
+    }
+    get prev(): AudioChain | undefined {
+        return this._prev;
+    }
+    *enum_filter(): Generator<{ name: string;[key: string]: any; }, void, unknown> {
+        throw new Error(`Not implemented`);
+    }
+    feed_ff(ff: FFRun, parent?: AudioChain): string {
         let filters = [];
-        for (const e of es) {
-            for (const f of e.enum_filter()) {
-                filters.push(f);
+        let input: ASource | undefined;
+        for (const x of this.walk()) {
+            if (x instanceof ASource) {
+                x.feed_ff(ff, this);
+                input = x;
+            } else if (x instanceof AFilter) {
+                filters.unshift(...x.enum_filter())
+            } else {
+                throw new Error(`Unexpected`);
             }
         }
-        // 56.toString()
-
+        if (!input) {
+            throw new Error(`Unexpected`);
+        }
         if (filters.length > 0) {
             const tag = ff.next_id();
-            this._tag = tag;
-            const o: FilterChain = { input: inp.feed_ff(ff, this), filters };
+            this._graph_name = tag;
+            const o: FilterChain = { input: input.graph_name(), filters };
             if (parent) {
                 o.output = tag;
             }
             ff.graph.push(o);
             return tag;
         } else {
-            return inp.feed_ff(ff, this);
+            return input.graph_name();
         }
-
-
     }
-    // override toString() {
-
-    // }
-
 }
 
 declare module "../model/elements" {
@@ -151,7 +158,7 @@ Asset.prototype.as_sound = function () {
     return new AudioSource({ id, duration, path: src });
 }
 
-export class AudioSource extends AudioFilterable {
+export class AudioSource extends ASource {
     static override tag = 'source';
     id: string;
     duration: number;
@@ -177,33 +184,31 @@ export class AudioSource extends AudioFilterable {
     }
     override _dump() {
         const { id, duration, path, loop } = this;
-        return { $: (this.constructor as typeof AudioFilterable).tag, id, path, loop, duration }
+        return { $: (this.constructor as typeof AudioChain).tag, id, path, loop, duration }
     }
-    static _load(d: any, prev: AudioFilterable) {
+    static override _load(d: any, prev: AFilter | ASource) {
         if (prev == undefined) {
             throw new Error(`Unexpected`);
         }
         return new AudioSource(d);
     }
-    override *enum_filter() {
-    }
-    override feed_ff(ff: FFRun, parent?: AudioFilterable) {
+
+    override feed_ff(ff: FFRun, parent?: AudioChain) {
         const inp = ff.get_input_id(this.id);
         const { id, duration, path, loop } = this;
         if (path) {
             inp.path = path;
         }
-
-        return this._tag = `${inp.index}:a`;
+        return this._graph_name = `${inp.index}:a`;
     }
 }
 
-export class StartAt extends AudioFilterable {
+export class StartAt extends AFilter {
     static override tag = 'start_at';
     _start: number;
-    constructor(prev: AudioFilterable, start: number) {
+    constructor(prev: AFilter | ASource, start: number) {
         super();
-        if (typeof start !== "number" || !(prev instanceof AudioFilterable) || !start) {
+        if (typeof start !== "number" || !(prev instanceof AudioChain) || !start) {
             throw new Error(`Unexpected`);
         }
         this._prev = prev;
@@ -219,34 +224,35 @@ export class StartAt extends AudioFilterable {
     }
 
     override _dump() {
-        return { $: (this.constructor as typeof AudioFilterable).tag, start: this._start }
+        return { $: (this.constructor as typeof AudioChain).tag, start: this._start }
     }
     override *enum_filter() {
     }
 
-    static _load(d: any, prev: AudioFilterable) {
+    static _load(d: any, prev: AFilter | ASource) {
         return new this(prev, d.start);
     }
 }
 
-export class AFadeIn extends AudioFilterable {
+export class AFadeIn extends AFilter {
     static override tag = 'fade_in';
     duration: number;
     curve: string;
-    constructor(prev: AudioFilterable, duration: number, curve: string) {
+    constructor(prev: AFilter | ASource, duration: number, curve: string) {
         super();
-        if (typeof duration !== "number" || !(prev instanceof AudioFilterable) || typeof curve !== "string") {
+        if (typeof duration !== "number" || !(prev instanceof AudioChain) || typeof curve !== "string") {
             throw new Error(`Unexpected`);
         }
         this._prev = prev;
         this.duration = duration;
         this.curve = curve;
+        // this.filter = prev.
     }
     override _dump() {
         let { duration, curve } = this;
-        return { $: (this.constructor as typeof AudioFilterable).tag, duration, curve }
+        return { $: (this.constructor as typeof AudioChain).tag, duration, curve }
     }
-    static _load(d: any, prev: AudioFilterable) {
+    static _load(d: any, prev: AFilter | ASource) {
         return new this(prev, d.duration, d.curve);
     }
     override *enum_filter() {
@@ -265,7 +271,7 @@ export class AFadeOut extends AFadeIn {
     static override tag = 'fade_out';
     override _dump() {
         let { duration, curve } = this;
-        return { $: (this.constructor as typeof AudioFilterable).tag, duration, curve }
+        return { $: (this.constructor as typeof AudioChain).tag, duration, curve }
     }
     *enum_filter() {
         const { duration, curve } = this;
@@ -279,15 +285,15 @@ export class AFadeOut extends AFadeIn {
     }
 }
 
-export class Slice extends AudioFilterable {
+export class Slice extends AFilter {
     static override tag = 'slice';
     _start: number;
     _end: number;
     from = 0;
     to = 0;
-    constructor(prev: AudioFilterable, from?: number, to?: number) {
+    constructor(prev: AFilter | ASource, from?: number, to?: number) {
         super();
-        if (typeof from !== "number" || !(prev instanceof AudioFilterable) || typeof to !== "number") {
+        if (typeof from !== "number" || !(prev instanceof AudioChain) || typeof to !== "number") {
             throw new Error(`Unexpected`);
         }
         this._prev = prev;
@@ -315,22 +321,22 @@ export class Slice extends AudioFilterable {
     }
 
     override _dump() {
-        return { $: (this.constructor as typeof AudioFilterable).tag, start: this.from, end: this.to }
+        return { $: (this.constructor as typeof AudioChain).tag, start: this.from, end: this.to }
     }
 
 
-    static _load(d: any, prev: AudioFilterable) {
+    static _load(d: any, prev: AFilter | ASource) {
         return new this(prev, d.start, d.end);
     }
 
 }
 
-export class AdjustVolume extends AudioFilterable {
+export class AdjustVolume extends AFilter {
     static override tag = 'adjust_volume';
     volume: number;
-    constructor(prev: AudioFilterable, volume: number) {
+    constructor(prev: AFilter | ASource, volume: number) {
         super();
-        if (typeof volume !== "number" || !(prev instanceof AudioFilterable)) {
+        if (typeof volume !== "number" || !(prev instanceof AudioChain)) {
             throw new Error(`Unexpected`);
         }
         this._prev = prev;
@@ -341,19 +347,19 @@ export class AdjustVolume extends AudioFilterable {
 
     }
     override _dump() {
-        return { $: (this.constructor as typeof AudioFilterable).tag, volume: this.volume }
+        return { $: (this.constructor as typeof AudioChain).tag, volume: this.volume }
     }
-    static _load(d: any, prev: AudioFilterable) {
+    static _load(d: any, prev: AFilter | ASource) {
         return new this(prev, d.volume);
     }
 }
 
-export class ADelay extends AudioFilterable {
+export class ADelay extends AFilter {
     static override tag = 'adelay';
     delay: number;
-    constructor(prev: AudioFilterable, delay: number) {
+    constructor(prev: AFilter | ASource, delay: number) {
         super();
-        if (typeof delay !== "number" || !(prev instanceof AudioFilterable)) {
+        if (typeof delay !== "number" || !(prev instanceof AudioChain)) {
             throw new Error(`Unexpected`);
         }
         this._prev = prev;
@@ -366,19 +372,19 @@ export class ADelay extends AudioFilterable {
         yield { name: 'adelay', delays: Math.floor(this.delay * 1000), all: 1 };
     }
     override _dump() {
-        return { $: (this.constructor as typeof AudioFilterable).tag, delay: this.delay }
+        return { $: (this.constructor as typeof AudioChain).tag, delay: this.delay }
     }
-    static _load(d: any, prev: AudioFilterable) {
+    static _load(d: any, prev: AFilter | ASource) {
         return new this(prev, d.delay);
     }
 }
 
-export class APad extends AudioFilterable {
+export class APad extends AFilter {
     static override tag = 'apad';
     pad_sec: number;
-    constructor(prev: AudioFilterable, sec: number) {
+    constructor(prev: AFilter | ASource, sec: number) {
         super();
-        if (typeof sec !== "number" || !(prev instanceof AudioFilterable)) {
+        if (typeof sec !== "number" || !(prev instanceof AudioChain)) {
             throw new Error(`Unexpected`);
         }
         this._prev = prev;
@@ -391,9 +397,9 @@ export class APad extends AudioFilterable {
         yield { name: 'apad', pad_dur: fix_num(this.pad_sec) };
     }
     override _dump() {
-        return { $: (this.constructor as typeof AudioFilterable).tag, pad_sec: this.pad_sec }
+        return { $: (this.constructor as typeof AudioChain).tag, pad_sec: this.pad_sec }
     }
-    static _load(d: any, prev: AudioFilterable) {
+    static _load(d: any, prev: AFilter | ASource) {
         return new this(prev, d.pad_sec);
     }
 }
@@ -404,6 +410,7 @@ export class FFRun {
     bin = 'ffmpeg';
     args = ['-hide_banner', '-y'];
     _next_no = 0;
+    filter_script_path = `/tmp/fcs.txt`;
 
     get_input_id(id: string) {
         for (const x of this.input) {
@@ -438,7 +445,7 @@ export class FFRun {
         return ff_params(this);
     }
     filter_complex_script(g: string) {
-        const file = `/tmp/fcs.txt`;
+        const file = this.filter_script_path;
         writeFileSync(file, g);
         return file;
     }
@@ -453,11 +460,11 @@ export class FFRun {
 
 }
 
-export class AMix extends AudioFilterable {
-    inputs: AudioFilterable[];
+export class AMix extends ASource {
+    inputs: AudioChain[];
     _start = 0;
     _end = 0;
-    constructor(inputs: AudioFilterable[]) {
+    constructor(inputs: AudioChain[]) {
         super();
         let _start = 0;
         let _end = 0;
@@ -477,7 +484,7 @@ export class AMix extends AudioFilterable {
                 // https://stackoverflow.com/questions/35509147/ffmpeg-amix-filter-volume-issue-with-inputs-of-different-duration
                 e = e.pad(pad_sec);
             }
-            console.log("inputs", pad_sec, [start, end], [_start, _end]);
+            // console.log("inputs", pad_sec, [start, end], [_start, _end]);
             return e;
         });
         this._start = _start;
@@ -490,18 +497,11 @@ export class AMix extends AudioFilterable {
     get end(): number {
         return this._end;
     }
-    override *enum_filter() {
-        yield {
-            name: 'amix',
-            inputs: this.inputs.length,
-            dropout_transition: 0,
-            normalize: 0,
-            // weights: streams.map((audio) => audio.mixVolume ?? 10),
-        };
-    }
-    override feed_ff(ff: FFRun, parent?: AudioFilterable) {
+
+    override feed_ff(ff: FFRun, parent?: AudioChain) {
         const inputs = this.inputs.map(v => {
-            return v.feed_ff(ff, this)
+            v.feed_ff(ff, this);
+            return v.graph_name();
         })
         const filters = [{
             name: 'amix',
@@ -510,99 +510,16 @@ export class AMix extends AudioFilterable {
             normalize: 0,
             // weights: streams.map((audio) => audio.mixVolume ?? 10),
         }]
-        ff.graph.push({
-            input: inputs, filters
-        });
         const tag = ff.next_id();
-        return this._tag = tag;
+        const o: FilterChain = { input: inputs, filters }
+        if (parent) {
+            o.output = tag;
+        }
+        ff.graph.push(o);
+        return this._graph_name = tag;
     }
 }
 
-export function mix_sounds(
-    ff: FFRun,
-    duration: number,
-    entries: Array<AudioFilterable>,
-    sources: { [key: string]: { [key: string]: string | number; path: string; loop: number } },
-    inputs: Array<Input>,
-    filter_chain: Array<FilterChain>,
-) {
-    // let id_map: { [key: string]: number } = {}
-    function get_index(id: string) {
-        const inp = ff.get_input_id(id);
-        const asset = sources[id];
-        if (asset) {
-            const { loop = 0, path } = asset;
-            if (loop) {
-                inp.loop = loop;
-            }
-            if (path) {
-                inp.path = path;
-            }
-        }
-        return inp;
-    }
-
-
-    let max_dur = 0;
-    for (const e of entries) {
-        max_dur = Math.max(e.end, max_dur);
-    }
-    max_dur = Math.min(duration, max_dur);
-
-    const outputs = [];
-
-    entries.map(e => {
-        const { start, end } = e;
-        let pad_sec = max_dur - e.end;
-        if (start > 0) {
-            e = e.pad_start(start);
-        }
-        if (pad_sec > 0) {
-            // https://stackoverflow.com/questions/35509147/ffmpeg-amix-filter-volume-issue-with-inputs-of-different-duration
-            e = e.pad(pad_sec);
-        }
-        return e;
-    });
-
-    for (let n = entries.length; n-- > 0;) {
-        const e = entries[n];
-        const es = [...e.walk()].reverse();
-        const last = es.at(0);
-        let I: Input;
-        if (last instanceof AudioSource) {
-            I = get_index(last.id)
-        } else {
-            throw new Error(`Unexpected`);
-        }
-        let filters = [];
-        for (const e of es) {
-            for (const f of e.enum_filter()) {
-                filters.push(f);
-            }
-        }
-        if (filters.length > 0) {
-            const tag = `a${I}`;
-            filter_chain.push({ input: StreamRef.audio(I), output: `a${I}`, filters: filters })
-            outputs.push(tag);
-        } else {
-            const tag = `${I}:a`;
-            outputs.push(tag);
-        }
-    }
-    filter_chain.push({
-        input: outputs,
-        filters: (function* () {
-            yield {
-                name: 'amix',
-                inputs: outputs.length,
-                dropout_transition: 0,
-                normalize: 0,
-            };
-        })()
-    });
-}
-
-// // Inputs to final audio
 
 function fix_num(n: number) {
     const v = n.toFixed(5);

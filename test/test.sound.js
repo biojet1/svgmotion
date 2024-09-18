@@ -41,24 +41,28 @@ test.test("Sound 1", async (t) => {
         // s.feed_ff(ff);
         console.dir(ff, { depth: 100 });
         ff.output = "/tmp/sound1.mp3";
+        ff.filter_script_path = "/tmp/sound1.txt";
         ff._run();
     }
     {
         let ff = new FFRun();
         let mix = new AMix([snd1, snd2.start_at(1), snd3.start_at(2), snd4.start_at(3)]);
         mix.feed_ff(ff);
+
         // s.feed_ff(ff);
         console.dir(ff, { depth: 100 });
         ff.output = "/tmp/sound2.mp3";
+        ff.filter_script_path = "/tmp/sound2.txt";
         ff._run();
     }
 
     {
         let ff = new FFRun();
-        let mix = new AMix([snd1, snd2, snd3, snd4]);
-        mix.fade_in(1, 'tri').feed_ff(ff);
+        let mix = new AMix([snd1, snd2.start_at(1), snd3.start_at(2), snd4.start_at(3)]);
+        mix.fade_in(3, 'tri').feed_ff(ff);
         // s.feed_ff(ff);
         console.dir(ff, { depth: 100 });
+        ff.filter_script_path = "/tmp/sound3.txt";
         ff.output = "/tmp/sound3.mp3";
         ff._run();
     }

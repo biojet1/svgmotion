@@ -192,7 +192,7 @@ export function ff_params(opt: FFCommand): Array<string> {
 				const g = ff_graph(graph, ';\n');
 				if (g) {
 					yield '-filter_complex_script';
-					yield filter_complex_script(g);
+					yield filter_complex_script.call(opt, g);
 				}
 			} else {
 				const g = ff_graph(graph);

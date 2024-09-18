@@ -2,7 +2,7 @@ import { Track } from "../../track/index.js";
 import { Proxy } from "../../track/action.js";
 import { Root } from "../elements.js";
 import { AudioEntry, cut_duration_of } from "../../utils/audio.js";
-import { AudioFilterable } from "../../utils/sound.js";
+import { AudioChain } from "../../utils/sound.js";
 
 export function Audio(src: string | AudioEntry, opt?: AudioEntry): Proxy {
     return function (track: Track) {
@@ -24,7 +24,7 @@ export function Audio(src: string | AudioEntry, opt?: AudioEntry): Proxy {
         };
     };
 }
-export function Play(src: AudioFilterable): Proxy {
+export function Play(src: AudioChain): Proxy {
     return function (track: Track) {
         // const entry = (typeof src === 'string') ? { ...opt, path: src } : { ...src, };
         // const dur = track.to_frame(cut_duration_of(entry));
