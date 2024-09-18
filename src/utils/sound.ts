@@ -31,7 +31,7 @@ export class AudioFilterable extends AudioChain {
         return this._prev?.start ?? NaN;
     }
     get end(): number {
-        return this._prev?.start ?? NaN;
+        return this._prev?.end ?? NaN;
     }
     slice(from?: number, to?: number) {
         return new Slice(this, from, to);
@@ -268,11 +268,11 @@ export class AFadeOut extends AFadeIn {
         return { $: (this.constructor as typeof AudioFilterable).tag, duration, curve }
     }
     *enum_filter() {
-        const { duration: fade_dur = 1, curve } = this;
+        const { duration, curve } = this;
         yield {
             name: 'afade',
             t: 'out',
-            st: (this._prev?.get_duration() ?? NaN) - this.duration,
+            st: (this._prev?.end ?? NaN) - duration,
             d: this.duration,
             curve,
         };
@@ -283,14 +283,18 @@ export class Slice extends AudioFilterable {
     static override tag = 'slice';
     _start: number;
     _end: number;
+    from = 0;
+    to = 0;
     constructor(prev: AudioFilterable, from?: number, to?: number) {
         super();
         if (typeof from !== "number" || !(prev instanceof AudioFilterable) || typeof to !== "number") {
             throw new Error(`Unexpected`);
         }
         this._prev = prev;
-        this._start = from ?? prev.start;
-        this._end = to ?? prev.end;
+        this.from = from ?? prev.start;
+        this.to = to ?? prev.end;
+        this._start = prev.start;
+        this._end = this._start + (this.to - this.from);
     }
 
     get start(): number {
@@ -302,16 +306,16 @@ export class Slice extends AudioFilterable {
     }
 
     override *enum_filter() {
-        const { start, end } = this;
-        yield { name: 'atrim', start, end };
-        if (start) {
-            // https://stackoverflow.com/questions/57972761/ffmpeg-afade-not-being-applied-to-atrim
+        const { start, end, from, to } = this;
+        yield { name: 'atrim', start: from, end: to };
+        if (from > 0) {
+            https://stackoverflow.com/questions/57972761/ffmpeg-afade-not-being-applied-to-atrim
             yield { name: 'asetpts', expr: 'PTS-STARTPTS' };
         }
     }
 
     override _dump() {
-        return { $: (this.constructor as typeof AudioFilterable).tag, start: this._start, end: this._end }
+        return { $: (this.constructor as typeof AudioFilterable).tag, start: this.from, end: this.to }
     }
 
 
@@ -434,12 +438,19 @@ export class FFRun {
         return ff_params(this);
     }
     filter_complex_script(g: string) {
-
         const file = `/tmp/fcs.txt`;
         writeFileSync(file, g);
         return file;
-
     }
+    _run() {
+        const cmd = this.ff_params();
+        return import('node:child_process').then(cp => {
+            let [bin, ...args] = cmd;
+            return cp.spawn(bin, args, { stdio: 'inherit' });
+        })
+    }
+
+
 }
 
 export class AMix extends AudioFilterable {
@@ -454,9 +465,11 @@ export class AMix extends AudioFilterable {
             _start = Math.min(e.start, _start);
             _end = Math.max(e.end, _end);
         }
+        // console.log("RANGE", _start, _end);
         inputs = inputs.map(e => {
             const { start, end } = e;
             let pad_sec = _end - end;
+
             if (start > _start) {
                 e = e.pad_start(start - _start);
             }
@@ -464,6 +477,7 @@ export class AMix extends AudioFilterable {
                 // https://stackoverflow.com/questions/35509147/ffmpeg-amix-filter-volume-issue-with-inputs-of-different-duration
                 e = e.pad(pad_sec);
             }
+            console.log("inputs", pad_sec, [start, end], [_start, _end]);
             return e;
         });
         this._start = _start;

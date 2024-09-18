@@ -3,7 +3,7 @@ import test from "tap";
 import { Matrix, Vector, BoundingBox, Root, Rel, ZoomTo, Pass, Easing, Par } from "svgmotion";
 import * as svgmo from "svgmotion";
 import { FFRun, AMix } from "../dist/utils/sound.js";
-
+import { writeFileSync } from 'fs';
 test.test("Say the_quick", async (t) => {
     const anim = new Root();
     await anim.load_svg("res/the_quick.svg");
@@ -33,21 +33,23 @@ test.test("Say the_quick", async (t) => {
     tr.run(svgmo.Bounce(the));
     {
         const snd1 = anim.add_file_asset(`/mnt/META/opt/animations/music/Follow_Me.mp3`);
-        const snd2 = anim.add_file_asset(`/mnt/META/opt/animations/Adobe_Sound_Effects-Transitions/Production Element Title Transition Bell Chime 02.wav`);
+        const snd2 = anim.add_file_asset(`/mnt/META/opt/animations/sfx/mixkit-hard-pop-click-2364.wav`);
         let s = snd1.as_sound();
         let t = snd2.as_sound();
-        console.log("duration", s.get_duration());
-        s = s.slice(11, 17)
-        console.log("duration", s.get_duration());
-        s = s.start_at(4)
-        console.log("duration", s.get_duration());
+        console.log("duration", s.get_duration(), s.start, s.end);
+        s = s.slice(10, 16)
+        console.log("duration", s.get_duration(), s.start, s.end);
+        // s = s.start_at(4)
+        console.log("duration", s.get_duration(), s.start, s.end);
         s = s.fade_out(2, 'tri')
+        console.log("duration", s.get_duration(), s.start, s.end);
         // s = s.pad_start(1)
         console.dir(s, { depth: 100 });
-        // console.dir(s.dump(), { depth: 100 });
         // s = s.(2, 'tri')
         t = t.start_at(3);
+        console.dir([s.dump(), t.dump()], { depth: 100 });
         console.dir(t, { depth: 100 });
+
         {
             let ff = new FFRun();
 
@@ -60,6 +62,7 @@ test.test("Say the_quick", async (t) => {
             const cmd = ff.ff_params();
             console.dir(cmd);
             console.dir(cmd.join(' '));
+            // writeFileSync(`/tmp/cmd.txt`, g);
             await import('node:child_process').then(cp => {
                 let [bin, ...args] = cmd;
                 return cp.spawn(bin, args, { stdio: 'inherit' });

@@ -56,8 +56,6 @@ export interface FilterChain {
 	filters?: Iterable<Filter>;
 }
 
-
-
 interface FFCommand {
 	bin?: string;
 	args?: Iterable<string> | { [key: string]: Value };
@@ -67,7 +65,7 @@ interface FFCommand {
 	filter_complex_script?: (g: string) => string;
 }
 
-export function ff_graph(fg: Iterable<FilterChain>) {
+export function ff_graph(fg: Iterable<FilterChain>, sep = ';') {
 	function* link(fc: FilterChain) {
 		const { input, output, filters } = fc;
 		if (input) {
@@ -109,7 +107,7 @@ export function ff_graph(fg: Iterable<FilterChain>) {
 			}
 		}
 	}
-	return Array.from(fg, (fc) => Array.from(link(fc)).join('')).join(';');
+	return Array.from(fg, (fc) => Array.from(link(fc)).join('')).join(sep);
 }
 
 export function* flatten_args(
@@ -189,12 +187,16 @@ export function ff_params(opt: FFCommand): Array<string> {
 			}
 		}
 		if (graph) {
-			const g = ff_graph(graph);
-			if (g) {
-				if (filter_complex_script) {
+
+			if (filter_complex_script) {
+				const g = ff_graph(graph, ';\n');
+				if (g) {
 					yield '-filter_complex_script';
 					yield filter_complex_script(g);
-				} else {
+				}
+			} else {
+				const g = ff_graph(graph);
+				if (g) {
 					yield '-filter_complex';
 					yield g;
 				}
