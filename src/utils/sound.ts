@@ -44,7 +44,9 @@ export class AudioChain {
         return new AdjustVolume(this, volume);
     }
     tremolo(frequency: number = 5, depth: number = 0.5) {
+        return new Tremolo2(this, { frequency, depth });
         return new Tremolo(this, frequency, depth);
+
     }
     reverse() {
         return new Reverse(this);
@@ -159,7 +161,7 @@ export class AEval extends ASource {
         return this.duration;
     }
     override _dump() {
-        return { $: (this.constructor as typeof AudioChain).tag, exprs: this.exprs, duration: this.duration }
+        return { exprs: this.exprs, duration: this.duration, $: (this.constructor as typeof AudioChain).tag }
     }
     static override _load(d: any, prev: AFilter | ASource) {
         if (prev != undefined) {
@@ -272,7 +274,6 @@ export class AFadeIn extends AFilter {
         this._prev = prev;
         this.duration = duration;
         this.curve = curve;
-        // this.filter = prev.
     }
     override _dump() {
         let { duration, curve } = this;
@@ -341,7 +342,7 @@ export class Slice extends AFilter {
         const { start, end, from, to } = this;
         yield { name: 'atrim', start: from, end: to };
         if (from > 0) {
-            https://stackoverflow.com/questions/57972761/ffmpeg-afade-not-being-applied-to-atrim
+            // https://stackoverflow.com/questions/57972761/ffmpeg-afade-not-being-applied-to-atrim
             yield { name: 'asetpts', expr: 'PTS-STARTPTS' };
         }
     }
@@ -376,6 +377,29 @@ export class AdjustVolume extends AFilter {
     }
     static _load(d: any, prev: AFilter | ASource) {
         return new this(prev, d.volume);
+    }
+}
+
+export class AFilter2 extends AFilter {
+    data: object;
+    constructor(prev: AFilter | ASource, data: object) {
+        super();
+        this._prev = prev;
+        this.data = data;
+    }
+    override _dump() {
+        return { ...this.data, $: (this.constructor as typeof AudioChain).tag }
+    }
+    static _load(d: object, prev: AFilter | ASource) {
+        return new this(prev, d);
+    }
+}
+
+export class Tremolo2 extends AFilter2 {
+    static override tag = 'tremolo';
+    *enum_filter() {
+        const { frequency, depth } = this.data as any;
+        yield { name: 'tremolo', f: frequency, d: depth };
     }
 }
 
@@ -561,6 +585,12 @@ export class AMix extends ASource {
         ff.graph.push(o);
         return this._graph_name = tag;
     }
+    static new(inputs: AudioChain[]) {
+        return new AMix(inputs);
+    }
+    static from(...inputs: AudioChain[]) {
+        return new AMix(inputs);
+    }
 }
 
 function fix_num(n: number) {
@@ -570,4 +600,3 @@ function fix_num(n: number) {
 
 import { FilterChain } from './ffparams.js';
 import { FFRun } from './ffrun.js';
-

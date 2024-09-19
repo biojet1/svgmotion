@@ -46,7 +46,7 @@ test.test("Sound 1", async (t) => {
     {
         let ff = new FFRun();
         let mix = new AMix([snd1, snd2.start_at(1), snd3.start_at(2), snd4.start_at(3)]);
-        mix.feed_ff(ff);
+        mix.tremolo(40, 1).feed_ff(ff);
 
         // s.feed_ff(ff);
         console.dir(ff, { depth: 100 });

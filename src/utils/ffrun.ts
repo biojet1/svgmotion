@@ -1,14 +1,15 @@
 import { writeFileSync } from "fs";
-import { Input, FilterChain, Source, ff_params } from "./ffparams.js";
+import { Input, FilterChain, Source, ff_params, Output } from "./ffparams.js";
 
 
 export class FFRun {
     input: Input[] = [];
+    output: Output[] = [];
     graph: FilterChain[] = [];
     bin = 'ffmpeg';
     args = ['-hide_banner', '-y'];
-    _next_no = 0;
     filter_script_path = `/tmp/fcs.txt`;
+    _next_no = 0;
 
     get_input_id(id: string) {
         for (const x of this.input) {
@@ -35,11 +36,36 @@ export class FFRun {
         return x;
     }
 
+    output_of_path(path: string) {
+        for (const x of this.output) {
+            if (x.path === path) {
+                return x;
+            }
+        }
+        let x = new Source();
+        x.path = path;
+        x.index = this.output.length;
+        this.output.push(x);
+        return x;
+    }
+
+    // add_filter_chain(path: string) {
+    //     for (const x of this.output) {
+    //         if (x.path === path) {
+    //             return x;
+    //         }
+    //     }
+    //     let x:FilterChain = {};
+    //     x.path = path;
+    //     x.index = this.output.length;
+    //     this.output.push(x);
+    //     return x;
+    // }
+
     next_id() {
         // String.fromCharCode()
         return 'S' + (++this._next_no).toString(36);
     }
-
     ff_params() {
         return ff_params(this);
     }

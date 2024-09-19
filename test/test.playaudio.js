@@ -80,18 +80,14 @@ test.test("load_svg the_quick", async (t) => {
 
     const snd2 = await anim.add_file_asset(`/mnt/META/opt/animations/sfx/mixkit-quick-jump-arcade-game-239.wav`).then(v => v.as_sound());
 
-
-
-
     tr.run(svgmo.ScaleOut([dog, fox], { easing: Easing.linear, parent: view }))
-    tr.sub().run(Play(svgmo.AEval.new("sin(10*2*PI*t)*sin(880*2*PI*t)")));
-
+    tr.run(Play(svgmo.AEval.new("sin(10*2*PI*t)*sin(880*2*PI*t)")));
     tr.run(HeartBeat(view, [lazy])).run(svgmo.Pulsate(the, { mode: '' }));
-    tr.sub().run(Play(svgmo.AEval.new("sin(100*2*PI*t)*sin(80*2*PI*t)")));
+    tr.run(Play(svgmo.AEval.new("sin(100*2*PI*t)*sin(80*2*PI*t)")));
     tr.run(svgmo.StretchOut([quick]));
-    tr.sub().run(Play(svgmo.AEval.new("sin(10*2*PI*t)*sin(10*2*PI*t)")));
+    tr.run(Play(svgmo.AEval.new("sin(200*2*PI*t)*sin(90*2*PI*t)")));
     tr.run(svgmo.ScaleOut(jumps, { anchor: ['left', 'center'] }));
-    tr.sub().run(Play(snd2));
+    tr.run(Play(snd2));
     tr.run(svgmo.ScaleIn(brown));
     tr.run(svgmo.Bounce(the2, { mode: 'out' }));
     tr.run(svgmo.Bounce(over, { mode: 'in' }));

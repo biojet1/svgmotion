@@ -94,7 +94,7 @@ export function from_json(src: PlainRoot) {
 }
 
 Root.prototype.load = function (src: PlainRoot) {
-    const { version, view, defs, frame_rate, sounds, assets, audios } = src;
+    const { version, view, defs, frame_rate, assets, sounds } = src;
     if (!version) {
         throw new Error("No version {${Object.keys(src)}}");
     } else if (!/^\d+\.\d+\.\d+$/.test(version)) {
@@ -122,12 +122,9 @@ Root.prototype.load = function (src: PlainRoot) {
         }
     }
     this.version = version;
+    this.sounds = [];
     if (sounds) {
-        this.sounds = sounds;
-    }
-    this.audios = [];
-    if (audios) {
-        for (const v of audios) {
+        for (const v of sounds) {
             let next: AudioChain | undefined = undefined;
             for (const u of v) {
                 if (next) {
@@ -137,7 +134,7 @@ Root.prototype.load = function (src: PlainRoot) {
                 }
             }
             if (next) {
-                this.audios.push(next);
+                this.sounds.push(next);
             }
         }
     }

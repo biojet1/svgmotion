@@ -17,7 +17,7 @@ export class GTTS extends Voice {
         const { language, slow } = this;
         return this.hash_string_plus(text, ...[language ?? '', slow ? 'slow' : ''].filter(v => !!v));
     }
-    override save(path: string, text: string) {
+    override async save(path: string, text: string) {
         const { language, domain, slow } = this;
         const args = Array.from(
             (function* () {
@@ -39,10 +39,15 @@ export class GTTS extends Voice {
                 yield path;
             })()
         );
-        console.warn(args);
-        spawnSync('gtts-cli', args, {
-            input: text,
+        return import('node:child_process').then(cp => {
+            const p = cp.spawn('gtts-cli', args);
+            p.stdin.write(text);
+            return p;
         });
+        // console.warn(args);
+        // spawnSync('gtts-cli', args, {
+        //     input: text,
+        // });
     }
     async say(text: string) {
         // file in cache

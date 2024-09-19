@@ -30,9 +30,8 @@ export interface PlainRoot {
     view: PlainNode;
     defs: { [key: string]: PlainNode };
     frame_rate: number;
-    sounds?: AudioEntry[];
     assets?: { [key: string]: PlainAsset };
-    audios: { $: string;[key: string]: any; }[][];
+    sounds: { $: string;[key: string]: any; }[][];
 }
 
 export class Container extends Element {
@@ -665,8 +664,7 @@ export class Root extends Container {
     frame_rate: number = 60;
     version: string = "0.0.1";
     working_dir?: string;
-    sounds: AudioEntry[] = [];
-    audios: AudioChain[] = [];
+    sounds: AudioChain[] = [];
     assets: { [key: string]: Asset } = {};
     // view
     get view() {

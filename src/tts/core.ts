@@ -9,7 +9,7 @@ export interface AudioEntryTTS {
 }
 
 export abstract class Voice extends Sluggable {
-    async say(text: string) {
+    async say(text: string): Promise<{ path: string; }> {
         throw new Error(`Not implemented`);
     }
     override save(path: string, text: string) {

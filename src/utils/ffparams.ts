@@ -1,8 +1,9 @@
+type Value = string | number | boolean;
+
 export interface Filter {
 	name: any;
+	[key: string]: Value;
 }
-
-type Value = string | number | boolean;
 
 interface Stream {
 	path?: string;
@@ -32,26 +33,8 @@ export class Source implements Input {
 export class Sink implements Output {
 }
 
-export class StreamRef {
-	stream!: Stream;
-	suffix!: string;
-	toString() {
-		return `${this.stream.index ?? 0}:${this.suffix}`
-	}
-	static audio(s: Stream, index?: number) {
-		const r = new StreamRef()
-		r.stream = s;
-		if (index == null) {
-			r.suffix = `a`;
-		} else {
-			r.suffix = `a:${index}`;
-		}
-		return r;
-	}
-}
-
 export interface FilterChain {
-	input?: Array<number | string | String | Stream | StreamRef> | number | string | Stream | StreamRef;
+	input?: Array<number | string | String | Stream> | number | string | Stream;
 	output?: Iterable<number | string> | number | string;
 	filters?: Iterable<Filter>;
 }
@@ -187,7 +170,6 @@ export function ff_params(opt: FFCommand): Array<string> {
 			}
 		}
 		if (graph) {
-
 			if (filter_complex_script) {
 				const g = ff_graph(graph, ';\n');
 				if (g) {

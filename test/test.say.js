@@ -24,12 +24,12 @@ test.test("Say the_quick", async (t) => {
     // console.log(bb.dump_rect());
 
     const tr = anim.at(0);
-    // const voc = new svgmo.WatsonTTS();
-    const voc = new svgmo.GTTS();
+    const voc = anim.voice(new svgmo.GTTS());
+    // const voc = new svgmo.GTTS();
     tr.run(svgmo.Bounce(dog));
-    tr.run(svgmo.Audio(await voc.say(`Hello`)));
+    tr.run(svgmo.Play(await voc.say(`Hello`)));
 
-    tr.run(Par([svgmo.Bounce(brown), svgmo.Audio(await voc.say(`Goodbye`))]));
+    tr.run(Par([svgmo.Bounce(brown), svgmo.Play(await voc.say(`Goodbye`))]));
 
     tr.run(svgmo.Bounce(the));
     {
@@ -70,7 +70,7 @@ test.test("Say the_quick", async (t) => {
             })
         }
 
-        anim.audios.push(s);
+        anim.sounds.push(s);
 
         // {
         //     let [bin, ...args] = ff;

@@ -4,9 +4,10 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { Writable } from 'stream';
 import { tmpdir } from "node:os";
 import fs from "node:fs/promises";
-import { ffcmd, VideoOutParams } from "./ffmpeg.js";
+import { ffcmd2, VideoOutParams } from "./ffmpeg.js";
 import { spawn, StdioOptions } from 'child_process';
 import { AudioMix } from "../utils/audio.js";
+import { AMix } from "../utils/sound.js";
 
 interface RenderParams {
     uri?: string,
@@ -114,14 +115,15 @@ export async function render_root(root: Root, {
 
         // SINK ////////////////
         if (!sink) {
-            console.dir(root.audios, { depth: 4 });
-            const audio_mix: AudioMix = { output_filters: [], streams: root.sounds };
-            let ffproc = await ffcmd(fps, [width, height], duration, false, audio_mix, output, { lossless: true, ...video_params }).then((cmd) => {
-                let [bin, ...args] = cmd;
-                console.log(`${bin} `, ...args);
-                return spawn(bin, args, {
-                    stdio: ['pipe', 'inherit', 'inherit'],
-                });
+            console.dir(root.sounds, { depth: 4 });
+            const ff = ffcmd2(fps, [width, height], false, output, { lossless: true, ...video_params });
+            const mix = AMix.new(root.sounds);
+            console.log(`AMix ${mix.get_duration()}`);
+            mix.feed_ff(ff);
+            const [bin, ...args] = ff.ff_params();
+            console.log(`${bin} `, ...args);
+            let ffproc = spawn(bin, args, {
+                stdio: ['pipe', 'inherit', 'inherit'],
             });
             sink = ffproc.stdin;
         }
