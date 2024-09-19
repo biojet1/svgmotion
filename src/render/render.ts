@@ -114,6 +114,7 @@ export async function render_root(root: Root, {
 
         // SINK ////////////////
         if (!sink) {
+            console.dir(root.audios, { depth: 4 });
             const audio_mix: AudioMix = { output_filters: [], streams: root.sounds };
             let ffproc = await ffcmd(fps, [width, height], duration, false, audio_mix, output, { lossless: true, ...video_params }).then((cmd) => {
                 let [bin, ...args] = cmd;

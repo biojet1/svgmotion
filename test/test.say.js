@@ -2,7 +2,8 @@
 import test from "tap";
 import { Matrix, Vector, BoundingBox, Root, Rel, ZoomTo, Pass, Easing, Par } from "svgmotion";
 import * as svgmo from "svgmotion";
-import { FFRun, AMix } from "../dist/utils/sound.js";
+import { AMix } from "../dist/utils/sound.js";
+import { FFRun } from "../dist/utils/ffrun.js";
 import { writeFileSync } from 'fs';
 test.test("Say the_quick", async (t) => {
     const anim = new Root();
@@ -32,10 +33,10 @@ test.test("Say the_quick", async (t) => {
 
     tr.run(svgmo.Bounce(the));
     {
-        const snd1 = anim.add_file_asset(`/mnt/META/opt/animations/music/Follow_Me.mp3`);
-        const snd2 = anim.add_file_asset(`/mnt/META/opt/animations/sfx/mixkit-hard-pop-click-2364.wav`);
-        let s = snd1.as_sound();
-        let t = snd2.as_sound();
+        const snd1 = await anim.add_file_asset(`/mnt/META/opt/animations/music/Follow_Me.mp3`);
+        const snd2 = await anim.add_file_asset(`/mnt/META/opt/animations/sfx/mixkit-hard-pop-click-2364.wav`);
+        let s = await snd1.as_sound();
+        let t = await snd2.as_sound();
         console.log("duration", s.get_duration(), s.start, s.end);
         s = s.slice(10, 16)
         console.log("duration", s.get_duration(), s.start, s.end);

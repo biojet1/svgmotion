@@ -1,7 +1,8 @@
 import { Animatable } from "../model/value.js";
-import { Container, Root, PlainRoot, PlainNode } from "../model/elements.js";
+import { Container, Root, PlainRoot, PlainNode, Asset } from "../model/elements.js";
 import { ValueSet } from "../model/valuesets.js";
 import { TextData, Element } from "../model/base.js";
+import { AudioSource } from "../utils/sound.js";
 
 declare module "../model/elements" {
     interface Container {
@@ -68,7 +69,7 @@ Root.prototype.dump = function (): PlainRoot {
         ),
         assets: Object.fromEntries(Object.entries(assets).map(([k, a]) => {
             if (!k || a.id !== k) {
-                throw new Error(`assert ${k}`);
+                throw new Error(`assert k[${k}] a.id[${a.id}]`);
             }
             return [k, a.dump()];
         }
@@ -82,3 +83,51 @@ TextData.prototype.dump = function (): any {
     return d;
 }
 
+declare module "../model/elements" {
+    interface Asset {
+        as_sound(): Promise<AudioSource>;
+    }
+}
+
+Asset.prototype.as_sound = async function () {
+    let { id, duration, src, _parent } = this;
+    if (!duration) {
+        duration = await media_duration(src);
+
+    }
+    return new AudioSource({ id, duration, path: src });
+}
+
+
+
+function media_duration(path: string) {
+    return import('node:child_process').then(cp =>
+        cp.spawn('ffprobe', [
+            '-v',
+            'error',
+            '-show_entries',
+            'format=duration',
+            '-of',
+            'default=noprint_wrappers=1:nokey=1',
+            path,
+        ], { stdio: 'pipe' })
+    ).then(async ({ stdout, stderr }) => {
+        // console.log("path", path, stdout);
+        if (stdout) {
+            let data = "";
+            for await (const chunk of stdout) {
+                data += chunk;
+            }
+            const parsed = parseFloat(data);
+            // assert(!Number.isNaN(parsed));
+            // console.log("DUR", parsed);
+            return parsed;
+        }
+        if (stderr) {
+            for await (const chunk of stderr) {
+                console.log(chunk);
+            }
+        }
+        throw new Error(`cp`);
+    })
+}

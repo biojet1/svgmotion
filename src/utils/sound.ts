@@ -1,22 +1,3 @@
-import { writeFileSync } from 'fs';
-function media_duration(path: string) {
-    const { error, stdout } = spawnSync('ffprobe', [
-        '-v',
-        'error',
-        '-show_entries',
-        'format=duration',
-        '-of',
-        'default=noprint_wrappers=1:nokey=1',
-        path,
-    ]);
-    if (error) {
-        throw new Error(`${error}`);
-    }
-    const parsed = parseFloat(stdout.toString());
-    // assert(!Number.isNaN(parsed));
-    return parsed;
-}
-
 export class AudioChain {
     _graph_name?: string;
     static tag = '';
@@ -62,17 +43,27 @@ export class AudioChain {
     adjust_volume(volume: number) {
         return new AdjustVolume(this, volume);
     }
+    tremolo(frequency: number = 5, depth: number = 0.5) {
+        return new Tremolo(this, frequency, depth);
+    }
+    reverse() {
+        return new Reverse(this);
+    }
     pad_start(delay: number) {
         return new ADelay(this, delay);
     }
     pad(sec: number) {
         return new APad(this, sec);
     }
+    loop(n: number) {
+        return new Loop(this, n);
+    }
     *walk() {
         for (let cur: AudioChain | undefined = this; cur; cur = cur.prev) {
             yield cur;
         }
     }
+
     dump(): any {
         let a: any[] = [];
         for (let cur: AFilter | ASource | undefined = this; cur; cur = cur.prev) {
@@ -83,18 +74,24 @@ export class AudioChain {
     static load(d: { $: string;[key: string]: any; }, prev: AFilter | ASource): AFilter | ASource {
         switch (d.$) {
             case "adelay": return ADelay._load(d, prev);
+            case "aevalsrc": return AEval._load(d, prev);
             case "fade_in": return AFadeIn._load(d, prev);
             case "fade_out": return AFadeOut._load(d, prev);
             case "apad": return APad._load(d, prev);
             case "adjust_volume": return AdjustVolume._load(d, prev);
             case "source": return AudioSource._load(d, prev);
+            case "loop": return Loop._load(d, prev);
+            case "revese": return Reverse._load(d, prev);
             case "slice": return Slice._load(d, prev);
             case "start_at": return StartAt._load(d, prev);
+            case "tremolo": return Tremolo._load(d, prev);
         }
         throw new Error(`Unexpected $ = '${d.$}'`);
     }
 }
 
+export class AFirst {
+}
 export class ASource extends AudioChain {
 
 }
@@ -123,11 +120,11 @@ export class AFilter extends AudioChain {
             } else if (x instanceof AFilter) {
                 filters.unshift(...x.enum_filter())
             } else {
-                throw new Error(`Unexpected`);
+                throw new Error(`Unexpected x<${x.constructor.name}>`);
             }
         }
         if (!input) {
-            throw new Error(`Unexpected`);
+            throw new Error(`input expected`);
         }
         if (filters.length > 0) {
             const tag = ff.next_id();
@@ -144,37 +141,16 @@ export class AFilter extends AudioChain {
     }
 }
 
-declare module "../model/elements" {
-    interface Asset {
-        as_sound(): AudioSource;
-    }
-}
 
-Asset.prototype.as_sound = function () {
-    let { id, duration, src, _parent } = this;
-    if (!duration) {
-        this.duration = (duration = media_duration(src));
-    }
-    return new AudioSource({ id, duration, path: src });
-}
 
-export class AudioSource extends ASource {
-    static override tag = 'source';
-    id: string;
+export class AEval extends ASource {
+    static override tag = 'aevalsrc';
+    exprs: string;
     duration: number;
-    path: string;
-    loop: number;
-    seq: number = 0;
-    constructor(kwargs: any) {
+    constructor(exprs: string = "-2+random(0)", duration: number = 1) {
         super();
-        const { id, duration, path, loop } = kwargs;
-        if (typeof duration !== "number" || typeof id !== "string" || !id || !duration) {
-            throw new Error(`Unexpected id = '${id}' duration = '${duration}'`);
-        }
-        this.id = id;
+        this.exprs = exprs;
         this.duration = duration;
-        this.path = path;
-        this.loop = loop;
     }
     get start(): number {
         return 0;
@@ -183,12 +159,62 @@ export class AudioSource extends ASource {
         return this.duration;
     }
     override _dump() {
-        const { id, duration, path, loop } = this;
-        return { $: (this.constructor as typeof AudioChain).tag, id, path, loop, duration }
+        return { $: (this.constructor as typeof AudioChain).tag, exprs: this.exprs, duration: this.duration }
     }
     static override _load(d: any, prev: AFilter | ASource) {
-        if (prev == undefined) {
-            throw new Error(`Unexpected`);
+        if (prev != undefined) {
+            throw new Error(`Unexpected prev`);
+        }
+        return new AEval(d.exprs, d.duration);
+    }
+    static new(exprs: string, duration: number = 1) {
+        return new AEval(exprs, duration);
+    }
+    override feed_ff(ff: FFRun, parent?: AudioChain) {
+        const tag = ff.next_id();
+        const filters = [{
+            name: 'aevalsrc',
+            exprs: this.exprs,
+            d: this.duration,
+        }]
+        const o: FilterChain = { filters };
+        if (parent) {
+            o.output = tag;
+        }
+        ff.graph.push(o);
+        return this._graph_name = tag;
+    }
+
+}
+
+export class AudioSource extends ASource {
+    static override tag = 'source';
+    id: string;
+    duration: number;
+    path: string;
+    constructor(kwargs: any) {
+        super();
+        const { id, duration, path } = kwargs;
+        if (typeof duration !== "number" || typeof id !== "string" || !id || !duration) {
+            throw new Error(`Unexpected id = '${id}' duration = '${duration}'`);
+        }
+        this.id = id;
+        this.duration = duration;
+        this.path = path;
+    }
+    get start(): number {
+        return 0;
+    }
+    get end(): number {
+        return this.duration;
+    }
+    override _dump() {
+        const { id, duration, path } = this;
+        return { $: (this.constructor as typeof AudioChain).tag, id, path, duration }
+    }
+    static override _load(d: any, prev: AFilter | ASource) {
+        if (prev != undefined) {
+            throw new Error(`Unexpected prev`);
         }
         return new AudioSource(d);
     }
@@ -344,13 +370,86 @@ export class AdjustVolume extends AFilter {
     }
     *enum_filter() {
         yield { name: 'volume', volume: this.volume };
-
     }
     override _dump() {
         return { $: (this.constructor as typeof AudioChain).tag, volume: this.volume }
     }
     static _load(d: any, prev: AFilter | ASource) {
         return new this(prev, d.volume);
+    }
+}
+
+export class Tremolo extends AFilter {
+    static override tag = 'tremolo';
+    depth: number;
+    frequency: number;
+    constructor(prev: AFilter | ASource, frequency: number = 5, depth: number = 0.5) {
+        super();
+        if (typeof frequency !== "number" || !(prev instanceof AudioChain)) {
+            throw new Error(`Unexpected`);
+        }
+        this._prev = prev;
+        this.frequency = frequency;
+        this.depth = depth;
+    }
+    *enum_filter() {
+        yield { name: 'tremolo', f: this.frequency, d: this.depth };
+    }
+    override _dump() {
+        return { $: (this.constructor as typeof AudioChain).tag, frequency: this.frequency, depth: this.depth }
+    }
+    static _load(d: any, prev: AFilter | ASource) {
+        return new this(prev, d.frequency, d.depth);
+    }
+}
+
+export class Reverse extends AFilter {
+    static override tag = 'revese';
+    constructor(prev: AFilter | ASource) {
+        super();
+        this._prev = prev;
+    }
+    *enum_filter() {
+        yield { name: 'areverse' };
+    }
+    override _dump() {
+        return { $: (this.constructor as typeof AudioChain).tag }
+    }
+    static _load(d: any, prev: AFilter | ASource) {
+        return new this(prev);
+    }
+}
+
+export class Loop extends AFilter {
+    static override tag = 'loop';
+    _loop: number;
+    _start: number;
+    _end: number;
+    constructor(prev: AFilter | ASource, loop: number = -1.0) {
+        super();
+        this._prev = prev;
+        this._start = prev.start;
+        this._end = prev.start + prev.get_duration() * (loop + 1);
+        this._loop = loop;
+    }
+    get start(): number {
+        return this._start;
+    }
+
+    get end(): number {
+        return this._end;
+    }
+
+    *enum_filter() {
+        // https://superuser.com/questions/1391777/create-a-looped-audio-from-a-certain-part-of-audio-using-ffmpeg
+        yield { name: 'asetrate', r: 48000 };
+        yield { name: 'aloop', loop: this._loop, size: this.get_duration() * 48000 };
+    }
+    override _dump() {
+        return { $: (this.constructor as typeof AudioChain).tag, loop: this._loop }
+    }
+    static _load(d: any, prev: AFilter | ASource) {
+        return new this(prev, d.loop);
     }
 }
 
@@ -402,62 +501,6 @@ export class APad extends AFilter {
     static _load(d: any, prev: AFilter | ASource) {
         return new this(prev, d.pad_sec);
     }
-}
-
-export class FFRun {
-    input: Input[] = [];
-    graph: FilterChain[] = [];
-    bin = 'ffmpeg';
-    args = ['-hide_banner', '-y'];
-    _next_no = 0;
-    filter_script_path = `/tmp/fcs.txt`;
-
-    get_input_id(id: string) {
-        for (const x of this.input) {
-            if (x.id === id) {
-                return x;
-            }
-        }
-        let x = new Source();
-        x.id = id;
-        x.index = this.input.length;
-        this.input.push(x); return x;
-    }
-
-    get_input_path(path: string) {
-        for (const x of this.input) {
-            if (x.path === path) {
-                return x;
-            }
-        }
-        let x = new Source();
-        x.path = path;
-        x.index = this.input.length;
-        this.input.push(x);
-        return x;
-    }
-
-    next_id() {
-        return 'S' + (++this._next_no).toString(36);
-    }
-
-    ff_params() {
-        return ff_params(this);
-    }
-    filter_complex_script(g: string) {
-        const file = this.filter_script_path;
-        writeFileSync(file, g);
-        return file;
-    }
-    _run() {
-        const cmd = this.ff_params();
-        return import('node:child_process').then(cp => {
-            let [bin, ...args] = cmd;
-            return cp.spawn(bin, args, { stdio: 'inherit' });
-        })
-    }
-
-
 }
 
 export class AMix extends ASource {
@@ -520,11 +563,11 @@ export class AMix extends ASource {
     }
 }
 
-
 function fix_num(n: number) {
     const v = n.toFixed(5);
     return v.indexOf('.') < 0 ? v : v.replace(/0+$/g, '').replace(/\.$/g, '');
 }
-import { Asset, Root } from '../model/elements.js';
-import { ff_params, FilterChain, Input, Source, StreamRef } from './ffparams.js';
-import { spawnSync } from 'node:child_process';
+
+import { FilterChain } from './ffparams.js';
+import { FFRun } from './ffrun.js';
+

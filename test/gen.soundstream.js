@@ -24,7 +24,7 @@ function* enum1(all) {
         const q = ptypes(v);
         const t = [...q];
         // console.log("X", kind, t)
-        if (t.includes("AudioFilter")) {
+        if (t.includes("AudioChain")) {
 
             yield { kind, tag: v.tag };
 
@@ -35,7 +35,7 @@ function* enum1(all) {
 if (1) {
     const col = [...enum1(all)];
     for (const { kind, tag } of col) {
-        console.log(`case "${tag}": return ${kind}._load(d, prev);`);
+        if (tag) { console.log(`case "${tag}": return ${kind}._load(d, prev);`); }
     }
 
 

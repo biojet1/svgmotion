@@ -14,6 +14,7 @@ export interface PlainNode {
 }
 
 export interface PlainAsset {
+    id?: string;
     path?: string;
     blob?: string;
     url?: string;
@@ -31,7 +32,7 @@ export interface PlainRoot {
     frame_rate: number;
     sounds?: AudioEntry[];
     assets?: { [key: string]: PlainAsset };
-    audios: any[];
+    audios: { $: string;[key: string]: any; }[][];
 }
 
 export class Container extends Element {
@@ -709,7 +710,7 @@ export class Root extends Container {
         xset(this, "track", v)
     }
     //
-    add_file_asset(path: string) {
+    async add_file_asset(path: string) {
         const id = crypto.randomUUID();
         const a = new FileAsset(id, path);
         a._parent = this;

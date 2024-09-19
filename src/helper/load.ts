@@ -10,6 +10,7 @@ import {
     TSpan, Text,
     Asset
 } from "../model/elements.js";
+import { AudioChain, AudioSource } from "../utils/sound.js";
 
 function load_properties(that: Element, props: { [key: string]: PlainValue<any> }) {
     for (let [k, v] of Object.entries(props)) {
@@ -107,6 +108,7 @@ Root.prototype.load = function (src: PlainRoot) {
         this.assets = {};
         if (assets) {
             for (const [k, v] of Object.entries(assets)) {
+                v.id = k;
                 this.assets[k] = Asset.load(v);
             }
         }
@@ -123,6 +125,23 @@ Root.prototype.load = function (src: PlainRoot) {
     if (sounds) {
         this.sounds = sounds;
     }
+    this.audios = [];
+    if (audios) {
+        for (const v of audios) {
+            let next: AudioChain | undefined = undefined;
+            for (const u of v) {
+                if (next) {
+                    next = AudioChain.load(u, next);
+                } else {
+                    next = AudioChain.load(u, next as unknown as AudioChain);
+                }
+            }
+            if (next) {
+                this.audios.push(next);
+            }
+        }
+    }
+    // 
     {
         const vp = load_node(view, this);
         if (!(vp instanceof ViewPort)) {
@@ -170,3 +189,5 @@ Container.prototype._add_element = function (name: string) {
     }
     throw new Error("Unexpected tag: " + name);
 }
+
+
