@@ -169,19 +169,23 @@ export function ff_params(opt: FFCommand): Array<string> {
 				}
 			}
 		}
-		if (graph) {
+		GRAPH: if (graph) {
 			if (filter_complex_script) {
 				const g = ff_graph(graph, ';\n');
 				if (g) {
-					yield '-filter_complex_script';
-					yield filter_complex_script.call(opt, g);
+					const path = filter_complex_script.call(opt, g);
+					if (path) {
+						// yield '-/filter_complex';
+						yield '-filter_complex_script';
+						yield path;
+						break GRAPH;
+					}
 				}
-			} else {
-				const g = ff_graph(graph);
-				if (g) {
-					yield '-filter_complex';
-					yield g;
-				}
+			}
+			const g = ff_graph(graph);
+			if (g) {
+				yield '-filter_complex';
+				yield g;
 			}
 		}
 		if (output) {

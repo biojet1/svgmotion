@@ -51,6 +51,7 @@ test.test("Sound 1", async (t) => {
         // s.feed_ff(ff);
         console.dir(ff, { depth: 100 });
         ff.output = "/tmp/sound2.mp3";
+        // ff.args.push()
         ff.filter_script_path = "/tmp/sound2.txt";
         ff._run();
     }
@@ -63,7 +64,10 @@ test.test("Sound 1", async (t) => {
         mix.feed_ff(ff);
         // s.feed_ff(ff);
         console.dir(ff, { depth: 100 });
-        ff.input.args = ["-vn"]
+        ff.input[0].args = ["-vn"]
+        ff.input[1].args = ["-vn"]
+        // ff.input[2].args = ["-vn"]
+        // ff.input[3].args = ["-vn"]
         ff.filter_script_path = "/tmp/sound3.txt";
         ff.output = "/tmp/sound3.mp3";
         ff._run();
@@ -79,7 +83,10 @@ test.test("Sound 1", async (t) => {
     }
     {
         let ff = new FFRun();
-        (new AEval("0.1*sin(2*PI*(360-2.5/2)*t) | 0.1*sin(2*PI*(360+2.5/2)*t)", 5)).fade_out(2, 'exp').feed_ff(ff);
+        AEval.new("0.1*sin(2*PI*(360-2.5/2)*t) | 0.1*sin(2*PI*(360+2.5/2)*t)", 5)
+            .fade_out(2, 'exp')
+            .fade_in(1, 'tri')
+            .feed_ff(ff);
         // ff.input[0].args = ["-vn"]
         ff.filter_script_path = "/tmp/sound5.txt";
         ff.output = "/tmp/sound5.mp3";

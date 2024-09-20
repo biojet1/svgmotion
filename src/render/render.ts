@@ -118,10 +118,11 @@ export async function render_root(root: Root, {
             console.dir(root.sounds, { depth: 4 });
             const ff = ffcmd2(fps, [width, height], false, output, { lossless: true, ...video_params });
             const mix = AMix.new(root.sounds);
-            console.log(`AMix ${mix.get_duration()}`);
+            // console.log(`AMix ${mix.get_duration()}`);
             mix.feed_ff(ff);
             const [bin, ...args] = ff.ff_params();
             console.log(`${bin} `, ...args);
+            console.dir(ff, { depth: 10 });
             let ffproc = spawn(bin, args, {
                 stdio: ['pipe', 'inherit', 'inherit'],
             });
