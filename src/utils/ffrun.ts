@@ -1,5 +1,5 @@
 import { writeFileSync } from "fs";
-import { Input, FilterChain, Source, ff_params, Output } from "./ffparams.js";
+import { Input, FilterChain, Source, ff_params, Output, Sink } from "./ffparams.js";
 
 
 export class FFRun {
@@ -42,7 +42,7 @@ export class FFRun {
                 return x;
             }
         }
-        let x = new Source();
+        let x = new Sink();
         x.path = path;
         x.index = this.output.length;
         this.output.push(x);

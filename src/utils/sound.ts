@@ -1,14 +1,16 @@
 export class AudioChain {
     _graph_name?: string;
     static tag = '';
-    get_duration() {
-        return this.end - this.start;
-    }
+    protected _start: number = 0;
+    protected _end: number = 0;
     get start(): number {
-        return NaN;
+        return this._start;
     }
     get end(): number {
-        return NaN;
+        return this._end;
+    }
+    get_duration() {
+        return this.end - this.start;
     }
     get prev(): AudioChain | undefined {
         return undefined
@@ -66,7 +68,7 @@ export class AudioChain {
     }
     dump(): any {
         let a: any[] = [];
-        for (let cur: AFilter | ASource | undefined = this; cur; cur = cur.prev) {
+        for (let cur: AudioChain | undefined = this; cur; cur = cur.prev) {
             a.push(cur._dump());
         }
         return a.reverse();
@@ -93,16 +95,34 @@ export class AudioChain {
 export class AFirst {
 }
 export class ASource extends AudioChain {
+    protected data: object;
+    constructor(
+        data: { [key: string]: any }
+    ) {
+        super();
+        this.data = data || {};
+    }
+    override _dump() {
+        return { ...this.data, $: (this.constructor as typeof AudioChain).tag }
+    }
 
+    static _load(d: object, prev: AudioChain) {
+        if (prev != undefined) {
+            throw new Error(`Unexpected prev`);
+        }
+        return new this(d);
+    }
 }
 
 export class AFilter extends AudioChain {
-    _prev?: AudioChain;
+    protected data: object;
+    protected _prev?: AudioChain;
+
     get start(): number {
-        return this._prev?.start ?? NaN;
+        return this._start;
     }
     get end(): number {
-        return this._prev?.end ?? NaN;
+        return this._end;
     }
     get prev(): AudioChain | undefined {
         return this._prev;
@@ -139,66 +159,48 @@ export class AFilter extends AudioChain {
             return input.graph_name();
         }
     }
-}
 
-export class AFilter2 extends AFilter {
-    data: object;
-    protected _start: number;
-    protected _end: number;
-    get start(): number {
-        return this._start;
-    }
-    get end(): number {
-        return this._end;
-    }
-    constructor(prev: AFilter | ASource, data: { [key: string]: any }) {
+    constructor(prev: AudioChain, data: { [key: string]: any }) {
         super();
         this._prev = prev;
         this._start = prev.start;
         this._end = prev.end;
         this.data = data;
     }
+
     override _dump() {
         return { ...this.data, $: (this.constructor as typeof AudioChain).tag }
     }
-    static _load(d: object, prev: AFilter | ASource) {
+
+    static _load(d: object, prev: AudioChain) {
         return new this(prev, d);
     }
 }
 
+
 export class AEval extends ASource {
     static override tag = 'aevalsrc';
-    exprs: string;
-    duration: number;
-    constructor(exprs: string = "-2+random(0)", duration: number = 1) {
-        super();
-        this.exprs = exprs;
-        this.duration = duration;
-    }
-    get start(): number {
-        return 0;
-    }
-    get end(): number {
-        return this.duration;
-    }
-    override _dump() {
-        return { exprs: this.exprs, duration: this.duration, $: (this.constructor as typeof AudioChain).tag }
-    }
-    static override _load(d: any, prev: AFilter | ASource) {
-        if (prev != undefined) {
-            throw new Error(`Unexpected prev`);
-        }
-        return new AEval(d.exprs, d.duration);
+
+    // exprs: string;
+    constructor(
+        data: { [key: string]: any }
+        // exprs: string = "-2+random(0)", duration: number = 1
+    ) {
+        super(data);
+        // this.exprs = exprs;
+        const { duration = 1 } = this.data as { duration: number };
+        this._end = duration;
     }
     static new(exprs: string, duration: number = 1) {
-        return new AEval(exprs, duration);
+        return new AEval({ exprs, duration });
     }
     override feed_ff(ff: FFRun, parent?: AudioChain) {
         const tag = ff.next_id();
+        const { exprs = "-2+random(0)" } = this.data as { exprs: string };
         const filters = [{
             name: 'aevalsrc',
-            exprs: this.exprs,
-            d: this.duration,
+            exprs: exprs,
+            d: this.get_duration(),
         }]
         const o: FilterChain = { filters };
         if (parent) {
@@ -212,39 +214,17 @@ export class AEval extends ASource {
 
 export class AudioSource extends ASource {
     static override tag = 'source';
-    id: string;
-    duration: number;
-    path: string;
-    constructor(kwargs: any) {
-        super();
-        const { id, duration, path } = kwargs;
+    constructor(data: { [key: string]: any }) {
+        super(data);
+        const { duration, id } = this.data as { id: string; duration: number };
         if (typeof duration !== "number" || typeof id !== "string" || !id || !duration) {
             throw new Error(`Unexpected id = '${id}' duration = '${duration}'`);
         }
-        this.id = id;
-        this.duration = duration;
-        this.path = path;
+        this._end = duration;
     }
-    get start(): number {
-        return 0;
-    }
-    get end(): number {
-        return this.duration;
-    }
-    override _dump() {
-        const { id, duration, path } = this;
-        return { $: (this.constructor as typeof AudioChain).tag, id, path, duration }
-    }
-    static override _load(d: any, prev: AFilter | ASource) {
-        if (prev != undefined) {
-            throw new Error(`Unexpected prev`);
-        }
-        return new AudioSource(d);
-    }
-
     override feed_ff(ff: FFRun, parent?: AudioChain) {
-        const inp = ff.get_input_id(this.id);
-        const { id, duration, path, loop } = this;
+        const { id, path } = this.data as { id: string; path: string };
+        const inp = ff.get_input_id(id);
         if (path) {
             inp.path = path;
         }
@@ -252,9 +232,9 @@ export class AudioSource extends ASource {
     }
 }
 
-export class StartAt extends AFilter2 {
+export class StartAt extends AFilter {
     static override tag = 'start_at';
-    constructor(prev: AFilter | ASource, data: { [key: string]: any }) {
+    constructor(prev: AudioChain, data: { [key: string]: any }) {
         super(prev, data);
         this._start = data.start as number;
         if (typeof this._start !== "number") {
@@ -266,7 +246,7 @@ export class StartAt extends AFilter2 {
     }
 }
 
-export class AFadeIn extends AFilter2 {
+export class AFadeIn extends AFilter {
     static override tag = 'fade_in';
     override *enum_filter() {
         const { duration: fade_dur = 1, curve = 'tri' } = this.data as { duration: number; curve: string };
@@ -290,13 +270,11 @@ export class AFadeOut extends AFadeIn {
     }
 }
 
-export class Slice extends AFilter2 {
+export class Slice extends AFilter {
     static override tag = 'slice';
-    _start: number;
-    _end: number;
     from = 0;
     to = 0;
-    constructor(prev: AFilter | ASource, data: { [key: string]: any }) {
+    constructor(prev: AudioChain, data: { [key: string]: any }) {
         super(prev, data);
         const { from = prev.start, to = prev.end } = data as { from: number, to: number };
         if (typeof from !== "number" || !(prev instanceof AudioChain) || typeof to !== "number") {
@@ -317,7 +295,7 @@ export class Slice extends AFilter2 {
     }
 }
 
-export class AdjustVolume extends AFilter2 {
+export class AdjustVolume extends AFilter {
     static override tag = 'adjust_volume';
     *enum_filter() {
         const { volume } = this.data as { volume: number };
@@ -327,7 +305,7 @@ export class AdjustVolume extends AFilter2 {
 
 
 
-export class Tremolo extends AFilter2 {
+export class Tremolo extends AFilter {
     static override tag = 'tremolo';
     *enum_filter() {
         const { frequency, depth } = this.data as any;
@@ -335,18 +313,18 @@ export class Tremolo extends AFilter2 {
     }
 }
 
-export class Reverse extends AFilter2 {
+export class Reverse extends AFilter {
     static override tag = 'revese';
     *enum_filter() {
         yield { name: 'areverse' };
     }
 }
 
-export class Loop extends AFilter2 {
+export class Loop extends AFilter {
     static override tag = 'loop';
     _loop: number;
 
-    constructor(prev: AFilter | ASource, data: { [key: string]: any }) {
+    constructor(prev: AudioChain, data: { [key: string]: any }) {
         super(prev, data);
         let { loop = -1 } = data as { loop: number }
         if (loop < 0) {
@@ -363,10 +341,10 @@ export class Loop extends AFilter2 {
     }
 }
 
-export class ADelay extends AFilter2 {
+export class ADelay extends AFilter {
     static override tag = 'adelay';
     delay: number;
-    constructor(prev: AFilter | ASource, data: { [key: string]: any }) {
+    constructor(prev: AudioChain, data: { [key: string]: any }) {
         super(prev, data);
         let { delay = 0 } = data as { delay: number }
         this.delay = delay;
@@ -377,10 +355,10 @@ export class ADelay extends AFilter2 {
     }
 }
 
-export class APad extends AFilter2 {
+export class APad extends AFilter {
     static override tag = 'apad';
     pad_sec: number;
-    constructor(prev: AFilter | ASource, data: { [key: string]: any }) {
+    constructor(prev: AudioChain, data: { [key: string]: any }) {
         super(prev, data);
         let { pad_sec = 0 } = data as { pad_sec: number }
         this._end += pad_sec;
@@ -396,15 +374,17 @@ export class APad extends AFilter2 {
 
 export class AMix extends ASource {
     inputs: AudioChain[];
-    _start = 0;
-    _end = 0;
-    constructor(inputs: AudioChain[]) {
-        super();
+    constructor(inputs: AudioChain[], data: { [key: string]: any }) {
+        super(data);
         let _start = 0;
         let _end = 0;
+        const { duration = -Infinity } = this.data as { duration?: number };
         for (const e of inputs) {
             _start = Math.min(e.start, _start);
             _end = Math.max(e.end, _end);
+        }
+        if (duration > 0) {
+            _end = Math.min(duration, _end);
         }
         // console.log("RANGE", _start, _end);
         inputs = inputs.map(e => {
@@ -424,12 +404,6 @@ export class AMix extends ASource {
         this._start = _start;
         this._end = _end;
         this.inputs = inputs;
-    }
-    get start(): number {
-        return this._start;
-    }
-    get end(): number {
-        return this._end;
     }
 
     override feed_ff(ff: FFRun, parent?: AudioChain) {
@@ -452,12 +426,12 @@ export class AMix extends ASource {
         ff.graph.push(o);
         return this._graph_name = tag;
     }
-    static new(inputs: AudioChain[]) {
-        return new AMix(inputs);
+    static new(inputs: AudioChain[], data: { [key: string]: any } = {}) {
+        return new AMix(inputs, data);
     }
-    static from(...inputs: AudioChain[]) {
-        return new AMix(inputs);
-    }
+    // static from(...inputs: AudioChain[]) {
+    //     return new AMix(inputs);
+    // }
 }
 
 function fix_num(n: number) {

@@ -117,7 +117,7 @@ export async function render_root(root: Root, {
         if (!sink) {
             console.dir(root.sounds, { depth: 4 });
             const ff = ffcmd2(fps, [width, height], false, output, { lossless: true, ...video_params });
-            const mix = AMix.new(root.sounds);
+            const mix = AMix.new(root.sounds, { duration });
             // console.log(`AMix ${mix.get_duration()}`);
             mix.feed_ff(ff);
             const [bin, ...args] = ff.ff_params();

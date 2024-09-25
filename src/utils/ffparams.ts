@@ -5,7 +5,7 @@ export interface Filter {
 	[key: string]: Value;
 }
 
-interface Stream {
+interface IStream {
 	path?: string;
 	args?: (string | [string, Value] | string[])[] /*| { [key: string]: Value }*/;
 	tag?: string;
@@ -13,28 +13,33 @@ interface Stream {
 	id?: string;
 }
 
-export interface Input extends Stream {
+export interface Input extends IStream {
 	loop?: number;
 }
 
-export interface Output extends Stream {
+export interface Output extends IStream {
 	format?: string;
 }
 
-export class Source implements Input {
+export class Stream implements IStream {
 	path?: string | undefined;
 	args?: (string | [string, Value] | string[])[];
 	tag?: string | undefined;
 	index?: number | undefined;
 	id?: string | undefined;
+}
+
+export class Source extends Stream implements Input {
 	loop?: number;
 }
 
-export class Sink implements Output {
+export class Sink extends Stream implements Output {
+
+
 }
 
 export interface FilterChain {
-	input?: Array<number | string | String | Stream> | number | string | Stream;
+	input?: Array<number | string | String | IStream> | number | string | IStream;
 	output?: Iterable<number | string> | number | string;
 	filters?: Iterable<Filter>;
 }

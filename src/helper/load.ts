@@ -10,7 +10,7 @@ import {
     TSpan, Text,
     Asset
 } from "../model/elements.js";
-import { AudioChain, AudioSource } from "../utils/sound.js";
+import { AFilter, ASource, AudioChain, AudioSource } from "../utils/sound.js";
 
 function load_properties(that: Element, props: { [key: string]: PlainValue<any> }) {
     for (let [k, v] of Object.entries(props)) {
@@ -125,12 +125,12 @@ Root.prototype.load = function (src: PlainRoot) {
     this.sounds = [];
     if (sounds) {
         for (const v of sounds) {
-            let next: AudioChain | undefined = undefined;
+            let next: ASource | AFilter | undefined = undefined;
             for (const u of v) {
                 if (next) {
                     next = AudioChain.load(u, next);
                 } else {
-                    next = AudioChain.load(u, next as unknown as AudioChain);
+                    next = AudioChain.load(u, next as unknown as ASource);
                 }
             }
             if (next) {

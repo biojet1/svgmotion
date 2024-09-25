@@ -7,11 +7,6 @@ test.test("Sound 1", async (t) => {
     const anim = new Root();
     await anim.load_svg("res/the_quick.svg");
 
-
-
-
-
-
     const snd1 = await anim.add_file_asset(`/mnt/META/opt/animations/sfx/mixkit-fast-air-sweep-transition-168.wav`).then(v => v.as_sound());
     const snd2 = await anim.add_file_asset(`/mnt/META/opt/animations/sfx/mixkit-quick-jump-arcade-game-239.wav`).then(v => v.as_sound());
     const snd3 = await anim.add_file_asset(`/mnt/META/opt/animations/sfx/mixkit-typewriter-single-mechanical-hit-1384.wav`).then(v => v.as_sound());
