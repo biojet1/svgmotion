@@ -397,6 +397,8 @@ export class AMix extends ASource {
             if (pad_sec > 0) {
                 // https://stackoverflow.com/questions/35509147/ffmpeg-amix-filter-volume-issue-with-inputs-of-different-duration
                 e = e.pad(pad_sec);
+            } else if (pad_sec < 0) {
+                e = e.slice(0, _end);
             }
             // console.log("inputs", pad_sec, [start, end], [_start, _end]);
             return e;

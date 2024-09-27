@@ -228,3 +228,60 @@ Root.prototype.load_json = function (src: string) {
         this.parse_json(blob)
     );
 }
+
+class SAXElement {
+    uri?: string = '';
+    name: string = '';
+    nodes: (string | SAXElement)[] = [];
+    attrs: SAXAttribute[] = [];
+}
+
+interface SAXAttribute {
+    uri?: string;
+    name: string;
+    value: string;
+}
+
+export async function sax_parse_svg(
+    root: Root,
+    src: string,
+    // opt: { xinclude?: boolean; base?: string | URL } = {}
+) {
+    const { SAXParser } = await import("sax-ts");
+    const strict: boolean = true; // change to false for HTML parsing
+    const options: {} = { xmlns: true, normalize: true, trim: true }; // refer to "Arguments" section
+    const parser = new SAXParser(strict, options);
+    let parents: SAXElement[] = [];
+    parser.onerror = function (e: any) {
+        console.error(e);
+    };
+    parser.ontext = function (t: string) {
+        parents.at(-1)?.nodes.push(t);
+    };
+    parser.onopentag = function (node: any) {
+        const { local, uri, attributes } = node as {
+            local: string; uri: string;
+            attributes: {
+                [key: string]: { name: string, value: string, prefix: string, local: string, uri: string }
+            }
+        };
+        const elem = new SAXElement();
+        elem.name = local;
+        elem.uri = uri;
+        elem.attrs = Array.from(Object.values(attributes)).map(function ({ uri, local, value }, i) {
+            return { uri, value, name: local };
+        }).filter(v => !!v.name);
+        parents.at(-1)?.nodes.push(elem);
+        parents.push(elem);
+    };
+    // parser.onattribute = function (attr: any) {
+    //     console.log('onAttribute: ', attr)
+    // };
+    parser.onend = function () {
+        // parser stream is done, and ready to have more stuff written to it.
+        // console.warn('end of XML');
+        parents.pop();
+    };
+    parser.write(src);
+    return parents[0];
+}

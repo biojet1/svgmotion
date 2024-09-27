@@ -17,8 +17,6 @@ export class TextData extends Node {
 export class Element extends Parent {
     id?: string;
     static tag = '?';
-
-
     cat_transform(frame: number, n: Matrix) {
         if (Object.hasOwn(this, "transform")) {
             this.transform.cat_transform(frame, n);

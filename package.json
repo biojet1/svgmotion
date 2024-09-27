@@ -51,6 +51,7 @@
     "domspec": "github:biojet1/domspec#release",
     "probe-image-size": "^7.2.3",
     "puppeteer": "^22.6.0",
+    "sax-ts": "^1.2.13",
     "tap": "^18.7.1",
     "yargs": "^17.7.2"
   },
