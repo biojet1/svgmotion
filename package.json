@@ -48,7 +48,6 @@
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
-    "domspec": "github:biojet1/domspec#release",
     "probe-image-size": "^7.2.3",
     "puppeteer": "^22.6.0",
     "sax-ts": "^1.2.13",

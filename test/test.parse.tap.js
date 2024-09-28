@@ -1,7 +1,6 @@
 "uses strict";
 import test from "tap";
-import { SVGDocument, XMLSerializer } from "domspec";
-import { Vector, RGB, Root, Rel } from "svgmotion";
+import { Root, Rel } from "svgmotion";
 
 test.test("load_svg polygon01", async (t) => {
     const anim = new Root();
@@ -31,16 +30,19 @@ test.test("load_svg polygon01", async (t) => {
 
 
     anim.save_html("/tmp/polygon01.html");
-    const nod = anim.to_dom(new SVGDocument());
-    anim.update_dom(0);
-    const ser = new XMLSerializer();
-    const xml = ser.serializeToString(nod);
-    // console.log(ser.serializeToString(nod));
     {
-        const fs = await import('fs/promises');
-        const h = await fs.open('/tmp/polygon01.svg', 'w');
-        await h.write(xml);
-        await h.close();
+        const { SVGDocument, XMLSerializer } = await import("domspec");
+        const nod = anim.to_dom(new SVGDocument());
+        anim.update_dom(0);
+        const ser = new XMLSerializer();
+        const xml = ser.serializeToString(nod);
+        // console.log(ser.serializeToString(nod));
+        {
+            const fs = await import('fs/promises');
+            const h = await fs.open('/tmp/polygon01.svg', 'w');
+            await h.write(xml);
+            await h.close();
+        }
     }
 
     t.end();
