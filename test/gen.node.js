@@ -1,5 +1,4 @@
 "uses strict";
-
 import * as all from "../dist/lib.js";
 
 function* ptypes(class_dec) {
@@ -44,6 +43,11 @@ function* enum1(all) {
                     case "svg":
                         name = "view";
                         break;
+                    default:
+                        if (name.starstWith("fe")) {
+                            // /(?<!^)(?=[A-Z])/.sub
+                            //     re.sub(r'', '_', name).lower()
+                        }
                 }
                 yield { name, kind, tag };
             }
@@ -94,26 +98,4 @@ if (1) {
     console.log(`\t}`);
     console.log(`\tthrow new Error("Unexpected tag: " + tag);`);
     console.log(`}`);
-
 }
-
-/*
-function tracePrototypeChainOf(object) {
-
-    var proto = object.constructor.prototype;
-    var result = '';
-
-    while (proto) {
-        result += ' -> ' + proto.constructor.name + '.prototype';
-        proto = Object.getPrototypeOf(proto)
-    }
-
-    result += ' -> null';
-    return result;
-}
-
-var trace = tracePrototypeChainOf(document.body)
-alert(trace);
-*/
-
-// console.log(all);

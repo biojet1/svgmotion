@@ -9,10 +9,10 @@ import {
     Use,
     TSpan, Text,
     Asset,
-    FEGaussianBlur,
     Filter
 } from "../model/elements.js";
 import { AFilter, ASource, AudioChain, AudioSource } from "../utils/sound.js";
+import { FEGaussianBlur } from "../model/filter.js";
 
 function load_properties(that: Element, props: { [key: string]: PlainValue<any> }) {
     for (let [k, v] of Object.entries(props)) {

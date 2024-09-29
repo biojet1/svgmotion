@@ -1,6 +1,6 @@
 import { Stepper } from "../track/stepper.js";
 import { ScalarValue, PointsValue, TextValue, Animatable, VectorValue } from "../model/value.js";
-import { Container, FEGaussianBlur, Root } from "../model/elements.js";
+import { Container, Root } from "../model/elements.js";
 import { Node } from "../model/linked.js";
 import { Transform, Fill, ViewBox, Font, Stroke, ValueSet } from "../model/valuesets.js";
 import { Element, TextData } from "../model/base.js";
@@ -164,7 +164,15 @@ const PROP_MAP: {
     filter: function (frame: number, node: SVGElement, prop: TextValue) {
         node.setAttribute("filter", prop.get_repr(frame));
     },
-
+    in: function (frame: number, node: SVGElement, prop: TextValue) {
+        node.setAttribute("in", prop.get_repr(frame));
+    },
+    // <feBlend>
+    // <feComposite>
+    // <feDisplacementMap>
+    in2: function (frame: number, node: SVGElement, prop: TextValue) {
+        node.setAttribute("in2", prop.get_repr(frame));
+    },
 };
 
 function update_dom(frame: number, target: Element) {
