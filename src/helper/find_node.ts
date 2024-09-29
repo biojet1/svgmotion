@@ -1,8 +1,10 @@
 import { Element, TextData } from "../model/base.js";
-import { Group, Container, Use, Text, TSpan, ViewPort, Image, Symbol } from "../model/elements.js";
+import { Container, Symbol, Group, ViewPort } from "../model/containers.js";
+import { Use, Image } from "../model/elements.js";
+import { Text, TSpan } from "../model/text.js";
 import { Circle, Ellipse, Line, Path, Polygon, Polyline, Rect } from "../model/shapes.js";
 
-declare module "../model/elements" {
+declare module "../model/containers" {
     interface Container {
         get_circle(x: number | string): Circle;
         get_data(x: number | string): TextData;

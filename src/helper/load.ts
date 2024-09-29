@@ -2,11 +2,11 @@ import { PlainValue, TextValue } from "../model/value.js";
 import { Animatable } from "../model/value.js";
 import { ValueSet } from "../model/valuesets.js";
 import { Element } from "../model/base.js";
-import {
-    Container, Root, PlainRoot, PlainNode, ViewPort, Group, Image, Symbol, Use, TSpan, Text, Asset, Filter
-} from "../model/elements.js";
+import { Root, PlainRoot, PlainNode, Image, Use, Asset } from "../model/elements.js";
+import { TSpan, Text } from "../model/text.js";
+import { Container, Group, Symbol, ViewPort, Filter } from "../model/containers.js";
 import { Ellipse, Circle, Polyline, Polygon, Rect, Path, Line, } from "../model/shapes.js";
-import { AFilter, ASource, AudioChain, AudioSource } from "../utils/sound.js";
+import { AFilter, ASource, AudioChain } from "../utils/sound.js";
 import { FEGaussianBlur } from "../model/filters.js";
 
 function load_properties(that: Element, props: { [key: string]: PlainValue<any> }) {
@@ -62,7 +62,9 @@ declare module "../model/elements" {
         load(src: PlainRoot): void;
         parse_json(src: string): void;
     }
+}
 
+declare module "../model/containers" {
     interface Container {
         add_circle(before?: Element): Circle;
         add_ellipse(before?: Element): Ellipse;
@@ -80,12 +82,10 @@ declare module "../model/elements" {
         add_tspan(before?: Element): TSpan;
         add_use(before?: Element): Use;
         add_view(before?: Element): ViewPort;
-
         ////
         _add_element(name: string): Element;
     }
 }
-
 
 export function from_json(src: PlainRoot) {
     const root = new Root();
@@ -196,7 +196,6 @@ Container.prototype._add_element = function (tag: string) {
         case "use": return this.add_use();
         case "svg": return this.add_view();
     }
-
     throw new Error("Unexpected tag: " + name);
 }
 

@@ -19,6 +19,7 @@ export abstract class Shape extends Element {
         return this.get_path(frame).bbox();
     }
 }
+
 export class Path extends Shape {
     static override tag = "path";
     ///

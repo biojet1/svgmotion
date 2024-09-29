@@ -1,9 +1,10 @@
 import { Stepper } from "../track/stepper.js";
-import { ScalarValue, PointsValue, TextValue, Animatable, VectorValue } from "../model/value.js";
-import { Container, Root } from "../model/elements.js";
 import { Node } from "../model/linked.js";
+import { ScalarValue, PointsValue, TextValue, Animatable, VectorValue } from "../model/value.js";
 import { Transform, Fill, ViewBox, Font, Stroke, ValueSet } from "../model/valuesets.js";
 import { Element, TextData } from "../model/base.js";
+import { Root } from "../model/elements.js";
+import { Container } from "../model/containers.js";
 
 const PROP_MAP: {
     [key: string]: ((frame: number, elem: any, prop: any, node: Element) => void);
@@ -211,12 +212,15 @@ declare module "../model/base" {
 }
 
 declare module "../model/elements" {
+    interface Root {
+        update_dom(frame: number): void;
+    }
+}
+
+declare module "../model/containers" {
     interface Container {
         update_dom(frame: number): void;
         stepper(): Stepper;
-    }
-    interface Root {
-        update_dom(frame: number): void;
     }
 }
 

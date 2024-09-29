@@ -4,7 +4,7 @@ import { Proxy } from "../../track/action.js";
 import { KeyExtra } from "../../keyframe/keyframe.js";
 import { xget } from "../valuesets.js";
 import { Element } from "../base.js";
-import { Container } from "../elements.js";
+import { Container } from "../containers.js";
 import { BoxLength } from "../../helper/svg_length.js";
 
 export interface ScaleParams extends KeyExtra {

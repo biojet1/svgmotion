@@ -1,6 +1,7 @@
 import { Matrix, MatrixMut, Vector } from "../geom/index.js";
 import { Element } from "./base.js";
-import { Group, ViewPort, Root, Container } from "./elements.js";
+import { Root } from "./elements.js";
+import { Container, Group, ViewPort } from "./containers.js";
 import { Parent } from "./linked.js";
 
 declare module "./base" {
@@ -16,6 +17,7 @@ declare module "./base" {
         transform_under(frame: number, top: Parent): Matrix;
     }
 }
+
 Element.prototype.get_root = function () {
     for (let x of this.ancestors()) {
         if (x instanceof Root) {
@@ -26,6 +28,7 @@ Element.prototype.get_root = function () {
         `Unexpected ${this.constructor.name} ${this._parent?.constructor.name}`
     );
 }
+
 Element.prototype.g_wrap = function () {
     const p = this.parent();
     if (p) {

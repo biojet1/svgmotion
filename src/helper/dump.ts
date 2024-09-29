@@ -1,20 +1,23 @@
 import { Animatable } from "../model/value.js";
-import { Container, Root, PlainRoot, PlainNode, Asset } from "../model/elements.js";
+import { Container } from "../model/containers.js";
+import { Root, PlainRoot, PlainNode, Asset } from "../model/elements.js";
 import { ValueSet } from "../model/valuesets.js";
 import { TextData, Element } from "../model/base.js";
 import { AudioSource } from "../utils/sound.js";
 import { Voice } from "../tts/core.js";
 
 declare module "../model/elements" {
-    interface Container {
-        dump(): any;
-    }
-
     interface Root {
         dump(): any;
     }
 }
 
+declare module "../model/containers" {
+    interface Container {
+        dump(): any;
+    }
+
+}
 declare module "../model/base" {
     interface TextData {
         dump(): any;

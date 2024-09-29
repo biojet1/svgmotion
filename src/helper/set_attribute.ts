@@ -2,6 +2,7 @@
 import { ScalarValue, UnknownValue } from "../model/value.js";
 import { ComputeLength } from "./svg_length.js";
 import { Element, LengthYValue, LengthXValue, LengthValue, FontSizeValue } from "../model/base.js";
+import { ViewPort, Symbol } from "../model/containers.js";
 
 declare module "../model/base" {
     interface Element {
@@ -185,10 +186,11 @@ Element.prototype.set_attribute = function (name: string, value: string): Elemen
     return this;
 }
 
-import { ViewPort, Image, Symbol, Use, TSpan, Text } from "../model/elements.js";
+import { Image, Use } from "../model/elements.js";
+import { TSpan, Text } from "../model/text.js";
 import { Rect, Path, Line, Ellipse, Circle, Polyline, Polygon } from "../model/shapes.js";
 
-declare module "../model/elements" {
+declare module "../model/containers" {
     interface ViewPort {
         set_attribute(name: string, value: string): this;
     }

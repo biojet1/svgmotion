@@ -2,7 +2,7 @@ import { Matrix } from "../../geom/index.js";
 import { Track, Proxy } from "../../track/index.js";
 import { KeyExtra } from "../../keyframe/keyframe.js";
 import { Element } from "../base.js";
-import { Container } from "../elements.js";
+import { Container } from "../containers.js";
 
 export interface AlignParams {
     hgap?: number;
