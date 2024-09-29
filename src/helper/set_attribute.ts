@@ -185,11 +185,8 @@ Element.prototype.set_attribute = function (name: string, value: string): Elemen
     return this;
 }
 
-import {
-    ViewPort, Rect, Path, Line, Ellipse, Circle, Polyline, Polygon, Image, Symbol,
-    Use,
-    TSpan, Text
-} from "../model/elements.js";
+import { ViewPort, Image, Symbol, Use, TSpan, Text } from "../model/elements.js";
+import { Rect, Path, Line, Ellipse, Circle, Polyline, Polygon } from "../model/shapes.js";
 
 declare module "../model/elements" {
     interface ViewPort {

@@ -1,16 +1,6 @@
-import {
-    Circle,
-    Container,
-    Ellipse,
-    Group, Line,
-    Path,
-    Polygon,
-    Polyline,
-    Rect,
-    Use, Text, TSpan,
-    ViewPort, Image, Symbol
-} from "../model/elements.js";
 import { Element, TextData } from "../model/base.js";
+import { Group, Container, Use, Text, TSpan, ViewPort, Image, Symbol } from "../model/elements.js";
+import { Circle, Ellipse, Line, Path, Polygon, Polyline, Rect } from "../model/shapes.js";
 
 declare module "../model/elements" {
     interface Container {

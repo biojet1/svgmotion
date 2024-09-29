@@ -3,16 +3,11 @@ import { Animatable } from "../model/value.js";
 import { ValueSet } from "../model/valuesets.js";
 import { Element } from "../model/base.js";
 import {
-    Container, Root, PlainRoot, PlainNode,
-    ViewPort, Rect, Path, Line, Group,
-    Ellipse, Circle, Polyline, Polygon, Image, Symbol,
-    Use,
-    TSpan, Text,
-    Asset,
-    Filter
+    Container, Root, PlainRoot, PlainNode, ViewPort, Group, Image, Symbol, Use, TSpan, Text, Asset, Filter
 } from "../model/elements.js";
+import { Ellipse, Circle, Polyline, Polygon, Rect, Path, Line, } from "../model/shapes.js";
 import { AFilter, ASource, AudioChain, AudioSource } from "../utils/sound.js";
-import { FEGaussianBlur } from "../model/filter.js";
+import { FEGaussianBlur } from "../model/filters.js";
 
 function load_properties(that: Element, props: { [key: string]: PlainValue<any> }) {
     for (let [k, v] of Object.entries(props)) {

@@ -167,9 +167,7 @@ const PROP_MAP: {
     in: function (frame: number, node: SVGElement, prop: TextValue) {
         node.setAttribute("in", prop.get_repr(frame));
     },
-    // <feBlend>
-    // <feComposite>
-    // <feDisplacementMap>
+    // <feBlend>, <feComposite>, <feDisplacementMap>
     in2: function (frame: number, node: SVGElement, prop: TextValue) {
         node.setAttribute("in2", prop.get_repr(frame));
     },
