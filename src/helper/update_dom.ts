@@ -1,6 +1,6 @@
 import { Stepper } from "../track/stepper.js";
-import { ScalarValue, PointsValue, TextValue, Animatable } from "../model/value.js";
-import { Container, Root } from "../model/elements.js";
+import { ScalarValue, PointsValue, TextValue, Animatable, VectorValue } from "../model/value.js";
+import { Container, FEGaussianBlur, Root } from "../model/elements.js";
 import { Node } from "../model/linked.js";
 import { Transform, Fill, ViewBox, Font, Stroke, ValueSet } from "../model/valuesets.js";
 import { Element, TextData } from "../model/base.js";
@@ -158,12 +158,19 @@ const PROP_MAP: {
         node.setAttribute("color-rendering", prop.get_repr(frame));
     },
 
+    std_dev: function (frame: number, node: SVGFEGaussianBlurElement, prop: VectorValue) {
+        node.setAttribute("stdDeviation", prop.get_repr(frame));
+    },
+    filter: function (frame: number, node: SVGElement, prop: TextValue) {
+        node.setAttribute("filter", prop.get_repr(frame));
+    },
 
 };
 
 function update_dom(frame: number, target: Element) {
     const { _start, _end: end } = target;
     let cur: Node | undefined = _start;
+    console.log("update_dom", target.constructor.name);
     do {
         const elem = (cur as any)._element;
         if (elem) {
@@ -202,8 +209,10 @@ declare module "../model/elements" {
         update_dom(frame: number): void;
         stepper(): Stepper;
     }
+    interface Root {
+        update_dom(frame: number): void;
+    }
 }
-
 
 function set_svg(elem: SVGElement, node: Element): SVGElement {
     const { id } = node;
@@ -238,23 +247,30 @@ TextData.prototype.to_dom = function (doc: typeof SVGElement.prototype.ownerDocu
 
 Root.prototype.to_dom = function to_dom(doc: typeof SVGElement.prototype.ownerDocument): SVGElement {
     const element = this.view.to_dom(doc);
-
     element.setAttribute("xmlns", "http://www.w3.org/2000/svg");
     element.setAttributeNS("http://www.w3.org/2000/svg", "version", "1.1");
     const defs = doc.createElementNS(NS_SVG, "defs");
+    // console.log("Root.prototype.to_dom:");
+    // console.dir(this.defs);
     for (let [n, v] of Object.entries(this.defs)) {
+        // console.log("defs appendChild", n);
+        // console.dir(v);
         defs.appendChild(v.to_dom(doc));
     }
     if (defs.firstElementChild) {
         element.insertBefore(defs, element.firstChild);
     }
-
     // element.setAttribute("version", "2.0");
     return element;
 }
 
 Container.prototype.update_dom = function (frame: number) {
     update_dom(frame, this);
+}
+
+Root.prototype.update_dom = function (frame: number) {
+    update_dom(frame, this);
+    Object.values(this.defs).map((elem) => update_dom(frame, elem));
 }
 
 TextData.prototype.update_dom = function (frame: number) {

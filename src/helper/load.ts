@@ -8,7 +8,9 @@ import {
     Ellipse, Circle, Polyline, Polygon, Image, Symbol,
     Use,
     TSpan, Text,
-    Asset
+    Asset,
+    FEGaussianBlur,
+    Filter
 } from "../model/elements.js";
 import { AFilter, ASource, AudioChain, AudioSource } from "../utils/sound.js";
 
@@ -69,6 +71,8 @@ declare module "../model/elements" {
     interface Container {
         add_circle(before?: Element): Circle;
         add_ellipse(before?: Element): Ellipse;
+        add_feGaussianBlur(before?: Element): FEGaussianBlur;
+        add_filter(before?: Element): Filter;
         add_group(before?: Element): Group;
         add_image(before?: Element): Image;
         add_line(before?: Element): Line;
@@ -81,6 +85,7 @@ declare module "../model/elements" {
         add_tspan(before?: Element): TSpan;
         add_use(before?: Element): Use;
         add_view(before?: Element): ViewPort;
+
         ////
         _add_element(name: string): Element;
     }
@@ -116,10 +121,18 @@ Root.prototype.load = function (src: PlainRoot) {
     {
         this.defs = {};
         if (defs) {
+            // console.log("defs:", defs);
             Object.entries(defs).map(([k, v]) => {
-                this.defs[k] = load_node(v, this);
+                // console.dir(v);
+                const node = load_node(v, this);
+                if (node.id !== k) {
+                    throw new Error(``);
+                }
+                node._detach();
+                this.defs[k] = node;
             });
         }
+        // console.log("DEFS:", this.defs);
     }
     this.version = version;
     this.sounds = [];
@@ -151,8 +164,11 @@ Root.prototype.load = function (src: PlainRoot) {
 Root.prototype.parse_json = function (src: string) {
     return this.load(JSON.parse(src))
 }
+// Container.prototype.add_...
 Container.prototype.add_circle = function (before?: Element) { const x = new Circle(); this.insert_before(before ?? this._end, x); return x; }
 Container.prototype.add_ellipse = function (before?: Element) { const x = new Ellipse(); this.insert_before(before ?? this._end, x); return x; }
+Container.prototype.add_feGaussianBlur = function (before?: Element) { const x = new FEGaussianBlur(); this.insert_before(before ?? this._end, x); return x; }
+Container.prototype.add_filter = function (before?: Element) { const x = new Filter(); this.insert_before(before ?? this._end, x); return x; }
 Container.prototype.add_group = function (before?: Element) { const x = new Group(); this.insert_before(before ?? this._end, x); return x; }
 Container.prototype.add_image = function (before?: Element) { const x = new Image(); this.insert_before(before ?? this._end, x); return x; }
 Container.prototype.add_line = function (before?: Element) { const x = new Line(); this.insert_before(before ?? this._end, x); return x; }
@@ -166,11 +182,12 @@ Container.prototype.add_tspan = function (before?: Element) { const x = new TSpa
 Container.prototype.add_use = function (before?: Element) { const x = new Use(); this.insert_before(before ?? this._end, x); return x; }
 Container.prototype.add_view = function (before?: Element) { const x = new ViewPort(); this.insert_before(before ?? this._end, x); return x; }
 
-
-Container.prototype._add_element = function (name: string) {
-    switch (name) {
+Container.prototype._add_element = function (tag: string) {
+    switch (tag) {
         case "circle": return this.add_circle();
         case "ellipse": return this.add_ellipse();
+        case "feGaussianBlur": return this.add_feGaussianBlur();
+        case "filter": return this.add_filter();
         case "g": return this.add_group();
         case "image": return this.add_image();
         case "line": return this.add_line();
@@ -184,6 +201,7 @@ Container.prototype._add_element = function (name: string) {
         case "use": return this.add_use();
         case "svg": return this.add_view();
     }
+
     throw new Error("Unexpected tag: " + name);
 }
 

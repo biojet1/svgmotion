@@ -5,7 +5,6 @@ import "./set_attribute.js";
 
 const NS_SVG = "http://www.w3.org/2000/svg";
 
-
 // a: (props: Map<string, string>, parent: Container) => false,
 // clipPath: (props: Map<string, string>, parent: Container) => false,
 // defs: (props: Map<string, string>, parent: Container) => false,
@@ -49,161 +48,6 @@ const NS_SVG = "http://www.w3.org/2000/svg";
 // tref: (props: Map<string, string>, parent: Container) => false,
 // use: (props: Map<string, string>, parent: Container) => false,
 
-
-function walk(elem: SVGElement, parent: Container, attrs: { [key: string]: string }) {
-    const { localName: tag } = elem;
-    switch (tag) {
-        case "desc":
-        case "metadata":
-        case "title":
-        case "script":
-            return;
-        case "defs":
-            {
-                const defs = parent.get_root().defs;
-                for (const sub of [...elem.children]) {
-                    const { id } = sub;
-                    const m = walk(sub as SVGElement, parent, attrs);
-                    if (m && id) {
-                        m.remove();
-                        defs[id] = m;
-                    }
-                }
-                return;
-            }
-    }
-    const props: { [key: string]: string } = {};
-    function* enum_attrs(e: SVGElement) {
-        for (const attr of e.attributes) {
-            if (attr != undefined) {
-                const { localName, namespaceURI, value } = attr;
-                if (!namespaceURI || namespaceURI == NS_SVG) {
-                    yield [localName, value];
-                }
-            }
-        }
-    }
-
-    for (const [key, value] of enum_attrs(elem)) {
-        if (key == "style") {
-            for (const s of value.split(/\s*;\s*/)) {
-                if (s) {
-                    const i = s.indexOf(':');
-                    if (i > 0) {
-                        const k = s.substring(0, i).trim();
-                        const v = s.substring(i + 1).trim();
-                        if (k && v && !k.startsWith("-")) {
-                            const m = v.match(/(.+)\s*!\s*(\w+)$/);
-                            if (m) {
-                                props[k] = m[1].trim();
-                                // this._tag[k] = { priority: m[2] };
-                            } else {
-                                props[k] = v;
-                            }
-                        }
-                    }
-                }
-            }
-        } else if (!(key.startsWith("aria-") || key.startsWith("-inkscape") || key.startsWith("inkscape"))) {
-            props[key] = value;
-        }
-    }
-    const node = parent._add_element(tag)
-    if (node) {
-        node.set_attributes(props);
-        // console.log(`walk-->`, tag, parent.constructor.name);
-        // const node = make_node(props, parent);
-        // console.log(`walk<-- ${node.constructor.name}`, tag);
-        if (node instanceof Container) {
-            // Non-propagating values
-            for (const s of ['id', 'class', 'clip-path', 'viewBox', 'preserveAspectRatio']) {
-                delete props[s];
-            }
-            let prev: Element | undefined = undefined;
-
-            const merged = { ...attrs, ...props };
-            for (const child of elem.childNodes) {
-                switch (child.nodeType) {
-                    case 1: {
-                        if ((child as any)?.namespaceURI == "http://www.w3.org/2000/svg") {
-                            prev = walk(child as SVGElement, node, merged);
-                        }
-                        break;
-                    }
-                    case 3:// TEXT_NODE
-                    case 4: //CDATA_SECTION_NODE
-                        {
-                            const { textContent } = child
-                            if (textContent && (node instanceof Text || node instanceof TSpan)) {
-                                node.add_chars(textContent);
-                            }
-                            break;
-                        }
-                }
-            }
-        } else if (!(node instanceof Element)) {
-            throw new Error(`tag "${tag}"`);
-        }
-        return node;
-    } else {
-        throw new Error(`No processor for "${tag}"`);
-    }
-}
-
-// export async function parse_svg(
-//     root: Root,
-//     src: string,
-//     opt: { xinclude?: boolean; base?: string | URL } = {}
-// ) {
-//     try {
-//         const domspec = await import("domspec");
-//         const doc = domspec.DOMParser.parseString(src, "image/svg+xml");
-//         const base = opt.base || src;
-//         const top = (doc as unknown as XMLDocument).documentElement;
-//         // console.info(`loadrd "${src}" ${top?.localName}`);
-//         if (top.namespaceURI != NS_SVG) {
-//             throw new Error(`not svg namespace ${top.namespaceURI}`);
-//         } else if (top.localName != "svg") {
-//             throw new Error(`not svg tag ${top.localName}`);
-//         } else {
-//             walk(top as unknown as SVGSVGElement, root, {});
-//         }
-//     } catch (err) {
-//         console.error(`Failed to load "${src}"`);
-//         throw err;
-//     };
-// }
-
-function load_svg_dom(parent: Container, doc: Document) {
-    const top = (doc as unknown as XMLDocument).documentElement;
-    // console.info(`loadrd "${src}" ${top?.localName}`);
-    if (top.namespaceURI != NS_SVG) {
-        throw new Error(`not svg namespace ${top.namespaceURI}`);
-    }
-    if (parent instanceof Root) {
-        if (top.localName != "svg") {
-            throw new Error(`not svg tag ${top.localName}`);
-        }
-    }
-    walk(top as unknown as SVGSVGElement, parent, {});
-}
-
-// async function load_svg(
-//     parent: Container,
-//     src: string | URL,
-//     opt: { xinclude?: boolean; base?: string | URL } = {}
-// ) {
-//     const domspec = await import("domspec");
-//     try {
-//         const doc = await domspec.DOMParser.loadXML(src, { ...opt, type: "image/svg+xml" });
-//         const base = opt.base || src;
-//         load_svg_dom(parent, doc as any as Document);
-//     } catch (err) {
-//         console.error(`Failed to load "${src}"`);
-//         throw err;
-//     }
-// }
-
 declare module "../model/elements" {
     interface Container {
         load_svg(src: string | URL, opt: { xinclude?: boolean; base?: string | URL }): Promise<void>;
@@ -237,6 +81,15 @@ class SAXElement {
     name: string = '';
     nodes: (string | SAXElement)[] = [];
     attrs: SAXAttribute[] = [];
+
+    get id() {
+        for (const a of this.attrs) {
+            const { name, value } = a;
+            if (name == 'id') {
+                return value;
+            }
+        }
+    }
 }
 
 interface SAXAttribute {
@@ -265,7 +118,6 @@ export async function sax_parse_svg(
     parser.oncdata = function (t: string) {
         parents.at(-1)?.nodes.push(t);
     };
-
     parser.onopentag = function (node: any) {
         // console.log("onopentag", node);
         const { local, uri, attributes } = node as {
@@ -309,6 +161,7 @@ export async function sax_parse_svg(
     parser.write(src);
     return root;
 }
+
 export async function sax_load_svg_src(
     src: string | URL,
     opt: { xinclude?: boolean; base?: string | URL } = {}
@@ -351,16 +204,14 @@ function sax_walk(elem: SAXElement, parent: Container, attrs: { [key: string]: s
                 const defs = parent.get_root().defs;
                 for (const sub of elem.nodes) {
                     if (sub instanceof SAXElement) {
-                        for (const a of sub.attrs) {
-                            const { name, value } = a;
-                            if (name == 'id') {
-                                const m = sax_walk(sub, parent, attrs);
-                                if (m && value) {
-                                    m.remove();
-                                    defs[value] = m;
-                                }
-                                break;
+                        const { id } = sub;
+                        if (id) {
+                            const m = sax_walk(sub, parent, attrs);
+                            if (m) {
+                                m.remove();
+                                defs[id] = m;
                             }
+                            break;
                         }
                     }
                 }

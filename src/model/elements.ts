@@ -3,7 +3,7 @@ import { Node, Parent } from "./linked.js";
 import { Track } from "../track/track.js";
 import { Keyframe } from "../keyframe/keyframe.js";
 import { Element, LengthYValue, LengthXValue, TextData, LengthValue } from "./base.js";
-import { Animatable, PointsValue, PositionValue, TextValue } from "./value.js";
+import { Animatable, PointsValue, PositionValue, TextValue, VectorValue } from "./value.js";
 import { ViewBox, ValueSet, xget, xset } from "./valuesets.js";
 import { AudioEntry } from "../utils/audio.js";
 import { AudioChain } from "../utils/sound.js";
@@ -627,6 +627,38 @@ export class TSpan extends Text {
     static override tag = "tspan";
 }
 
+export class FilterElement extends Element {
+}
+
+export class FEGaussianBlur extends FilterElement {
+    static override tag = "feGaussianBlur";
+    get std_dev() {
+        return this._new_field("std_dev", new VectorValue([0, 0]));
+    }
+    set std_dev(v: VectorValue) {
+        this._new_field("std_dev", v);
+    }
+    ///
+    get edge_mode() {
+        return this._new_field("edge_mode", new TextValue('duplicate'));
+    }
+    set edge_mode(v: TextValue) {
+        this._new_field("edge_mode", v);
+    }
+    ///
+    get in() {
+        return this._new_field("in", new TextValue(''));
+    }
+    set in(v: TextValue) {
+        this._new_field("in", v);
+    }
+}
+
+export class Filter extends Container {
+    static override tag = "filter";
+
+}
+
 export class AnimTrack extends Track {
     root!: Root;
 }
@@ -713,6 +745,21 @@ export class Root extends Container {
         const a = new FileAsset(id, path);
         a._parent = this;
         return this.assets[id] = a;
+    }
+
+    def_filter() {
+        const a = new Filter();
+        const id = crypto.randomUUID();
+        a.id = id;
+        console.log("add_filter", id);
+        return this.defs[id] = a;
+    }
+
+    override *enum_values(): Generator<Animatable<any>, void, unknown> {
+        yield* super.enum_values();
+        for (const elem of Object.values(this.defs)) {
+            yield* elem.enum_values();
+        }
     }
 }
 
