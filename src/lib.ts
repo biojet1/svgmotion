@@ -3,7 +3,6 @@ export * from "./track/index.js";
 export * from "./keyframe/index.js";
 export * from "./model/index.js";
 export * from "./model/mixin.js";
-export * from "./model/base.js";
 export * from "./helper/from_dom.js";
 export * from "./helper/dump.js";
 export * from "./helper/load.js";
@@ -16,8 +15,8 @@ export * from "./tts/gtts.js";
 export * from './model/actions/audio.js';
 export * from './utils/sound.js';
 
-import { Root } from "./model/elements.js";
-declare module "./model/elements" {
+import { Root } from "./model/root.js";
+declare module "./model/root" {
     interface Root {
         save_html(file: string): Promise<void>;
         save_json(file: string): Promise<void>;

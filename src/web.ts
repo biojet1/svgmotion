@@ -1,4 +1,4 @@
-import { Root } from "./model/elements.js";
+import { Root } from "./model/root.js";
 
 export * from "./model/index.js";
 export * from "./model/mixin.js";
@@ -67,7 +67,7 @@ export function animate2(root: Root, fps: number) {
     }
 }
 
-declare module "./model/elements" {
+declare module "./model/root" {
     interface Root {
         animate(params: {
             fps: number,

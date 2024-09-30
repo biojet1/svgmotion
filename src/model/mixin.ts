@@ -1,6 +1,6 @@
 import { Matrix, MatrixMut, Vector } from "../geom/index.js";
 import { Element } from "./base.js";
-import { Root } from "./elements.js";
+import { Root } from "./root.js";
 import { Container, Group, ViewPort } from "./containers.js";
 import { Parent } from "./linked.js";
 

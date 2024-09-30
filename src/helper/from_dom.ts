@@ -1,6 +1,6 @@
 
 import { Element } from "../model/base.js";
-import { Root } from "../model/elements.js";
+import { Root } from "../model/root.js";
 import { Text, TSpan } from "../model/text.js";
 import { Container } from "../model/containers.js";
 import "./set_attribute.js";
@@ -50,8 +50,7 @@ const NS_SVG = "http://www.w3.org/2000/svg";
 // tref: (props: Map<string, string>, parent: Container) => false,
 // use: (props: Map<string, string>, parent: Container) => false,
 
-declare module "../model/elements" {
-
+declare module "../model/root" {
     interface Root {
         load_json(src: string): void;
         parse_svg(src: string): Promise<void>;

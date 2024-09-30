@@ -1,5 +1,5 @@
 import { Browser, BrowserLaunchArgumentOptions, LaunchOptions, ScreenshotOptions, launch } from "puppeteer";
-import { Root } from "../model/elements.js";
+import { Root } from "../model/root.js";
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { Writable } from 'stream';
 import { tmpdir } from "node:os";

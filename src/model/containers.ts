@@ -295,4 +295,3 @@ export function viewbox_transform(
     // translate(translate-x, translate-y) scale(scale-x, scale-y)
     return [translate_x, translate_y, scale_x, scale_y];
 }
-

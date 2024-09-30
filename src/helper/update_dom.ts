@@ -3,7 +3,7 @@ import { Node } from "../model/linked.js";
 import { ScalarValue, PointsValue, TextValue, Animatable, VectorValue } from "../model/value.js";
 import { Transform, Fill, ViewBox, Font, Stroke, ValueSet } from "../model/valuesets.js";
 import { Element, TextData } from "../model/base.js";
-import { Root } from "../model/elements.js";
+import { Root } from "../model/root.js";
 import { Container } from "../model/containers.js";
 
 const PROP_MAP: {
@@ -211,7 +211,7 @@ declare module "../model/base" {
     }
 }
 
-declare module "../model/elements" {
+declare module "../model/root" {
     interface Root {
         update_dom(frame: number): void;
     }

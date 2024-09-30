@@ -2,7 +2,7 @@ import { PathLC, BoundingBox, Matrix } from "../geom/index.js";
 import { Element, LengthYValue, LengthXValue, LengthValue } from "./base.js";
 import { PointsValue, TextValue } from "./value.js";
 
-export abstract class Shape extends Element {
+abstract class Shape extends Element {
     describe(frame: number): string {
         throw new Error(`Not implemented`);
     }
@@ -20,6 +20,33 @@ export abstract class Shape extends Element {
     }
 }
 
+class EllipseBase extends Shape {
+    ///
+    get cx() {
+        return this._new_field("cx", new LengthXValue(0));
+    }
+    set cx(v: LengthXValue) {
+        this._new_field("cx", v);
+    }
+    ///
+    get cy() {
+        return this._new_field("cy", new LengthYValue(0));
+    }
+    set cy(v: LengthYValue) {
+        this._new_field("cy", v);
+    }
+}
+
+class PointBase extends Shape {
+    /// points
+    get points() {
+        return this._new_field("points", new PointsValue([]));
+    }
+    set points(v: PointsValue) {
+        this._new_field("points", v);
+    }
+}
+
 export class Path extends Shape {
     static override tag = "path";
     ///
@@ -29,6 +56,7 @@ export class Path extends Shape {
     set d(v: TextValue) {
         this._new_field("d", v);
     }
+    //
     override describe(frame: number) {
         return this.d.get_value(frame);
     }
@@ -112,22 +140,6 @@ export class Rect extends Shape {
     }
 }
 
-export class EllipseBase extends Shape {
-    ///
-    get cx() {
-        return this._new_field("cx", new LengthXValue(0));
-    }
-    set cx(v: LengthXValue) {
-        this._new_field("cx", v);
-    }
-    ///
-    get cy() {
-        return this._new_field("cy", new LengthYValue(0));
-    }
-    set cy(v: LengthYValue) {
-        this._new_field("cy", v);
-    }
-}
 
 export class Circle extends EllipseBase {
     static override tag = "circle";
@@ -211,16 +223,6 @@ export class Line extends Shape {
         const y1 = this.y1.get_value(frame);
         const y2 = this.y2.get_value(frame);
         return `M ${x1} ${y1} L ${x2} ${y2}`;
-    }
-}
-
-export class PointBase extends Shape {
-    /// points
-    get points() {
-        return this._new_field("points", new PointsValue([]));
-    }
-    set points(v: PointsValue) {
-        this._new_field("points", v);
     }
 }
 

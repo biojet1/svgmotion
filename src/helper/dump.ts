@@ -1,12 +1,12 @@
 import { Animatable } from "../model/value.js";
 import { Container } from "../model/containers.js";
-import { Root, PlainRoot, PlainNode, Asset } from "../model/elements.js";
+import { Root, PlainRoot, PlainNode, Asset } from "../model/root.js";
 import { ValueSet } from "../model/valuesets.js";
 import { TextData, Element } from "../model/base.js";
 import { AudioSource } from "../utils/sound.js";
 import { Voice } from "../tts/core.js";
 
-declare module "../model/elements" {
+declare module "../model/root" {
     interface Root {
         dump(): any;
     }
@@ -86,7 +86,7 @@ TextData.prototype.dump = function (): any {
     return d;
 }
 
-declare module "../model/elements" {
+declare module "../model/root" {
     interface Asset {
         as_sound(): Promise<AudioSource>;
     }
@@ -131,7 +131,7 @@ function media_duration(path: string) {
         throw new Error(`cp`);
     })
 }
-declare module "../model/elements" {
+declare module "../model/root" {
     interface Root {
         voice(voc: Voice): VoiceHelp;
     }

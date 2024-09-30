@@ -4,7 +4,8 @@ import { FontSizeValue, LengthValue } from "./base.js";
 import { VectorValue, ScalarValue, PositionValue, RGBValue, TextValue, PercentageValue } from "./value.js";
 import { PlainValue, Animatable } from "./value.js";
 import { Element } from "./base.js";
-import { BoxLength, CalcLength } from "../helper/svg_length.js";
+import { BoxLength } from "../helper/svg_length.js";
+
 export function xget<T>(that: any, name: string, value: T): T {
     // console.log(`_GETX ${name}`);
     Object.defineProperty(that, name, {

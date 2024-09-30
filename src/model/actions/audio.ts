@@ -1,6 +1,6 @@
 import { Track } from "../../track/index.js";
 import { Proxy } from "../../track/action.js";
-import { Root } from "../elements.js";
+import { Root } from "../root.js";
 import { AudioChain } from "../../utils/sound.js";
 
 export function Play(src: AudioChain): Proxy {

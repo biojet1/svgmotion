@@ -2,7 +2,8 @@ import { PlainValue, TextValue } from "../model/value.js";
 import { Animatable } from "../model/value.js";
 import { ValueSet } from "../model/valuesets.js";
 import { Element } from "../model/base.js";
-import { Root, PlainRoot, PlainNode, Image, Use, Asset } from "../model/elements.js";
+import { Image, Use } from "../model/elements.js";
+import { Root, PlainRoot, PlainNode, Asset } from "../model/root.js";
 import { TSpan, Text } from "../model/text.js";
 import { Container, Group, Symbol, ViewPort, Filter } from "../model/containers.js";
 import { Ellipse, Circle, Polyline, Polygon, Rect, Path, Line, } from "../model/shapes.js";
@@ -57,7 +58,7 @@ function load_node(obj: PlainNode, parent: Container) {
     throw new Error(`No node factory for "${tag}"`);
 }
 
-declare module "../model/elements" {
+declare module "../model/root" {
     interface Root {
         load(src: PlainRoot): void;
         parse_json(src: string): void;
