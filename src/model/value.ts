@@ -285,6 +285,21 @@ export class UnknownValue extends AnimatableD<string> {
 
 }
 
+export class BiVectorValue extends VectorValue {
+    override check_value(x: Vector) {
+        if (x instanceof Vector) {
+            return x;
+        } else if (typeof x == "string") {
+            const n = parseFloat(x);
+            return new Vector([n, n]);
+        } else if (typeof x == "number") {
+            return new Vector([x, x]);
+        } else {
+            return new Vector(x);
+        }
+    };
+}
+
 export class RGBValue extends VectorValue {
     static to_css_rgb([r, g, b, a]: Iterable<number>) {
         if (a == 0) {

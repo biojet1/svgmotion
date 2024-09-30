@@ -1,8 +1,8 @@
 import { Animatable } from "../model/value.js";
-import { Container } from "../model/containers.js";
-import { Root, PlainRoot, PlainNode, Asset } from "../model/root.js";
 import { ValueSet } from "../model/valuesets.js";
 import { TextData, Element } from "../model/base.js";
+import { Container } from "../model/containers.js";
+import { Root, PlainRoot, PlainNode, Asset } from "../model/root.js";
 import { AudioSource } from "../utils/sound.js";
 import { Voice } from "../tts/core.js";
 
@@ -18,6 +18,7 @@ declare module "../model/containers" {
     }
 
 }
+
 declare module "../model/base" {
     interface TextData {
         dump(): any;
@@ -26,7 +27,6 @@ declare module "../model/base" {
         dump(): any;
     }
 }
-
 
 Container.prototype.dump = function () {
     const o: any = { tag: (<typeof Container>this.constructor).tag };

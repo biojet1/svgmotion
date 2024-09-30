@@ -1,10 +1,10 @@
-import { Stepper } from "../track/stepper.js";
-import { Node } from "../model/linked.js";
-import { ScalarValue, PointsValue, TextValue, Animatable, VectorValue } from "../model/value.js";
-import { Transform, Fill, ViewBox, Font, Stroke, ValueSet } from "../model/valuesets.js";
-import { Element, TextData } from "../model/base.js";
-import { Root } from "../model/root.js";
-import { Container } from "../model/containers.js";
+import { Stepper } from "../../track/stepper.js";
+import { Node } from "../linked.js";
+import { ScalarValue, PointsValue, TextValue, Animatable, VectorValue } from "../value.js";
+import { Transform, Fill, ViewBox, Font, Stroke, ValueSet } from "../valuesets.js";
+import { Element, TextData } from "../base.js";
+import { Root } from "../root.js";
+import { Container } from "../containers.js";
 
 const PROP_MAP: {
     [key: string]: ((frame: number, elem: any, prop: any, node: Element) => void);
@@ -199,7 +199,7 @@ function update_dom(frame: number, target: Element) {
 
 const NS_SVG = "http://www.w3.org/2000/svg";
 
-declare module "../model/base" {
+declare module "../base" {
     interface TextData {
         _element?: Text;
         to_dom(doc: typeof SVGElement.prototype.ownerDocument): Text;
@@ -211,13 +211,13 @@ declare module "../model/base" {
     }
 }
 
-declare module "../model/root" {
+declare module "../root" {
     interface Root {
         update_dom(frame: number): void;
     }
 }
 
-declare module "../model/containers" {
+declare module "../containers" {
     interface Container {
         update_dom(frame: number): void;
         stepper(): Stepper;

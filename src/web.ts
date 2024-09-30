@@ -1,9 +1,9 @@
 import { Root } from "./model/root.js";
 
 export * from "./model/index.js";
-export * from "./model/mixin.js";
-export * from "./helper/update_dom.js";
-export * from "./helper/load.js";
+// export * from "./model/mixin.js";
+export * from "./model/mixins/update_dom.js";
+export * from "./model/mixins/load.js";
 
 export function animate(anim: Root, fps: number) {
     const [start, end] = anim.calc_time_range();

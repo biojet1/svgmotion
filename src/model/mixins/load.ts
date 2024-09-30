@@ -1,14 +1,14 @@
-import { PlainValue, TextValue } from "../model/value.js";
-import { Animatable } from "../model/value.js";
-import { ValueSet } from "../model/valuesets.js";
-import { Element } from "../model/base.js";
-import { Image, Use } from "../model/elements.js";
-import { Root, PlainRoot, PlainNode, Asset } from "../model/root.js";
-import { TSpan, Text } from "../model/text.js";
-import { Container, Group, Symbol, ViewPort, Filter } from "../model/containers.js";
-import { Ellipse, Circle, Polyline, Polygon, Rect, Path, Line, } from "../model/shapes.js";
-import { AFilter, ASource, AudioChain } from "../utils/sound.js";
-import { FEGaussianBlur } from "../model/filters.js";
+import { PlainValue, TextValue } from "../value.js";
+import { Animatable } from "../value.js";
+import { ValueSet } from "../valuesets.js";
+import { Element } from "../base.js";
+import { Image, Use } from "../elements.js";
+import { Root, PlainRoot, PlainNode, Asset } from "../root.js";
+import { TSpan, Text } from "../text.js";
+import { Container, Group, Symbol, ViewPort, Filter } from "../containers.js";
+import { Ellipse, Circle, Polyline, Polygon, Rect, Path, Line, } from "../shapes.js";
+import { AFilter, ASource, AudioChain } from "../../utils/sound.js";
+import { FEGaussianBlur } from "../filters.js";
 
 function load_properties(that: Element, props: { [key: string]: PlainValue<any> }) {
     for (let [k, v] of Object.entries(props)) {
@@ -58,14 +58,14 @@ function load_node(obj: PlainNode, parent: Container) {
     throw new Error(`No node factory for "${tag}"`);
 }
 
-declare module "../model/root" {
+declare module "../root" {
     interface Root {
         load(src: PlainRoot): void;
         parse_json(src: string): void;
     }
 }
 
-declare module "../model/containers" {
+declare module "../containers" {
     interface Container {
         add_circle(before?: Element): Circle;
         add_ellipse(before?: Element): Ellipse;
@@ -199,5 +199,3 @@ Container.prototype._add_element = function (tag: string) {
     }
     throw new Error("Unexpected tag: " + name);
 }
-
-

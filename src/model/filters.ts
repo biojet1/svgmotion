@@ -1,15 +1,16 @@
 import { Element, LengthYValue, LengthXValue } from "./base.js";
-import { VectorValue, TextValue } from "./value.js";
+import { VectorValue, BiVectorValue, TextValue } from "./value.js";
 
 export class FilterElement extends Element {
 }
 
 export class FEGaussianBlur extends FilterElement {
     static override tag = "feGaussianBlur";
+    ///   
     get std_dev() {
-        return this._new_field("std_dev", new VectorValue([0, 0]));
+        return this._new_field("std_dev", new BiVectorValue([0, 0]));
     }
-    set std_dev(v: VectorValue) {
+    set std_dev(v: BiVectorValue) {
         this._new_field("std_dev", v);
     }
     ///
@@ -30,6 +31,7 @@ export class FEGaussianBlur extends FilterElement {
 
 export class FEDropShadow extends FilterElement {
     static override tag = "feDropShadow";
+    ///
     get std_dev() {
         return this._new_field("std_dev", new VectorValue([0, 0]));
     }

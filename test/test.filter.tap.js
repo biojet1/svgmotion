@@ -10,11 +10,11 @@ test.test("sax_load_svg_src", async (t) => {
     t.ok(f instanceof Element);
     const gb = new FEGaussianBlur();
     f.append_child(gb);
-    console.dir(f);
+    // console.dir(f);
     let d = anim.dump();
     t.same(d.defs[f.id].id, f.id);
     t.same(d.defs[f.id].tag, 'filter');
-    console.dir(d, { depth: 100 });
+    // console.dir(d, { depth: 100 });
 
     t.end();
 });
@@ -45,7 +45,7 @@ test.test("load_svg the_quick", async (t) => {
 
 
     tr.run(To(gb.std_dev, [0.5, 0.5]));
-    tr.run(To(gb.std_dev, [4, 4]));
+    tr.run(To(gb.std_dev, 4));
     tr.run(To(gb.std_dev, [0, 0]));
 
     anim.save_json('/tmp/the_quick_ef.json');
