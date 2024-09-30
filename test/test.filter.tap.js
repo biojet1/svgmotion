@@ -1,6 +1,5 @@
 "uses strict";
 import test from "tap";
-import { sax_parse_svg, sax_load_svg_src } from "../dist/helper/from_dom.js";
 import { FEGaussianBlur, Element, Root, To, Filter } from "svgmotion";
 
 test.test("sax_load_svg_src", async (t) => {

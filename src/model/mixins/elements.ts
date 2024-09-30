@@ -1,10 +1,10 @@
-import { Matrix, MatrixMut, Vector } from "../geom/index.js";
-import { Element } from "./base.js";
-import { Root } from "./root.js";
-import { Container, Group, ViewPort } from "./containers.js";
-import { Parent } from "./linked.js";
+import { Matrix, MatrixMut, Vector } from "../../geom/index.js";
+import { Element } from "../base.js";
+import { Root } from "../root.js";
+import { Container, Group, ViewPort } from "../containers.js";
+import { Parent } from "../linked.js";
 
-declare module "./base" {
+declare module "../base" {
     interface Element {
         owner_viewport(): ViewPort | undefined;
         farthest_viewport(): ViewPort | undefined;

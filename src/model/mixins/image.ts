@@ -1,6 +1,6 @@
-import { Image } from "../model/elements.js";
+import { Image } from "../elements.js";
 
-declare module "../model/elements" {
+declare module "../elements" {
     interface Image {
         image_blob(src: string): any;
     }

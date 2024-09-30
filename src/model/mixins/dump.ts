@@ -1,25 +1,25 @@
-import { Animatable } from "../model/value.js";
-import { ValueSet } from "../model/valuesets.js";
-import { TextData, Element } from "../model/base.js";
-import { Container } from "../model/containers.js";
-import { Root, PlainRoot, PlainNode, Asset } from "../model/root.js";
-import { AudioSource } from "../utils/sound.js";
-import { Voice } from "../tts/core.js";
+import { Animatable } from "../value.js";
+import { ValueSet } from "../valuesets.js";
+import { TextData, Element } from "../base.js";
+import { Container } from "../containers.js";
+import { Root, PlainRoot, PlainNode, Asset } from "../root.js";
+import { AudioSource } from "../../utils/sound.js";
+import { Voice } from "../../tts/core.js";
 
-declare module "../model/root" {
+declare module "../root" {
     interface Root {
         dump(): any;
     }
 }
 
-declare module "../model/containers" {
+declare module "../containers" {
     interface Container {
         dump(): any;
     }
 
 }
 
-declare module "../model/base" {
+declare module "../base" {
     interface TextData {
         dump(): any;
     }
@@ -86,7 +86,7 @@ TextData.prototype.dump = function (): any {
     return d;
 }
 
-declare module "../model/root" {
+declare module "../root" {
     interface Asset {
         as_sound(): Promise<AudioSource>;
     }
@@ -131,7 +131,7 @@ function media_duration(path: string) {
         throw new Error(`cp`);
     })
 }
-declare module "../model/root" {
+declare module "../root" {
     interface Root {
         voice(voc: Voice): VoiceHelp;
     }

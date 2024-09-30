@@ -1,8 +1,8 @@
 
-import { Element } from "../model/base.js";
-import { Root } from "../model/root.js";
-import { Text, TSpan } from "../model/text.js";
-import { Container } from "../model/containers.js";
+import { Element } from "../base.js";
+import { Root } from "../root.js";
+import { Text, TSpan } from "../text.js";
+import { Container } from "../containers.js";
 import "./set_attribute.js";
 
 const NS_SVG = "http://www.w3.org/2000/svg";
@@ -50,18 +50,17 @@ const NS_SVG = "http://www.w3.org/2000/svg";
 // tref: (props: Map<string, string>, parent: Container) => false,
 // use: (props: Map<string, string>, parent: Container) => false,
 
-declare module "../model/root" {
+declare module "../root" {
     interface Root {
         load_json(src: string): void;
         parse_svg(src: string): Promise<void>;
     }
 }
 
-declare module "../model/containers" {
+declare module "../containers" {
     interface Container {
         load_svg(src: string | URL, opt: { xinclude?: boolean; base?: string | URL }): Promise<void>;
     }
-
 }
 
 Container.prototype.load_svg = async function (src: string | URL,

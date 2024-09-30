@@ -53,5 +53,3 @@ export class FEDropShadow extends FilterElement {
         this._new_field("dy", v);
     }
 }
-
-
