@@ -1,5 +1,4 @@
-import { Resource, Sluggable } from '../utils/resource.js';
-// export const cache = new Resource();
+import { Sluggable } from '../utils/resource.js';
 
 type MarkEntry = [tag: string, start: number, end: number];
 export interface AudioEntryTTS {
@@ -9,10 +8,10 @@ export interface AudioEntryTTS {
 }
 
 export abstract class Voice extends Sluggable {
-    async say(text: string): Promise<{ path: string; }> {
+    async say(_text: string): Promise<{ path: string; }> {
         throw new Error(`Not implemented`);
     }
-    override save(path: string, text: string) {
+    override save(_path: string, _text: string) {
         throw new Error(`Not implemented`);
     }
 }

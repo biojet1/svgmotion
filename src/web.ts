@@ -13,7 +13,7 @@ export function animate(anim: Root, fps: number) {
         const frames = end - start + 1;
         let frame = start;
 
-        function render(currentTime: DOMHighResTimeStamp) {
+        function render(_currentTime: DOMHighResTimeStamp) {
             const t = performance.now();
             {
                 if ((frame + 1) == frames) {
@@ -44,7 +44,7 @@ export function animate2(root: Root, fps: number) {
         const frames = st.end - st.start + 1;
         let frame = st.start;
 
-        function render(currentTime: DOMHighResTimeStamp) {
+        function render(_currentTime: DOMHighResTimeStamp) {
             const t = performance.now();
             {
                 if ((frame + 1) == frames) {

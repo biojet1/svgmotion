@@ -18,7 +18,7 @@ export interface BounceParams extends KeyExtra {
 export function Bounce(items: Element[] | Element, params: BounceParams = {}): Proxy {
     const nodes = Array.isArray(items) ? items : [items];
     return function (track: Track) {
-        let { mode = '', times = 5, dur, dir = 'down', dist: span, ...extra } = params;
+        let { mode = '', times = 5, dur, dir = 'down', dist: span, /*...extra*/ } = params;
         const show = mode === 'show' || mode === 'in';
         const hide = mode === 'hide' || mode === 'out';
         const motion = dir === 'up' || dir === 'left' ? -1 : 1;
@@ -28,7 +28,7 @@ export function Bounce(items: Element[] | Element, params: BounceParams = {}): P
         const ease0 = params.ease1 ?? Easing.outquad;
         const ease1 = params.ease2 ?? Easing.inquad;
 
-        function apply(node: Element, start: number, end: number) {
+        function apply(node: Element, start: number, _end: number) {
             const h = node.transform.prefix_hexad();
             let m0 = h.get_matrix(start);
             let t = start;
@@ -69,7 +69,7 @@ export function Bounce(items: Element[] | Element, params: BounceParams = {}): P
             //
         }
 
-        function supply(that: Track) {
+        function supply(_that: Track) {
             const { start, end } = supply;
             for (const e of nodes) {
                 apply(e, start, end);
@@ -77,7 +77,7 @@ export function Bounce(items: Element[] | Element, params: BounceParams = {}): P
         };
         supply.start = -Infinity;
         supply.end = -Infinity;
-        return function (frame: number, base_frame: number, hint_dur: number) {
+        return function (frame: number, _base_frame: number, _hint_dur: number) {
             supply.start = frame;
             supply.end = frame + (anims * speed);
             return supply
@@ -88,7 +88,7 @@ export function Bounce(items: Element[] | Element, params: BounceParams = {}): P
 export function Pulsate(items: Element[] | Element, params: BounceParams = {}): Proxy {
     const nodes = Array.isArray(items) ? items : [items];
     return function (track: Track) {
-        let { mode = 'show', times = 5, dur, ...extra } = params;
+        let { mode = 'show', times = 5, dur, /*...extra*/ } = params;
         const show = mode === 'show' || mode === 'in';
         const hide = mode === 'hide' || mode === 'out';
         const anims = times * 2 + (show || hide ? 1 : 0);
@@ -97,8 +97,8 @@ export function Pulsate(items: Element[] | Element, params: BounceParams = {}): 
         const ease1 = params.ease1 ?? Easing.outexpo;
         const ease2 = params.ease2 ?? Easing.inexpo;
 
-        function apply(node: Element, start: number, end: number) {
-            const steps: any[] = [];
+        function apply(node: Element, start: number, _end: number) {
+            // const steps: any[] = [];
             let animateTo = show ? 1 : 0;
             let i = 1;
             let t = start;
@@ -122,7 +122,7 @@ export function Pulsate(items: Element[] | Element, params: BounceParams = {}): 
             // yield Tween(nodes, steps).with({ t: 0 });
         }
 
-        function supply(that: Track) {
+        function supply(_that: Track) {
             const { start, end } = supply;
             for (const e of nodes) {
                 apply(e, start, end);
@@ -130,7 +130,7 @@ export function Pulsate(items: Element[] | Element, params: BounceParams = {}): 
         };
         supply.start = -Infinity;
         supply.end = -Infinity;
-        return function (frame: number, base_frame: number, hint_dur: number) {
+        return function (frame: number, _base_frame: number, _hint_dur: number) {
             supply.start = frame;
             supply.end = frame + (anims * speed);
             return supply

@@ -80,7 +80,7 @@ export class PathLC {
             yield cur;
         }
     }
-    *shapes(opt?: DescParams) {
+    *shapes(_opt?: DescParams) {
         const { _tail } = this;
         if (_tail) {
             yield* enum_shapes(_tail);
@@ -344,26 +344,26 @@ function segment_at_length(
     return [undefined, NaN, NaN];
 }
 
-function* enum_sub_paths(cur: BaseLC | undefined) {
-    let tail: undefined | BaseLC;
-    for (; cur; cur = cur._prev) {
-        if (cur instanceof MoveLC) {
-            if (tail) {
-                if (tail === cur) {
-                    throw new Error();
-                } else {
-                    yield tail.with_far_prev_3(cur, undefined);
-                }
-                tail = undefined;
-            }
-        } else if (!tail) {
-            tail = cur;
-        }
-    }
-    if (tail) {
-        yield tail;
-    }
-}
+// function* enum_sub_paths(cur: BaseLC | undefined) {
+//     let tail: undefined | BaseLC;
+//     for (; cur; cur = cur._prev) {
+//         if (cur instanceof MoveLC) {
+//             if (tail) {
+//                 if (tail === cur) {
+//                     throw new Error();
+//                 } else {
+//                     yield tail.with_far_prev_3(cur, undefined);
+//                 }
+//                 tail = undefined;
+//             }
+//         } else if (!tail) {
+//             tail = cur;
+//         }
+//     }
+//     if (tail) {
+//         yield tail;
+//     }
+// }
 function* enum_shapes(cur: BaseLC | undefined) {
     // sub continues path is a path
     let tail: undefined | BaseLC;

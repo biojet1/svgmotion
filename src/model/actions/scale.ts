@@ -47,7 +47,7 @@ export function ScaleOut(items: Element[] | Element, params: ScaleParams = {}): 
         let _dur = dur == undefined ? undefined : track.to_frame(dur);
         let sx = 0.001;
         let sy = 0.001;
-        function supply(that: Track) {
+        function supply(_that: Track) {
             const { start, end } = supply;
             function* each() {
                 if (parent) {
@@ -99,7 +99,7 @@ export function ScaleOut(items: Element[] | Element, params: ScaleParams = {}): 
         };
         supply.start = -Infinity;
         supply.end = -Infinity;
-        return function (frame: number, base_frame: number, hint_dur: number) {
+        return function (frame: number, _base_frame: number, hint_dur: number) {
             supply.start = frame;
             supply.end = frame + (_dur ?? (_dur = hint_dur));
             return supply

@@ -112,13 +112,13 @@ export function AlignTo(parent: Container, ref: Element, items: Element[], param
     let { dur, ...extra } = params ?? {};
     return function (track: Track) {
         let _dur = dur == undefined ? undefined : track.to_frame(dur);
-        function supply(that: Track) {
+        function supply(_that: Track) {
             const { start, end } = supply;
             align_to(start, end, parent, ref, items, extra)
         };
         supply.start = -Infinity;
         supply.end = -Infinity;
-        return function (frame: number, base_frame: number, hint_dur: number) {
+        return function (frame: number, _base_frame: number, hint_dur: number) {
             supply.start = frame;
             supply.end = frame + (_dur ?? (_dur = hint_dur));
             return supply

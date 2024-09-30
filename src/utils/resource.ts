@@ -30,7 +30,7 @@ export class Resource {
 
     get cache_dir() {
         for (const dir of (function* () {
-            const { env, cwd } = process;
+            const { env } = process;
             yield env[`CACHE_DIR`] ?? '';
             yield path.join(os.homedir(), '.cache');
             yield path.join(os.tmpdir(), 'cache');

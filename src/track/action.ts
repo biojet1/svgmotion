@@ -54,10 +54,10 @@ function list_props(x: IProperty<any>[] | IProperty<any>) {
 export function Pass(dur: number = 1): Proxy {
     return function (track: Track) {
         dur = track.to_frame(dur);
-        function sup(that: Track) { }
+        function sup(_that: Track) { }
         sup.start = -Infinity;
         sup.end = -Infinity;
-        return function (frame: number, base_frame: number, hint_dur: number) {
+        return function (frame: number, _base_frame: number, _hint_dur: number) {
             sup.start = frame;
             sup.end = frame + dur;
             return sup;
@@ -82,11 +82,11 @@ export function To(
         const _first = m.at(0)!;
         let _dur = dur == undefined ? undefined : track.to_frame(dur);
         for (let cur: Params2 | undefined = _first; cur; cur = cur._next) {
-            const { property, extra } = cur;
+            const { extra } = cur;
             extra.easing ?? (extra.easing = track.easing);
             extra.add = add;
         }
-        function sup(that: Track) {
+        function sup(_that: Track) {
             const { start, end } = sup;
             for (let cur: Params2 | undefined = _first; cur; cur = cur._next) {
                 const { property, extra, value } = cur;
@@ -96,7 +96,7 @@ export function To(
         }
         sup.start = -Infinity;
         sup.end = -Infinity;
-        return function (frame: number, base_frame: number, hint_dur: number) {
+        return function (frame: number, _base_frame: number, hint_dur: number) {
             if (_dur == undefined) {
                 _dur = hint_dur;
             }
@@ -140,7 +140,7 @@ export function llsup(track: Track, items: Array<Proxy>) {
 export function Seq(items: Array<Proxy>, params?: SeqParams): Proxy {
     return function (track: Track) {
         const head = llsup(track, items);
-        let { easing, hint_dur, delay, stagger } = params ?? {};
+        let { hint_dur, delay, stagger } = params ?? {};
         let dur_hint = hint_dur && track.to_frame(hint_dur);
         delay && (delay = track.to_frame(delay));
         stagger && (stagger = track.to_frame(stagger));
@@ -212,7 +212,7 @@ export function Par(
 ): Proxy {
     return function (track: Track) {
         const head = llsup(track, items);
-        let { easing, hint_dur, tail } = params;
+        let { hint_dur, tail } = params;
         const dur_hint = hint_dur && track.to_frame(hint_dur);
         function sup(that: Track) {
             for (let res = head; res; res = res.next) {

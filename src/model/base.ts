@@ -31,7 +31,7 @@ export class Element extends Parent {
             }
         }
     }
-    update_bbox(bbox: BoundingBox, frame: number, m?: Matrix) {
+    update_bbox(_bbox: BoundingBox, _frame: number, _m?: Matrix) {
 
     }
     bounding_box(frame: number, m?: Matrix) {
@@ -39,7 +39,7 @@ export class Element extends Parent {
         this.update_bbox(bb, frame, m);
         return bb
     }
-    object_bbox(frame: number) {
+    object_bbox(_frame: number) {
         const bb = BoundingBox.not();
         // TODO:
         return bb
@@ -53,8 +53,8 @@ export class Element extends Parent {
     }
     protected _new_field<T extends Animatable<any> | ValueSet>(name: string, value: T): T {
         const v = xget(this, name, value);
-        value._parent = this;
-        return value;
+        v._parent = this;
+        return v;
     }
     /// FILL
     get fill() {

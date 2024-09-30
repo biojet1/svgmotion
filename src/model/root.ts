@@ -43,7 +43,7 @@ export class Asset {
         this.id = id;
     }
     dump() {
-        return Object.fromEntries(Object.entries(this).filter(([k, v]) => /^[A-Za-z]+/.test(k) && k != 'id'));
+        return Object.fromEntries(Object.entries(this).filter(([k,]) => /^[A-Za-z]+/.test(k) && k != 'id'));
     }
     static load(x: any) {
         const a = new Asset(``);

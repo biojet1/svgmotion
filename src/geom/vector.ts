@@ -110,7 +110,7 @@ export class Vector extends Float64Array {
         return this.post_subtract(p).angle;
     }
 
-    toString() {
+    override  toString() {
         return this.join(', ')
     }
 

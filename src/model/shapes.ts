@@ -4,7 +4,7 @@ import { PointsValue, TextValue } from "./value.js";
 
 abstract class Shape extends Element {
     describe(frame: number): string {
-        throw new Error(`Not implemented`);
+        throw new Error(`Not implemented frame=${frame}`);
     }
     get_path(frame: number): PathLC {
         return PathLC.parse(this.describe(frame));

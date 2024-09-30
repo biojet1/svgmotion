@@ -1,6 +1,6 @@
 import path from 'path';
 import fs from 'fs';
-import { spawn, spawnSync } from 'child_process';
+import { spawn } from 'child_process';
 import { AudioEntryTTS, Voice } from './core.js';
 import { Resource } from '../utils/resource.js';
 
@@ -49,7 +49,7 @@ export class GTTS extends Voice {
         //     input: text,
         // });
     }
-    async say(text: string) {
+    override async say(text: string) {
         // file in cache
         const f = Resource.get().get_cache_file(this.slug_id(text), 'tts');
         const j = `${f}.json`; // metadata json file in cache
@@ -198,9 +198,9 @@ function ibm_stt_transcript(audio_file: string, data: AudioEntryTTS, opt: any = 
                 }
             });
             // Display events on the console.
-            function onEvent(name: string, event: any) {
-                console.warn(name, JSON.stringify(event, null, 2));
-            }
+            // function onEvent(name: string, event: any) {
+            //     console.warn(name, JSON.stringify(event, null, 2));
+            // }
         });
     });
 }

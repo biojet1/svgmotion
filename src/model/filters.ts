@@ -1,4 +1,4 @@
-import { Element, LengthYValue, LengthXValue, TextData, LengthValue } from "./base.js";
+import { Element, LengthYValue, LengthXValue } from "./base.js";
 import { VectorValue, TextValue } from "./value.js";
 
 export class FilterElement extends Element {

@@ -7,7 +7,7 @@ export function FadeOut(items: Element[], params: KeyExtra & { dur?: number } = 
     let { dur, ...extra } = params;
     return function (track: Track) {
         let _dur = dur == undefined ? undefined : track.to_frame(dur);
-        function supply(that: Track) {
+        function supply(_that: Track) {
             const { start, end } = supply;
             for (const e of items) {
                 e.opacity.key_value(end, 0, { ...extra, start })
@@ -15,7 +15,7 @@ export function FadeOut(items: Element[], params: KeyExtra & { dur?: number } = 
         };
         supply.start = -Infinity;
         supply.end = -Infinity;
-        return function (frame: number, base_frame: number, hint_dur: number) {
+        return function (frame: number, _base_frame: number, hint_dur: number) {
             supply.start = frame;
             supply.end = frame + (_dur ?? (_dur = hint_dur));
             return supply
@@ -27,7 +27,7 @@ export function FadeIn(items: Element[], params: KeyExtra & { dur?: number } = {
     let { dur, ...extra } = params;
     return function (track: Track) {
         let _dur = dur == undefined ? undefined : track.to_frame(dur);
-        function supply(that: Track) {
+        function supply(_that: Track) {
             const { start, end } = supply;
             for (const e of items) {
                 e.opacity.key_value(end, 1, { ...extra, start })
@@ -35,7 +35,7 @@ export function FadeIn(items: Element[], params: KeyExtra & { dur?: number } = {
         };
         supply.start = -Infinity;
         supply.end = -Infinity;
-        return function (frame: number, base_frame: number, hint_dur: number) {
+        return function (frame: number, _base_frame: number, hint_dur: number) {
             supply.start = frame;
             supply.end = frame + (_dur ?? (_dur = hint_dur));
             return supply

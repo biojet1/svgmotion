@@ -12,14 +12,14 @@ export function Play(src: AudioChain): Proxy {
         } else {
             throw new Error(``);
         }
-        function supply(that: Track) {
+        function supply(_that: Track) {
             if (root instanceof Root) {
                 root.sounds.push(src.start_at(supply.start / track.frame_rate));
             }
         };
         supply.start = -Infinity;
         supply.end = -Infinity;
-        return function (frame: number, base_frame: number, hint_dur: number) {
+        return function (frame: number, _base_frame: number, _hint_dur: number) {
             supply.start = frame;
             supply.end = frame + dur;
             return supply;

@@ -19,7 +19,7 @@ function* pickXY(args: NumOrVec[]) {
 	}
 }
 
-function Pt(x: NumOrVec, y?: number) {
+function Pt(x: NumOrVec, _y?: number) {
 	if (typeof x === 'object') {
 		return Vector.pos(...x);
 	} else {
@@ -45,22 +45,22 @@ export class VecRay {
 	}
 
 	get y() {
-		const [x, y] = this.pos;
+		const [_x, y] = this.pos;
 		return y;
 	}
 
 	get z() {
-		const [x, y, z] = this.pos;
+		const [_x, _y, z] = this.pos;
 		return z;
 	}
 
 	get h() {
-		const [x, y] = this.dir;
+		const [x, _y] = this.dir;
 		return x;
 	}
 
 	get v() {
-		const [x, y] = this.dir;
+		const [_x, y] = this.dir;
 		return y;
 	}
 

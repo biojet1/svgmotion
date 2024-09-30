@@ -17,7 +17,7 @@ export interface StretchParams extends KeyExtra {
 }
 
 export function StretchOut(items: Element[] | Element, params: StretchParams = {}): Proxy {
-    let { dur, dir, ...extra } = params;
+    let { dur, dir, /*...extra*/ } = params;
     const nodes = Array.isArray(items) ? items : [items];
     return function (track: Track) {
         let _dur = dur == undefined ? undefined : track.to_frame(dur);
@@ -25,7 +25,7 @@ export function StretchOut(items: Element[] | Element, params: StretchParams = {
         const speed = track.to_frame(params.speed ?? 0.5);
         const times = params.times ?? 0.53;
         dur = 2 * speed * times;
-        function apply(node: Element, start: number, end: number) {
+        function apply(node: Element, start: number, _end: number) {
             const h = node.transform.prefix_hexad();
             let t = start;
             let bb = node.bounding_box(start);
@@ -106,7 +106,7 @@ export function StretchOut(items: Element[] | Element, params: StretchParams = {
             op.key_value(t, 0, { easing: Easing.inoutsine });
         }
 
-        function supply(that: Track) {
+        function supply(_that: Track) {
             const { start, end } = supply;
             if (bb.is_valid()) {
                 throw new Error(`Todo`)
@@ -118,7 +118,7 @@ export function StretchOut(items: Element[] | Element, params: StretchParams = {
         };
         supply.start = -Infinity;
         supply.end = -Infinity;
-        return function (frame: number, base_frame: number, hint_dur: number) {
+        return function (frame: number, _base_frame: number, hint_dur: number) {
             supply.start = frame;
             supply.end = frame + (_dur ?? (_dur = hint_dur));
             return supply

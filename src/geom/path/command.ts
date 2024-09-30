@@ -780,7 +780,7 @@ export class ArcLC extends BaseLC {
 }
 
 function parse(d: string, prev: BaseLC | undefined): BaseLC {
-    let mat: RegExpExecArray | null;
+    // let mat: RegExpExecArray | null;
     const dRE = /[\s,]*(?:([MmZzLlHhVvCcSsQqTtAa])|([-+]?[0-9]*\.?[0-9]+(?:[eE][-+]?[0-9]+)?))/y;
     const peek = function () {
         const i = dRE.lastIndex;

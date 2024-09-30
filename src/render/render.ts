@@ -1,12 +1,11 @@
-import { Browser, BrowserLaunchArgumentOptions, LaunchOptions, ScreenshotOptions, launch } from "puppeteer";
-import { Root } from "../model/root.js";
+import fs from "node:fs/promises";
+import { tmpdir } from "node:os";
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { Writable } from 'stream';
-import { tmpdir } from "node:os";
-import fs from "node:fs/promises";
+import { spawn } from 'child_process';
+import { Browser, BrowserLaunchArgumentOptions, LaunchOptions, ScreenshotOptions, launch } from "puppeteer";
+import { Root } from "../model/root.js";
 import { ffcmd2, VideoOutParams } from "./ffmpeg.js";
-import { spawn, StdioOptions } from 'child_process';
-import { AudioMix } from "../utils/audio.js";
 import { AMix } from "../utils/sound.js";
 
 interface RenderParams {
@@ -27,7 +26,7 @@ interface RenderParams {
 }
 
 export async function render_root(root: Root, {
-    uri, file, output, width = 0, height, par, quality,
+    uri, file: _file, output, width = 0, height, par: _par, quality: _quality,
     puppeteer_options, browser, video_params = {}, sink,
     bgcolor, fps
 }: RenderParams) {
@@ -196,4 +195,4 @@ export function frameTime(N: number, fps: number) {
         } `
     );
 }
-const { max, round, floor } = Math;
+const { /*max, round,*/ floor } = Math;

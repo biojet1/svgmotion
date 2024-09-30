@@ -25,9 +25,9 @@ export class AudioChain {
         }
         throw new Error(`No name`);
     }
-    static _load(d: any, prev: AFilter | ASource) {
+    static _load(_d: any, _prev: AFilter | ASource) {
     }
-    feed_ff(ff: FFRun, parent?: AudioChain) {
+    feed_ff(_ff: FFRun, _parent?: AudioChain) {
         throw new Error(`Not implemented in ${this.constructor.name}`);
     }
     slice(from?: number, to?: number) {
@@ -106,7 +106,7 @@ export class ASource extends AudioChain {
         return { ...this.data, $: (this.constructor as typeof AudioChain).tag }
     }
 
-    static _load(d: object, prev: AudioChain) {
+    static override _load(d: object, prev: AudioChain) {
         if (prev != undefined) {
             throw new Error(`Unexpected prev`);
         }
@@ -118,19 +118,19 @@ export class AFilter extends AudioChain {
     protected data: object;
     protected _prev?: AudioChain;
 
-    get start(): number {
+    override  get start(): number {
         return this._start;
     }
-    get end(): number {
+    override  get end(): number {
         return this._end;
     }
-    get prev(): AudioChain | undefined {
+    override    get prev(): AudioChain | undefined {
         return this._prev;
     }
     *enum_filter(): Generator<{ name: string;[key: string]: any; }, void, unknown> {
         throw new Error(`Not implemented`);
     }
-    feed_ff(ff: FFRun, parent?: AudioChain): string {
+    override   feed_ff(ff: FFRun, parent?: AudioChain): string {
         let filters = [];
         let input: ASource | undefined;
         for (const x of this.walk()) {
@@ -172,7 +172,7 @@ export class AFilter extends AudioChain {
         return { ...this.data, $: (this.constructor as typeof AudioChain).tag }
     }
 
-    static _load(d: object, prev: AudioChain) {
+    static override _load(d: object, prev: AudioChain) {
         return new this(prev, d);
     }
 }
@@ -222,7 +222,7 @@ export class AudioSource extends ASource {
         }
         this._end = duration;
     }
-    override feed_ff(ff: FFRun, parent?: AudioChain) {
+    override feed_ff(ff: FFRun, _parent?: AudioChain) {
         const { id, path } = this.data as { id: string; path: string };
         const inp = ff.get_input_id(id);
         if (path) {
@@ -258,7 +258,7 @@ export class AFadeIn extends AFilter {
 
 export class AFadeOut extends AFadeIn {
     static override tag = 'fade_out';
-    *enum_filter() {
+    override *enum_filter() {
         const { duration: fade_dur = 1, curve = 'tri' } = this.data as { duration: number; curve: string };
         yield {
             name: 'afade',
@@ -297,7 +297,7 @@ export class Slice extends AFilter {
 
 export class AdjustVolume extends AFilter {
     static override tag = 'adjust_volume';
-    *enum_filter() {
+    override   *enum_filter() {
         const { volume } = this.data as { volume: number };
         yield { name: 'volume', volume };
     }
@@ -307,7 +307,7 @@ export class AdjustVolume extends AFilter {
 
 export class Tremolo extends AFilter {
     static override tag = 'tremolo';
-    *enum_filter() {
+    override  *enum_filter() {
         const { frequency, depth } = this.data as any;
         yield { name: 'tremolo', f: frequency, d: depth };
     }
@@ -315,7 +315,7 @@ export class Tremolo extends AFilter {
 
 export class Reverse extends AFilter {
     static override tag = 'revese';
-    *enum_filter() {
+    override  *enum_filter() {
         yield { name: 'areverse' };
     }
 }
@@ -334,7 +334,7 @@ export class Loop extends AFilter {
         this._end = prev.start + prev.get_duration() * (loop + 1);
         this._loop = loop;
     }
-    *enum_filter() {
+    override   *enum_filter() {
         // https://superuser.com/questions/1391777/create-a-looped-audio-from-a-certain-part-of-audio-using-ffmpeg
         yield { name: 'asetrate', r: 48000 };
         yield { name: 'aloop', loop: this._loop, size: this.get_duration() * 48000 };
@@ -350,7 +350,7 @@ export class ADelay extends AFilter {
         this.delay = delay;
         this._start -= delay;
     }
-    *enum_filter() {
+    override  *enum_filter() {
         yield { name: 'adelay', delays: Math.floor(this.delay * 1000), all: 1 };
     }
 }
@@ -364,10 +364,10 @@ export class APad extends AFilter {
         this._end += pad_sec;
         this.pad_sec = pad_sec;
     }
-    get end(): number {
+    override  get end(): number {
         return (this._prev?.end ?? NaN) - this.pad_sec;
     }
-    *enum_filter() {
+    override *enum_filter() {
         yield { name: 'apad', pad_dur: fix_num(this.pad_sec) };
     }
 }

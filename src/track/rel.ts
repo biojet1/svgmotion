@@ -7,12 +7,12 @@ class RelOp {
     constructor(extra: KeyExtra) {
         this.extra = extra;
     }
-    apply(k: IProperty<any>, e: RelEntry2, i: number, a: RelEntry2[]) {
+    apply(_k: IProperty<any>, _e: RelEntry2, _i: number, _a: RelEntry2[]) {
         throw new Error(`Not implemented`);
     }
 }
 class RelInit extends RelOp {
-    override apply(k: IProperty<any>, e: RelEntry2, i: number, a: RelEntry2[]) {
+    override apply(k: IProperty<any>, e: RelEntry2, _i: number, _a: RelEntry2[]) {
         k.key_value(e.to, k.initial_value(), this.extra);
     }
 }
@@ -23,7 +23,7 @@ class RelTo extends RelOp {
         super(extra);
         this.value = value;
     }
-    override apply(k: IProperty<any>, e: RelEntry2, i: number, a: RelEntry2[]) {
+    override apply(k: IProperty<any>, e: RelEntry2, i: number, _a: RelEntry2[]) {
         let { extra } = this
         if (i == 0 && e.offset > 0) {
             extra = { ...extra, start: e.from }
@@ -40,7 +40,7 @@ class RelAdd extends RelTo {
 }
 
 class RelFirst extends RelInit {
-    override apply(k: IProperty<any>, e: RelEntry2, i: number, a: RelEntry2[]) {
+    override apply(k: IProperty<any>, e: RelEntry2, _i: number, a: RelEntry2[]) {
         k.key_value(e.to, k.get_value(a[0].to), this.extra);
     }
 }
@@ -128,7 +128,7 @@ export function Rel(t: string | number): Proxy {
         sup.start = -Infinity;
         sup.end = -Infinity;
 
-        return function (frame: number, base_frame: number, hint_dur: number) {
+        return function (frame: number, _base_frame: number, _hint_dur: number) {
             for (const v of map.values()) {
                 for (const e of v) {
                     e.to = frame + e.offset;

@@ -106,7 +106,7 @@ interface SAXAttribute {
 
 export async function sax_parse_svg(
     src: string,
-    opt: { xinclude?: boolean; base?: string | URL } = {}
+    _opt: { xinclude?: boolean; base?: string | URL } = {}
 ) {
     const { SAXParser } = await import("sax-ts");
     const strict: boolean = true; // change to false for HTML parsing
@@ -135,7 +135,7 @@ export async function sax_parse_svg(
         const elem = new SAXElement();
         elem.name = local;
         uri && (elem.uri = uri);
-        elem.attrs = Array.from(Object.values(attributes)).map(function ({ uri, local, value }, i) {
+        elem.attrs = Array.from(Object.values(attributes)).map(function ({ uri, local, value },) {
             let a: SAXAttribute = { value, name: local };
             uri && (a.uri = uri);
             return a;
@@ -150,7 +150,7 @@ export async function sax_parse_svg(
     // parser.onattribute = function (attr: any) {
     //     console.log('onAttribute: ', attr)
     // };
-    parser.onclosetag = function (node: any) {
+    parser.onclosetag = function (_node: any) {
         // console.log("onclosetag", node);
         if (parents.length < 1) {
             throw new Error(``);
@@ -170,7 +170,7 @@ export async function sax_parse_svg(
 
 export async function sax_load_svg_src(
     src: string | URL,
-    opt: { xinclude?: boolean; base?: string | URL } = {}
+    _opt: { xinclude?: boolean; base?: string | URL } = {}
 ) {
     return import('fs/promises').then((fs) => fs.readFile(src, { encoding: 'utf8' })).then((blob) =>
         sax_parse_svg(blob.trim())
@@ -267,12 +267,11 @@ function sax_walk(elem: SAXElement, parent: Container, attrs: { [key: string]: s
             for (const s of ['id', 'class', 'clip-path', 'viewBox', 'preserveAspectRatio']) {
                 delete props[s];
             }
-            let prev: Element | undefined = undefined;
             const merged = { ...attrs, ...props };
             for (const child of elem.nodes) {
                 if (child instanceof SAXElement) {
                     if (child.uri == NS_SVG) {
-                        prev = sax_walk(child, node, merged);
+                        sax_walk(child, node, merged);
                     }
                 } else {
                     if (child && (node instanceof Text || node instanceof TSpan)) {

@@ -20,7 +20,7 @@ export function ZoomTo(view: ViewPort, items: Element[], params: KeyExtra & { du
         let _dur = dur == undefined ? undefined : track.to_frame(dur);
         let bb = BoundingBox.not();
         let { position, size } = view.view_box;
-        function supply(that: Track) {
+        function supply(_that: Track) {
             let b2 = bb.clone();
             if (margin) {
                 if (Array.isArray(margin)) {
@@ -58,7 +58,7 @@ export function ZoomTo(view: ViewPort, items: Element[], params: KeyExtra & { du
         };
         supply.start = -Infinity;
         supply.end = -Infinity;
-        return function (frame: number, base_frame: number, hint_dur: number) {
+        return function (frame: number, _base_frame: number, hint_dur: number) {
             bb = BoundingBox.not();
             for (const x of items) {
                 if (x instanceof BoundingBox) {

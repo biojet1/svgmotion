@@ -93,7 +93,7 @@ declare module "../model/root" {
 }
 
 Asset.prototype.as_sound = async function () {
-    let { id, duration, src, _parent } = this;
+    let { id, duration, src } = this;
     if (!duration) {
         duration = await media_duration(src);
     }

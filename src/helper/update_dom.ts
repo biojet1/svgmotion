@@ -54,7 +54,7 @@ const PROP_MAP: {
         }
     },
     fill: function (frame: number, node: SVGSVGElement, prop: Fill) {
-        for (let [n, v] of Object.entries(prop)) {
+        for (let [n,] of Object.entries(prop)) {
             let k: string, s: string;
             switch (n) {
                 case "color":
@@ -76,7 +76,7 @@ const PROP_MAP: {
         }
     },
     stroke: function (frame: number, node: SVGSVGElement, prop: Stroke) {
-        for (let [n, v] of Object.entries(prop)) {
+        for (let [n,] of Object.entries(prop)) {
             let k: string, s: string;
             switch (n) {
                 case "color":
@@ -262,7 +262,7 @@ Root.prototype.to_dom = function to_dom(doc: typeof SVGElement.prototype.ownerDo
     const defs = doc.createElementNS(NS_SVG, "defs");
     // console.log("Root.prototype.to_dom:");
     // console.dir(this.defs);
-    for (let [n, v] of Object.entries(this.defs)) {
+    for (let [_n, v] of Object.entries(this.defs)) {
         // console.log("defs appendChild", n);
         // console.dir(v);
         defs.appendChild(v.to_dom(doc));

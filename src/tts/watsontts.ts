@@ -24,7 +24,7 @@ export class WatsonTTS extends Voice {
         return this.hash_string_plus(text, ...[accept, voice].filter((v) => !!v));
     }
 
-    async say(text: string) {
+    override async say(text: string) {
         // file in cache
         const f = Resource.get().get_cache_file(this.slug_id(text), 'tts');
         const j = `${f}.json`; // metadata file in cache
@@ -95,10 +95,10 @@ export class WatsonTTS extends Voice {
                 //   to be explicitly set to flowing mode by uncommenting the following line:
                 sock.resume();
             }
-            sock.on('words', (message, data: { words: Array<[string, number, number]> }) => {
+            sock.on('words', (_message, data: { words: Array<[string, number, number]> }) => {
                 words.push(...data.words);
             });
-            sock.on('marks', (message, data: { marks: Array<[string, number, number]> }) => {
+            sock.on('marks', (_message, data: { marks: Array<[string, number, number]> }) => {
                 marks.push(...data.marks);
             });
             return new Promise<AudioEntryTTS>((resolve, reject) => {

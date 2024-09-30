@@ -13,11 +13,11 @@ export class Animated<V, K extends Keyframe<V> = Keyframe<V>> implements Steppab
     // static
     /* c8 ignore start */
     // should be static
-    lerp_value(ratio: number, a: V, b: V): V {
-        throw Error(`Not implemented by '${this.constructor.name}'`);
+    lerp_value(ratio: number, _a: V, _b: V): V {
+        throw Error(`Not implemented by '${this.constructor.name}' (${ratio})`);
     }
     // should be static
-    add_value(a: V, b: V): V {
+    add_value(_a: V, _b: V): V {
         throw Error(`Not implemented by '${this.constructor.name}'`);
     }
     // should be static
@@ -37,7 +37,7 @@ export class Animated<V, K extends Keyframe<V> = Keyframe<V>> implements Steppab
         this.update_value(frame);
     }
     //
-    update_value(frame: number): any {
+    update_value(_frame: number): any {
         throw Error(`Not implemented by '${this.constructor.name}'`);
     }
     /* c8 ignore stop */
@@ -88,7 +88,7 @@ export class Animated<V, K extends Keyframe<V> = Keyframe<V>> implements Steppab
         });
         return value;
     }
-    set kfs_stepper(v: Stepper<V> | undefined) {
+    set kfs_stepper(_v: Stepper<V> | undefined) {
 
     }
 

@@ -6,7 +6,7 @@ import { Element, LengthXValue, LengthYValue } from "./base.js";
 import { Node } from "./linked.js";
 
 export class Container extends Element {
-    *enum_values(): Generator<Animatable<any>, void, unknown> {
+    override *enum_values(): Generator<Animatable<any>, void, unknown> {
         for (let v of Object.values(this)) {
             if (v instanceof Animatable) {
                 yield v;
