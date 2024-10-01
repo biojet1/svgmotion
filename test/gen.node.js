@@ -91,7 +91,7 @@ if (1) {
         await w.write(`// Container.prototype.add_...\n`);
         for (const { name, kind, tag } of col) {
             tag && await w.write(`Container.prototype.add_${name} = function (params?: AddOpt) {` +
-                `const { before, ...etc } = params ?? {}; const x = new ${kind}(etc);this.insert_before(before ?? this._end, x); return x;}\n`);
+                `const { before, ...etc } = params ?? {}; const x = ${kind}.new(etc);this.insert_before(before ?? this._end, x); return x;}\n`);
         }
     });
 

@@ -13,20 +13,20 @@ export class TextData extends Node {
         xset(this, "content", v);
     }
 }
-
+interface Constructor<M> {
+    new(...args: any[]): M
+}
 export class Element extends Parent {
     id?: string;
     static tag = '?';
-    constructor(params?: object) {
-        super();
-        params && this._set_params(params);
-    }
-    // static new(params?: object) {
-    //     const e = new this();
-    //     params && e._set_params(params);
-    //     return e;
+    // constructor(params?: object) {
+    //     super();
     // }
-
+    static new<T extends Element>(this: Constructor<T>, params?: object): T {
+        const e = new this();
+        params && e._set_params(params);
+        return e;
+    }
     *ancestors() {
         let top = this._parent;
         while (top) {

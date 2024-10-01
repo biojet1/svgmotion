@@ -34,10 +34,8 @@ test.test("load_svg the_quick", async (t) => {
     const tr = anim.at(0);
 
     let f = anim.def_filter();
-    const gb = new FEGaussianBlur();
+    const gb = FEGaussianBlur.new({ std_dev: 2 });
     f.append_child(gb);
-    gb.std_dev.set_value(2);
-
 
     dog.filter.set_value(`url(#${f.id})`);
 

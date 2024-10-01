@@ -167,23 +167,23 @@ Root.prototype.parse_json = function (src: string) {
 }
 
 // Container.prototype.add_...
-Container.prototype.add_circle = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = new Circle(etc); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_ellipse = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = new Ellipse(etc); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_feDropShadow = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = new FEDropShadow(etc); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_feGaussianBlur = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = new FEGaussianBlur(etc); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_filter = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = new Filter(etc); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_group = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = new Group(etc); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_image = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = new Image(etc); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_line = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = new Line(etc); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_path = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = new Path(etc); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_polygon = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = new Polygon(etc); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_polyline = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = new Polyline(etc); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_rect = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = new Rect(etc); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_symbol = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = new Symbol(etc); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_text = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = new Text(etc); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_tspan = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = new TSpan(etc); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_use = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = new Use(etc); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_view = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = new ViewPort(etc); this.insert_before(before ?? this._end, x); return x; }
+Container.prototype.add_circle = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = Circle.new(etc); this.insert_before(before ?? this._end, x); return x; }
+Container.prototype.add_ellipse = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = Ellipse.new(etc); this.insert_before(before ?? this._end, x); return x; }
+Container.prototype.add_feDropShadow = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = FEDropShadow.new(etc); this.insert_before(before ?? this._end, x); return x; }
+Container.prototype.add_feGaussianBlur = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = FEGaussianBlur.new(etc); this.insert_before(before ?? this._end, x); return x; }
+Container.prototype.add_filter = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = Filter.new(etc); this.insert_before(before ?? this._end, x); return x; }
+Container.prototype.add_group = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = Group.new(etc); this.insert_before(before ?? this._end, x); return x; }
+Container.prototype.add_image = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = Image.new(etc); this.insert_before(before ?? this._end, x); return x; }
+Container.prototype.add_line = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = Line.new(etc); this.insert_before(before ?? this._end, x); return x; }
+Container.prototype.add_path = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = Path.new(etc); this.insert_before(before ?? this._end, x); return x; }
+Container.prototype.add_polygon = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = Polygon.new(etc); this.insert_before(before ?? this._end, x); return x; }
+Container.prototype.add_polyline = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = Polyline.new(etc); this.insert_before(before ?? this._end, x); return x; }
+Container.prototype.add_rect = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = Rect.new(etc); this.insert_before(before ?? this._end, x); return x; }
+Container.prototype.add_symbol = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = Symbol.new(etc); this.insert_before(before ?? this._end, x); return x; }
+Container.prototype.add_text = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = Text.new(etc); this.insert_before(before ?? this._end, x); return x; }
+Container.prototype.add_tspan = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = TSpan.new(etc); this.insert_before(before ?? this._end, x); return x; }
+Container.prototype.add_use = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = Use.new(etc); this.insert_before(before ?? this._end, x); return x; }
+Container.prototype.add_view = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = ViewPort.new(etc); this.insert_before(before ?? this._end, x); return x; }
 
 
 Container.prototype._add_element = function (tag: string) {
