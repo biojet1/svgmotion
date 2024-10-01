@@ -2,7 +2,7 @@ import { BoundingBox, Matrix } from "../geom/index.js";
 import { Keyframe } from "../keyframe/keyframe.js";
 import { Animatable, TextValue } from "./value.js";
 import { ValueSet, ViewBox } from "./valuesets.js";
-import { Element, LengthXValue, LengthYValue } from "./base.js";
+import { Element, LengthValue, LengthXValue, LengthYValue } from "./base.js";
 import { Node } from "./linked.js";
 
 export class Container extends Element {
@@ -145,8 +145,68 @@ export class Filter extends Container {
     static override tag = "filter";
 }
 
-export class ViewPort extends Container {
-    static override tag = "svg";
+export class Marker extends Container {
+    static override tag = "marker";
+    ///
+    get view_box() {
+        return this._new_field("view_box", new ViewBox([0, 0], [100, 100]));
+    }
+    set view_box(v: ViewBox) {
+        this._new_field("view_box", v);
+    }
+    ///
+    get fit_view() {
+        return this._new_field("fit_view", new TextValue(""));
+    }
+    set fit_view(v: TextValue) {
+        this._new_field("fit_view", v);
+    }
+    ///
+    get marker_units() {
+        return this._new_field("marker_units", new TextValue("strokeWidth"));
+    }
+    set marker_units(v: TextValue) {
+        this._new_field("marker_units", v);
+    }
+    ///
+    get marker_width() {
+        return this._new_field("marker_width", new LengthXValue(3));
+    }
+    set marker_width(v: LengthXValue) {
+        this._new_field("marker_width", v);
+    }
+    ///
+    get marker_height() {
+        return this._new_field("marker_height", new LengthYValue(3));
+    }
+    set marker_height(v: LengthYValue) {
+        this._new_field("marker_height", v);
+    }
+    ///
+    get ref_x() {
+        return this._new_field("ref_x", new LengthXValue(0));
+    }
+    set ref_x(v: LengthXValue) {
+        this._new_field("ref_x", v);
+    }
+    ///
+    get ref_y() {
+        return this._new_field("ref_y", new LengthYValue(0));
+    }
+    set ref_y(v: LengthYValue) {
+        this._new_field("ref_y", v);
+    }
+    ///
+    get orient() {
+        return this._new_field("orient", new LengthValue(0));
+    }
+    set orient(v: LengthValue) {
+        this._new_field("orient", v);
+    }
+}
+
+export class Pattern extends Container {
+    static override tag = "pattern";
     ///
     get x() {
         return this._new_field("x", new LengthXValue(0));
@@ -163,14 +223,14 @@ export class ViewPort extends Container {
     }
     ///
     get width() {
-        return this._new_field("width", new LengthXValue('100%'));
+        return this._new_field("width", new LengthXValue(100));
     }
     set width(v: LengthXValue) {
         this._new_field("width", v);
     }
     ///
     get height() {
-        return this._new_field("height", new LengthYValue('100%'));
+        return this._new_field("height", new LengthYValue(100));
     }
     set height(v: LengthYValue) {
         this._new_field("height", v);
@@ -182,116 +242,91 @@ export class ViewPort extends Container {
     set view_box(v: ViewBox) {
         this._new_field("view_box", v);
     }
-    ///
+    //
     get fit_view() {
         return this._new_field("fit_view", new TextValue(""));
     }
     set fit_view(v: TextValue) {
         this._new_field("fit_view", v);
     }
-    ///
-    get zoom_pan() {
-        return this._new_field("zoom_pan", new TextValue("disable"));
+    /// href
+    get href() {
+        return this._new_field("href", new TextValue(''));
     }
-    set zoom_pan(v: TextValue) {
-        this._new_field("zoom_pan", v);
-    }
-    // 
-    override update_bbox(bbox: BoundingBox, frame: number, m?: Matrix) {
-        const width = this.width.get_value(frame);
-        const height = this.height.get_value(frame);
-        const x = this.x.get_value(frame);
-        const y = this.y.get_value(frame);
-        if (width && height) {
-            let b = BoundingBox.rect(x, y, width, height);
-            if (m) {
-                b = b.transform(m);
-            }
-            bbox.merge_self(b);
-        }
+    set href(v: TextValue) {
+        this._new_field("href", v);
     }
     ///
-    override cat_transform(frame: number, n: Matrix) {
-        if (Object.hasOwn(this, "view_box")) {
-            let w = this.width.get_value(frame);
-            let h = this.height.get_value(frame);
-            if (w && h) {
-                const x = this.x.get_value(frame);
-                const y = this.y.get_value(frame);
-                let [vx, vy] = this.view_box.position.get_value(frame);
-                let [vw, vh] = this.view_box.size.get_value(frame);
-                const fv = this.fit_view.get_value(frame);
-                // const { x: vx, y: vy, width: vw, height: vh } = this.viewBox._calcBox();
-                (vx == null || isNaN(vx)) && (vx = x);
-                (vy == null || isNaN(vy)) && (vy = y);
-                (vw == null || isNaN(vw)) && (vw = w);
-                (vh == null || isNaN(vh)) && (vh = h);
-                if (vw && vh) {
-                    const [tx, ty, sx, sy] = viewbox_transform(
-                        x,
-                        y,
-                        w,
-                        h,
-                        vx,
-                        vy,
-                        vw,
-                        vh,
-                        fv
-                    );
-                    n.cat_self(Matrix.translate(tx, ty).scale(sx, sy));
-                }
-            }
-        }
+    get pattern_units() {
+        return this._new_field("pattern_units", new TextValue("objectBoundingBox"));
+    }
+    set pattern_units(v: TextValue) {
+        this._new_field("pattern_units", v);
+    }
+    ///
+    get pattern_content_units() {
+        return this._new_field("pattern_units", new TextValue("userSpaceOnUse"));
+    }
+    set pattern_content_units(v: TextValue) {
+        this._new_field("pattern_units", v);
+    }
+    ///
+    // pattern_transform=transform
+}
+
+export class Mask extends Container {
+    static override tag = "mask";
+    ///
+    get x() {
+        return this._new_field("x", new LengthXValue(0));
+    }
+    set x(v: LengthXValue) {
+        this._new_field("x", v);
+    }
+    ///
+    get y() {
+        return this._new_field("y", new LengthYValue(0));
+    }
+    set y(v: LengthYValue) {
+        this._new_field("y", v);
+    }
+    ///
+    get width() {
+        return this._new_field("width", new LengthXValue(100));
+    }
+    set width(v: LengthXValue) {
+        this._new_field("width", v);
+    }
+    ///
+    get height() {
+        return this._new_field("height", new LengthYValue(100));
+    }
+    set height(v: LengthYValue) {
+        this._new_field("height", v);
+    }
+    ///
+    get mask_units() {
+        return this._new_field("mask_units", new TextValue("objectBoundingBox"));
+    }
+    set mask_units(v: TextValue) {
+        this._new_field("mask_units", v);
+    }
+    ///
+    get mask_content_units() {
+        return this._new_field("mask_content_units", new TextValue("userSpaceOnUse"));
+    }
+    set mask_content_units(v: TextValue) {
+        this._new_field("mask_content_units", v);
     }
 }
 
-export function viewbox_transform(
-    e_x: number,
-    e_y: number,
-    e_width: number,
-    e_height: number,
-    vb_x: number,
-    vb_y: number,
-    vb_width: number,
-    vb_height: number,
-    aspect?: string | null
-) {
-    // https://svgwg.org/svg2-draft/coords.html#ComputingAViewportsTransform
-    //  Let align be the align value of preserveAspectRatio, or 'xMidYMid' if preserveAspectRatio is not defined.
-    let [align = "xmidymid", meet_or_slice = "meet"] = aspect
-        ? aspect.toLowerCase().split(" ")
-        : [];
-    // Initialize scale-x to e-width/vb-width.
-    let scale_x = e_width / vb_width;
-    // Initialize scale-y to e-height/vb-height.
-    let scale_y = e_height / vb_height;
-    // If align is not 'none' and meetOrSlice is 'meet', set the larger of scale-x and scale-y to the smaller.
-    if (align != "none" && meet_or_slice == "meet") {
-        scale_x = scale_y = Math.min(scale_x, scale_y);
-    } else if (align != "none" && meet_or_slice == "slice") {
-        // Otherwise, if align is not 'none' and v is 'slice', set the smaller of scale-x and scale-y to the larger
-        scale_x = scale_y = Math.max(scale_x, scale_y);
+export class ClipPath extends Container {
+    static override tag = "clipPath";
+    ///
+    get clip_path_units() {
+        return this._new_field("clip_path_units", new TextValue("userSpaceOnUse"));
     }
-    // Initialize translate-x to e-x - (vb-x * scale-x).
-    let translate_x = e_x - vb_x * scale_x;
-    // Initialize translate-y to e-y - (vb-y * scale-y)
-    let translate_y = e_y - vb_y * scale_y;
-    // If align contains 'xMid', add (e-width - vb-width * scale-x) / 2 to translate-x.
-    if (align.indexOf("xmid") >= 0) {
-        translate_x += (e_width - vb_width * scale_x) / 2.0;
+    set clip_path_units(v: TextValue) {
+        this._new_field("clip_path_units", v);
     }
-    // If align contains 'xMax', add (e-width - vb-width * scale-x) to translate-x.
-    if (align.indexOf("xmax") >= 0) {
-        translate_x += e_width - vb_width * scale_x;
-    }
-    // If align contains 'yMid', add (e-height - vb-height * scale-y) / 2 to translate-y.
-    if (align.indexOf("ymid") >= 0) {
-        translate_y += (e_height - vb_height * scale_y) / 2.0;
-    }
-    //  If align contains 'yMax', add (e-height - vb-height * scale-y) to translate-y.
-    if (align.indexOf("ymax") >= 0) {
-        translate_y += e_height - vb_height * scale_y;
-    }
-    // translate(translate-x, translate-y) scale(scale-x, scale-y)
-    return [translate_x, translate_y, scale_x, scale_y];
 }

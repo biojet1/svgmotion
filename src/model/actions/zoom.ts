@@ -1,6 +1,6 @@
 import { BoundingBox, Vector } from "../../geom/index.js";
 import { Element } from "../base.js";
-import { ViewPort } from "../containers.js";
+import { ViewPort } from "../viewport.js";
 import { Track } from "../../track/index.js";
 import { Proxy } from "../../track/action.js";
 import { KeyExtra } from "../../keyframe/keyframe.js";

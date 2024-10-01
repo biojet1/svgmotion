@@ -2,8 +2,8 @@
 import { ScalarValue, UnknownValue } from "../value.js";
 import { ComputeLength } from "../../helper/svg_length.js";
 import { Element, LengthYValue, LengthXValue, LengthValue, FontSizeValue } from "../base.js";
-import { ViewPort, Symbol } from "../containers.js";
-
+import { Symbol } from "../containers.js";
+import { ViewPort } from "../viewport.js";
 declare module "../base" {
     interface Element {
         set_attribute(name: string, value: string): this;
@@ -190,7 +190,7 @@ import { Image, Use } from "../elements.js";
 import { TSpan, Text } from "../text.js";
 import { Rect, Path, Line, Ellipse, Circle, Polyline, Polygon } from "../shapes.js";
 
-declare module "../containers" {
+declare module "../viewport" {
     interface ViewPort {
         set_attribute(name: string, value: string): this;
     }

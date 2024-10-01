@@ -3,7 +3,8 @@ import { AudioChain } from "../utils/sound.js";
 import { Animatable } from "./value.js";
 import { xget, xset } from "./valuesets.js";
 import { Element } from "./base.js";
-import { Container, ViewPort, Filter } from "./containers.js";
+import { Container, Filter } from "./containers.js";
+import { ViewPort } from "./viewport.js";
 
 export class AnimTrack extends Track {
     root!: Root;

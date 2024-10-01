@@ -1,5 +1,6 @@
 import { Element, TextData } from "../base.js";
-import { Container, Symbol, Group, ViewPort } from "../containers.js";
+import { Container, Symbol, Group } from "../containers.js";
+import { ViewPort } from "../viewport.js";
 import { Use, Image } from "../elements.js";
 import { Text, TSpan } from "../text.js";
 import { Circle, Ellipse, Line, Path, Polygon, Polyline, Rect } from "../shapes.js";
