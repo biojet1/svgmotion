@@ -86,18 +86,12 @@ if (1) {
     for (const { name, kind, tag } of col) {
         console.log(`Container.prototype.find_${name} = function (x: number | string = 0) : ${kind} | void {\n            return find_node(this, x, ${kind});\n}`);
     }
-    // console.log(`// Container.prototype.add_...`);
-    // for (const { name, kind, tag } of col) {
-    //     tag && console.log(`Container.prototype.add_${name} = function (params?: AddOpt) {` +
-    //         `const { before, ...etc } = params ?? {}; const x = new ${kind}();this.insert_before(before ?? this._end, x);x._set_params(etc);return x;}`);
-    // }
-    // console.log(``);
 
     fs.open("/tmp/Container.add.js", "w").then(async w => {
         await w.write(`// Container.prototype.add_...\n`);
         for (const { name, kind, tag } of col) {
             tag && await w.write(`Container.prototype.add_${name} = function (params?: AddOpt) {` +
-                `const { before, ...etc } = params ?? {}; const x = new ${kind}();this.insert_before(before ?? this._end, x);x._set_params(etc);return x;}\n`);
+                `const { before, ...etc } = params ?? {}; const x = new ${kind}(etc);this.insert_before(before ?? this._end, x); return x;}\n`);
         }
     });
 
@@ -111,8 +105,6 @@ if (1) {
         await w.write(`\tswitch (tag) {\n`);
         for (const { name, kind, tag } of col) {
             tag && w.write(`\t\tcase "${tag}": return this.add_${name}();\n`);
-            // tag && console.log(`${tag} : function () {` +
-            //     `return this.add_${name}();},`);
         }
         await w.write(`\t}\n`);
         await w.write(`\tthrow new Error("Unexpected tag: " + tag);\n`);

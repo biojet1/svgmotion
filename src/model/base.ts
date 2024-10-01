@@ -17,9 +17,14 @@ export class TextData extends Node {
 export class Element extends Parent {
     id?: string;
     static tag = '?';
-    // constructor(params:object) {
-    //     super();
-    //     this._set_params(params);
+    constructor(params?: object) {
+        super();
+        params && this._set_params(params);
+    }
+    // static new(params?: object) {
+    //     const e = new this();
+    //     params && e._set_params(params);
+    //     return e;
     // }
 
     *ancestors() {

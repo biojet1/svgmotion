@@ -8,7 +8,7 @@ test.test("load_svg polygon01", async (t) => {
     const tr = anim.at(0);
     // console.log(anim.view);
     const pg1 = anim.get_polygon(1);
-    const c = anim.view.add_circle({ r: 60, cx: 850, cy: 200, fill: { color: 'green' } });
+    const c = anim.view.add_circle({ r: 60, cx: 850, cy: 200, fill: { color: 'pink' } });
     // console.dir(pg1.points.get_repr());
     // c.r.key_value(0, 10);
     // c.cx.key_value(0, 850);
