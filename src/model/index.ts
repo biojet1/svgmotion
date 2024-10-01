@@ -4,6 +4,7 @@ export * from './base.js';
 export * from './elements.js';
 export * from './containers.js';
 export * from './shapes.js';
+export * from './text.js';
 export * from './filters.js';
 export * from './root.js';
 export * from './actions/zoom.js';

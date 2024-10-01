@@ -9,6 +9,8 @@ export * from "./model/mixins/load.js";
 export * from "./model/mixins/update_dom.js";
 export * from "./model/mixins/find_node.js";
 export * from "./model/mixins/image.js";
+export * from "./model/mixins/sound.js";
+export * from "./model/mixins/voice.js";
 export * from './model/actions/audio.js';
 export * from "./helper/parse_color.js";
 export * from "./tts/watsontts.js";

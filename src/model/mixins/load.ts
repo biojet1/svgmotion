@@ -8,7 +8,7 @@ import { TSpan, Text } from "../text.js";
 import { Container, Group, Symbol, ViewPort, Filter } from "../containers.js";
 import { Ellipse, Circle, Polyline, Polygon, Rect, Path, Line, } from "../shapes.js";
 import { AFilter, ASource, AudioChain } from "../../utils/sound.js";
-import { FEGaussianBlur } from "../filters.js";
+import { FEDropShadow, FEGaussianBlur } from "../filters.js";
 
 function load_properties(that: Element, props: { [key: string]: PlainValue<any> }) {
     for (let [k, v] of Object.entries(props)) {
@@ -64,25 +64,30 @@ declare module "../root" {
         parse_json(src: string): void;
     }
 }
-
+export interface AddOpt {
+    [key: string]: any;
+    before?: Element;
+}
 declare module "../containers" {
     interface Container {
-        add_circle(before?: Element): Circle;
-        add_ellipse(before?: Element): Ellipse;
-        add_feGaussianBlur(before?: Element): FEGaussianBlur;
-        add_filter(before?: Element): Filter;
-        add_group(before?: Element): Group;
-        add_image(before?: Element): Image;
-        add_line(before?: Element): Line;
-        add_path(before?: Element): Path;
-        add_polygon(before?: Element): Polygon;
-        add_polyline(before?: Element): Polyline;
-        add_rect(before?: Element): Rect;
-        add_symbol(before?: Element): Symbol;
-        add_text(before?: Element): Text;
-        add_tspan(before?: Element): TSpan;
-        add_use(before?: Element): Use;
-        add_view(before?: Element): ViewPort;
+        add_circle(params?: AddOpt): Circle;
+        add_ellipse(params?: AddOpt): Ellipse;
+        add_feDropShadow(params?: AddOpt): FEDropShadow;
+        add_feGaussianBlur(params?: AddOpt): FEGaussianBlur;
+        add_filter(params?: AddOpt): Filter;
+        add_group(params?: AddOpt): Group;
+        add_image(params?: AddOpt): Image;
+        add_line(params?: AddOpt): Line;
+        add_path(params?: AddOpt): Path;
+        add_polygon(params?: AddOpt): Polygon;
+        add_polyline(params?: AddOpt): Polyline;
+        add_rect(params?: AddOpt): Rect;
+        add_symbol(params?: AddOpt): Symbol;
+        add_text(params?: AddOpt): Text;
+        add_tspan(params?: AddOpt): TSpan;
+        add_use(params?: AddOpt): Use;
+        add_view(params?: AddOpt): ViewPort;
+
         ////
         _add_element(name: string): Element;
     }
@@ -160,23 +165,35 @@ Root.prototype.load = function (src: PlainRoot) {
 Root.prototype.parse_json = function (src: string) {
     return this.load(JSON.parse(src))
 }
+
 // Container.prototype.add_...
-Container.prototype.add_circle = function (before?: Element) { const x = new Circle(); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_ellipse = function (before?: Element) { const x = new Ellipse(); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_feGaussianBlur = function (before?: Element) { const x = new FEGaussianBlur(); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_filter = function (before?: Element) { const x = new Filter(); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_group = function (before?: Element) { const x = new Group(); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_image = function (before?: Element) { const x = new Image(); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_line = function (before?: Element) { const x = new Line(); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_path = function (before?: Element) { const x = new Path(); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_polygon = function (before?: Element) { const x = new Polygon(); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_polyline = function (before?: Element) { const x = new Polyline(); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_rect = function (before?: Element) { const x = new Rect(); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_symbol = function (before?: Element) { const x = new Symbol(); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_text = function (before?: Element) { const x = new Text(); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_tspan = function (before?: Element) { const x = new TSpan(); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_use = function (before?: Element) { const x = new Use(); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_view = function (before?: Element) { const x = new ViewPort(); this.insert_before(before ?? this._end, x); return x; }
+Container.prototype.add_circle = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = new Circle(); this.insert_before(before ?? this._end, x); x._set_params(etc); return x; }
+Container.prototype.add_ellipse = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = new Ellipse(); this.insert_before(before ?? this._end, x); x._set_params(etc); return x; }
+Container.prototype.add_feDropShadow = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = new FEDropShadow(); this.insert_before(before ?? this._end, x); x._set_params(etc); return x; }
+Container.prototype.add_feGaussianBlur = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = new FEGaussianBlur(); this.insert_before(before ?? this._end, x); x._set_params(etc); return x; }
+Container.prototype.add_filter = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = new Filter(); this.insert_before(before ?? this._end, x); x._set_params(etc); return x; }
+Container.prototype.add_group = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = new Group(); this.insert_before(before ?? this._end, x); x._set_params(etc); return x; }
+Container.prototype.add_image = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = new Image(); this.insert_before(before ?? this._end, x); x._set_params(etc); return x; }
+Container.prototype.add_line = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = new Line(); this.insert_before(before ?? this._end, x); x._set_params(etc); return x; }
+Container.prototype.add_path = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = new Path(); this.insert_before(before ?? this._end, x); x._set_params(etc); return x; }
+Container.prototype.add_polygon = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = new Polygon(); this.insert_before(before ?? this._end, x); x._set_params(etc); return x; }
+Container.prototype.add_polyline = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = new Polyline(); this.insert_before(before ?? this._end, x); x._set_params(etc); return x; }
+Container.prototype.add_rect = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = new Rect(); this.insert_before(before ?? this._end, x); x._set_params(etc); return x; }
+Container.prototype.add_symbol = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = new Symbol(); this.insert_before(before ?? this._end, x); x._set_params(etc); return x; }
+Container.prototype.add_text = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = new Text(); this.insert_before(before ?? this._end, x); x._set_params(etc); return x; }
+Container.prototype.add_tspan = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = new TSpan(); this.insert_before(before ?? this._end, x); x._set_params(etc); return x; }
+Container.prototype.add_use = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = new Use(); this.insert_before(before ?? this._end, x); x._set_params(etc); return x; }
+Container.prototype.add_view = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = new ViewPort(); this.insert_before(before ?? this._end, x); x._set_params(etc); return x; }
+
+function add_x(self: Container, params?: AddOpt) {
+    const { before, ...etc } = params ?? {};
+    const x = new ViewPort();
+    self.insert_before(before ?? self._end, x);
+    x._set_params(etc);
+    return x;
+}
+
+
 
 Container.prototype._add_element = function (tag: string) {
     switch (tag) {
@@ -197,5 +214,5 @@ Container.prototype._add_element = function (tag: string) {
         case "use": return this.add_use();
         case "svg": return this.add_view();
     }
-    throw new Error("Unexpected tag: " + name);
+    throw new Error("Unexpected tag: " + tag);
 }

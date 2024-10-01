@@ -17,9 +17,16 @@ export class TextData extends Node {
 export class Element extends Parent {
     id?: string;
     static tag = '?';
-    cat_transform(frame: number, n: Matrix) {
-        if (Object.hasOwn(this, "transform")) {
-            this.transform.cat_transform(frame, n);
+    // constructor(params:object) {
+    //     super();
+    //     this._set_params(params);
+    // }
+
+    *ancestors() {
+        let top = this._parent;
+        while (top) {
+            yield top
+            top = top._parent;
         }
     }
     *enum_values(): Generator<Animatable<any>, void, unknown> {
@@ -31,6 +38,12 @@ export class Element extends Parent {
             }
         }
     }
+    cat_transform(frame: number, n: Matrix) {
+        if (Object.hasOwn(this, "transform")) {
+            this.transform.cat_transform(frame, n);
+        }
+    }
+
     update_bbox(_bbox: BoundingBox, _frame: number, _m?: Matrix) {
 
     }
@@ -44,17 +57,32 @@ export class Element extends Parent {
         // TODO:
         return bb
     }
-    *ancestors() {
-        let top = this._parent;
-        while (top) {
-            yield top
-            top = top._parent;
-        }
-    }
+
     protected _new_field<T extends Animatable<any> | ValueSet>(name: string, value: T): T {
         const v = xget(this, name, value);
         v._parent = this;
         return v;
+    }
+    _set_params(o: object) {
+        for (const [k, v] of Object.entries(o)) {
+            switch (k) {
+                case 'id':
+                    this.id = v;
+                    break;
+                default:
+                    const f = (this as any)[k];
+                    if (f instanceof Animatable) {
+                        f.set_value(v);
+                    } else if (f instanceof ValueSet) {
+                        for (const [n, w] of Object.entries(v)) {
+                            const g = (f as any)[n];
+                            if (g instanceof Animatable) {
+                                g.set_value(w);
+                            }
+                        }
+                    }
+            }
+        }
     }
     /// FILL
     get fill() {
