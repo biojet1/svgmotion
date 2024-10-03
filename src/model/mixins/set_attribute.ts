@@ -1,10 +1,11 @@
 
 import { ScalarValue, UnknownValue } from "../value.js";
-import { ComputeLength } from "../length.js";
-import { Element } from "../base.js";
 import { LengthYValue, LengthXValue, LengthValue, FontSizeValue } from "../value.js";
+import { Element } from "../base.js";
 import { Symbol } from "../containers.js";
 import { ViewPort } from "../viewport.js";
+import { ComputeLength } from "../length.js";
+
 declare module "../base" {
     interface Element {
         set_attribute(name: string, value: string): this;
@@ -206,6 +207,7 @@ ViewPort.prototype.set_attribute = function (name: string, value: string) {
             break;
         case "preserveAspectRatio":
             this.fit_view.set_repr(value);
+            // this.view_box.fit.set_repr(value);
             break;
         case "zoomAndPan":
             this.zoom_pan.set_repr(value);

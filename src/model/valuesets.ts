@@ -137,6 +137,13 @@ export class ViewBox extends ValueSet {
     set position(v: PositionValue) {
         this._new_field("position", v);
     }
+    // fit
+    get fit() {
+        return this._new_field("fit", new TextValue(""));
+    }
+    set fit(v: TextValue) {
+        this._new_field("fit", v);
+    }
     // repr
     get_repr(frame: number): string {
         const s = this.size.get_value(frame);

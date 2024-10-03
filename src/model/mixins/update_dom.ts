@@ -29,6 +29,12 @@ const PROP_MAP: {
             node.setAttribute(name, value);
         }
     },
+    view_box: function (frame: number, node: SVGRectElement | SVGSVGElement, prop: ViewBox) {
+        node.setAttribute("viewBox", prop.get_repr(frame));
+    },
+    fit_view: function (frame: number, node: SVGRectElement | SVGSVGElement, prop: TextValue) {
+        node.setAttribute("preserveAspectRatio", prop.get_repr(frame));
+    },
 
     opacity: function (frame: number, node: SVGElement, prop: ScalarValue) {
         node.setAttribute("opacity", prop.get_repr(frame));
@@ -60,15 +66,11 @@ const PROP_MAP: {
     ry: function (frame: number, node: SVGRectElement | SVGEllipseElement, prop: ScalarValue) {
         node.setAttribute("ry", prop.get_repr(frame));
     },
-    view_box: function (frame: number, node: SVGRectElement | SVGSVGElement, prop: ViewBox) {
-        node.setAttribute("viewBox", prop.get_repr(frame));
-    },
+
     d: function (frame: number, node: SVGPathElement, prop: TextValue) {
         node.setAttribute("d", prop.get_repr(frame));
     },
-    fit_view: function (frame: number, node: SVGRectElement | SVGSVGElement, prop: TextValue) {
-        node.setAttribute("preserveAspectRatio", prop.get_repr(frame));
-    },
+
 
     line_height: function (frame: number, node: SVGElement, prop: ScalarValue) {
         node.style.lineHeight = prop.get_repr(frame);
@@ -348,10 +350,6 @@ Fill.prototype.enum_attibutes = function* (frame: number) {
 }
 
 Transform.prototype.enum_attibutes = function* (frame: number) {
-    // const r = this.get_repr(frame);
-    // if (r) {
-    //     yield { name: "transform", value: r }
-    // }
     for (let [n,] of Object.entries(this)) {
         let name: string, value: string;
         switch (n) {
@@ -375,4 +373,25 @@ Transform.prototype.enum_attibutes = function* (frame: number) {
 }
 
 
-
+ViewBox.prototype.enum_attibutes = function* (frame: number) {
+    let box = false;
+    for (let [n,] of Object.entries(this)) {
+        switch (n) {
+            case "size":
+            case "position":
+                box = true;
+                break;
+            case "fit":
+                yield { name: "preserveAspectRatio", value: this.fit.get_repr(frame) }
+                break;
+            default:
+                continue;
+        }
+    }
+    if (box) {
+        const s = this.size.get_value(frame);
+        const p = this.position.get_value(frame);
+        const value = `${p[0]} ${p[1]} ${s[0]} ${s[1]}`;
+        yield { name: "viewBox", value }
+    }
+}
