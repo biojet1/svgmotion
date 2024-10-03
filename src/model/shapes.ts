@@ -1,6 +1,6 @@
 import { PathLC, BoundingBox, Matrix } from "../geom/index.js";
-import { Element, LengthYValue, LengthXValue, LengthValue } from "./base.js";
-import { PointsValue, TextValue } from "./value.js";
+import { Element } from "./base.js";
+import { PointsValue, TextValue, LengthYValue, LengthXValue, LengthValue } from "./value.js";
 
 abstract class Shape extends Element {
     describe(frame: number): string {
@@ -55,6 +55,27 @@ export class Path extends Shape {
     }
     set d(v: TextValue) {
         this._new_field("d", v);
+    }
+    //
+    get marker_start() {
+        return this._new_field("marker_start", new TextValue("none"));
+    }
+    set marker_start(v: TextValue) {
+        this._new_field("marker_start", v);
+    }
+    //
+    get marker_mid() {
+        return this._new_field("marker_mid", new TextValue("none"));
+    }
+    set marker_mid(v: TextValue) {
+        this._new_field("marker_mid", v);
+    }
+    //
+    get marker_end() {
+        return this._new_field("marker_end", new TextValue("none"));
+    }
+    set marker_end(v: TextValue) {
+        this._new_field("marker_end", v);
     }
     //
     override describe(frame: number) {

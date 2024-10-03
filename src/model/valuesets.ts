@@ -1,10 +1,9 @@
 import { BoundingBox, Matrix, MatrixMut, Vector } from "../geom/index.js";
 import { KeyExtra } from "../keyframe/keyframe.js";
-import { FontSizeValue, LengthValue } from "./base.js";
 import { VectorValue, ScalarValue, PositionValue, RGBValue, TextValue, PercentageValue } from "./value.js";
-import { PlainValue, Animatable } from "./value.js";
+import { PlainValue, Animatable, FontSizeValue, LengthValue } from "./value.js";
 import { Element } from "./base.js";
-import { BoxLength } from "../helper/svg_length.js";
+import { BoxLength } from "./length.js";
 
 export function xget<T>(that: any, name: string, value: T): T {
     // console.log(`_GETX ${name}`);
@@ -26,6 +25,27 @@ export function xset<T>(that: any, name: string, value: T) {
     });
 }
 
+function set_params(that: { id?: string }, o: object) {
+    for (const [k, v] of Object.entries(o)) {
+        switch (k) {
+            case 'id':
+                that.id = v;
+                break;
+            default:
+                const f = (that as any)[k];
+                if (f instanceof Animatable) {
+                    f.set_value(v);
+                } else if (f instanceof ValueSet) {
+                    for (const [n, w] of Object.entries(v)) {
+                        const g = (f as any)[n];
+                        if (g instanceof Animatable) {
+                            g.set_value(w);
+                        }
+                    }
+                }
+        }
+    }
+}
 function find_parent<T>(
     that: Animatable<any> | ValueSet,
     K: { new(...args: any[]): T }
@@ -59,6 +79,10 @@ export class ValueSet {
         const v = xget(this, name, value);
         v._parent = this;
         return v;
+    }
+
+    *enum_attibutes(frame: number): Generator<{ name: string; value: string; }, void, unknown> {
+        throw new Error(`Not implemented (${frame})`);
     }
 
     *enum_values(): Generator<Animatable<any>, void, unknown> {
@@ -271,35 +295,9 @@ export class Font extends ValueSet {
     }
 
     //////
-    *enum_attibutes(frame: number) {
-        for (let [n, _] of Object.entries(this)) {
-            switch (n) {
-                case "family":
-                    yield { name: "font-family", value: this.family.get_repr(frame) }
-                    break;
-                case "size":
-                    yield { name: "font-size", value: this.size.get_repr(frame) }
-                    break;
-                case "style":
-                    yield { name: "font-style", value: this.style.get_repr(frame) }
-                    break;
-                case "weight":
-                    yield { name: "font-weight", value: this.weight.get_repr(frame) }
-                    break;
-                case "variant":
-                    yield { name: "font-variant", value: this.variant.get_repr(frame) }
-                    break;
-                case "stretch":
-                    yield { name: "font-stretch", value: this.stretch.get_repr(frame) }
-                    break;
-                case "size-adjust":
-                    yield { name: "font-size-adjust", value: this.size_adjust.get_repr(frame) }
-                    break;
-            }
-        }
-
-    }
 }
+
+
 
 export class Transform extends ValueSet {
     clear() {
@@ -358,11 +356,7 @@ export class Transform extends ValueSet {
         }
         return '';
     }
-    *enum_attibutes(frame: number) {
-        if ('all' in this) {
-            yield { name: "transform", value: _get_repr(this.all, frame) }
-        }
-    }
+
     cat_transform(frame: number, n: Matrix) {
         if (Object.hasOwn(this, "all")) {
             const { all } = this;

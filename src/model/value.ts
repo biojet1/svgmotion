@@ -483,3 +483,16 @@ export class RGB extends Vector {
         super([r, g, b]);
     }
 }
+
+export class LengthXValue extends ScalarValue {
+}
+
+export class LengthYValue extends ScalarValue {
+}
+
+export class LengthValue extends ScalarValue {
+}
+
+export class FontSizeValue extends ScalarValue {
+
+}

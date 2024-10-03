@@ -1,5 +1,5 @@
-import { Element, LengthYValue, LengthXValue } from "./base.js";
-import { VectorValue, BiVectorValue, TextValue } from "./value.js";
+import { Element } from "./base.js";
+import { VectorValue, BiVectorValue, LengthYValue, LengthXValue, TextValue } from "./value.js";
 
 export class FilterElement extends Element {
 }

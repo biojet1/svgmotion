@@ -1,8 +1,8 @@
 import { BoundingBox, Matrix } from "../geom/index.js";
 import { Keyframe } from "../keyframe/keyframe.js";
-import { Animatable, TextValue } from "./value.js";
+import { Animatable, TextValue, LengthValue, LengthXValue, LengthYValue } from "./value.js";
 import { ValueSet, ViewBox } from "./valuesets.js";
-import { Element, LengthValue, LengthXValue, LengthYValue } from "./base.js";
+import { Element } from "./base.js";
 import { Node } from "./linked.js";
 
 export class Container extends Element {

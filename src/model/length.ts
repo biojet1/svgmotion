@@ -1,9 +1,8 @@
 import { BoundingBox } from "../geom/index.js";
-import { xget } from "../model/valuesets.js";
-import { Element } from "../model/base.js";
+import { xget } from "./valuesets.js";
+import { Element } from "./base.js";
 
-const BOTH_MATCH =
-    /^\s*(([-+]?[0-9]+(\.[0-9]*)?|[-+]?\.[0-9]+)([eE][-+]?[0-9]+)?)\s*(in|pt|px|mm|cm|m|km|Q|pc|yd|ft||%|em|ex|ch|rem|vw|vh|vmin|vmax|deg|grad|rad|turn|s|ms|Hz|kHz|dpi|dpcm|dppx)\s*$/i;
+const BOTH_MATCH = /^\s*(([-+]?[0-9]+(\.[0-9]*)?|[-+]?\.[0-9]+)([eE][-+]?[0-9]+)?)\s*(in|pt|px|mm|cm|m|km|Q|pc|yd|ft||%|em|ex|ch|rem|vw|vh|vmin|vmax|deg|grad|rad|turn|s|ms|Hz|kHz|dpi|dpcm|dppx)\s*$/i;
 
 export class CalcLength {
     protected _node!: Element;
@@ -30,13 +29,13 @@ export class CalcLength {
         return xget(this, "vh", n);
     }
     get relative_length(): number {
-        throw new Error(`Not implemented`)
+        throw new Error(`Not implemented`);
     }
     get relative_length_x(): number {
-        throw new Error(`Not implemented`)
+        throw new Error(`Not implemented`);
     }
     get relative_length_y(): number {
-        throw new Error(`Not implemented`)
+        throw new Error(`Not implemented`);
     }
     get relative_min_x(): number {
         return xget(this, "relative_min_x", 0);
@@ -45,7 +44,7 @@ export class CalcLength {
         return xget(this, "relative_min_y", 0);
     }
     get relative_length_f(): number {
-        throw new Error(`Not implemented`)
+        throw new Error(`Not implemented`);
     }
     parse_len(value: string, dir?: string) {
         const m = BOTH_MATCH.exec(value);
@@ -83,7 +82,7 @@ export class CalcLength {
                 switch (dir) {
                     case 'x':
                         n = this.relative_length_x;
-                        o = this.relative_min_x
+                        o = this.relative_min_x;
                         break;
                     case 'y':
                         n = this.relative_length_y;
@@ -114,33 +113,33 @@ export class CalcLength {
                 if (vw == undefined) {
                     throw Error(`No vw`);
                 }
-                return amount * vw / 100.0
+                return amount * vw / 100.0;
             }
             case "vh": {
                 const { vh } = this;
                 if (vh == undefined) {
                     throw Error(`No vh`);
                 }
-                return amount * vh / 100.0
+                return amount * vh / 100.0;
             }
             case "vmin": {
                 const { vh, vw } = this;
                 if (vh == undefined || vw == undefined) {
                     throw Error(`No vh/vw`);
                 }
-                return amount * Math.min(vw, vh) / 100.0
+                return amount * Math.min(vw, vh) / 100.0;
             }
             case "vmax": {
                 const { vh, vw } = this;
                 if (vh == undefined || vw == undefined) {
                     throw Error(`No vh/vw`);
                 }
-                return amount * Math.max(vw, vh) / 100.0
+                return amount * Math.max(vw, vh) / 100.0;
             }
             case "pt":
-                return amount * 4.0 / 3.0
+                return amount * 4.0 / 3.0;
             case "pc":
-                return amount * 16.0
+                return amount * 16.0;
             case "em": {
                 const { font_size } = this;
                 if (font_size == undefined) {
@@ -158,7 +157,7 @@ export class CalcLength {
             case undefined:
             case "px":
             case "":
-                return amount
+                return amount;
         }
         throw Error(`Unexpected unit "${units}"`);
     }
@@ -170,7 +169,7 @@ export class ComputeLength extends CalcLength {
         this._node = node;
         this.frame = frame;
     }
-    override  get relative_length_x(): number {
+    override get relative_length_x(): number {
         const n = this.node.get_vp_size(this.frame).x;
         return xget(this, "relative_length_x", n);
     }
@@ -184,7 +183,7 @@ export class ComputeLength extends CalcLength {
     }
     override get relative_length() {
         const { x, y } = this.node.get_vp_size(this.frame);
-        const n = Math.hypot(x, y) / Math.sqrt(2)
+        const n = Math.hypot(x, y) / Math.sqrt(2);
         return xget(this, "relative_length", n);
     }
 }

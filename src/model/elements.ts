@@ -1,6 +1,6 @@
 import { BoundingBox, Matrix } from "../geom/index.js";
-import { TextValue } from "./value.js";
-import { Element, LengthYValue, LengthXValue } from "./base.js";
+import { TextValue, LengthYValue, LengthXValue } from "./value.js";
+import { Element, } from "./base.js";
 
 export class Use extends Element {
     static override tag = "use";

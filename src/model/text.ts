@@ -1,5 +1,6 @@
 import { Node } from "./linked.js";
-import { LengthXValue, LengthYValue, TextData } from "./base.js";
+import { TextData } from "./base.js";
+import { LengthXValue, LengthYValue } from "./value.js";
 import { Container } from "./containers.js";
 
 export class Text extends Container {

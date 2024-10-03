@@ -9,6 +9,27 @@ import { Container } from "../containers.js";
 const PROP_MAP: {
     [key: string]: ((frame: number, elem: any, prop: any, node: Element) => void);
 } = {
+    transform: function (frame: number, node: SVGElement, prop: Transform) {
+        for (const { name, value } of prop.enum_attibutes(frame)) {
+            node.setAttribute(name, value);
+        }
+    },
+    fill: function (frame: number, node: SVGSVGElement, prop: Fill) {
+        for (const { name, value } of prop.enum_attibutes(frame)) {
+            node.setAttribute(name, value);
+        }
+    },
+    stroke: function (frame: number, node: SVGSVGElement, prop: Stroke) {
+        for (const { name, value } of prop.enum_attibutes(frame)) {
+            node.setAttribute(name, value);
+        }
+    },
+    font: function (frame: number, node: SVGSVGElement, prop: Font) {
+        for (const { name, value } of prop.enum_attibutes(frame)) {
+            node.setAttribute(name, value);
+        }
+    },
+
     opacity: function (frame: number, node: SVGElement, prop: ScalarValue) {
         node.setAttribute("opacity", prop.get_repr(frame));
     },
@@ -48,72 +69,7 @@ const PROP_MAP: {
     fit_view: function (frame: number, node: SVGRectElement | SVGSVGElement, prop: TextValue) {
         node.setAttribute("preserveAspectRatio", prop.get_repr(frame));
     },
-    transform: function (frame: number, node: SVGElement, prop: Transform) {
-        for (const { name, value } of prop.enum_attibutes(frame)) {
-            node.setAttribute(name, value);
-        }
-    },
-    fill: function (frame: number, node: SVGSVGElement, prop: Fill) {
-        for (let [n,] of Object.entries(prop)) {
-            let k: string, s: string;
-            switch (n) {
-                case "color":
-                    k = "fill";
-                    s = prop.color.get_repr(frame);
-                    break;
-                case "opacity":
-                    k = "fill-opacity";
-                    s = prop.opacity.get_repr(frame);
-                    break;
-                case "rule":
-                    k = "fill-rule";
-                    s = prop.rule.get_repr(frame);
-                    break;
-                default:
-                    continue;
-            }
-            node.setAttribute(k, s);
-        }
-    },
-    stroke: function (frame: number, node: SVGSVGElement, prop: Stroke) {
-        for (let [n,] of Object.entries(prop)) {
-            let k: string, s: string;
-            switch (n) {
-                case "color":
-                    [k, s] = ["stroke", prop.color.get_repr(frame)];
-                    break;
-                case "opacity":
-                    [k, s] = ["stroke-opacity", prop.opacity.get_repr(frame)];
-                    break;
-                case "width":
-                    [k, s] = ["stroke-width", prop.width.get_repr(frame)];
-                    break;
-                case "miter_limit":
-                    [k, s] = ["stroke-miterlimit", prop.miter_limit.get_repr(frame)];
-                    break;
-                case "dash_array":
-                    [k, s] = ["stroke-dasharray", prop.dash_array.get_repr(frame)];
-                    break;
-                case "dash_offset":
-                    [k, s] = ["stroke-dashoffset", prop.dash_offset.get_repr(frame)];
-                    break;
-                case "linecap":
-                    [k, s] = ["stroke-linecap", prop.linecap.get_repr(frame)];
-                    break;
-                case "linejoin":
-                    [k, s] = ["stroke-linejoin", prop.linejoin.get_repr(frame)];
-                    break;
-                default:
-                    continue;
-            }
-            node.setAttribute(k, s);
-        }
-    },
-    font: function (frame: number, node: SVGSVGElement, prop: Font) {
-        for (const { name, value } of prop.enum_attibutes(frame)) {
-            node.setAttribute(name, value);
-        }
-    },
+
     line_height: function (frame: number, node: SVGElement, prop: ScalarValue) {
         node.style.lineHeight = prop.get_repr(frame);
     },
@@ -305,3 +261,118 @@ Container.prototype.stepper = function () {
     }
     return Stepper.create((n) => update_dom(n, this), min, max);
 }
+
+Font.prototype.enum_attibutes = function* (frame: number) {
+    for (let [n, _] of Object.entries(this)) {
+        switch (n) {
+            case "family":
+                yield { name: "font-family", value: this.family.get_repr(frame) }
+                break;
+            case "size":
+                yield { name: "font-size", value: this.size.get_repr(frame) }
+                break;
+            case "style":
+                yield { name: "font-style", value: this.style.get_repr(frame) }
+                break;
+            case "weight":
+                yield { name: "font-weight", value: this.weight.get_repr(frame) }
+                break;
+            case "variant":
+                yield { name: "font-variant", value: this.variant.get_repr(frame) }
+                break;
+            case "stretch":
+                yield { name: "font-stretch", value: this.stretch.get_repr(frame) }
+                break;
+            case "size-adjust":
+                yield { name: "font-size-adjust", value: this.size_adjust.get_repr(frame) }
+                break;
+        }
+    }
+
+}
+
+Stroke.prototype.enum_attibutes = function* (frame: number) {
+    for (let [n, _] of Object.entries(this)) {
+        switch (n) {
+            case "color":
+                yield { name: "stroke", value: this.color.get_repr(frame) }
+                break;
+            case "opacity":
+                yield { name: "stroke-opacity", value: this.opacity.get_repr(frame) }
+                break;
+            case "width":
+                yield { name: "stroke-width", value: this.width.get_repr(frame) }
+                break;
+            case "miter_limit":
+                yield { name: "stroke-miterlimit", value: this.miter_limit.get_repr(frame) }
+                break;
+            case "dash_array":
+                yield { name: "stroke-dasharray", value: this.dash_array.get_repr(frame) }
+                break;
+            case "dash_offset":
+                yield { name: "stroke-dashoffset", value: this.dash_offset.get_repr(frame) }
+                break;
+            case "linecap":
+                yield { name: "stroke-linecap", value: this.linecap.get_repr(frame) }
+                break;
+            case "linejoin":
+                yield { name: "stroke-linejoin", value: this.linejoin.get_repr(frame) }
+                break;
+            default:
+                continue;
+        }
+    }
+}
+
+Fill.prototype.enum_attibutes = function* (frame: number) {
+    for (let [n,] of Object.entries(this)) {
+        let name: string, value: string;
+        switch (n) {
+            case "color":
+                name = "fill";
+                value = this.color.get_repr(frame);
+                break;
+            case "opacity":
+                name = "fill-opacity";
+                value = this.opacity.get_repr(frame);
+                break;
+            case "rule":
+                name = "fill-rule";
+                value = this.rule.get_repr(frame);
+                break;
+            default:
+                continue;
+        }
+        yield { name, value: value }
+    }
+}
+
+Transform.prototype.enum_attibutes = function* (frame: number) {
+    // const r = this.get_repr(frame);
+    // if (r) {
+    //     yield { name: "transform", value: r }
+    // }
+    for (let [n,] of Object.entries(this)) {
+        let name: string, value: string;
+        switch (n) {
+            case "all":
+                name = "transform";
+                value = this.all.map((x) => x.get_repr(frame)).join(" ");
+                break;
+            case "origin":
+                name = "transform-origin";
+                value = this.origin.get_repr(frame);
+                break;
+            case "box":
+                name = "transform-box";
+                value = this.box.get_repr(frame);
+                break;
+            default:
+                continue;
+        }
+        yield { name, value: value }
+    }
+}
+
+
+

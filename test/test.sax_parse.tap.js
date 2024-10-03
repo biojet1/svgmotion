@@ -1,7 +1,6 @@
 "uses strict";
 import test from "tap";
 import { sax_parse_svg, sax_load_svg_src } from "../dist/model/mixins/parse_xml.js";
-import { Vector, RGB, Root, Rel } from "svgmotion";
 
 // test.test("sax_parse_svg", async (t) => {
 //   const anim = new Root();

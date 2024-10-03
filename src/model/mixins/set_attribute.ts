@@ -1,7 +1,8 @@
 
 import { ScalarValue, UnknownValue } from "../value.js";
-import { ComputeLength } from "../../helper/svg_length.js";
-import { Element, LengthYValue, LengthXValue, LengthValue, FontSizeValue } from "../base.js";
+import { ComputeLength } from "../length.js";
+import { Element } from "../base.js";
+import { LengthYValue, LengthXValue, LengthValue, FontSizeValue } from "../value.js";
 import { Symbol } from "../containers.js";
 import { ViewPort } from "../viewport.js";
 declare module "../base" {

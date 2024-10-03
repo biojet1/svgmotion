@@ -1,8 +1,9 @@
 import { Matrix, BoundingBox } from "../geom/index.js";
 import { Node, Parent } from "./linked.js";
-import { ScalarValue, TextValue, PercentageValue, VectorValue } from "./value.js";
+import { TextValue, PercentageValue, VectorValue, FontSizeValue, LengthValue } from "./value.js";
 import { Animatable } from "./value.js";
 import { Fill, Transform, xset, xget, Font, Stroke, ValueSet } from "./valuesets.js";
+
 /// @@@ //////////
 export class TextData extends Node {
     id?: string;
@@ -19,14 +20,7 @@ interface Constructor<M> {
 export class Element extends Parent {
     id?: string;
     static tag = '?';
-    // constructor(params?: object) {
-    //     super();
-    // }
-    static new<T extends Element>(this: Constructor<T>, params?: object): T {
-        const e = new this();
-        params && e._set_params(params);
-        return e;
-    }
+    // tree
     *ancestors() {
         let top = this._parent;
         while (top) {
@@ -43,14 +37,13 @@ export class Element extends Parent {
             }
         }
     }
+    // geom
     cat_transform(frame: number, n: Matrix) {
         if (Object.hasOwn(this, "transform")) {
             this.transform.cat_transform(frame, n);
         }
     }
-
     update_bbox(_bbox: BoundingBox, _frame: number, _m?: Matrix) {
-
     }
     bounding_box(frame: number, m?: Matrix) {
         const bb = BoundingBox.not();
@@ -62,7 +55,12 @@ export class Element extends Parent {
         // TODO:
         return bb
     }
-
+    // field
+    static new<T extends Element>(this: Constructor<T>, params?: object): T {
+        const e = new this();
+        params && e._set_params(params);
+        return e;
+    }
     protected _new_field<T extends Animatable<any> | ValueSet>(name: string, value: T): T {
         const v = xget(this, name, value);
         v._parent = this;
@@ -285,18 +283,7 @@ export class Element extends Parent {
 
 };
 
-export class LengthXValue extends ScalarValue {
-}
 
-export class LengthYValue extends ScalarValue {
-}
-
-export class LengthValue extends ScalarValue {
-}
-
-export class FontSizeValue extends ScalarValue {
-
-}
 
 export class OriginValue extends VectorValue {
 }

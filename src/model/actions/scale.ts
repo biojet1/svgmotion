@@ -5,7 +5,7 @@ import { KeyExtra } from "../../keyframe/keyframe.js";
 import { xget } from "../valuesets.js";
 import { Element } from "../base.js";
 import { Container } from "../containers.js";
-import { BoxLength } from "../../helper/svg_length.js";
+import { BoxLength } from "../length.js";
 
 export interface ScaleParams extends KeyExtra {
     dur?: number;
