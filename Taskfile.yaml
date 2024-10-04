@@ -64,3 +64,23 @@ tasks:
         method: none
         cmds:
             - rm -r dist
+
+    gen.elements:
+        method: checksum
+        sources:
+            - test/gen.node.js
+        generates:
+            - /tmp/elements.json
+        cmds:
+            - node test/gen.node.js
+
+    find_node.j2:
+        method: checksum
+        deps: [gen.elements]
+        sources:
+            - src/model/mixins/find_node.j2.ts
+            - /tmp/elements.json
+        generates:
+            - src/model/mixins/find_node.ts
+        cmds:
+            - python3 -m jinjagen -d /tmp/elements.json -D / -i src/model/mixins/find_node.j2.ts -o src/model/mixins/find_node.j2.out.ts

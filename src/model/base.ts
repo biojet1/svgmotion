@@ -283,8 +283,4 @@ export class Element extends Parent {
 
 };
 
-
-
-export class OriginValue extends VectorValue {
-}
 // TODO: dash array, path

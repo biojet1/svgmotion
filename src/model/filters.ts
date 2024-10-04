@@ -144,6 +144,7 @@ export class LinearGradient extends Gradient {
 }
 
 export class RadialGradient extends Gradient {
+    static override tag = "radialGradient";
     ///
     get cx() {
         return this._new_field("cx", new LengthXValue(0));
@@ -190,7 +191,9 @@ export class RadialGradient extends Gradient {
 }
 
 export class MeshPatch extends Container {
+    static override tag = "meshpatch";
 }
 
 export class MeshRow extends Container {
+    static override tag = "meshrow";
 }
