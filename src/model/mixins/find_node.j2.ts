@@ -54,7 +54,7 @@ function* enum_node_type<T>(that: Container, x: { new(...args: any[]): T }) {
 declare module "../containers" {
     interface Container {
         /*% for e in elements %*/
-        get_/*{ e.name }*/(x: number | string): /*{ e.kind }*/;
+        get_/*{ e.name }*/(x: number | string)/*{ ': ' ~ e.kind }*/;
         /*% endfor %*/
         /*% for e in elements %*/
         find_/*{ e.name }*/(x: number | string): /*{ e.kind }*/ | void;
@@ -64,9 +64,9 @@ declare module "../containers" {
 
 /*% for e in elements %*/
 Container.prototype.get_/*{ e.name }*/ = function (x: number | string = 0) {
-    return get_node(this, x, /*{ e.kind }*/);
+    /*{ 'return get_node(this, x, ' ~ e.kind ~ ');' }*/
 }
 Container.prototype.find_/*{ e.name }*/ = function (x: number | string = 0): /*{ e.kind }*/ | void {
-    return find_node(this, x, /*{ e.kind }*/);
+    /*{ 'return find_node(this, x, ' ~ e.kind ~ ');' }*/
 }
 /*% endfor %*/

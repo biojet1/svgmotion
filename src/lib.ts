@@ -6,6 +6,7 @@ export * from "./model/mixins/elements.js";
 export * from "./model/mixins/parse_xml.js";
 export * from "./model/mixins/dump.js";
 export * from "./model/mixins/load.js";
+export * from "./model/mixins/add_elements.js";
 export * from "./model/mixins/update_dom.js";
 export * from "./model/mixins/find_node.js";
 export * from "./model/mixins/image.js";
