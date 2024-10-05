@@ -92,34 +92,6 @@ export class Ellipse extends Shape {
 
 export class Line extends Shape {
     static override tag = "line";
-    /// x1
-    get x1() {
-        return this._new_field("x1", new LengthXValue(0));
-    }
-    set x1(v: LengthXValue) {
-        this._new_field("x1", v);
-    }
-    /// y1
-    get y1() {
-        return this._new_field("y1", new LengthYValue(0));
-    }
-    set y1(v: LengthYValue) {
-        this._new_field("y1", v);
-    }
-    /// x2
-    get x2() {
-        return this._new_field("x2", new LengthXValue(0));
-    }
-    set x2(v: LengthXValue) {
-        this._new_field("x2", v);
-    }
-    /// y2
-    get y2() {
-        return this._new_field("y2", new LengthYValue(0));
-    }
-    set y2(v: LengthYValue) {
-        this._new_field("y2", v);
-    }
     ////
     override describe(frame: number) {
         const x1 = this.x1.get_value(frame);

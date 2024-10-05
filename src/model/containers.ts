@@ -83,61 +83,11 @@ export class Group extends Container {
 
 export class Symbol extends Container {
     static override tag = "symbol";
-    ///
-    get x() {
-        return this._new_field("x", new LengthXValue(0));
-    }
-    set x(v: LengthXValue) {
-        this._new_field("x", v);
-    }
-    ///
-    get y() {
-        return this._new_field("y", new LengthYValue(0));
-    }
-    set y(v: LengthYValue) {
-        this._new_field("y", v);
-    }
-    ///
-    get width() {
-        return this._new_field("width", new LengthXValue(100));
-    }
-    set width(v: LengthXValue) {
-        this._new_field("width", v);
-    }
-    ///
-    get height() {
-        return this._new_field("height", new LengthYValue(100));
-    }
-    set height(v: LengthYValue) {
-        this._new_field("height", v);
-    }
-    ///
-    get view_box() {
-        return this._new_field("view_box", new ViewBox([0, 0], [100, 100]));
-    }
-    set view_box(v: ViewBox) {
-        this._new_field("view_box", v);
-    }
-    //
     get fit_view() {
         return this._new_field("fit_view", new TextValue(""));
     }
     set fit_view(v: TextValue) {
         this._new_field("fit_view", v);
-    }
-    ///
-    get ref_x() {
-        return this._new_field("ref_x", new LengthXValue(0));
-    }
-    set ref_x(v: LengthXValue) {
-        this._new_field("ref_x", v);
-    }
-    ///
-    get ref_y() {
-        return this._new_field("ref_y", new LengthYValue(0));
-    }
-    set ref_y(v: LengthYValue) {
-        this._new_field("ref_y", v);
     }
 }
 
@@ -148,13 +98,6 @@ export class Filter extends Container {
 export class Marker extends Container {
     static override tag = "marker";
     ///
-    get view_box() {
-        return this._new_field("view_box", new ViewBox([0, 0], [100, 100]));
-    }
-    set view_box(v: ViewBox) {
-        this._new_field("view_box", v);
-    }
-    ///
     get fit_view() {
         return this._new_field("fit_view", new TextValue(""));
     }
@@ -162,47 +105,6 @@ export class Marker extends Container {
         this._new_field("fit_view", v);
     }
     ///
-    get marker_units() {
-        return this._new_field("marker_units", new TextValue("strokeWidth"));
-    }
-    set marker_units(v: TextValue) {
-        this._new_field("marker_units", v);
-    }
-    ///
-    get marker_width() {
-        return this._new_field("marker_width", new LengthXValue(3));
-    }
-    set marker_width(v: LengthXValue) {
-        this._new_field("marker_width", v);
-    }
-    ///
-    get marker_height() {
-        return this._new_field("marker_height", new LengthYValue(3));
-    }
-    set marker_height(v: LengthYValue) {
-        this._new_field("marker_height", v);
-    }
-    ///
-    get ref_x() {
-        return this._new_field("ref_x", new LengthXValue(0));
-    }
-    set ref_x(v: LengthXValue) {
-        this._new_field("ref_x", v);
-    }
-    ///
-    get ref_y() {
-        return this._new_field("ref_y", new LengthYValue(0));
-    }
-    set ref_y(v: LengthYValue) {
-        this._new_field("ref_y", v);
-    }
-    ///
-    get orient() {
-        return this._new_field("orient", new LengthValue(0));
-    }
-    set orient(v: LengthValue) {
-        this._new_field("orient", v);
-    }
 }
 
 export class Pattern extends Container {
