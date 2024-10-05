@@ -32,34 +32,6 @@ class PointBase extends Shape {
 
 export class Path extends Shape {
     static override tag = "path";
-    ///
-    get d() {
-        return this._new_field("d", new TextValue(""));
-    }
-    set d(v: TextValue) {
-        this._new_field("d", v);
-    }
-    //
-    get marker_start() {
-        return this._new_field("marker_start", new TextValue("none"));
-    }
-    set marker_start(v: TextValue) {
-        this._new_field("marker_start", v);
-    }
-    //
-    get marker_mid() {
-        return this._new_field("marker_mid", new TextValue("none"));
-    }
-    set marker_mid(v: TextValue) {
-        this._new_field("marker_mid", v);
-    }
-    //
-    get marker_end() {
-        return this._new_field("marker_end", new TextValue("none"));
-    }
-    set marker_end(v: TextValue) {
-        this._new_field("marker_end", v);
-    }
     //
     override describe(frame: number) {
         return this.d.get_value(frame);

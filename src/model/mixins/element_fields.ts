@@ -1,7 +1,13 @@
-import { Circle, Ellipse, Polygon, Polyline } from "../shapes.js";
+import { Circle, Ellipse, Path, Polygon, Polyline } from "../shapes.js";
 import { LengthValue, LengthXValue, LengthYValue, TextValue } from "../value.js";
 
 declare module "../index" {
+    interface Path {
+        get marker_start(): TextValue;
+        get marker_mid(): TextValue;
+        get marker_end(): TextValue;
+        get d(): TextValue;
+    }
     interface Ellipse {
         get rx(): LengthXValue;
         get ry(): LengthYValue;
@@ -25,6 +31,26 @@ declare module "../index" {
     }
 }
 
+Object.defineProperty(Path.prototype, "marker_start", {
+    get: function () {
+        return this._new_field("marker_start", new TextValue('none'));
+    },
+});
+Object.defineProperty(Path.prototype, "marker_mid", {
+    get: function () {
+        return this._new_field("marker_mid", new TextValue('none'));
+    },
+});
+Object.defineProperty(Path.prototype, "marker_end", {
+    get: function () {
+        return this._new_field("marker_end", new TextValue('none'));
+    },
+});
+Object.defineProperty(Path.prototype, "d", {
+    get: function () {
+        return this._new_field("d", new TextValue(''));
+    },
+});
 Object.defineProperty(Ellipse.prototype, "rx", {
     get: function () {
         return this._new_field("rx", new LengthXValue(0));
