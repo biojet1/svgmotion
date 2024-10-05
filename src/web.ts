@@ -4,6 +4,7 @@ export * from "./model/index.js";
 // export * from "./model/mixin.js";
 export * from "./model/mixins/update_dom.js";
 export * from "./model/mixins/add_elements.js";
+export * from "./model/mixins/element_fields.js";
 export * from "./model/mixins/load.js";
 
 export function animate(anim: Root, fps: number) {

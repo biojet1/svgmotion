@@ -1,21 +1,67 @@
-import { Polygon } from "../shapes.js";
-import { TextValue } from "../value.js";
+import { Circle, Polygon, Polyline } from "../shapes.js";
+import { LengthValue, LengthXValue, LengthYValue, TextValue } from "../value.js";
 
 declare module "../index" {
+    interface Circle {
+        get cx(): LengthXValue;
+        get cy(): LengthYValue;
+        get r(): LengthValue;
+    }
     interface Polygon {
         get marker_start(): TextValue;
-        // set marker_start(v: TextValue);
+        get marker_mid(): TextValue;
+        get marker_end(): TextValue;
+    }
+    interface Polyline {
+        get marker_start(): TextValue;
+        get marker_mid(): TextValue;
+        get marker_end(): TextValue;
     }
 }
 
-// Polygon.prototype.marker_start = function () {
-//     return this._new_field("marker_start", new TextValue("none"));
-// }
-Object.defineProperty(Polygon.prototype, "marker_start", {
+Object.defineProperty(Circle.prototype, "cx", {
     get: function () {
-        return this._new_field("marker_start", new TextValue("none"));
+        return this._new_field("cx", new LengthXValue(0));
     },
 });
-// Polygon.prototype.marker_start = function (v: TextValue) {
-//     this._new_field("marker_start", v);
-// }
+Object.defineProperty(Circle.prototype, "cy", {
+    get: function () {
+        return this._new_field("cy", new LengthYValue(0));
+    },
+});
+Object.defineProperty(Circle.prototype, "r", {
+    get: function () {
+        return this._new_field("r", new LengthValue(0));
+    },
+});
+
+Object.defineProperty(Polygon.prototype, "marker_start", {
+    get: function () {
+        return this._new_field("marker_start", new TextValue('none'));
+    },
+});
+Object.defineProperty(Polygon.prototype, "marker_mid", {
+    get: function () {
+        return this._new_field("marker_mid", new TextValue('none'));
+    },
+});
+Object.defineProperty(Polygon.prototype, "marker_end", {
+    get: function () {
+        return this._new_field("marker_end", new TextValue('none'));
+    },
+});
+Object.defineProperty(Polyline.prototype, "marker_start", {
+    get: function () {
+        return this._new_field("marker_start", new TextValue('none'));
+    },
+});
+Object.defineProperty(Polyline.prototype, "marker_mid", {
+    get: function () {
+        return this._new_field("marker_mid", new TextValue('none'));
+    },
+});
+Object.defineProperty(Polyline.prototype, "marker_end", {
+    get: function () {
+        return this._new_field("marker_end", new TextValue('none'));
+    },
+});

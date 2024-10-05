@@ -10,9 +10,9 @@ declare module "../index" {
 
 /*% for kind, element in elements.items() %*/
 /*% for name, field in element.fields.items() %*/
-Object.defineProperty(/*{ kind }*/.prototype, "marker_start", {
+Object.defineProperty(/*{ kind }*/.prototype, "/*{ name }*/", {
     get: function () {
-        return this._new_field("marker_start", new /*{ field.kind }*/("none"));
+        return this._new_field("/*{ name }*/", new /*{ field.kind }*/(/*{ "%r"|format(field.argv) }*/));
     },
 });
 /*% endfor %*/

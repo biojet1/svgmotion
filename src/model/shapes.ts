@@ -162,15 +162,15 @@ export class Rect extends Shape {
 }
 
 
-export class Circle extends EllipseBase {
+export class Circle extends Shape {
     static override tag = "circle";
     ///
-    get r() {
-        return this._new_field("r", new LengthValue(0));
-    }
-    set r(v: LengthValue) {
-        this._new_field("r", v);
-    }
+    // get r() {
+    //     return this._new_field("r", new LengthValue(0));
+    // }
+    // set r(v: LengthValue) {
+    //     this._new_field("r", v);
+    // }
     ////
     override describe(frame: number) {
         const x = this.cx.get_value(frame);
