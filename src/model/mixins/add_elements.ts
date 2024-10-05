@@ -70,6 +70,18 @@ Container.prototype.add_tspan = function (params?: AddOpt) { const { before, ...
 Container.prototype.add_use = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = Use.new(etc); this.insert_before(before ?? this._end, x); return x; }
 Container.prototype.add_view = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = ViewPort.new(etc); this.insert_before(before ?? this._end, x); return x; }
 
+
+// function _add<T>(
+//     that: Container,
+//     klass:  (new () => T),
+//     params?: AddOpt
+// ): T {
+//     const { before, ...etc } = params ?? {};
+//     const x = klass.new(etc);
+//     that.insert_before(before ?? that._end, x);
+//     return x;
+// }
+
 Container.prototype._add_element = function (tag: string) {
     switch (tag) {
         case "circle": return this.add_circle();

@@ -35,6 +35,7 @@ export class Stop extends Element {
         this._new_field("path", v);
     }
 }
+
 export class FEGaussianBlur extends FilterElement {
     static override tag = "feGaussianBlur";
     ///   
@@ -187,7 +188,6 @@ export class RadialGradient extends Gradient {
     set fr(v: LengthValue) {
         this._new_field("fr", v);
     }
-
 }
 
 export class MeshPatch extends Container {
@@ -196,4 +196,42 @@ export class MeshPatch extends Container {
 
 export class MeshRow extends Container {
     static override tag = "meshrow";
+}
+
+export class MeshGradient extends Container {
+    /// x
+    get x() {
+        return this._new_field("x", new PercentageValue(0));
+    }
+    set x(v: PercentageValue) {
+        this._new_field("x", v);
+    }
+    /// y
+    get y() {
+        return this._new_field("y", new PercentageValue(0));
+    }
+    set y(v: PercentageValue) {
+        this._new_field("y", v);
+    }
+    ///
+    get type() {
+        return this._new_field("type", new TextValue('bilinear'));
+    }
+    set type(v: TextValue) {
+        this._new_field("type", v);
+    }
+    ///
+    get gradient_units() {
+        return this._new_field("gradient_units", new TextValue("objectBoundingBox"));
+    }
+    set gradient_units(v: TextValue) {
+        this._new_field("gradient_units", v);
+    }
+    /// href
+    get href() {
+        return this._new_field("href", new TextValue(''));
+    }
+    set href(v: TextValue) {
+        this._new_field("href", v);
+    }
 }

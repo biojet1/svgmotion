@@ -106,5 +106,13 @@ test.test("parse_svg", async (t) => {
     // console.dir(im.href, { depth: 100 })
     anim.save_json('/tmp/parse1.json')
     anim.save_html('/tmp/parse1.html');
+    {
+        const poly = anim.view.add_polygon();
+        console.log('marker_start', poly.marker_start.get_value(0));
+        poly.marker_start.set_value("lorem")
+        console.log('marker_start', poly.marker_start.get_value(0));
+        poly.marker_start.set_value("ipsum")
+        console.log('marker_start', poly.marker_start.get_value(0));
+    }
     t.end();
 });

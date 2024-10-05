@@ -61,7 +61,7 @@ export class Element extends Parent {
         params && e._set_params(params);
         return e;
     }
-    protected _new_field<T extends Animatable<any> | ValueSet>(name: string, value: T): T {
+    _new_field<T extends Animatable<any> | ValueSet>(name: string, value: T): T {
         const v = xget(this, name, value);
         v._parent = this;
         return v;
