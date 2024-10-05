@@ -1,3 +1,6 @@
+import { Circle, Polygon, Polyline } from "../shapes.js";
+import { LengthValue, LengthXValue, LengthYValue, TextValue } from "../value.js";
+
 declare module "../index" {
     /*% for kind, element in elements.items() %*/
     interface /*{ kind }*/ {

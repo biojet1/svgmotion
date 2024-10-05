@@ -33,7 +33,11 @@ test.test("field 1", async (t) => {
         const c = anim.view.add_circle();
         t.same(c.r.get_value(0), 0);
         t.same(c.cx.get_value(0), 0);
-
+    }
+    {
+        const c = anim.view.add_ellipse({ rx: 10 });
+        t.same(c.rx.get_value(0), 10);
+        t.same(c.cx.get_value(0), 0);
     }
 
     t.end();

@@ -20,23 +20,6 @@ abstract class Shape extends Element {
     }
 }
 
-class EllipseBase extends Shape {
-    ///
-    get cx() {
-        return this._new_field("cx", new LengthXValue(0));
-    }
-    set cx(v: LengthXValue) {
-        this._new_field("cx", v);
-    }
-    ///
-    get cy() {
-        return this._new_field("cy", new LengthYValue(0));
-    }
-    set cy(v: LengthYValue) {
-        this._new_field("cy", v);
-    }
-}
-
 class PointBase extends Shape {
     /// points
     get points() {
@@ -127,14 +110,7 @@ export class Rect extends Shape {
     set ry(v: LengthYValue) {
         this._new_field("ry", v);
     }
-    ///
-    // get size() {
-    //     return this._new_field("size", new PositionValue([100, 100]));
-    // }
-    // set size(v: PositionValue) {
-    //     this._new_field("size", v);
-    // }
-    //
+
     override describe(frame: number) {
         const width = this.width.get_value(frame);
         const height = this.height.get_value(frame);
@@ -164,14 +140,6 @@ export class Rect extends Shape {
 
 export class Circle extends Shape {
     static override tag = "circle";
-    ///
-    // get r() {
-    //     return this._new_field("r", new LengthValue(0));
-    // }
-    // set r(v: LengthValue) {
-    //     this._new_field("r", v);
-    // }
-    ////
     override describe(frame: number) {
         const x = this.cx.get_value(frame);
         const y = this.cy.get_value(frame);
@@ -181,22 +149,8 @@ export class Circle extends Shape {
     }
 }
 
-export class Ellipse extends EllipseBase {
+export class Ellipse extends Shape {
     static override tag = "ellipse";
-    /// rx
-    get rx() {
-        return this._new_field("rx", new LengthXValue(0));
-    }
-    set rx(v: LengthXValue) {
-        this._new_field("rx", v);
-    }
-    /// ry
-    get ry() {
-        return this._new_field("ry", new LengthYValue(0));
-    }
-    set ry(v: LengthYValue) {
-        this._new_field("ry", v);
-    }
     ///
     override describe(frame: number) {
         const x = this.cx.get_value(frame);
