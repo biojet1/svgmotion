@@ -1,4 +1,4 @@
-import { Circle, Ellipse, Path, Polygon, Polyline } from "../shapes.js";
+import { Circle, Ellipse, Path, Rect, Polygon, Polyline } from "../shapes.js";
 import { LengthValue, LengthXValue, LengthYValue, TextValue } from "../value.js";
 
 declare module "../index" {

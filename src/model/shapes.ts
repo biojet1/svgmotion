@@ -41,48 +41,6 @@ export class Path extends Shape {
 export class Rect extends Shape {
     static override tag = "rect";
     ///
-    get x() {
-        return this._new_field("x", new LengthXValue(0));
-    }
-    set x(v: LengthXValue) {
-        this._new_field("x", v);
-    }
-    ///
-    get y() {
-        return this._new_field("y", new LengthYValue(0));
-    }
-    set y(v: LengthYValue) {
-        this._new_field("y", v);
-    }
-    ///
-    get width() {
-        return this._new_field("width", new LengthXValue(100));
-    }
-    set width(v: LengthXValue) {
-        this._new_field("width", v);
-    }
-    ///
-    get height() {
-        return this._new_field("height", new LengthYValue(100));
-    }
-    set height(v: LengthYValue) {
-        this._new_field("height", v);
-    }
-    ///
-    get rx() {
-        return this._new_field("rx", new LengthXValue(0));
-    }
-    set rx(v: LengthXValue) {
-        this._new_field("rx", v);
-    }
-    ///
-    get ry() {
-        return this._new_field("ry", new LengthYValue(0));
-    }
-    set ry(v: LengthYValue) {
-        this._new_field("ry", v);
-    }
-
     override describe(frame: number) {
         const width = this.width.get_value(frame);
         const height = this.height.get_value(frame);
@@ -108,7 +66,6 @@ export class Rect extends Shape {
         return `M ${left} ${top} h ${width} v ${height} h ${-width} Z`;
     }
 }
-
 
 export class Circle extends Shape {
     static override tag = "circle";

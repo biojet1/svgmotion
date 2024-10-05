@@ -1,4 +1,4 @@
-import { Circle, Ellipse, Path, Polygon, Polyline } from "../shapes.js";
+import { Circle, Ellipse, Path, Rect, Polygon, Polyline } from "../shapes.js";
 import { LengthValue, LengthXValue, LengthYValue, TextValue } from "../value.js";
 
 declare module "../index" {
@@ -18,6 +18,14 @@ declare module "../index" {
         get cx(): LengthXValue;
         get cy(): LengthYValue;
         get r(): LengthValue;
+    }
+    interface Rect {
+        get rx(): LengthXValue;
+        get ry(): LengthYValue;
+        get width(): LengthXValue;
+        get height(): LengthYValue;
+        get x(): LengthXValue;
+        get y(): LengthYValue;
     }
     interface Polygon {
         get marker_start(): TextValue;
@@ -84,6 +92,36 @@ Object.defineProperty(Circle.prototype, "cy", {
 Object.defineProperty(Circle.prototype, "r", {
     get: function () {
         return this._new_field("r", new LengthValue(0));
+    },
+});
+Object.defineProperty(Rect.prototype, "rx", {
+    get: function () {
+        return this._new_field("rx", new LengthXValue(0));
+    },
+});
+Object.defineProperty(Rect.prototype, "ry", {
+    get: function () {
+        return this._new_field("ry", new LengthYValue(0));
+    },
+});
+Object.defineProperty(Rect.prototype, "width", {
+    get: function () {
+        return this._new_field("width", new LengthXValue(100));
+    },
+});
+Object.defineProperty(Rect.prototype, "height", {
+    get: function () {
+        return this._new_field("height", new LengthYValue(100));
+    },
+});
+Object.defineProperty(Rect.prototype, "x", {
+    get: function () {
+        return this._new_field("x", new LengthXValue(0));
+    },
+});
+Object.defineProperty(Rect.prototype, "y", {
+    get: function () {
+        return this._new_field("y", new LengthYValue(0));
     },
 });
 Object.defineProperty(Polygon.prototype, "marker_start", {
