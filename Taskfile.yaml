@@ -106,3 +106,8 @@ tasks:
         cmds:
             - env -C /mnt/META/wrx/python/flottie python3 -m tests.gen_elements || true
             - python3 -m jinjagen -d /tmp/elements-col.json -D / -i src/model/mixins/fields.j2.ts > /tmp/fields.ts
+
+    elements.j2:
+        cmds:
+            - env -C /mnt/META/wrx/python/flottie python3 -m tests.gen_elements || true
+            - python3 -m jinjagen -d /tmp/elements-col.json -D / -i src/model/mixins/elements.j2.ts -o /tmp/elements.ts

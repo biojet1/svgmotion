@@ -3,57 +3,36 @@ import { TextValue, LengthXValue, LengthYValue } from "./value.js";
 import { ViewBox } from "./valuesets.js";
 import { Container } from "./containers.js";
 
+// declare class ViewPort {
+//     get width(): LengthXValue;
+//     get height(): LengthYValue;
+//     get x(): LengthXValue;
+//     get y(): LengthYValue;
+//     get view_box(): ViewBox;
+//     get zoom_pan(): TextValue;
+
+// }
 
 export class ViewPort extends Container {
     static override tag = "svg";
-    ///
-    get x() {
-        return this._new_field("x", new LengthXValue(0));
-    }
-    set x(v: LengthXValue) {
-        this._new_field("x", v);
-    }
-    ///
-    get y() {
-        return this._new_field("y", new LengthYValue(0));
-    }
-    set y(v: LengthYValue) {
-        this._new_field("y", v);
-    }
-    ///
+    //
     get width() {
         return this._new_field("width", new LengthXValue('100%'));
     }
-    set width(v: LengthXValue) {
-        this._new_field("width", v);
-    }
-    ///
     get height() {
         return this._new_field("height", new LengthYValue('100%'));
     }
-    set height(v: LengthYValue) {
-        this._new_field("height", v);
+    get x() {
+        return this._new_field("x", new LengthXValue(0));
     }
-    ///
+    get y() {
+        return this._new_field("y", new LengthYValue(0));
+    }
     get view_box() {
         return this._new_field("view_box", new ViewBox([0, 0], [100, 100]));
     }
-    set view_box(v: ViewBox) {
-        this._new_field("view_box", v);
-    }
-    ///
-    get fit_view() {
-        return this._new_field("fit_view", new TextValue(""));
-    }
-    set fit_view(v: TextValue) {
-        this._new_field("fit_view", v);
-    }
-    ///
     get zoom_pan() {
-        return this._new_field("zoom_pan", new TextValue("disable"));
-    }
-    set zoom_pan(v: TextValue) {
-        this._new_field("zoom_pan", v);
+        return this._new_field("zoom_pan", new TextValue('disable'));
     }
     // 
     override update_bbox(bbox: BoundingBox, frame: number, m?: Matrix) {
@@ -79,7 +58,7 @@ export class ViewPort extends Container {
                 const y = this.y.get_value(frame);
                 let [vx, vy] = this.view_box.position.get_value(frame);
                 let [vw, vh] = this.view_box.size.get_value(frame);
-                const fv = this.fit_view.get_value(frame);
+                const fv = this.view_box.fit.get_value(frame);
                 // const { x: vx, y: vy, width: vw, height: vh } = this.viewBox._calcBox();
                 (vx == null || isNaN(vx)) && (vx = x);
                 (vy == null || isNaN(vy)) && (vy = y);

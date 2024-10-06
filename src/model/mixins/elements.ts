@@ -4,6 +4,7 @@ import { Root } from "../root.js";
 import { Container, Group } from "../containers.js";
 import { ViewPort } from "../viewport.js";
 import { Parent } from "../linked.js";
+import "./element_fields.js";
 
 declare module "../base" {
     interface Element {

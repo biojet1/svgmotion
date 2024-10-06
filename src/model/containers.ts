@@ -83,12 +83,14 @@ export class Group extends Container {
 
 export class Symbol extends Container {
     static override tag = "symbol";
-    get fit_view() {
-        return this._new_field("fit_view", new TextValue(""));
-    }
-    set fit_view(v: TextValue) {
-        this._new_field("fit_view", v);
-    }
+    //
+    get width() { return this._new_field("width", new LengthXValue(100)); }
+    get height() { return this._new_field("height", new LengthYValue(100)); }
+    get x() { return this._new_field("x", new LengthXValue(0)); }
+    get y() { return this._new_field("y", new LengthYValue(0)); }
+    get ref_x() { return this._new_field("ref_x", new LengthXValue(0)); }
+    get ref_y() { return this._new_field("ref_y", new LengthYValue(0)); }
+    get view_box() { return this._new_field("view_box", new ViewBox([0, 0], [100, 100])); }
 }
 
 export class Filter extends Container {
@@ -98,12 +100,13 @@ export class Filter extends Container {
 export class Marker extends Container {
     static override tag = "marker";
     ///
-    get fit_view() {
-        return this._new_field("fit_view", new TextValue(""));
-    }
-    set fit_view(v: TextValue) {
-        this._new_field("fit_view", v);
-    }
+    get ref_x() { return this._new_field("ref_x", new LengthXValue(0)); }
+    get ref_y() { return this._new_field("ref_y", new LengthYValue(0)); }
+    get view_box() { return this._new_field("view_box", new ViewBox([0, 0], [100, 100])); }
+    get marker_units() { return this._new_field("marker_units", new TextValue('strokeWidth')); }
+    get marker_width() { return this._new_field("marker_width", new LengthXValue(3)); }
+    get marker_height() { return this._new_field("marker_height", new LengthYValue(3)); }
+    get orient() { return this._new_field("orient", new LengthValue(0)); }
     ///
 }
 

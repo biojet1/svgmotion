@@ -5,6 +5,7 @@ import { Element } from "../base.js";
 import { Symbol } from "../containers.js";
 import { ViewPort } from "../viewport.js";
 import { ComputeLength } from "../length.js";
+import { Image, Use } from "../elements.js";
 
 declare module "../base" {
     interface Element {
@@ -188,7 +189,7 @@ Element.prototype.set_attribute = function (name: string, value: string): Elemen
     return this;
 }
 
-import { Image, Use } from "../elements.js";
+
 import { TSpan, Text } from "../text.js";
 import { Rect, Path, Line, Ellipse, Circle, Polyline, Polygon } from "../shapes.js";
 
@@ -206,7 +207,7 @@ ViewPort.prototype.set_attribute = function (name: string, value: string) {
             this.view_box.set_repr(value);
             break;
         case "preserveAspectRatio":
-            this.fit_view.set_repr(value);
+            this.view_box.fit.set_repr(value);
             // this.view_box.fit.set_repr(value);
             break;
         case "zoomAndPan":
@@ -439,7 +440,7 @@ Symbol.prototype.set_attribute = function (name: string, value: string) {
             this.view_box.set_repr(value);
             break;
         case "preserveAspectRatio":
-            this.fit_view.set_repr(value);
+            this.view_box.fit.set_repr(value);
             break;
         case "refX":
             this.ref_x.set_repr(value);

@@ -33,6 +33,11 @@ class PointBase extends Shape {
 export class Path extends Shape {
     static override tag = "path";
     //
+    get marker_start() { return this._new_field("marker_start", new TextValue('none')); }
+    get marker_mid() { return this._new_field("marker_mid", new TextValue('none')); }
+    get marker_end() { return this._new_field("marker_end", new TextValue('none')); }
+    get d() { return this._new_field("d", new TextValue('')); }
+    //
     override describe(frame: number) {
         return this.d.get_value(frame);
     }
@@ -40,7 +45,14 @@ export class Path extends Shape {
 
 export class Rect extends Shape {
     static override tag = "rect";
-    ///
+    //
+    get rx() { return this._new_field("rx", new LengthXValue(0)); }
+    get ry() { return this._new_field("ry", new LengthYValue(0)); }
+    get width() { return this._new_field("width", new LengthXValue(100)); }
+    get height() { return this._new_field("height", new LengthYValue(100)); }
+    get x() { return this._new_field("x", new LengthXValue(0)); }
+    get y() { return this._new_field("y", new LengthYValue(0)); }
+    //
     override describe(frame: number) {
         const width = this.width.get_value(frame);
         const height = this.height.get_value(frame);
@@ -62,13 +74,17 @@ export class Rect extends Shape {
                 `L ${left},${cpts[2]} ` +
                 `A ${rx},${ry} 0 0 1 ${cpts[0]},${top} z`;
         }
-        // TODO: rx, ry
         return `M ${left} ${top} h ${width} v ${height} h ${-width} Z`;
     }
 }
 
 export class Circle extends Shape {
     static override tag = "circle";
+    //
+    get cx() { return this._new_field("cx", new LengthXValue(0)); }
+    get cy() { return this._new_field("cy", new LengthYValue(0)); }
+    get r() { return this._new_field("r", new LengthValue(0)); }
+    //
     override describe(frame: number) {
         const x = this.cx.get_value(frame);
         const y = this.cy.get_value(frame);
@@ -80,7 +96,12 @@ export class Circle extends Shape {
 
 export class Ellipse extends Shape {
     static override tag = "ellipse";
-    ///
+    //
+    get rx() { return this._new_field("rx", new LengthXValue(0)); }
+    get ry() { return this._new_field("ry", new LengthYValue(0)); }
+    get cx() { return this._new_field("cx", new LengthXValue(0)); }
+    get cy() { return this._new_field("cy", new LengthYValue(0)); }
+    //
     override describe(frame: number) {
         const x = this.cx.get_value(frame);
         const y = this.cy.get_value(frame);
@@ -92,7 +113,15 @@ export class Ellipse extends Shape {
 
 export class Line extends Shape {
     static override tag = "line";
-    ////
+    //
+    get marker_start() { return this._new_field("marker_start", new TextValue('none')); }
+    get marker_mid() { return this._new_field("marker_mid", new TextValue('none')); }
+    get marker_end() { return this._new_field("marker_end", new TextValue('none')); }
+    get x1() { return this._new_field("x1", new LengthXValue(0)); }
+    get y1() { return this._new_field("y1", new LengthYValue(0)); }
+    get x2() { return this._new_field("x2", new LengthXValue(0)); }
+    get y2() { return this._new_field("y2", new LengthYValue(0)); }
+    //
     override describe(frame: number) {
         const x1 = this.x1.get_value(frame);
         const x2 = this.x2.get_value(frame);
@@ -104,7 +133,11 @@ export class Line extends Shape {
 
 export class Polyline extends PointBase {
     static override tag = "polyline";
-    ///
+    //
+    get marker_start() { return this._new_field("marker_start", new TextValue('none')); }
+    get marker_mid() { return this._new_field("marker_mid", new TextValue('none')); }
+    get marker_end() { return this._new_field("marker_end", new TextValue('none')); }
+    //
     override describe(frame: number) {
         const s = this.points.get_value(frame).map(v => `${v[0]},${v[1]}`).join(' ');
         return s ? `M ${s}` : "";
@@ -113,7 +146,11 @@ export class Polyline extends PointBase {
 
 export class Polygon extends PointBase {
     static override tag = "polygon";
-    ///
+    //
+    get marker_start() { return this._new_field("marker_start", new TextValue('none')); }
+    get marker_mid() { return this._new_field("marker_mid", new TextValue('none')); }
+    get marker_end() { return this._new_field("marker_end", new TextValue('none')); }
+    //
     override describe(frame: number) {
         const s = this.points.get_value(frame).map(v => `${v[0]},${v[1]}`).join(' ');
         return s ? `M ${s}` : "";
