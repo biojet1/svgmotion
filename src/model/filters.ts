@@ -6,18 +6,12 @@ export class FilterElement extends Element {
 }
 
 export class Stop extends Element {
+    static override tag = "stop";
     /// offset
     get offset() {
         return this._new_field("offset", new PercentageValue(1));
     }
     set offset(v: PercentageValue) {
-        this._new_field("opacity", v);
-    }
-    /// opacity
-    get opacity() {
-        return this._new_field("opacity", new PercentageValue(1));
-    }
-    set opacity(v: PercentageValue) {
         this._new_field("opacity", v);
     }
     /// color

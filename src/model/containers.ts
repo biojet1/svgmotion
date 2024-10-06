@@ -6,6 +6,7 @@ import { Element } from "./base.js";
 import { Node } from "./linked.js";
 
 export class Container extends Element {
+    // tree
     override *enum_values(): Generator<Animatable<any>, void, unknown> {
         for (let v of Object.values(this)) {
             if (v instanceof Animatable) {
@@ -53,6 +54,7 @@ export class Container extends Element {
             }
         } while (cur !== end && (cur = cur._next));
     }
+    // geom
     bbox_of(frame: number, ...args: Element[]) {
         const bb = BoundingBox.not();
         for (const x of args) {
@@ -113,125 +115,30 @@ export class Marker extends Container {
 export class Pattern extends Container {
     static override tag = "pattern";
     ///
-    get x() {
-        return this._new_field("x", new LengthXValue(0));
-    }
-    set x(v: LengthXValue) {
-        this._new_field("x", v);
-    }
-    ///
-    get y() {
-        return this._new_field("y", new LengthYValue(0));
-    }
-    set y(v: LengthYValue) {
-        this._new_field("y", v);
-    }
-    ///
-    get width() {
-        return this._new_field("width", new LengthXValue(100));
-    }
-    set width(v: LengthXValue) {
-        this._new_field("width", v);
-    }
-    ///
-    get height() {
-        return this._new_field("height", new LengthYValue(100));
-    }
-    set height(v: LengthYValue) {
-        this._new_field("height", v);
-    }
-    ///
-    get view_box() {
-        return this._new_field("view_box", new ViewBox([0, 0], [100, 100]));
-    }
-    set view_box(v: ViewBox) {
-        this._new_field("view_box", v);
-    }
-    //
-    get fit_view() {
-        return this._new_field("fit_view", new TextValue(""));
-    }
-    set fit_view(v: TextValue) {
-        this._new_field("fit_view", v);
-    }
-    /// href
-    get href() {
-        return this._new_field("href", new TextValue(''));
-    }
-    set href(v: TextValue) {
-        this._new_field("href", v);
-    }
-    ///
-    get pattern_units() {
-        return this._new_field("pattern_units", new TextValue("objectBoundingBox"));
-    }
-    set pattern_units(v: TextValue) {
-        this._new_field("pattern_units", v);
-    }
-    ///
-    get pattern_content_units() {
-        return this._new_field("pattern_units", new TextValue("userSpaceOnUse"));
-    }
-    set pattern_content_units(v: TextValue) {
-        this._new_field("pattern_units", v);
-    }
-    ///
-    // pattern_transform=transform
+    get href() { return this._new_field("href", new TextValue('')); }
+    get width() { return this._new_field("width", new LengthXValue(100)); }
+    get height() { return this._new_field("height", new LengthYValue(100)); }
+    get x() { return this._new_field("x", new LengthXValue(0)); }
+    get y() { return this._new_field("y", new LengthYValue(0)); }
+    get view_box() { return this._new_field("view_box", new ViewBox([0, 0], [100, 100])); }
+    get pattern_units() { return this._new_field("pattern_units", new TextValue('objectBoundingBox')); }
+    get pattern_content_units() { return this._new_field("pattern_content_units", new TextValue('userSpaceOnUse')); }
+    get pattern_transform() { return this._new_field("pattern_transform", new TextValue('')); }
 }
 
 export class Mask extends Container {
     static override tag = "mask";
     ///
-    get x() {
-        return this._new_field("x", new LengthXValue(0));
-    }
-    set x(v: LengthXValue) {
-        this._new_field("x", v);
-    }
-    ///
-    get y() {
-        return this._new_field("y", new LengthYValue(0));
-    }
-    set y(v: LengthYValue) {
-        this._new_field("y", v);
-    }
-    ///
-    get width() {
-        return this._new_field("width", new LengthXValue(100));
-    }
-    set width(v: LengthXValue) {
-        this._new_field("width", v);
-    }
-    ///
-    get height() {
-        return this._new_field("height", new LengthYValue(100));
-    }
-    set height(v: LengthYValue) {
-        this._new_field("height", v);
-    }
-    ///
-    get mask_units() {
-        return this._new_field("mask_units", new TextValue("objectBoundingBox"));
-    }
-    set mask_units(v: TextValue) {
-        this._new_field("mask_units", v);
-    }
-    ///
-    get mask_content_units() {
-        return this._new_field("mask_content_units", new TextValue("userSpaceOnUse"));
-    }
-    set mask_content_units(v: TextValue) {
-        this._new_field("mask_content_units", v);
-    }
+    get width() { return this._new_field("width", new LengthXValue(100)); }
+    get height() { return this._new_field("height", new LengthYValue(100)); }
+    get x() { return this._new_field("x", new LengthXValue(0)); }
+    get y() { return this._new_field("y", new LengthYValue(0)); }
+    get mask_units() { return this._new_field("mask_units", new TextValue('objectBoundingBox')); }
+    get mask_content_units() { return this._new_field("mask_content_units", new TextValue('userSpaceOnUse')); }
 }
 
 export class ClipPath extends Container {
     static override tag = "clipPath";
     ///
-    get clip_path_units() {
-        return this._new_field("clip_path_units", new TextValue("userSpaceOnUse"));
-    }
-    set clip_path_units(v: TextValue) {
-        this._new_field("clip_path_units", v);
-    }
+    get clip_path_units() { return this._new_field("clip_path_units", new TextValue('userSpaceOnUse')); }
 }

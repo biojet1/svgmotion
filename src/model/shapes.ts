@@ -20,15 +20,15 @@ abstract class Shape extends Element {
     }
 }
 
-class PointBase extends Shape {
-    /// points
-    get points() {
-        return this._new_field("points", new PointsValue([]));
-    }
-    set points(v: PointsValue) {
-        this._new_field("points", v);
-    }
-}
+// class PointBase extends Shape {
+//     /// points
+//     get points() {
+//         return this._new_field("points", new PointsValue([]));
+//     }
+//     set points(v: PointsValue) {
+//         this._new_field("points", v);
+//     }
+// }
 
 export class Path extends Shape {
     static override tag = "path";
@@ -131,12 +131,13 @@ export class Line extends Shape {
     }
 }
 
-export class Polyline extends PointBase {
+export class Polyline extends Shape {
     static override tag = "polyline";
     //
     get marker_start() { return this._new_field("marker_start", new TextValue('none')); }
     get marker_mid() { return this._new_field("marker_mid", new TextValue('none')); }
     get marker_end() { return this._new_field("marker_end", new TextValue('none')); }
+    get points() { return this._new_field("points", new PointsValue([])); }
     //
     override describe(frame: number) {
         const s = this.points.get_value(frame).map(v => `${v[0]},${v[1]}`).join(' ');
@@ -144,12 +145,13 @@ export class Polyline extends PointBase {
     }
 }
 
-export class Polygon extends PointBase {
+export class Polygon extends Shape {
     static override tag = "polygon";
     //
     get marker_start() { return this._new_field("marker_start", new TextValue('none')); }
     get marker_mid() { return this._new_field("marker_mid", new TextValue('none')); }
     get marker_end() { return this._new_field("marker_end", new TextValue('none')); }
+    get points() { return this._new_field("points", new PointsValue([])); }
     //
     override describe(frame: number) {
         const s = this.points.get_value(frame).map(v => `${v[0]},${v[1]}`).join(' ');
