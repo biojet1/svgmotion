@@ -4,13 +4,13 @@ import { TSpan, Text } from "../text.js";
 import { Container, Group, Symbol, Filter, Marker, Mask, Pattern, ClipPath } from "../containers.js";
 import { ViewPort } from "../viewport.js";
 import { Ellipse, Circle, Polyline, Polygon, Rect, Path, Line, } from "../shapes.js";
-import { FEDropShadow, FEGaussianBlur, LinearGradient, MeshPatch, MeshRow, RadialGradient } from "../filters.js";
+import { FEDropShadow, FEGaussianBlur, LinearGradient, MeshGradient, MeshPatch, MeshRow, RadialGradient, Stop } from "../filters.js";
 
 interface AddOpt {
     [key: string]: any;
     before?: Element;
 }
-
+/* <INSERT add_elements.ins.ts > */
 declare module "../containers" {
     interface Container {
         add_circle(params?: AddOpt): Circle;
@@ -25,6 +25,7 @@ declare module "../containers" {
         add_linear_gradient(params?: AddOpt): LinearGradient;
         add_marker(params?: AddOpt): Marker;
         add_mask(params?: AddOpt): Mask;
+        add_meshgradient(params?: AddOpt): MeshGradient;
         add_meshpatch(params?: AddOpt): MeshPatch;
         add_meshrow(params?: AddOpt): MeshRow;
         add_path(params?: AddOpt): Path;
@@ -33,6 +34,7 @@ declare module "../containers" {
         add_polyline(params?: AddOpt): Polyline;
         add_radial_gradient(params?: AddOpt): RadialGradient;
         add_rect(params?: AddOpt): Rect;
+        add_stop(params?: AddOpt): Stop;
         add_symbol(params?: AddOpt): Symbol;
         add_text(params?: AddOpt): Text;
         add_tspan(params?: AddOpt): TSpan;
@@ -44,43 +46,33 @@ declare module "../containers" {
 }
 
 // Container.prototype.add_...
-Container.prototype.add_circle = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = Circle.new(etc); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_clip_path = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = ClipPath.new(etc); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_drop_shadow = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = FEDropShadow.new(etc); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_ellipse = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = Ellipse.new(etc); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_filter = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = Filter.new(etc); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_gaussian_blur = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = FEGaussianBlur.new(etc); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_group = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = Group.new(etc); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_image = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = Image.new(etc); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_line = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = Line.new(etc); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_linear_gradient = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = LinearGradient.new(etc); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_marker = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = Marker.new(etc); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_mask = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = Mask.new(etc); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_meshpatch = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = MeshPatch.new(etc); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_meshrow = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = MeshRow.new(etc); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_path = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = Path.new(etc); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_pattern = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = Pattern.new(etc); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_polygon = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = Polygon.new(etc); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_polyline = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = Polyline.new(etc); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_radial_gradient = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = RadialGradient.new(etc); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_rect = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = Rect.new(etc); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_symbol = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = Symbol.new(etc); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_text = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = Text.new(etc); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_tspan = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = TSpan.new(etc); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_use = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = Use.new(etc); this.insert_before(before ?? this._end, x); return x; }
-Container.prototype.add_view = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = ViewPort.new(etc); this.insert_before(before ?? this._end, x); return x; }
-
-
-// function _add<T>(
-//     that: Container,
-//     klass:  (new () => T),
-//     params?: AddOpt
-// ): T {
-//     const { before, ...etc } = params ?? {};
-//     const x = klass.new(etc);
-//     that.insert_before(before ?? that._end, x);
-//     return x;
-// }
+Container.prototype.add_circle = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = Circle.new(etc); this.insert_before(before, x); return x; }
+Container.prototype.add_clip_path = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = ClipPath.new(etc); this.insert_before(before, x); return x; }
+Container.prototype.add_drop_shadow = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = FEDropShadow.new(etc); this.insert_before(before, x); return x; }
+Container.prototype.add_ellipse = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = Ellipse.new(etc); this.insert_before(before, x); return x; }
+Container.prototype.add_filter = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = Filter.new(etc); this.insert_before(before, x); return x; }
+Container.prototype.add_gaussian_blur = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = FEGaussianBlur.new(etc); this.insert_before(before, x); return x; }
+Container.prototype.add_group = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = Group.new(etc); this.insert_before(before, x); return x; }
+Container.prototype.add_image = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = Image.new(etc); this.insert_before(before, x); return x; }
+Container.prototype.add_line = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = Line.new(etc); this.insert_before(before, x); return x; }
+Container.prototype.add_linear_gradient = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = LinearGradient.new(etc); this.insert_before(before, x); return x; }
+Container.prototype.add_marker = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = Marker.new(etc); this.insert_before(before, x); return x; }
+Container.prototype.add_mask = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = Mask.new(etc); this.insert_before(before, x); return x; }
+Container.prototype.add_meshgradient = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = MeshGradient.new(etc); this.insert_before(before, x); return x; }
+Container.prototype.add_meshpatch = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = MeshPatch.new(etc); this.insert_before(before, x); return x; }
+Container.prototype.add_meshrow = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = MeshRow.new(etc); this.insert_before(before, x); return x; }
+Container.prototype.add_path = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = Path.new(etc); this.insert_before(before, x); return x; }
+Container.prototype.add_pattern = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = Pattern.new(etc); this.insert_before(before, x); return x; }
+Container.prototype.add_polygon = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = Polygon.new(etc); this.insert_before(before, x); return x; }
+Container.prototype.add_polyline = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = Polyline.new(etc); this.insert_before(before, x); return x; }
+Container.prototype.add_radial_gradient = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = RadialGradient.new(etc); this.insert_before(before, x); return x; }
+Container.prototype.add_rect = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = Rect.new(etc); this.insert_before(before, x); return x; }
+Container.prototype.add_stop = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = Stop.new(etc); this.insert_before(before, x); return x; }
+Container.prototype.add_symbol = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = Symbol.new(etc); this.insert_before(before, x); return x; }
+Container.prototype.add_text = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = Text.new(etc); this.insert_before(before, x); return x; }
+Container.prototype.add_tspan = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = TSpan.new(etc); this.insert_before(before, x); return x; }
+Container.prototype.add_use = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = Use.new(etc); this.insert_before(before, x); return x; }
+Container.prototype.add_view = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = ViewPort.new(etc); this.insert_before(before, x); return x; }
 
 Container.prototype._add_element = function (tag: string) {
     switch (tag) {
@@ -96,6 +88,7 @@ Container.prototype._add_element = function (tag: string) {
         case "linearGradient": return this.add_linear_gradient();
         case "marker": return this.add_marker();
         case "mask": return this.add_mask();
+        case "meshgradient": return this.add_meshgradient();
         case "meshpatch": return this.add_meshpatch();
         case "meshrow": return this.add_meshrow();
         case "path": return this.add_path();
@@ -104,6 +97,7 @@ Container.prototype._add_element = function (tag: string) {
         case "polyline": return this.add_polyline();
         case "radialGradient": return this.add_radial_gradient();
         case "rect": return this.add_rect();
+        case "stop": return this.add_stop();
         case "symbol": return this.add_symbol();
         case "text": return this.add_text();
         case "tspan": return this.add_tspan();
@@ -112,3 +106,5 @@ Container.prototype._add_element = function (tag: string) {
     }
     throw new Error("Unexpected tag: " + tag);
 }
+/* </INSERT> */
+//

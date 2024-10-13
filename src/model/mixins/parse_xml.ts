@@ -258,9 +258,6 @@ function sax_walk(elem: SAXElement, parent: Container, attrs: { [key: string]: s
     const node = parent._add_element(tag)
     if (node) {
         node.set_attributes(props);
-        // console.log(`walk-->`, tag, parent.constructor.name);
-        // const node = make_node(props, parent);
-        // console.log(`walk<-- ${node.constructor.name}`, tag);
         if (node instanceof Container) {
             // Non-propagating values
             for (const s of ['id', 'class', 'clip-path', 'viewBox', 'preserveAspectRatio']) {

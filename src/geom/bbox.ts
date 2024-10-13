@@ -241,7 +241,7 @@ export class BoundingBox extends Array<BoundingInterval> {
         let xMin = Infinity;
         let xMax = -Infinity;
         let yMin = Infinity;
-        let maxY = -Infinity;
+        let yMax = -Infinity;
         const { left, top, bottom, right } = this;
         [Vector.pos(left, top), Vector.pos(right, top), Vector.pos(left, bottom), Vector.pos(right, bottom)].forEach(
             function (p) {
@@ -249,10 +249,10 @@ export class BoundingBox extends Array<BoundingInterval> {
                 xMin = min(xMin, x);
                 xMax = max(xMax, x);
                 yMin = min(yMin, y);
-                maxY = max(maxY, y);
+                yMax = max(yMax, y);
             }
         );
-        return (this.constructor as typeof BoundingBox).extrema([xMin, xMax], [yMin, maxY]);
+        return (this.constructor as typeof BoundingBox).extrema([xMin, xMax], [yMin, yMax]);
     }
     overlap(other: BoundingBox): BoundingBox {
         if (!this.is_valid()) {

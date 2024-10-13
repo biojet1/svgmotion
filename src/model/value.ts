@@ -285,7 +285,7 @@ export class UnknownValue extends AnimatableD<string> {
 
 }
 
-export class BiVectorValue extends VectorValue {
+export class ScalarPairValue extends VectorValue {
     override check_value(x: Vector) {
         if (x instanceof Vector) {
             return x;

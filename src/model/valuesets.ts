@@ -25,27 +25,6 @@ export function xset<T>(that: any, name: string, value: T) {
     });
 }
 
-function set_params(that: { id?: string }, o: object) {
-    for (const [k, v] of Object.entries(o)) {
-        switch (k) {
-            case 'id':
-                that.id = v;
-                break;
-            default:
-                const f = (that as any)[k];
-                if (f instanceof Animatable) {
-                    f.set_value(v);
-                } else if (f instanceof ValueSet) {
-                    for (const [n, w] of Object.entries(v)) {
-                        const g = (f as any)[n];
-                        if (g instanceof Animatable) {
-                            g.set_value(w);
-                        }
-                    }
-                }
-        }
-    }
-}
 function find_parent<T>(
     that: Animatable<any> | ValueSet,
     K: { new(...args: any[]): T }
@@ -110,6 +89,9 @@ export class ValueSet {
                 throw new Error(`Unexpected property "${k}" (${v})`);
             }
         }
+    }
+    get_repr(frame: number): string {
+        throw new Error(`Not implemented`);
     }
 }
 
@@ -572,6 +554,14 @@ export class Transform extends ValueSet {
                 yield sub;
             }
         }
+        if ('box' in this) {
+            yield this.box;
+
+        }
+        if ('origin' in this) {
+            yield this.origin;
+
+        }
     }
     //
     prefix_hexad() {
@@ -592,10 +582,8 @@ export class Transform extends ValueSet {
         switch (a) {
             case "":
             case "view-box":
-                {
-                    const [w, h] = get_element(this).get_vp_size(frame);
-                    return BoundingBox.rect(0, 0, w, h);
-                }
+                const [w, h] = get_element(this).get_vp_size(frame);
+                return BoundingBox.rect(0, 0, w, h);
             case "content-box":
             case "border-box":
             case "fill-box":

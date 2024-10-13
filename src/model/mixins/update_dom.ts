@@ -131,11 +131,66 @@ const PROP_MAP: {
         node.setAttribute("in2", prop.get_repr(frame));
     },
 };
-
+/* <INSERT name-to-attr.ins.ts > */
+const name_to_attr: {
+    [key: string]: string
+} = {
+    "width": "width",
+    "height": "height",
+    "x": "x",
+    "y": "y",
+    "ref_x": "refX",
+    "ref_y": "refY",
+    "view_box": "",
+    "href": "href",
+    "pattern_units": "patternUnits",
+    "pattern_content_units": "patternContentUnits",
+    "pattern_transform": "patternTransform",
+    "marker_units": "markerUnits",
+    "marker_width": "markerWidth",
+    "marker_height": "markerHeight",
+    "orient": "orient",
+    "clip_path_units": "clipPathUnits",
+    "mask_units": "maskUnits",
+    "mask_content_units": "maskContentUnits",
+    "zoom_pan": "zoomAndPan",
+    "fit_view": "preserveAspectRatio",
+    "cross_origin": "crossorigin",
+    "std_dev": "stdDeviation",
+    "dx": "dx",
+    "dy": "dy",
+    "input": "in",
+    "edge_mode": "edgeMode",
+    "spread": "spreadMethod",
+    "gradient_units": "gradientUnits",
+    "gradient_transform": "gradientTransform",
+    "x1": "x1",
+    "y1": "y1",
+    "x2": "x2",
+    "y2": "y2",
+    "type": "type",
+    "r": "r",
+    "cx": "cx",
+    "cy": "cy",
+    "fx": "cx",
+    "fy": "cy",
+    "fr": "cy",
+    "offset": "offset",
+    "color": "stop-color",
+    "path": "path",
+    "marker_start": "marker-start",
+    "marker_mid": "marker-mid",
+    "marker_end": "marker-end",
+    "points": "points",
+    "rx": "rx",
+    "ry": "ry",
+    "d": "d"
+};
+/* </INSERT> */
 function update_dom(frame: number, target: Element) {
     const { _start, _end: end } = target;
     let cur: Node | undefined = _start;
-    console.log("update_dom", target.constructor.name);
+    // console.log("update_dom", target.constructor.name);
     do {
         const elem = (cur as any)._element;
         if (elem) {
@@ -147,6 +202,11 @@ function update_dom(frame: number, target: Element) {
                     } else if (n.startsWith("data-")) {
                         // TODO
                     } else {
+                        const a = name_to_attr[n];
+                        if (a) {
+                            elem.setAttribute(a, v.get_repr(frame));
+                            continue;
+                        }
                         throw new Error(`Unexpected property ${n}`);
                     }
                 }

@@ -20,16 +20,6 @@ abstract class Shape extends Element {
     }
 }
 
-// class PointBase extends Shape {
-//     /// points
-//     get points() {
-//         return this._new_field("points", new PointsValue([]));
-//     }
-//     set points(v: PointsValue) {
-//         this._new_field("points", v);
-//     }
-// }
-
 export class Path extends Shape {
     static override tag = "path";
     //
@@ -64,7 +54,7 @@ export class Rect extends Shape {
             const right = left + width;
             const bottom = top + height;
             const cpts = [left + rx, right - rx, top + ry, bottom - ry];
-            return `M ${cpts[0]},${self.top}` +
+            return `M ${cpts[0]},${top}` +
                 `L ${cpts[1]},${top} ` +
                 `A ${rx},${ry} 0 0 1 ${right},${cpts[2]}` +
                 `L ${right},${cpts[3]} ` +

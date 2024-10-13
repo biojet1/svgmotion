@@ -1,83 +1,33 @@
 import { Element } from "./base.js";
 import { Container } from "./containers.js";
-import { VectorValue, BiVectorValue, LengthYValue, LengthXValue, TextValue, PercentageValue, RGBValue, LengthValue } from "./value.js";
+import { ScalarPairValue, LengthYValue, LengthXValue, TextValue, PercentageValue, RGBValue, LengthValue } from "./value.js";
+import { Transform } from "./valuesets.js";
 
-export class FilterElement extends Element {
+export class FilterBase extends Element {
 }
 
 export class Stop extends Element {
     static override tag = "stop";
-    /// offset
-    get offset() {
-        return this._new_field("offset", new PercentageValue(1));
-    }
-    set offset(v: PercentageValue) {
-        this._new_field("opacity", v);
-    }
-    /// color
-    get color() {
-        return this._new_field("color", new RGBValue([0, 0, 0]));
-    }
-    set color(v: RGBValue) {
-        this._new_field("color", v);
-    }
-    /// path
-    get path() {
-        return this._new_field("path", new TextValue(''));
-    }
-    set path(v: TextValue) {
-        this._new_field("path", v);
-    }
+    get offset() { return this._new_field("offset", new PercentageValue(1.0)); }
+    get color() { return this._new_field("color", new RGBValue([0, 0, 0])); }
+    get path() { return this._new_field("path", new TextValue('')); }
 }
 
-export class FEGaussianBlur extends FilterElement {
+export class FEGaussianBlur extends FilterBase {
     static override tag = "feGaussianBlur";
     ///   
-    get std_dev() {
-        return this._new_field("std_dev", new BiVectorValue([0, 0]));
-    }
-    set std_dev(v: BiVectorValue) {
-        this._new_field("std_dev", v);
-    }
-    ///
-    get edge_mode() {
-        return this._new_field("edge_mode", new TextValue('duplicate'));
-    }
-    set edge_mode(v: TextValue) {
-        this._new_field("edge_mode", v);
-    }
-    ///
-    get in() {
-        return this._new_field("in", new TextValue(''));
-    }
-    set in(v: TextValue) {
-        this._new_field("in", v);
-    }
+    get std_dev() { return this._new_field("std_dev", new ScalarPairValue([0, 0])); }
+    get edge_mode() { return this._new_field("edge_mode", new TextValue('duplicate')); }
+    get input() { return this._new_field("input", new TextValue('')); }
 }
 
-export class FEDropShadow extends FilterElement {
+export class FEDropShadow extends FilterBase {
     static override tag = "feDropShadow";
     ///
-    get std_dev() {
-        return this._new_field("std_dev", new VectorValue([0, 0]));
-    }
-    set std_dev(v: VectorValue) {
-        this._new_field("std_dev", v);
-    }
-    ///
-    get dx() {
-        return this._new_field("dx", new LengthXValue(0));
-    }
-    set dx(v: LengthXValue) {
-        this._new_field("dx", v);
-    }
-    ///
-    get dy() {
-        return this._new_field("dy", new LengthYValue(0));
-    }
-    set dy(v: LengthYValue) {
-        this._new_field("dy", v);
-    }
+    get std_dev() { return this._new_field("std_dev", new ScalarPairValue([0, 0])); }
+    get dx() { return this._new_field("dx", new LengthXValue(0)); }
+    get dy() { return this._new_field("dy", new LengthYValue(0)); }
+    get input() { return this._new_field("input", new TextValue('')); }
 }
 
 export class Gradient extends Container {
@@ -106,82 +56,28 @@ export class Gradient extends Container {
 
 export class LinearGradient extends Gradient {
     static override tag = "linearGradient";
-    ///
-    /// x1
-    get x1() {
-        return this._new_field("x1", new PercentageValue(0));
-    }
-    set x1(v: PercentageValue) {
-        this._new_field("x1", v);
-    }
-    /// x2
-    get x2() {
-        return this._new_field("x2", new PercentageValue(1));
-    }
-    set x2(v: PercentageValue) {
-        this._new_field("x2", v);
-    }
-    /// x1
-    get y1() {
-        return this._new_field("y1", new PercentageValue(0));
-    }
-    set y1(v: PercentageValue) {
-        this._new_field("y1", v);
-    }
-    /// y2
-    get y2() {
-        return this._new_field("y2", new PercentageValue(1));
-    }
-    set y2(v: PercentageValue) {
-        this._new_field("y2", v);
-    }
-
+    get href() { return this._new_field("href", new TextValue('')); }
+    get spread() { return this._new_field("spread", new TextValue('pad')); }
+    get gradient_units() { return this._new_field("gradient_units", new TextValue('objectBoundingBox')); }
+    get gradient_transform() { return this._new_field("gradient_transform", new Transform()); }
+    get x1() { return this._new_field("x1", new PercentageValue(0)); }
+    get y1() { return this._new_field("y1", new PercentageValue(0)); }
+    get x2() { return this._new_field("x2", new PercentageValue(1)); }
+    get y2() { return this._new_field("y2", new PercentageValue(0)); }
 }
 
 export class RadialGradient extends Gradient {
     static override tag = "radialGradient";
-    ///
-    get cx() {
-        return this._new_field("cx", new LengthXValue(0));
-    }
-    set cx(v: LengthXValue) {
-        this._new_field("cx", v);
-    }
-    ///
-    get cy() {
-        return this._new_field("cy", new LengthYValue(0));
-    }
-    set cy(v: LengthYValue) {
-        this._new_field("cy", v);
-    }
-    ///
-    get r() {
-        return this._new_field("r", new LengthValue(0));
-    }
-    set r(v: LengthValue) {
-        this._new_field("r", v);
-    }
-    ///
-    get fx() {
-        return this._new_field("fx", new LengthXValue(0));
-    }
-    set fx(v: LengthXValue) {
-        this._new_field("fx", v);
-    }
-    ///
-    get fy() {
-        return this._new_field("fy", new LengthYValue(0));
-    }
-    set fy(v: LengthYValue) {
-        this._new_field("fy", v);
-    }
-    ///
-    get fr() {
-        return this._new_field("fr", new LengthValue(0));
-    }
-    set fr(v: LengthValue) {
-        this._new_field("fr", v);
-    }
+    get href() { return this._new_field("href", new TextValue('')); }
+    get spread() { return this._new_field("spread", new TextValue('pad')); }
+    get gradient_units() { return this._new_field("gradient_units", new TextValue('objectBoundingBox')); }
+    get gradient_transform() { return this._new_field("gradient_transform", new Transform()); }
+    get r() { return this._new_field("r", new LengthValue(0)); }
+    get cx() { return this._new_field("cx", new LengthXValue(0)); }
+    get cy() { return this._new_field("cy", new LengthYValue(0)); }
+    get fx() { return this._new_field("fx", new LengthXValue(0)); }
+    get fy() { return this._new_field("fy", new LengthYValue(0)); }
+    get fr() { return this._new_field("fr", new LengthYValue(0)); }
 }
 
 export class MeshPatch extends Container {
@@ -193,39 +89,12 @@ export class MeshRow extends Container {
 }
 
 export class MeshGradient extends Container {
-    /// x
-    get x() {
-        return this._new_field("x", new PercentageValue(0));
-    }
-    set x(v: PercentageValue) {
-        this._new_field("x", v);
-    }
-    /// y
-    get y() {
-        return this._new_field("y", new PercentageValue(0));
-    }
-    set y(v: PercentageValue) {
-        this._new_field("y", v);
-    }
-    ///
-    get type() {
-        return this._new_field("type", new TextValue('bilinear'));
-    }
-    set type(v: TextValue) {
-        this._new_field("type", v);
-    }
-    ///
-    get gradient_units() {
-        return this._new_field("gradient_units", new TextValue("objectBoundingBox"));
-    }
-    set gradient_units(v: TextValue) {
-        this._new_field("gradient_units", v);
-    }
-    /// href
-    get href() {
-        return this._new_field("href", new TextValue(''));
-    }
-    set href(v: TextValue) {
-        this._new_field("href", v);
-    }
+    static override tag = "meshgradient";
+    ////
+    get href() { return this._new_field("href", new TextValue('')); }
+    get x() { return this._new_field("x", new PercentageValue(0)); }
+    get y() { return this._new_field("y", new PercentageValue(0)); }
+    get type() { return this._new_field("type", new TextValue('bilinear')); }
+    get gradient_units() { return this._new_field("gradient_units", new TextValue('objectBoundingBox')); }
 }
+

@@ -12,15 +12,15 @@ export class Text extends Container {
     get dy() { return this._new_field("dy", new LengthYValue(0)); }
     ///
     add_chars(text: string, before?: Node) {
-        const x = new TextData();
-        // x.data = text;
-        x.content.set_value(text);
-        this.insert_before(before ?? this._end, x);
+        const n = new TextData();
+        // n.data = text;
+        n.content.set_value(text);
+        this.insert_before(before ?? this._end, n);
     }
     add_content(before?: Node) {
-        const x = new TextData();
-        this.insert_before(before ?? this._end, x);
-        return x;
+        const n = new TextData();
+        this.insert_before(before ?? this._end, n);
+        return n;
     }
 }
 export class TSpan extends Text {

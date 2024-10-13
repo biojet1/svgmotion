@@ -94,7 +94,9 @@ tasks:
         generates:
             - /tmp/add_elements.ts
         cmds:
-            - python3 -m jinjagen -d /tmp/elements.json -D / -i src/model/mixins/add_elements.j2.ts -o /tmp/add_elements.ts
+            # - python3 -m jinjagen -d /tmp/elements.json -D / -i src/model/mixins/add_elements.j2.ts -o /tmp/add_elements.ts
+            - python3 -m jinjagen -d /tmp/elements.json -D / -i src/model/mixins/add_elements.j2.ts -o /tmp/add_elements.ins.ts
+            - python3 -m biojet1.scandir.insert src/model/mixins/ -s /tmp --act
 
     fields.j2:
         method: checksum

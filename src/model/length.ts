@@ -4,7 +4,7 @@ import { Element } from "./base.js";
 
 const BOTH_MATCH = /^\s*(([-+]?[0-9]+(\.[0-9]*)?|[-+]?\.[0-9]+)([eE][-+]?[0-9]+)?)\s*(in|pt|px|mm|cm|m|km|Q|pc|yd|ft||%|em|ex|ch|rem|vw|vh|vmin|vmax|deg|grad|rad|turn|s|ms|Hz|kHz|dpi|dpcm|dppx)\s*$/i;
 
-export class CalcLength {
+class CalcLength {
     protected _node!: Element;
     public get node(): Element {
         return this._node;

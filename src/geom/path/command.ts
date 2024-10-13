@@ -448,15 +448,13 @@ export class MoveLC extends LineCL {
                 const [sx, sy] = _prev.to;
                 return ['m', x - sx, y - sy];
             }
-            return ['m', x, y];
         }
 
         return ['M', x, y];
     }
     override split_at(t: number): [BaseLC, BaseLC] {
-        const { to } = this;
         const c = this.point_at(t);
-        return [new MoveLC(this._prev, c), new MoveLC(new MoveLC(undefined, c), to)];
+        return [new MoveLC(this._prev, c), new MoveLC(new MoveLC(undefined, c), this.to)];
     }
     override transform(M: any) {
         const { to, _prev } = this;
@@ -472,8 +470,7 @@ export class MoveLC extends LineCL {
         }
     }
     override with_prev(prev: BaseLC | undefined) {
-        const { to } = this;
-        return new MoveLC(prev, to);
+        return new MoveLC(prev, this.to);
     }
     override segment_len() {
         return 0;
