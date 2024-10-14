@@ -1,39 +1,19 @@
 import { BoundingBox, Matrix } from "../geom/index.js";
 import { TextValue, LengthXValue, LengthYValue } from "./value.js";
 import { ViewBox } from "./valuesets.js";
-import { Container } from "./containers.js";
+import { Container, Defs } from "./containers.js";
 
-// declare class ViewPort {
-//     get width(): LengthXValue;
-//     get height(): LengthYValue;
-//     get x(): LengthXValue;
-//     get y(): LengthYValue;
-//     get view_box(): ViewBox;
-//     get zoom_pan(): TextValue;
 
-// }
 
 export class ViewPort extends Container {
     static override tag = "svg";
     //
-    get width() {
-        return this._new_field("width", new LengthXValue('100%'));
-    }
-    get height() {
-        return this._new_field("height", new LengthYValue('100%'));
-    }
-    get x() {
-        return this._new_field("x", new LengthXValue(0));
-    }
-    get y() {
-        return this._new_field("y", new LengthYValue(0));
-    }
-    get view_box() {
-        return this._new_field("view_box", new ViewBox([0, 0], [100, 100]));
-    }
-    get zoom_pan() {
-        return this._new_field("zoom_pan", new TextValue('disable'));
-    }
+    get width() { return this._new_field("width", new LengthXValue('100%')); }
+    get height() { return this._new_field("height", new LengthYValue('100%')); }
+    get x() { return this._new_field("x", new LengthXValue(0)); }
+    get y() { return this._new_field("y", new LengthYValue(0)); }
+    get view_box() { return this._new_field("view_box", new ViewBox([0, 0], [100, 100])); }
+    get zoom_pan() { return this._new_field("zoom_pan", new TextValue('disable')); }
     // 
     override update_bbox(bbox: BoundingBox, frame: number, m?: Matrix) {
         const width = this.width.get_value(frame);
@@ -59,7 +39,6 @@ export class ViewPort extends Container {
                 let [vx, vy] = this.view_box.position.get_value(frame);
                 let [vw, vh] = this.view_box.size.get_value(frame);
                 const fv = this.view_box.fit.get_value(frame);
-                // const { x: vx, y: vy, width: vw, height: vh } = this.viewBox._calcBox();
                 (vx == null || isNaN(vx)) && (vx = x);
                 (vy == null || isNaN(vy)) && (vy = y);
                 (vw == null || isNaN(vw)) && (vw = w);
@@ -80,6 +59,15 @@ export class ViewPort extends Container {
                 }
             }
         }
+    }
+    //
+    get defs(): Defs {
+        for (let cur = this.first_child(); cur; cur = cur.next_sibling()) {
+            if (cur instanceof Defs) {
+                return cur;
+            }
+        }
+        return this.add_defs();
     }
 }
 

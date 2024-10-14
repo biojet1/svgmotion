@@ -30,7 +30,6 @@ export interface PlainSound {
 export interface PlainRoot {
     version: string;
     view: PlainNode;
-    defs: { [key: string]: PlainNode; };
     frame_rate: number;
     assets?: { [key: string]: PlainAsset; };
     sounds: { $: string;[key: string]: any; }[][];
@@ -64,7 +63,6 @@ export class FileAsset extends Asset {
 }
 
 export class Root extends Container {
-    defs: { [key: string]: Element; } = {};
     all: { [key: string]: Element; } = {};
     frame_rate: number = 60;
     version: string = "0.0.1";
@@ -84,6 +82,7 @@ export class Root extends Container {
             return x;
         }
         throw new Error("Unexpected");
+
     }
 
     set_view(vp: ViewPort) {
@@ -95,9 +94,6 @@ export class Root extends Container {
         return super.add_view();
     }
     // etc
-    remember_id(id: string, node: Element) {
-        this.all[id] = node;
-    }
     at(offset: number) {
         return this.track.sub(offset);
     }
@@ -119,19 +115,13 @@ export class Root extends Container {
         a._parent = this;
         return this.assets[id] = a;
     }
-
-    def_filter() {
-        const a = new Filter();
-        const id = crypto.randomUUID();
-        a.id = id;
-        // console.log("add_filter", id);
-        return this.defs[id] = a;
+    //
+    static _load_svg(src: string): Promise<Root> {
+        throw new Error(`Not implemented`)
+    }
+    static _parse_svg(src: string): Promise<Root> {
+        throw new Error(`Not implemented`)
     }
 
-    override *enum_values(): Generator<Animatable<any>, void, unknown> {
-        yield* super.enum_values();
-        for (const elem of Object.values(this.defs)) {
-            yield* elem.enum_values();
-        }
-    }
+
 }

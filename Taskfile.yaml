@@ -79,11 +79,12 @@ tasks:
         deps: [gen.elements]
         sources:
             - src/model/mixins/find_node.j2.ts
-            - /tmp/elements.json
+            - /tmp/elements-col.json
         generates:
             - src/model/mixins/find_node.ts
         cmds:
-            - python3 -m jinjagen -d /tmp/elements.json -D / -i src/model/mixins/find_node.j2.ts -o src/model/mixins/find_node.j2.out.ts
+            - python3 -m jinjagen -d /tmp/elements-col.json -D / -i src/model/mixins/find_node.j2.ts -o /tmp/find_elements.ins.ts
+            - python3 -m biojet1.scandir.insert src/model/mixins/ -s /tmp --act
 
     add_elements.j2:
         method: checksum
@@ -95,19 +96,19 @@ tasks:
             - /tmp/add_elements.ts
         cmds:
             # - python3 -m jinjagen -d /tmp/elements.json -D / -i src/model/mixins/add_elements.j2.ts -o /tmp/add_elements.ts
-            - python3 -m jinjagen -d /tmp/elements.json -D / -i src/model/mixins/add_elements.j2.ts -o /tmp/add_elements.ins.ts
+            - python3 -m jinjagen -d /tmp/elements-col.json -D / -i src/model/mixins/add_elements.j2.ts -o /tmp/add_elements.ins.ts
             - python3 -m biojet1.scandir.insert src/model/mixins/ -s /tmp --act
 
-    fields.j2:
-        method: checksum
-        sources:
-            - src/model/mixins/add_elements.j2.ts
-            - /tmp/elements.json
-        generates:
-            - /tmp/add_elements.ts
-        cmds:
-            - env -C /mnt/META/wrx/python/flottie python3 -m tests.gen_elements || true
-            - python3 -m jinjagen -d /tmp/elements-col.json -D / -i src/model/mixins/fields.j2.ts > /tmp/fields.ts
+    # fields.j2:
+    #     method: checksum
+    #     sources:
+    #         - src/model/mixins/add_elements.j2.ts
+    #         - /tmp/elements.json
+    #     generates:
+    #         - /tmp/add_elements.ts
+    #     cmds:
+    #         - env -C /mnt/META/wrx/python/flottie python3 -m tests.gen_elements || true
+    #         - python3 -m jinjagen -d /tmp/elements-col.json -D / -i src/model/mixins/fields.j2.ts > /tmp/fields.ts
 
     elements.j2:
         cmds:

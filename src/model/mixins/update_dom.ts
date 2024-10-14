@@ -129,7 +129,7 @@ const PROP_MAP: {
     // <feBlend>, <feComposite>, <feDisplacementMap>
     in2: function (frame: number, node: SVGElement, prop: TextValue) {
         node.setAttribute("in2", prop.get_repr(frame));
-    },
+    }
 };
 /* <INSERT name-to-attr.ins.ts > */
 const name_to_attr: {
@@ -172,9 +172,9 @@ const name_to_attr: {
     "r": "r",
     "cx": "cx",
     "cy": "cy",
-    "fx": "cx",
-    "fy": "cy",
-    "fr": "cy",
+    "fx": "fx",
+    "fy": "fy",
+    "fr": "fr",
     "offset": "offset",
     "color": "stop-color",
     "path": "path",
@@ -277,17 +277,17 @@ Root.prototype.to_dom = function to_dom(doc: typeof SVGElement.prototype.ownerDo
     const element = this.view.to_dom(doc);
     element.setAttribute("xmlns", "http://www.w3.org/2000/svg");
     element.setAttributeNS("http://www.w3.org/2000/svg", "version", "1.1");
-    const defs = doc.createElementNS(NS_SVG, "defs");
+    // const defs = doc.createElementNS(NS_SVG, "defs");
     // console.log("Root.prototype.to_dom:");
     // console.dir(this.defs);
-    for (let [_n, v] of Object.entries(this.defs)) {
-        // console.log("defs appendChild", n);
-        // console.dir(v);
-        defs.appendChild(v.to_dom(doc));
-    }
-    if (defs.firstElementChild) {
-        element.insertBefore(defs, element.firstChild);
-    }
+    // for (let [_n, v] of Object.entries(this.defs)) {
+    //     // console.log("defs appendChild", n);
+    //     // console.dir(v);
+    //     defs.appendChild(v.to_dom(doc));
+    // }
+    // if (defs.firstElementChild) {
+    //     element.insertBefore(defs, element.firstChild);
+    // }
     // element.setAttribute("version", "2.0");
     return element;
 }
@@ -298,7 +298,7 @@ Container.prototype.update_dom = function (frame: number) {
 
 Root.prototype.update_dom = function (frame: number) {
     update_dom(frame, this);
-    Object.values(this.defs).map((elem) => update_dom(frame, elem));
+    // Object.values(this.defs).map((elem) => update_dom(frame, elem));
 }
 
 TextData.prototype.update_dom = function (frame: number) {
@@ -375,10 +375,10 @@ Stroke.prototype.enum_attibutes = function* (frame: number) {
                 yield { name: "stroke-dashoffset", value: this.dash_offset.get_repr(frame) }
                 break;
             case "linecap":
-                yield { name: "stroke-linecap", value: this.linecap.get_repr(frame) }
+                yield { name: "stroke-linecap", value: this.line_cap.get_repr(frame) }
                 break;
             case "linejoin":
-                yield { name: "stroke-linejoin", value: this.linejoin.get_repr(frame) }
+                yield { name: "stroke-linejoin", value: this.line_join.get_repr(frame) }
                 break;
             default:
                 continue;

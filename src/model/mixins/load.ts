@@ -70,7 +70,7 @@ export function from_json(src: PlainRoot) {
 }
 
 Root.prototype.load = function (src: PlainRoot) {
-    const { version, view, defs, frame_rate, assets, sounds } = src;
+    const { version, view, frame_rate, assets, sounds } = src;
     if (!version) {
         throw new Error("No version {${Object.keys(src)}}");
     } else if (!/^\d+\.\d+\.\d+$/.test(version)) {
@@ -89,22 +89,22 @@ Root.prototype.load = function (src: PlainRoot) {
             }
         }
     }
-    {
-        this.defs = {};
-        if (defs) {
-            // console.log("defs:", defs);
-            Object.entries(defs).map(([k, v]) => {
-                // console.dir(v);
-                const node = load_node(v, this);
-                if (node.id !== k) {
-                    throw new Error(``);
-                }
-                node._detach();
-                this.defs[k] = node;
-            });
-        }
-        // console.log("DEFS:", this.defs);
-    }
+    // {
+    //     this.defs = {};
+    //     if (defs) {
+    //         // console.log("defs:", defs);
+    //         Object.entries(defs).map(([k, v]) => {
+    //             // console.dir(v);
+    //             const node = load_node(v, this);
+    //             if (node.id !== k) {
+    //                 throw new Error(``);
+    //             }
+    //             node._detach();
+    //             this.defs[k] = node;
+    //         });
+    //     }
+    //     // console.log("DEFS:", this.defs);
+    // }
     this.version = version;
     this.sounds = [];
     if (sounds) {

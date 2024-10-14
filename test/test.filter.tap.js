@@ -2,26 +2,20 @@
 import test from "tap";
 import { FEGaussianBlur, Element, Root, To, Filter } from "svgmotion";
 
-test.test("sax_load_svg_src", async (t) => {
+test.test("add_filter", async (t) => {
     const anim = new Root();
-    let f = anim.def_filter();
+    let f = anim.view.defs.add_filter();
     t.ok(f instanceof Filter);
     t.ok(f instanceof Element);
     const gb = new FEGaussianBlur();
     f.append_child(gb);
-    // console.dir(f);
     let d = anim.dump();
-    t.same(d.defs[f.id].id, f.id);
-    t.same(d.defs[f.id].tag, 'filter');
-    // console.dir(d, { depth: 100 });
-
     t.end();
 });
 
-test.test("load_svg the_quick", async (t) => {
-    const anim = new Root();
-    await anim.load_svg("res/the_quick.svg");
-    const { view } = anim;
+test.test("add_fe_gaussian_blur", async (t) => {
+    const root = await Root._load_svg("res/the_quick.svg");
+    const { view } = root;
     view.width.set_value(384);
     view.height.set_value(216);
     let the = view.get_group("The");
@@ -31,11 +25,10 @@ test.test("load_svg the_quick", async (t) => {
     let lazy = view.get_group("lazy");
     let bb = view.bbox_of(0, dog, the);
 
-    const tr = anim.at(0);
+    const tr = root.at(0);
 
-    let f = anim.def_filter();
-    const gb = FEGaussianBlur.new({ std_dev: 2 });
-    f.append_child(gb);
+    let f = view.defs.add_filter();
+    const gb = f.add_fe_gaussian_blur({ std_dev: 2 });
 
     dog.filter.set_value(`url(#${f.id})`);
 
@@ -45,8 +38,8 @@ test.test("load_svg the_quick", async (t) => {
     tr.run(To(gb.std_dev, 4));
     tr.run(To(gb.std_dev, [0, 0]));
 
-    anim.save_json('/tmp/the_quick_ef.json');
-    anim.save_html('/tmp/the_quick_ef.html');
+    root.save_json('/tmp/ts-filter.json');
+    root.save_html('/tmp/ts-filter.html');
     // {
     //     const A = new Root();
     //     await A.load_json("/tmp/the_quick_ef.json");

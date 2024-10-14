@@ -18,8 +18,9 @@ interface Constructor<M> {
     new(...args: any[]): M
 }
 export class Element extends Parent {
-    id?: string;
+    // id?: string;
     static tag = '?';
+    static _prop_attr: { [key: string]: string } = {};
     // tree
     *ancestors() {
         let top = this._parent;
@@ -87,6 +88,16 @@ export class Element extends Parent {
             }
         }
     }
+    // id
+    get id() {
+        const id = Math.round(Math.random() * 1E+5).toString(36)
+        xget(this, "id", id);
+        return id;
+    }
+    set id(id: string) {
+        xget(this, "id", id);
+    }
+
     /// FILL
     get fill() {
         return this._new_field("fill", new Fill());

@@ -39,12 +39,8 @@ test.test("Keyframe", (t) => {
 test.test("Rect.new", (t) => {
     // Rect
     const r = Rect.new({ x: 45 });
-
     t.ok(r instanceof Rect);
     t.same(r.x.get_value(0), 45);
     t.same(r.y.get_value(0), 0);
-
-
     t.end();
-
 });

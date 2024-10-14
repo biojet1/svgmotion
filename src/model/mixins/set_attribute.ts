@@ -1,5 +1,5 @@
 
-import { ScalarValue, UnknownValue } from "../value.js";
+import { Animatable, ScalarValue, UnknownValue } from "../value.js";
 import { LengthYValue, LengthXValue, LengthValue, FontSizeValue } from "../value.js";
 import { Element } from "../base.js";
 import { Symbol } from "../containers.js";
@@ -28,7 +28,7 @@ Element.prototype.set_attribute = function (name: string, value: string): Elemen
     switch (name) {
         case "id":
             if (value) {
-                this.get_root().remember_id((this.id = value), this);
+                this.id = value;
             }
             break;
         case "opacity":
@@ -137,12 +137,12 @@ Element.prototype.set_attribute = function (name: string, value: string): Elemen
             break;
         case "stroke-linecap":// 
             if (value) {
-                this.stroke.linecap.set_repr(value);
+                this.stroke.line_cap.set_repr(value);
             }
             break;
         case "stroke-linejoin":// 
             if (value) {
-                this.stroke.linejoin.set_repr(value);
+                this.stroke.line_join.set_repr(value);
             }
             break;
         /// TEXT //////////
@@ -181,6 +181,17 @@ Element.prototype.set_attribute = function (name: string, value: string): Elemen
                 (this as any)[name] = new UnknownValue(value);
                 return this;
             }
+            for (const [n, a] of Object.entries(Element._prop_attr)) {
+                console.log("SET", n, a, name)
+                if (a == name) {
+                    const f = (this as any)[n];
+                    if (f instanceof Animatable) {
+                        f.set_repr(value);
+                        return this;
+                    }
+                }
+            }
+
             throw new Error(
                 `Unexpected attribute [${name}]="${value}" tag="${(this.constructor as any).tag}" this="${this.constructor.name}"`
             );
@@ -192,6 +203,7 @@ Element.prototype.set_attribute = function (name: string, value: string): Elemen
 
 import { TSpan, Text } from "../text.js";
 import { Rect, Path, Line, Ellipse, Circle, Polyline, Polygon } from "../shapes.js";
+import { ValueSet } from "../valuesets.js";
 
 declare module "../viewport" {
     interface ViewPort {
@@ -507,3 +519,8 @@ FontSizeValue.prototype.initial_value = function () {
     }
     return ScalarValue.prototype.initial_value.call(this);
 }
+
+Element._prop_attr = {
+    'offset': 'offset',
+    'color': 'stop-color',
+};

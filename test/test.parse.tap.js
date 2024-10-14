@@ -25,7 +25,7 @@ test.test("load_svg polygon01", async (t) => {
     // console.dir(anim.dump(), { depth: 100 });
 
 
-    anim.save_html("/tmp/polygon01.html");
+    anim.save_html("/tmp/ts-polygon01.html");
     {
         const { SVGDocument, XMLSerializer } = await import("domspec");
         const nod = anim.to_dom(new SVGDocument());
@@ -104,8 +104,8 @@ test.test("parse_svg", async (t) => {
     //     im.y.set_value(5);
     // }
     // console.dir(im.href, { depth: 100 })
-    anim.save_json('/tmp/parse1.json')
-    anim.save_html('/tmp/parse1.html');
+    anim.save_json('/tmp/ts-tspan.json')
+    anim.save_html('/tmp/ts-tspan.html');
     {
         const poly = anim.view.add_polygon();
         console.log('marker_start', poly.marker_start.get_value(0));

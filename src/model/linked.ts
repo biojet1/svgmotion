@@ -138,9 +138,11 @@ export class Parent extends Node {
         }
     }
 
-    insert_before(child: Node | undefined, ...nodes: Array<Node>) {
+    insert_before(child: Node | undefined | true, ...nodes: Array<Node>) {
         if (child == undefined) {
             child = this._end;
+        } else if (child === true) {
+            child = this.first_child() ?? this._end;
         }
         if (child._parent !== this) {
             throw new Error("child not found");

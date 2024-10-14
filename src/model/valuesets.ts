@@ -155,57 +155,33 @@ export class Stroke extends ValueSet {
     get width() {
         return this._new_field("width", new LengthValue(1));
     }
-    set width(v: LengthValue) {
-        this._new_field("width", v);
-    }
     /// opacity
     get opacity() {
         return this._new_field("opacity", new PercentageValue(1));
-    }
-    set opacity(v: PercentageValue) {
-        this._new_field("opacity", v);
     }
     /// color
     get color() {
         return this._new_field("color", new RGBValue([0, 0, 0]));
     }
-    set color(v: RGBValue) {
-        this._new_field("color", v);
-    }
     /// stroke-miterlimit
     get miter_limit() {
         return this._new_field("miter_limit", new LengthValue(4));
-    }
-    set miter_limit(v: LengthValue) {
-        this._new_field("miter_limit", v);
     }
     // stroke-dashoffset
     get dash_offset() {
         return this._new_field("dash_offset", new LengthValue(1));
     }
-    set dash_offset(v: LengthValue) {
-        this._new_field("dash_offset", v);
-    }
     // stroke-dasharray
     get dash_array() {
         return this._new_field("dash_array", new VectorValue([1, 1]));
     }
-    set dash_array(v: VectorValue) {
-        this._new_field("dash_array", v);
-    }
     // stroke-linecap
-    get linecap() {
+    get line_cap() {
         return this._new_field("linecap", new TextValue('butt'));
     }
-    set linecap(v: TextValue) {
-        this._new_field("linecap", v);
-    }
     // stroke-linejoin
-    get linejoin() {
+    get line_join() {
         return this._new_field("linejoin", new TextValue('miter'));
-    }
-    set linejoin(v: TextValue) {
-        this._new_field("linejoin", v);
     }
 }
 
