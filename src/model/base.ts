@@ -5,7 +5,7 @@ import { Animatable } from "./value.js";
 import { Fill, Transform, xset, xget, Font, Stroke, ValueSet } from "./valuesets.js";
 
 /// @@@ //////////
-export class TextData extends Node {
+export class Chars extends Node {
     id?: string;
     get content() {
         return xget(this, "content", new TextValue(''));

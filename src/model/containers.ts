@@ -2,7 +2,7 @@ import { BoundingBox, Matrix } from "../geom/index.js";
 import { Keyframe } from "../keyframe/keyframe.js";
 import { Animatable, TextValue, LengthValue, LengthXValue, LengthYValue } from "./value.js";
 import { ValueSet, ViewBox } from "./valuesets.js";
-import { Element, TextData } from "./base.js";
+import { Element, Chars } from "./base.js";
 import { Node } from "../tree/linked3.js";
 
 export class Container extends Element {
@@ -43,7 +43,7 @@ export class Container extends Element {
     }
     // tree
 
-    _find_node<T>(x: number | string = 0, K: { new(...args: any[]): T; }): T | void {
+    find_node<T>(x: number | string = 0, K: { new(...args: any[]): T; }): T | void {
         if (typeof x == "number") {
             for (const n of enum_node_type(this, K)) {
                 if (!(x-- > 0)) {
@@ -61,11 +61,11 @@ export class Container extends Element {
             }
         }
     }
-    _get_node<T>(
+    get_node<T>(
         x: number | string = 0,
         K: { new(...args: any[]): T }
     ): T {
-        const n = this._find_node(x, K);
+        const n = this.find_node(x, K);
         if (n) {
             return n;
         }
@@ -82,11 +82,11 @@ export class Container extends Element {
             }
         } while (cur !== end && (cur = cur._next));
     }
-    get_data(x: number) {
-        return this._get_node(x, TextData);
+    get_chars(x: number) {
+        return this.get_node(x, Chars);
     }
     get_element(x: number | string = 0) {
-        return this._get_node(x, Element);
+        return this.get_node(x, Element);
     }
     // geom
     bbox_of(frame: number, ...args: Element[]) {
@@ -118,7 +118,7 @@ function* enum_node_type<T>(that: Container, x: { new(...args: any[]): T }) {
     const { _start, _end: end } = that;
     let cur: typeof _start | undefined = _start;
     do {
-        if (cur instanceof Element || cur instanceof TextData) {
+        if (cur instanceof Element || cur instanceof Chars) {
             if (cur instanceof x) {
                 yield cur;
             }

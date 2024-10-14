@@ -2,7 +2,7 @@ import { Stepper } from "../../track/stepper.js";
 import { Node } from "../../tree/linked3.js";
 import { ScalarValue, PointsValue, TextValue, Animatable, VectorValue } from "../value.js";
 import { Transform, Fill, ViewBox, Font, Stroke, ValueSet } from "../valuesets.js";
-import { Element, TextData } from "../base.js";
+import { Element, Chars } from "../base.js";
 import { Root } from "../root.js";
 import { Container } from "../containers.js";
 
@@ -132,59 +132,59 @@ const PROP_MAP: {
     }
 };
 /* <INSERT name-to-attr.ins.ts > */
-const name_to_attr: {
-    [key: string]: string;
-} = {
-    "width": "width",
-    "height": "height",
-    "x": "x",
-    "y": "y",
-    "ref_x": "refX",
-    "ref_y": "refY",
-    "view_box": "",
-    "href": "href",
-    "pattern_units": "patternUnits",
-    "pattern_content_units": "patternContentUnits",
-    "pattern_transform": "patternTransform",
-    "marker_units": "markerUnits",
-    "marker_width": "markerWidth",
-    "marker_height": "markerHeight",
-    "orient": "orient",
-    "clip_path_units": "clipPathUnits",
-    "mask_units": "maskUnits",
-    "mask_content_units": "maskContentUnits",
-    "zoom_pan": "zoomAndPan",
-    "fit_view": "preserveAspectRatio",
-    "cross_origin": "crossorigin",
-    "std_dev": "stdDeviation",
-    "dx": "dx",
-    "dy": "dy",
-    "input": "in",
-    "edge_mode": "edgeMode",
-    "spread": "spreadMethod",
-    "gradient_units": "gradientUnits",
-    "gradient_transform": "gradientTransform",
-    "x1": "x1",
-    "y1": "y1",
-    "x2": "x2",
-    "y2": "y2",
-    "type": "type",
-    "r": "r",
-    "cx": "cx",
-    "cy": "cy",
-    "fx": "fx",
-    "fy": "fy",
-    "fr": "fr",
-    "offset": "offset",
-    "color": "stop-color",
-    "path": "path",
-    "marker_start": "marker-start",
-    "marker_mid": "marker-mid",
-    "marker_end": "marker-end",
-    "points": "points",
-    "rx": "rx",
-    "ry": "ry",
-    "d": "d"
+const name_to_attr : {
+    [key: string]: string
+}  = {
+ "width": "width",
+ "height": "height",
+ "x": "x",
+ "y": "y",
+ "ref_x": "refX",
+ "ref_y": "refY",
+ "view_box": "",
+ "href": "href",
+ "pattern_units": "patternUnits",
+ "pattern_content_units": "patternContentUnits",
+ "pattern_transform": "patternTransform",
+ "marker_units": "markerUnits",
+ "marker_width": "markerWidth",
+ "marker_height": "markerHeight",
+ "orient": "orient",
+ "clip_path_units": "clipPathUnits",
+ "mask_units": "maskUnits",
+ "mask_content_units": "maskContentUnits",
+ "zoom_pan": "zoomAndPan",
+ "fit_view": "preserveAspectRatio",
+ "cross_origin": "crossorigin",
+ "std_dev": "stdDeviation",
+ "dx": "dx",
+ "dy": "dy",
+ "input": "in",
+ "edge_mode": "edgeMode",
+ "spread": "spreadMethod",
+ "gradient_units": "gradientUnits",
+ "gradient_transform": "gradientTransform",
+ "x1": "x1",
+ "y1": "y1",
+ "x2": "x2",
+ "y2": "y2",
+ "type": "type",
+ "r": "r",
+ "cx": "cx",
+ "cy": "cy",
+ "fx": "fx",
+ "fy": "fy",
+ "fr": "fr",
+ "offset": "offset",
+ "color": "stop-color",
+ "path": "path",
+ "marker_start": "marker-start",
+ "marker_mid": "marker-mid",
+ "marker_end": "marker-end",
+ "points": "points",
+ "rx": "rx",
+ "ry": "ry",
+ "d": "d"
 };
 /* </INSERT> */
 function update_dom(frame: number, target: Element) {
@@ -218,7 +218,7 @@ function update_dom(frame: number, target: Element) {
 const NS_SVG = "http://www.w3.org/2000/svg";
 
 declare module "../base" {
-    interface TextData {
+    interface Chars {
         _element?: Text;
         to_dom(doc: typeof SVGElement.prototype.ownerDocument): Text;
         update_dom(frame: number): void;
@@ -271,7 +271,7 @@ Element.prototype.to_dom = function (doc: typeof SVGElement.prototype.ownerDocum
     return set_svg(e, this);
 }
 
-TextData.prototype.to_dom = function (doc: typeof SVGElement.prototype.ownerDocument) {
+Chars.prototype.to_dom = function (doc: typeof SVGElement.prototype.ownerDocument) {
     return (this._element = doc.createTextNode(this.content.get_value(0)));
 }
 
@@ -290,7 +290,7 @@ Root.prototype.update_dom = function (frame: number) {
     update_dom(frame, this);
 }
 
-TextData.prototype.update_dom = function (frame: number) {
+Chars.prototype.update_dom = function (frame: number) {
     // TODO: this function not called
     const elem: Text = (this as any)._element;
     if (elem) {

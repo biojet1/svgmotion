@@ -1,6 +1,6 @@
 import { Animatable } from "../value.js";
 import { ValueSet } from "../valuesets.js";
-import { TextData, Element } from "../base.js";
+import { Chars, Element } from "../base.js";
 import { Container } from "../containers.js";
 import { Root, PlainRoot, PlainNode } from "../root.js";
 
@@ -18,7 +18,7 @@ declare module "../containers" {
 }
 
 declare module "../base" {
-    interface TextData {
+    interface Chars {
         dump(): any;
     }
     interface Element {
@@ -83,7 +83,7 @@ Root.prototype.dump = function (): PlainRoot {
     };
 }
 
-TextData.prototype.dump = function (): any {
+Chars.prototype.dump = function (): any {
     const d = this.content.dump();
     (d as any).tag = "$";
     return d;

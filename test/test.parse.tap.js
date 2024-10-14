@@ -84,7 +84,7 @@ test.test("parse_svg", async (t) => {
     }
     const ts = anim.get_tspan(0);
     const g = anim.get_group(0);
-    const c = ts.get_data(0).content;
+    const c = ts.get_chars(0).content;
     // console.dir(ts.dx);
     console.log(`get_font_size ${ts.get_font_size()}`);
 

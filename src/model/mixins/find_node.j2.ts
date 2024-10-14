@@ -11,9 +11,9 @@ declare module "../containers" {
 
 /*% for kind, e in elements.items() %*/
 Container.prototype.get_/*{ e.name }*/ = function (x: number | string = 0) {
-    /*{ 'return this._get_node(x, ' ~ kind ~ ');' }*/
+    /*{ 'return this.get_node(x, ' ~ kind ~ ');' }*/
 }
 Container.prototype.find_/*{ e.name }*/ = function (x: number | string = 0): /*{ e.kind }*/ | void {
-    /*{ 'return this._find_node(x, ' ~ kind ~ ');' }*/
+    /*{ 'return this.find_node(x, ' ~ kind ~ ');' }*/
 }
 /*% endfor %*/

@@ -68,171 +68,171 @@ declare module "../containers" {
 }
 
 Container.prototype.get_group = function (x: number | string = 0) {
-    return this._get_node(x, Group);
+    return this.get_node(x, Group);
 }
 Container.prototype.find_group = function (x: number | string = 0): Group | void {
-    return this._find_node(x, Group);
+    return this.find_node(x, Group);
 }
 Container.prototype.get_defs = function (x: number | string = 0) {
-    return this._get_node(x, Defs);
+    return this.get_node(x, Defs);
 }
 Container.prototype.find_defs = function (x: number | string = 0): Defs | void {
-    return this._find_node(x, Defs);
+    return this.find_node(x, Defs);
 }
 Container.prototype.get_filter = function (x: number | string = 0) {
-    return this._get_node(x, Filter);
+    return this.get_node(x, Filter);
 }
 Container.prototype.find_filter = function (x: number | string = 0): Filter | void {
-    return this._find_node(x, Filter);
+    return this.find_node(x, Filter);
 }
 Container.prototype.get_symbol = function (x: number | string = 0) {
-    return this._get_node(x, Symbol);
+    return this.get_node(x, Symbol);
 }
 Container.prototype.find_symbol = function (x: number | string = 0): Symbol | void {
-    return this._find_node(x, Symbol);
+    return this.find_node(x, Symbol);
 }
 Container.prototype.get_pattern = function (x: number | string = 0) {
-    return this._get_node(x, Pattern);
+    return this.get_node(x, Pattern);
 }
 Container.prototype.find_pattern = function (x: number | string = 0): Pattern | void {
-    return this._find_node(x, Pattern);
+    return this.find_node(x, Pattern);
 }
 Container.prototype.get_marker = function (x: number | string = 0) {
-    return this._get_node(x, Marker);
+    return this.get_node(x, Marker);
 }
 Container.prototype.find_marker = function (x: number | string = 0): Marker | void {
-    return this._find_node(x, Marker);
+    return this.find_node(x, Marker);
 }
 Container.prototype.get_clip_path = function (x: number | string = 0) {
-    return this._get_node(x, ClipPath);
+    return this.get_node(x, ClipPath);
 }
 Container.prototype.find_clip_path = function (x: number | string = 0): ClipPath | void {
-    return this._find_node(x, ClipPath);
+    return this.find_node(x, ClipPath);
 }
 Container.prototype.get_mask = function (x: number | string = 0) {
-    return this._get_node(x, Mask);
+    return this.get_node(x, Mask);
 }
 Container.prototype.find_mask = function (x: number | string = 0): Mask | void {
-    return this._find_node(x, Mask);
+    return this.find_node(x, Mask);
 }
 Container.prototype.get_view = function (x: number | string = 0) {
-    return this._get_node(x, ViewPort);
+    return this.get_node(x, ViewPort);
 }
 Container.prototype.find_view = function (x: number | string = 0): ViewPort | void {
-    return this._find_node(x, ViewPort);
+    return this.find_node(x, ViewPort);
 }
 Container.prototype.get_use = function (x: number | string = 0) {
-    return this._get_node(x, Use);
+    return this.get_node(x, Use);
 }
 Container.prototype.find_use = function (x: number | string = 0): Use | void {
-    return this._find_node(x, Use);
+    return this.find_node(x, Use);
 }
 Container.prototype.get_image = function (x: number | string = 0) {
-    return this._get_node(x, Image);
+    return this.get_node(x, Image);
 }
 Container.prototype.find_image = function (x: number | string = 0): Image | void {
-    return this._find_node(x, Image);
+    return this.find_node(x, Image);
 }
 Container.prototype.get_fe_drop_shadow = function (x: number | string = 0) {
-    return this._get_node(x, FEDropShadow);
+    return this.get_node(x, FEDropShadow);
 }
 Container.prototype.find_fe_drop_shadow = function (x: number | string = 0): FEDropShadow | void {
-    return this._find_node(x, FEDropShadow);
+    return this.find_node(x, FEDropShadow);
 }
 Container.prototype.get_fe_gaussian_blur = function (x: number | string = 0) {
-    return this._get_node(x, FEGaussianBlur);
+    return this.get_node(x, FEGaussianBlur);
 }
 Container.prototype.find_fe_gaussian_blur = function (x: number | string = 0): FEGaussianBlur | void {
-    return this._find_node(x, FEGaussianBlur);
+    return this.find_node(x, FEGaussianBlur);
 }
 Container.prototype.get_linear_gradient = function (x: number | string = 0) {
-    return this._get_node(x, LinearGradient);
+    return this.get_node(x, LinearGradient);
 }
 Container.prototype.find_linear_gradient = function (x: number | string = 0): LinearGradient | void {
-    return this._find_node(x, LinearGradient);
+    return this.find_node(x, LinearGradient);
 }
 Container.prototype.get_meshgradient = function (x: number | string = 0) {
-    return this._get_node(x, MeshGradient);
+    return this.get_node(x, MeshGradient);
 }
 Container.prototype.find_meshgradient = function (x: number | string = 0): MeshGradient | void {
-    return this._find_node(x, MeshGradient);
+    return this.find_node(x, MeshGradient);
 }
 Container.prototype.get_meshpatch = function (x: number | string = 0) {
-    return this._get_node(x, MeshPatch);
+    return this.get_node(x, MeshPatch);
 }
 Container.prototype.find_meshpatch = function (x: number | string = 0): MeshPatch | void {
-    return this._find_node(x, MeshPatch);
+    return this.find_node(x, MeshPatch);
 }
 Container.prototype.get_meshrow = function (x: number | string = 0) {
-    return this._get_node(x, MeshRow);
+    return this.get_node(x, MeshRow);
 }
 Container.prototype.find_meshrow = function (x: number | string = 0): MeshRow | void {
-    return this._find_node(x, MeshRow);
+    return this.find_node(x, MeshRow);
 }
 Container.prototype.get_radial_gradient = function (x: number | string = 0) {
-    return this._get_node(x, RadialGradient);
+    return this.get_node(x, RadialGradient);
 }
 Container.prototype.find_radial_gradient = function (x: number | string = 0): RadialGradient | void {
-    return this._find_node(x, RadialGradient);
+    return this.find_node(x, RadialGradient);
 }
 Container.prototype.get_stop = function (x: number | string = 0) {
-    return this._get_node(x, Stop);
+    return this.get_node(x, Stop);
 }
 Container.prototype.find_stop = function (x: number | string = 0): Stop | void {
-    return this._find_node(x, Stop);
+    return this.find_node(x, Stop);
 }
 Container.prototype.get_circle = function (x: number | string = 0) {
-    return this._get_node(x, Circle);
+    return this.get_node(x, Circle);
 }
 Container.prototype.find_circle = function (x: number | string = 0): Circle | void {
-    return this._find_node(x, Circle);
+    return this.find_node(x, Circle);
 }
 Container.prototype.get_polyline = function (x: number | string = 0) {
-    return this._get_node(x, Polyline);
+    return this.get_node(x, Polyline);
 }
 Container.prototype.find_polyline = function (x: number | string = 0): Polyline | void {
-    return this._find_node(x, Polyline);
+    return this.find_node(x, Polyline);
 }
 Container.prototype.get_rect = function (x: number | string = 0) {
-    return this._get_node(x, Rect);
+    return this.get_node(x, Rect);
 }
 Container.prototype.find_rect = function (x: number | string = 0): Rect | void {
-    return this._find_node(x, Rect);
+    return this.find_node(x, Rect);
 }
 Container.prototype.get_line = function (x: number | string = 0) {
-    return this._get_node(x, Line);
+    return this.get_node(x, Line);
 }
 Container.prototype.find_line = function (x: number | string = 0): Line | void {
-    return this._find_node(x, Line);
+    return this.find_node(x, Line);
 }
 Container.prototype.get_ellipse = function (x: number | string = 0) {
-    return this._get_node(x, Ellipse);
+    return this.get_node(x, Ellipse);
 }
 Container.prototype.find_ellipse = function (x: number | string = 0): Ellipse | void {
-    return this._find_node(x, Ellipse);
+    return this.find_node(x, Ellipse);
 }
 Container.prototype.get_path = function (x: number | string = 0) {
-    return this._get_node(x, Path);
+    return this.get_node(x, Path);
 }
 Container.prototype.find_path = function (x: number | string = 0): Path | void {
-    return this._find_node(x, Path);
+    return this.find_node(x, Path);
 }
 Container.prototype.get_polygon = function (x: number | string = 0) {
-    return this._get_node(x, Polygon);
+    return this.get_node(x, Polygon);
 }
 Container.prototype.find_polygon = function (x: number | string = 0): Polygon | void {
-    return this._find_node(x, Polygon);
+    return this.find_node(x, Polygon);
 }
 Container.prototype.get_tspan = function (x: number | string = 0) {
-    return this._get_node(x, TSpan);
+    return this.get_node(x, TSpan);
 }
 Container.prototype.find_tspan = function (x: number | string = 0): TSpan | void {
-    return this._find_node(x, TSpan);
+    return this.find_node(x, TSpan);
 }
 Container.prototype.get_text = function (x: number | string = 0) {
-    return this._get_node(x, Text);
+    return this.get_node(x, Text);
 }
 Container.prototype.find_text = function (x: number | string = 0): Text | void {
-    return this._find_node(x, Text);
+    return this.find_node(x, Text);
 }
 /* </INSERT> */

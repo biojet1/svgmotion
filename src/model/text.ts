@@ -1,5 +1,5 @@
 import { Node } from "../tree/linked3.js";
-import { TextData } from "./base.js";
+import { Chars } from "./base.js";
 import { LengthXValue, LengthYValue } from "./value.js";
 import { Container } from "./containers.js";
 
@@ -12,13 +12,13 @@ export class Text extends Container {
     get dy() { return this._new_field("dy", new LengthYValue(0)); }
     ///
     add_chars(text: string, before?: Node) {
-        const n = new TextData();
+        const n = new Chars();
         // n.data = text;
         n.content.set_value(text);
         this.insert_before(before ?? this._end, n);
     }
     add_content(before?: Node) {
-        const n = new TextData();
+        const n = new Chars();
         this.insert_before(before ?? this._end, n);
         return n;
     }

@@ -1,4 +1,4 @@
-import { Element, TextData } from "../base.js";
+import { Element, Chars } from "../base.js";
 import { Container, Symbol, Group, ClipPath, Marker, Mask, Pattern, Filter } from "../containers.js";
 import { ViewPort } from "../viewport.js";
 import { Use, Image } from "../elements.js";
