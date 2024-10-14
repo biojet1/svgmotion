@@ -1,7 +1,7 @@
 declare module "../containers" {
     interface Container {
-        /*% for e in elements %*/
-        add_/*{ e.name }*/(params?: AddOpt)/*{ ': ' ~ e.kind }*/;
+        /*% for kind, e in elements.items() %*/
+        add_/*{ e.name }*/(params?: AddOpt)/*{ ': ' ~ kind }*/;
         /*% endfor %*/
         ////
         _add_element(name: string): Element;
@@ -9,14 +9,14 @@ declare module "../containers" {
 }
 
 // Container.prototype.add_...
-/*% for e in elements %*/
-Container.prototype.add_/*{ e.name }*/ = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = /*{ e.kind }*/.new(etc); this.insert_before(before, x); return x; }
+/*% for kind, e in elements.items() %*/
+Container.prototype.add_/*{ e.name }*/ = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = /*{ kind }*/.new(etc); this.insert_before(before, x); return x; }
 /*% endfor %*/
 
-Container.prototype._add_element = function (tag: string) {
+Container.prototype._add_element = function (tag: string, params?: AddOpt) {
     switch (tag) {
-        /*% for e in elements %*/
-        case "/*{ e.tag }*/": return this.add_/*{ e.name }*/();
+        /*% for kind, e in elements.items() %*/
+        case "/*{ e.tag }*/": return this.add_/*{ e.name }*/(params);
         /*% endfor %*/
     }
     throw new Error("Unexpected tag: " + tag);

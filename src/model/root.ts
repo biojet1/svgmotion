@@ -64,7 +64,7 @@ export class FileAsset extends Asset {
 }
 
 export class Root extends Container {
-    defs: { [key: string]: Element; } = {};
+    // defs: { [key: string]: Element; } = {};
     all: { [key: string]: Element; } = {};
     frame_rate: number = 60;
     version: string = "0.0.1";

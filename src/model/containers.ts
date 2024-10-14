@@ -22,6 +22,33 @@ export class Container extends Element {
         }
     }
 
+
+    _find_node<T>(x: number | string = 0, K: { new(...args: any[]): T; }): T | void {
+        if (typeof x == "number") {
+            for (const n of enum_node_type(this, K)) {
+                if (!(x-- > 0)) {
+                    return n;
+                }
+            }
+        } else {
+            for (const n of enum_node_type(this, K)) {
+                if (n.id === x) {
+                    return n;
+                }
+            }
+        }
+    }
+    _get_node<T>(
+        x: number | string = 0,
+        K: { new(...args: any[]): T }
+    ): T {
+        const n = this._find_node(x, K);
+        if (n) {
+            return n;
+        }
+        throw new Error(`not found ${K.name} '${x}'`);
+    }
+
     *enum_keyframes(): Generator<Array<Keyframe<any>>, void, unknown> {
         for (let v of this.enum_values()) {
             yield v.kfs;
@@ -79,8 +106,25 @@ export class Container extends Element {
         return bb;
     }
 }
+
+function* enum_node_type<T>(that: Container, x: { new(...args: any[]): T }) {
+    const { _start, _end: end } = that;
+    let cur: typeof _start | undefined = _start;
+    do {
+        if (cur instanceof Element) {
+            if (cur instanceof x) {
+                yield cur;
+            }
+        }
+    } while (cur !== end && (cur = cur._next));
+}
+
 export class Group extends Container {
     static override tag = "g";
+}
+
+export class Defs extends Container {
+    static override tag = "defs";
 }
 
 export class Symbol extends Container {
