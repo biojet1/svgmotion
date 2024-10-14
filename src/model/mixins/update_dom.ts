@@ -1,5 +1,5 @@
 import { Stepper } from "../../track/stepper.js";
-import { Node } from "../linked.js";
+import { Node } from "../../tree/linked3.js";
 import { ScalarValue, PointsValue, TextValue, Animatable, VectorValue } from "../value.js";
 import { Transform, Fill, ViewBox, Font, Stroke, ValueSet } from "../valuesets.js";
 import { Element, TextData } from "../base.js";
@@ -133,7 +133,7 @@ const PROP_MAP: {
 };
 /* <INSERT name-to-attr.ins.ts > */
 const name_to_attr: {
-    [key: string]: string
+    [key: string]: string;
 } = {
     "width": "width",
     "height": "height",
@@ -243,9 +243,11 @@ declare module "../containers" {
 }
 
 function set_svg(elem: SVGElement, node: Element): SVGElement {
-    const { id } = node;
-    if (id) {
-        elem.id = id;
+    if (Object.hasOwn(node, 'id')) {
+        const { id } = node;
+        if (id) {
+            elem.id = id;
+        }
     }
     return elem;
 }
@@ -277,18 +279,6 @@ Root.prototype.to_dom = function to_dom(doc: typeof SVGElement.prototype.ownerDo
     const element = this.view.to_dom(doc);
     element.setAttribute("xmlns", "http://www.w3.org/2000/svg");
     element.setAttributeNS("http://www.w3.org/2000/svg", "version", "1.1");
-    // const defs = doc.createElementNS(NS_SVG, "defs");
-    // console.log("Root.prototype.to_dom:");
-    // console.dir(this.defs);
-    // for (let [_n, v] of Object.entries(this.defs)) {
-    //     // console.log("defs appendChild", n);
-    //     // console.dir(v);
-    //     defs.appendChild(v.to_dom(doc));
-    // }
-    // if (defs.firstElementChild) {
-    //     element.insertBefore(defs, element.firstChild);
-    // }
-    // element.setAttribute("version", "2.0");
     return element;
 }
 
@@ -298,7 +288,6 @@ Container.prototype.update_dom = function (frame: number) {
 
 Root.prototype.update_dom = function (frame: number) {
     update_dom(frame, this);
-    // Object.values(this.defs).map((elem) => update_dom(frame, elem));
 }
 
 TextData.prototype.update_dom = function (frame: number) {
@@ -350,7 +339,6 @@ Font.prototype.enum_attibutes = function* (frame: number) {
                 break;
         }
     }
-
 }
 
 Stroke.prototype.enum_attibutes = function* (frame: number) {
@@ -431,7 +419,6 @@ Transform.prototype.enum_attibutes = function* (frame: number) {
         yield { name, value: value }
     }
 }
-
 
 ViewBox.prototype.enum_attibutes = function* (frame: number) {
     let box = false;

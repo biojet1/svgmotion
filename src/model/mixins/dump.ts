@@ -33,10 +33,13 @@ Container.prototype.dump = function () {
             o[k] = v.dump();
         }
     }
-    const { id } = this;
-    if (id) {
-        o.id = id;
+    if (Object.hasOwn(this, 'id')) {
+        const { id } = this;
+        if (id) {
+            o.id = id;
+        }
     }
+
 
     o.nodes = [...this.children<Element>()].map((v) =>
         v.dump()
@@ -51,9 +54,11 @@ Element.prototype.dump = function (): PlainNode {
             o[k] = v.dump();
         }
     }
-    const { id } = this;
-    if (id) {
-        o.id = id;
+    if (Object.hasOwn(this, 'id')) {
+        const { id } = this;
+        if (id) {
+            o.id = id;
+        }
     }
     return o;
 }

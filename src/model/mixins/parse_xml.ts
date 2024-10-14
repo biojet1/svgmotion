@@ -99,22 +99,12 @@ export async function sax_parse_svg(
         }
         parents.push(elem);
     };
-    // parser.onattribute = function (attr: any) {
-    //     console.log('onAttribute: ', attr)
-    // };
     parser.onclosetag = function (_node: any) {
         // console.log("onclosetag", node);
         if (parents.length < 1) {
             throw new Error(``);
         }
-        // parser stream is done, and ready to have more stuff written to it.
-        // console.warn('end of XML');
         parents.pop();
-    };
-    parser.onend = function () {
-        // parser stream is done, and ready to have more stuff written to it.
-        // console.warn('end of XML');
-        // parents.pop();
     };
     parser.write(src);
     return root;
@@ -157,24 +147,6 @@ function sax_walk(elem: SAXElement, parent: Container, attrs: { [key: string]: s
         case "title":
         case "script":
             return;
-        // case "defs":
-        //     {
-        //         // const defs = parent.get_root().defs;
-        //         for (const sub of elem.nodes) {
-        //             if (sub instanceof SAXElement) {
-        //                 const { id } = sub;
-        //                 if (id) {
-        //                     const m = sax_walk(sub, parent.get_root(), attrs);
-        //                     // if (m) {
-        //                     //     m.remove();
-        //                     //     defs[id] = m;
-        //                     // }
-        //                     // break;
-        //                 }
-        //             }
-        //         }
-        //         return;
-        //     }
     }
     const props: { [key: string]: string } = {};
     function* enum_attrs(e: SAXElement) {

@@ -3,57 +3,10 @@ import { Keyframe } from "../keyframe/keyframe.js";
 import { Animatable, TextValue, LengthValue, LengthXValue, LengthYValue } from "./value.js";
 import { ValueSet, ViewBox } from "./valuesets.js";
 import { Element, TextData } from "./base.js";
-import { Node } from "./linked.js";
+import { Node } from "../tree/linked3.js";
 
 export class Container extends Element {
-    // tree
-    override *enum_values(): Generator<Animatable<any>, void, unknown> {
-        for (let v of Object.values(this)) {
-            if (v instanceof Animatable) {
-                yield v;
-            } else if (v instanceof ValueSet) {
-                yield* v.enum_values();
-            }
-        }
-        for (const sub of this.children<Element>()) {
-            if (sub instanceof Element) {
-                yield* sub.enum_values();
-            }
-        }
-    }
-
-
-    _find_node<T>(x: number | string = 0, K: { new(...args: any[]): T; }): T | void {
-        if (typeof x == "number") {
-            for (const n of enum_node_type(this, K)) {
-                if (!(x-- > 0)) {
-                    return n;
-                }
-            }
-        } else {
-            for (const n of enum_node_type(this, K)) {
-                if (n.id === x) {
-                    return n;
-                }
-            }
-        }
-    }
-    _get_node<T>(
-        x: number | string = 0,
-        K: { new(...args: any[]): T }
-    ): T {
-        const n = this._find_node(x, K);
-        if (n) {
-            return n;
-        }
-        throw new Error(`not found ${K.name} '${x}'`);
-    }
-    get_data(x: number) {
-        return this._get_node(x, TextData);
-    }
-    get_element(x: number | string = 0) {
-        return this._get_node(x, Element);
-    }
+    // keyframes
     *enum_keyframes(): Generator<Array<Keyframe<any>>, void, unknown> {
         for (let v of this.enum_values()) {
             yield v.kfs;
@@ -74,17 +27,66 @@ export class Container extends Element {
         }
         return [min, max];
     }
+    override *enum_values(): Generator<Animatable<any>, void, unknown> {
+        for (let v of Object.values(this)) {
+            if (v instanceof Animatable) {
+                yield v;
+            } else if (v instanceof ValueSet) {
+                yield* v.enum_values();
+            }
+        }
+        for (const sub of this.children<Element>()) {
+            if (sub instanceof Element) {
+                yield* sub.enum_values();
+            }
+        }
+    }
+    // tree
 
+    _find_node<T>(x: number | string = 0, K: { new(...args: any[]): T; }): T | void {
+        if (typeof x == "number") {
+            for (const n of enum_node_type(this, K)) {
+                if (!(x-- > 0)) {
+                    return n;
+                }
+            }
+        } else {
+            for (const n of enum_node_type(this, K)) {
+
+                if (n instanceof Element) {
+                    if (n.id_equals(x)) {
+                        return n
+                    }
+                }
+            }
+        }
+    }
+    _get_node<T>(
+        x: number | string = 0,
+        K: { new(...args: any[]): T }
+    ): T {
+        const n = this._find_node(x, K);
+        if (n) {
+            return n;
+        }
+        throw new Error(`not found ${K.name} '${x}'`);
+    }
     get_id(id: string) {
         const { _start, _end: end } = this;
         let cur: Node | undefined = _start;
         do {
             if (cur instanceof Element) {
-                if (cur.id === id) {
+                if (cur.id_equals(id)) {
                     return cur;
                 }
             }
         } while (cur !== end && (cur = cur._next));
+    }
+    get_data(x: number) {
+        return this._get_node(x, TextData);
+    }
+    get_element(x: number | string = 0) {
+        return this._get_node(x, Element);
     }
     // geom
     bbox_of(frame: number, ...args: Element[]) {

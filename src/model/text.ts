@@ -1,4 +1,4 @@
-import { Node } from "./linked.js";
+import { Node } from "../tree/linked3.js";
 import { TextData } from "./base.js";
 import { LengthXValue, LengthYValue } from "./value.js";
 import { Container } from "./containers.js";

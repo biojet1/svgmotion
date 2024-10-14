@@ -322,7 +322,14 @@ export class RGBValue extends VectorValue {
         }
         throw new Error(`Invalid color "${x}"`);
     };
+    override set_value(value: Vector | any): void {
+        if (value == "none") {
+            this.value = value;
+        } else {
+            super.set_value(value);
+        }
 
+    }
 
     override value_repr(value: Vector): string {
         return RGBValue.to_css_rgb(value);

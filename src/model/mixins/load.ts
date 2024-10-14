@@ -89,22 +89,6 @@ Root.prototype.load = function (src: PlainRoot) {
             }
         }
     }
-    // {
-    //     this.defs = {};
-    //     if (defs) {
-    //         // console.log("defs:", defs);
-    //         Object.entries(defs).map(([k, v]) => {
-    //             // console.dir(v);
-    //             const node = load_node(v, this);
-    //             if (node.id !== k) {
-    //                 throw new Error(``);
-    //             }
-    //             node._detach();
-    //             this.defs[k] = node;
-    //         });
-    //     }
-    //     // console.log("DEFS:", this.defs);
-    // }
     this.version = version;
     this.sounds = [];
     if (sounds) {

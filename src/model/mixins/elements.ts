@@ -3,7 +3,7 @@ import { Element } from "../base.js";
 import { Root } from "../root.js";
 import { Container, Group } from "../containers.js";
 import { ViewPort } from "../viewport.js";
-import { Parent } from "../linked.js";
+import { Parent } from "../../tree/linked3.js";
 
 
 declare module "../base" {

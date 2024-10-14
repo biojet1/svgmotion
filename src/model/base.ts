@@ -1,5 +1,5 @@
 import { Matrix, BoundingBox } from "../geom/index.js";
-import { Node, Parent } from "./linked.js";
+import { Node, Parent } from "../tree/linked3.js";
 import { TextValue, PercentageValue, FontSizeValue, LengthValue } from "./value.js";
 import { Animatable } from "./value.js";
 import { Fill, Transform, xset, xget, Font, Stroke, ValueSet } from "./valuesets.js";
@@ -22,13 +22,6 @@ export class Element extends Parent {
     static tag = '?';
     static _prop_attr: { [key: string]: string } = {};
     // tree
-    *ancestors() {
-        let top = this._parent;
-        while (top) {
-            yield top
-            top = top._parent;
-        }
-    }
     *enum_values(): Generator<Animatable<any>, void, unknown> {
         for (let v of Object.values(this)) {
             if (v instanceof Animatable) {
@@ -96,6 +89,9 @@ export class Element extends Parent {
     }
     set id(id: string) {
         xget(this, "id", id);
+    }
+    id_equals(id: string) {
+        return Object.hasOwn(this, 'id') && this.id == id;
     }
 
     /// FILL

@@ -99,6 +99,14 @@ export class Node {
     remove() {
         this._detach();
     }
+
+    *ancestors() {
+        let parent = this._parent;
+        while (parent) {
+            yield parent;
+            parent = parent._parent;
+        }
+    }
 }
 
 export class Parent extends Node {

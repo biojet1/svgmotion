@@ -172,9 +172,6 @@ Element.prototype.set_attribute = function (name: string, value: string): Elemen
             }
             break;
         /// ETC //////////
-        case "shape-inside":
-        case "paint-order":
-            break;
         default:
 
             if (name.startsWith("data-")) {
@@ -182,7 +179,7 @@ Element.prototype.set_attribute = function (name: string, value: string): Elemen
                 return this;
             }
             for (const [n, a] of Object.entries(Element._prop_attr)) {
-                console.log("SET", n, a, name)
+                // console.log("SET", n, a, name)
                 if (a == name) {
                     const f = (this as any)[n];
                     if (f instanceof Animatable) {

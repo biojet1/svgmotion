@@ -41,5 +41,6 @@ test.test("linearGradient", async (t) => {
   t1.run(Add(st1.offset, -.2), Add(st2.offset, .1))
   root.save_json('/tmp/ts-linearGradient.json')
   root.save_html('/tmp/ts-linearGradient.html');
+  root.view.add_circle({ fill: { color: 'none' } })
   t.end();
 });
