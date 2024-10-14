@@ -1,7 +1,7 @@
 "uses strict";
 import test from "tap";
 
-import { Node, Parent } from "../dist/model/linked.js";
+import { Node, Parent } from "../dist/tree/linked3.js";
 
 class Unit extends Parent {
     constructor(v) {
