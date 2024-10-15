@@ -18,7 +18,7 @@ test.test("Track2", (t) => {
 
 test.test("Keyframe", (t) => {
     let x = new Rect();
-    let tr = x.transform = new Transform();
+    let tr = x.transform;
     tr.rotation = new ScalarValue(30);
     tr.rotation.key_value(30, 10);
     // console.info(tr.dump());

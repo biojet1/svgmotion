@@ -64,6 +64,9 @@ export class ValueSet {
         throw new Error(`Not implemented (${frame})`);
     }
 
+    *enum_updates(): Generator<{ attr: string; value?: string; call?: (frame: number) => string }, void, unknown> {
+        throw new Error(`Not implemented`);
+    }
     *enum_values(): Generator<Animatable<any>, void, unknown> {
         for (const sub of Object.values(this)) {
             if (sub instanceof Animatable) {
@@ -90,7 +93,7 @@ export class ValueSet {
             }
         }
     }
-    get_repr(frame: number): string {
+    get_repr(_frame: number): string {
         throw new Error(`Not implemented`);
     }
 }
@@ -127,7 +130,7 @@ export class ViewBox extends ValueSet {
         this._new_field("fit", v);
     }
     // repr
-    get_repr(frame: number): string {
+    override get_repr(frame: number): string {
         const s = this.size.get_value(frame);
         const p = this.position.get_value(frame);
         return `${p[0]} ${p[1]} ${s[0]} ${s[1]}`;
@@ -315,7 +318,7 @@ export class Transform extends ValueSet {
             }
         }
     }
-    get_repr(frame: number) {
+    override get_repr(frame: number) {
         if ('all' in this) {
             return _get_repr(this.all, frame);
         }

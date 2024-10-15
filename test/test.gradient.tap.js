@@ -31,12 +31,12 @@ test.test("linearGradient", async (t) => {
   const lg1 = root.get_linear_gradient();
   const st1 = lg1.get_stop(0);
   const st2 = lg1.get_stop(1);
-  root.at(0).run(Rel(0).to(st1.color, "blue").at(0.5)
-    .to(st1.color, "green").at(1)
-    .to(st1.color, "grey"))
-  root.at(0).run(Rel(0).to(st2.color, "grey").at(0.5)
-    .to(st2.color, "red").at(1)
-    .to(st2.color, "blue"))
+  root.at(0).run(Rel(0).to(st1.stop_color, "blue").at(0.5)
+    .to(st1.stop_color, "green").at(1)
+    .to(st1.stop_color, "grey"))
+  root.at(0).run(Rel(0).to(st2.stop_color, "grey").at(0.5)
+    .to(st2.stop_color, "red").at(1)
+    .to(st2.stop_color, "blue"))
   t1.run(Add(st1.offset, .3), Add(st2.offset, -.4))
   t1.run(Add(st1.offset, -.2), Add(st2.offset, .1))
   root.save_json('/tmp/ts-linearGradient.json')

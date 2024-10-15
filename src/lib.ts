@@ -9,6 +9,7 @@ export * from "./model/mixins/geom.js";
 export * from "./model/mixins/load.js";
 export * from "./model/mixins/add_elements.js";
 export * from "./model/mixins/update_dom.js";
+export * from "./model/mixins/update_dom_2.js";
 export * from "./model/mixins/find_node.js";
 export * from "./model/mixins/image.js";
 export * from "./model/mixins/sound.js";

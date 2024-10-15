@@ -13,6 +13,7 @@ interface AddOpt {
 /* <INSERT add_elements.ins.ts > */
 declare module "../containers" {
     interface Container {
+        add_?(params?: AddOpt): Element;
         add_group(params?: AddOpt): Group;
         add_defs(params?: AddOpt): Defs;
         add_filter(params?: AddOpt): Filter;

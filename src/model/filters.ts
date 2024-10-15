@@ -9,7 +9,7 @@ export class FilterBase extends Element {
 export class Stop extends Element {
     static override tag = "stop";
     get offset() { return this._new_field("offset", new PercentageValue(1.0)); }
-    get color() { return this._new_field("color", new RGBValue([0, 0, 0])); }
+    get stop_color() { return this._new_field("stop_color", new RGBValue([0, 0, 0])); }
     get path() { return this._new_field("path", new TextValue('')); }
 }
 
@@ -30,31 +30,9 @@ export class FEDropShadow extends FilterBase {
     get input() { return this._new_field("input", new TextValue('')); }
 }
 
-export class Gradient extends Container {
-    ///
-    get spread() {
-        return this._new_field("spread", new TextValue('pad'));
-    }
-    set spread(v: TextValue) {
-        this._new_field("spread", v);
-    }
-    ///
-    get gradient_units() {
-        return this._new_field("gradient_units", new TextValue("objectBoundingBox"));
-    }
-    set gradient_units(v: TextValue) {
-        this._new_field("gradient_units", v);
-    }
-    /// href
-    get href() {
-        return this._new_field("href", new TextValue(''));
-    }
-    set href(v: TextValue) {
-        this._new_field("href", v);
-    }
-}
 
-export class LinearGradient extends Gradient {
+
+export class LinearGradient extends Container {
     static override tag = "linearGradient";
     get href() { return this._new_field("href", new TextValue('')); }
     get spread() { return this._new_field("spread", new TextValue('pad')); }
@@ -66,7 +44,7 @@ export class LinearGradient extends Gradient {
     get y2() { return this._new_field("y2", new PercentageValue(0)); }
 }
 
-export class RadialGradient extends Gradient {
+export class RadialGradient extends Container {
     static override tag = "radialGradient";
     get href() { return this._new_field("href", new TextValue('')); }
     get spread() { return this._new_field("spread", new TextValue('pad')); }

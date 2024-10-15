@@ -1,9 +1,8 @@
 import { Track } from "../track/index.js";
 import { AudioChain } from "../utils/sound.js";
-import { Animatable } from "./value.js";
 import { xget, xset } from "./valuesets.js";
 import { Element } from "./base.js";
-import { Container, Filter } from "./containers.js";
+import { Container } from "./containers.js";
 import { ViewPort } from "./viewport.js";
 
 export class AnimTrack extends Track {
@@ -116,12 +115,10 @@ export class Root extends Container {
         return this.assets[id] = a;
     }
     //
-    static _load_svg(src: string): Promise<Root> {
+    static _load_svg(_src: string): Promise<Root> {
         throw new Error(`Not implemented`)
     }
-    static _parse_svg(src: string): Promise<Root> {
+    static _parse_svg(_src: string): Promise<Root> {
         throw new Error(`Not implemented`)
     }
-
-
 }

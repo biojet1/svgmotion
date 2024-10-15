@@ -1,7 +1,9 @@
-import { Root } from "./model/root.js";
 
+import { Root } from "./model/root.js";
 export * from "./model/index.js";
 export * from "./model/mixins/update_dom.js";
+import { updater_dom } from "./model/mixins/update_dom_2.js";
+import { Stepper } from "./track/stepper.js";
 export * from "./model/mixins/add_elements.js";
 export * from "./model/mixins/load.js";
 
@@ -36,8 +38,7 @@ export function animate(anim: Root, fps: number) {
     }
 }
 
-export function animate2(root: Root, fps: number) {
-    const st = root.stepper();
+export function animate2(st: Stepper, fps: number) {
     if (st.start < st.end) {
 
         const mspf = 1000 / fps; // miliseconds per frame
@@ -81,12 +82,24 @@ Root.prototype.animate = function ({ fps = 60, parent }) {
     if (typeof parent === 'string') {
         parent = document.getElementById(parent);
     }
-    if (parent) {
-        let svg = this.to_dom(document);
-        parent.appendChild(svg);
+    if (0) {
+        if (parent) {
+            let svg = this.to_dom(document);
+            parent.appendChild(svg);
+        }
+        animate(this, fps);
+    } else {
+        if (parent) {
+            let { svg, updates } = updater_dom(this, document);
+            parent.appendChild(svg);
+
+            const [min, max] = this.calc_time_range();
+
+            animate2(Stepper.create(function up(n: number) {
+                for (let u of updates) {
+                    u(n);
+                }
+            }, min, max), fps);
+        }
     }
-    animate(this, fps);
 };
-
-
-

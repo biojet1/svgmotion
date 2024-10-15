@@ -88,14 +88,12 @@ tasks:
 
     add_elements.j2:
         method: checksum
-        deps: [gen.elements]
         sources:
             - src/model/mixins/add_elements.j2.ts
-            - /tmp/elements.json
+            - /tmp/elements-col.json
         generates:
             - /tmp/add_elements.ts
         cmds:
-            # - python3 -m jinjagen -d /tmp/elements.json -D / -i src/model/mixins/add_elements.j2.ts -o /tmp/add_elements.ts
             - python3 -m jinjagen -d /tmp/elements-col.json -D / -i src/model/mixins/add_elements.j2.ts -o /tmp/add_elements.ins.ts
             - python3 -m biojet1.scandir.insert src/model/mixins/ -s /tmp --act
 
