@@ -1,6 +1,6 @@
 import { Matrix, BoundingBox } from "../geom/index.js";
 import { Node, Parent } from "../tree/linked3.js";
-import { TextValue, PercentageValue, FontSizeValue, LengthValue, RGBValue } from "./value.js";
+import { TextValue, PercentageValue, FontSizeValue, LengthValue } from "./value.js";
 import { Animatable } from "./value.js";
 import { Fill, Transform, xset, xget, Font, Stroke, ValueSet } from "./valuesets.js";
 

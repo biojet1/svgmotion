@@ -10,8 +10,6 @@ interface AttUP {
     value?: string;
     call?: (frame: number) => string;
     kfv?: Animatable<any>;
-    // elem?: globalThis.SVGElement
-    // text?: globalThis.Text
 }
 
 declare module "../value" {
@@ -27,9 +25,6 @@ declare module "../valuesets" {
 }
 
 Animatable.prototype.attr_field_updater = function (attr: string) {
-    // if (this.value instanceof string) {
-    //     return { attr, value: this.value.toString(), kfv: (this.kfs.length > 0) ? this : undefined };
-    // }
     return {
         attr,
         value: (typeof this.value === "string") ? this.value : this.value_repr(this.value),
@@ -203,6 +198,7 @@ function element_dom(self: Element,
                 if (sub.content.kfs.length > 0) {
                     add_upd({ kfv: sub.content }, undefined, txt);
                 }
+                elem.appendChild(txt);
             }
         }
     }
@@ -213,7 +209,7 @@ export function updater_dom(root: Root, doc: typeof SVGElement.prototype.ownerDo
     const updates: Array<(frame: number) => void> = [];
     function add_upd(attup: AttUP, elem?: globalThis.SVGElement, text?: globalThis.Text) {
         let { kfv, attr, call, value } = attup;
-        console.log(attr, value, elem?.constructor.name)
+        console.log(attr, value, elem?.constructor.name, text?.constructor.name, kfv)
         if (kfv) {
             if (elem) {
                 if (!attr || text) {
@@ -228,9 +224,9 @@ export function updater_dom(root: Root, doc: typeof SVGElement.prototype.ownerDo
                     throw new Error(``);
                 }
                 value == undefined || (text.textContent = value);
-                updates.push((frame: number) =>
+                updates.push(function (frame: number) {
                     text.textContent = kfv.get_repr(frame)
-                );
+                });
             }
         } else if (call) {
             if (elem) {
