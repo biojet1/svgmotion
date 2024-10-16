@@ -95,6 +95,7 @@ test.test("Tree Linked3", (t) => {
     to_string_check(t, D, 'D(F() E() G())');
     G.place_after(E);
     to_string_check(t, D, 'D(F() G() E())');
+    t.same([...D].map(v => v.value).join(':'), 'F:G:E');
     A.append_child(D);
     to_string_check(t, A, 'A(C() B() D(F() G() E()))');
     E.remove();
@@ -129,5 +130,14 @@ test.test("Tree Linked3", (t) => {
     t.not(B.contains(A));
     t.not(A.contains(I));
     t.same(H.root(), A);
+    t.same(H.root_or_self(), A);
+    t.same(A.root_or_self(), A);
+    t.same([...H.ancestors()].map(v => v.value).join(':'), 'D:A');
+    D.remove_children()
+    to_string_check(t, A, 'A(D() B() C())');
+    A.remove_children()
+    to_string_check(t, A, 'A()');
+    A.prepend_child(B)
+    to_string_check(t, A, 'A(B())');
     t.end();
 });

@@ -1,7 +1,6 @@
 import { Track } from "../track/index.js";
 import { AudioChain } from "../utils/sound.js";
 import { xget, xset } from "./valuesets.js";
-import { Element } from "./base.js";
 import { Container } from "./containers.js";
 import { ViewPort } from "./viewport.js";
 

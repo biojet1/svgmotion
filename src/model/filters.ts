@@ -30,8 +30,6 @@ export class FEDropShadow extends FilterBase {
     get input() { return this._new_field("input", new TextValue('')); }
 }
 
-
-
 export class LinearGradient extends Container {
     static override tag = "linearGradient";
     get href() { return this._new_field("href", new TextValue('')); }
@@ -75,4 +73,3 @@ export class MeshGradient extends Container {
     get type() { return this._new_field("type", new TextValue('bilinear')); }
     get gradient_units() { return this._new_field("gradient_units", new TextValue('objectBoundingBox')); }
 }
-

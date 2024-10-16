@@ -162,10 +162,10 @@ export class Parent extends Node {
         }
     }
     append_child(...nodes: Array<Node>) {
-        this.insert_before(this._end, ...nodes);
+        this.insert_before(undefined, ...nodes);
     }
     prepend_child(...nodes: Array<Node>) {
-        this.insert_before(this._next || this._end, ...nodes);
+        this.insert_before(true, ...nodes);
     }
 
     remove_child(node: Node) {

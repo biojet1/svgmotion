@@ -13,13 +13,12 @@ export class Text extends Container {
     ///
     add_chars(text: string, before?: Node) {
         const n = new Chars();
-        // n.data = text;
         n.content.set_value(text);
-        this.insert_before(before ?? this._end, n);
+        this.insert_before(before, n);
     }
     add_content(before?: Node) {
         const n = new Chars();
-        this.insert_before(before ?? this._end, n);
+        this.insert_before(before, n);
         return n;
     }
 }

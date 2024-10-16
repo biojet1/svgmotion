@@ -26,6 +26,11 @@ test.test("Sound 1", async (t) => {
     // t = t.start_at(3);
     // console.dir([s.dump(), t.dump()], { depth: 100 });
     // console.dir(t, { depth: 100 });
+    console.log(snd4.start_at(5)
+        .fade_in(1, "exp")
+        .fade_out(0.5, "sin").dump())
+    // AudioSource(path="music.mp3", duration=60)
+
 
     {
         let ff = new FFRun();
