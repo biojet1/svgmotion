@@ -171,7 +171,6 @@ function element_dom(self: Element,
     for (let [n, v] of Object.entries(self)) {
         if (n == 'id') {
             elem.id = v.toString();
-
         } else if (v instanceof Animatable) {
             const attr = name_to_attr[n];
             if (!attr) {

@@ -21,10 +21,10 @@ export interface PlainAsset {
     url?: string;
 }
 
-export interface PlainSound {
-    ref: string;
-    filters?: any[];
-}
+// export interface PlainSound {
+//     ref: string;
+//     filters?: any[];
+// }
 
 export interface PlainRoot {
     version: string;
@@ -62,34 +62,37 @@ export class FileAsset extends Asset {
 }
 
 export class Root extends Container {
-    all: { [key: string]: Element; } = {};
     frame_rate: number = 60;
     version: string = "0.0.1";
-    working_dir?: string;
     sounds: AudioChain[] = [];
     assets: { [key: string]: Asset; } = {};
     // view
     get view() {
-        let x = this.first_child();
-        if (x instanceof ViewPort) {
-            return x;
-        } else if (!x) {
-            this.remove_children();
-            x = this.add_view();
+        for (const c of this.children()) {
+            if (c instanceof ViewPort) {
+                return c;
+            }
         }
-        if (x instanceof ViewPort) {
-            return x;
-        }
-        throw new Error("Unexpected");
-
+        const x = new ViewPort();
+        this.append_child(x);
+        return x;
     }
 
     set_view(vp: ViewPort) {
-        this.remove_children();
+        for (const c of this.children()) {
+            if (c instanceof ViewPort) {
+                c.remove();
+            }
+        }
         this.append_child(vp);
     }
+
     override add_view(): ViewPort {
-        this.remove_children();
+        for (const c of this.children()) {
+            if (c instanceof ViewPort) {
+                c.remove();
+            }
+        }
         return super.add_view();
     }
     // etc

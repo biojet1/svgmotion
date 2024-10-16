@@ -83,15 +83,10 @@ export class Element extends Parent {
     }
     // id
     get id() {
-        const id = Math.round(Math.random() * 1E+5).toString(36)
-        xget(this, "id", id);
-        return id;
+        return xget(this, "id", Math.round(Math.random() * 1E+5).toString(36));
     }
     set id(id: string) {
         xget(this, "id", id);
-    }
-    id_equals(id: string) {
-        return Object.hasOwn(this, 'id') && this.id == id;
     }
     /// Properties ////////////
     get transform() { return this._new_field("transform", new Transform()); }

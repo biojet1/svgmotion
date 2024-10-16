@@ -7,8 +7,8 @@ import { Stepper } from "./track/stepper.js";
 export * from "./model/mixins/add_elements.js";
 export * from "./model/mixins/load.js";
 
-export function animate(anim: Root, fps: number) {
-    const [start, end] = anim.calc_time_range();
+export function animate(root: Root, fps: number) {
+    const [start, end] = root.calc_time_range();
     if (start < end) {
 
         const mspf = 1000 / fps; // miliseconds per frame
@@ -21,7 +21,7 @@ export function animate(anim: Root, fps: number) {
                 if ((frame + 1) == frames) {
                     console.info(`${frame} t=${t} frames=${frames} ${start}-${end}`);
                 }
-                anim.update_dom(frame);
+                root.update_dom(frame);
             }
             frame = (frame + 1) % frames;
             const excess = mspf - (performance.now() - t);
@@ -34,7 +34,7 @@ export function animate(anim: Root, fps: number) {
         }
         requestAnimationFrame(render);
     } else {
-        anim.update_dom(0);
+        root.update_dom(0);
     }
 }
 

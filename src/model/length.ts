@@ -21,12 +21,10 @@ class CalcLength {
         return xget(this, "ppi", 96);
     }
     get vw() {
-        const n = this.node.get_vp_width(this.frame);
-        return xget(this, "vw", n);
+        return xget(this, "vw", this.node.get_vp_width(this.frame));
     }
     get vh() {
-        const n = this.node.get_vp_height(this.frame);
-        return xget(this, "vh", n);
+        return xget(this, "vh", this.node.get_vp_height(this.frame));
     }
     get relative_length(): number {
         throw new Error(`Not implemented`);

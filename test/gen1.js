@@ -1,12 +1,11 @@
 import { Root, Rel, Easing, Seq, To } from "svgmotion";
 export async function animate(lib) {
     const sigm = new Easing(1 / 3, 0, 1 - 1 / 3, 1);
-    const anim = new Root();
-    await anim.load_svg("test/shapes.svg");
-    const maru1 = anim.get_circle("maru");
-    const maru2 = anim.get_circle("maru2");
-    const r2 = anim.get_rect("r2");
-    const e1 = anim.get_ellipse(0);
+    const root = await Root._load_svg("test/shapes.svg");
+    const maru1 = root.get_circle("maru");
+    const maru2 = root.get_circle("maru2");
+    const r2 = root.get_rect("r2");
+    const e1 = root.get_ellipse(0);
     delete maru1.cx;
     delete maru1.cy;
     delete r2.y;
@@ -26,7 +25,7 @@ export async function animate(lib) {
         Object.hasOwn(r2.transform, "all")
     );
     const R = g2.transform.add_translate();
-    anim.at(0).run(
+    root.at(0).run(
         Rel(0).to(R, [400, 400])
             .at(1).to(R, [250, 400])
         // Step(
@@ -53,7 +52,7 @@ export async function animate(lib) {
     );
     const X = r2.transform.add_scale();
     const C = r2.fill.color;
-    anim.at(0).run(
+    root.at(0).run(
         Rel(0).to(X, [1, 1], { easing: Easing.linear }).to(C, "blue", { easing: Easing.linear })
         // Step(
         // [
@@ -79,7 +78,7 @@ export async function animate(lib) {
     delete e1.cy;
     delete e1.cx;
     const mov = e1.transform.add_translate();
-    anim.at(0).run(
+    root.at(0).run(
         Rel(0).to(mov, [100, 100])
         // Step(
         //     [
@@ -100,7 +99,7 @@ export async function animate(lib) {
     // console.log(mov.dump());
     const EY = e1.ry;
     const EX = e1.rx;
-    anim.at(0).run(
+    root.at(0).run(
         Rel(0).to([EX, EY], 40)
         // Step(
         //     [
@@ -121,7 +120,7 @@ export async function animate(lib) {
 
     {
         const S = maru1.transform.add_translate();
-        anim.at(1).run(
+        root.at(1).run(
             Rel(0).to(S, [0, 0])
             // Step(
             //     [
@@ -145,7 +144,7 @@ export async function animate(lib) {
     {
         const pos = maru2.transform.add_translate();
         const CO = maru2.fill.color;
-        anim.at(0).run(
+        root.at(0).run(
             Rel(0).to(CO, "yellow")
             // Step(
             //     [
@@ -160,7 +159,7 @@ export async function animate(lib) {
         );
         // CO.repeat(66666666666, true);
 
-        const tr = anim.at(0);
+        const tr = root.at(0);
         tr.run(
             Seq([
                 To(pos, [-200, -100], {
@@ -205,5 +204,5 @@ export async function animate(lib) {
     // console.log(r2.transform.dump());
     // console.log(r2.transform.get_transform_repr());
 
-    return anim;
+    return root;
 }

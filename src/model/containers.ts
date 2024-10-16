@@ -52,9 +52,8 @@ export class Container extends Element {
             }
         } else {
             for (const n of enum_node_type(this, K)) {
-
                 if (n instanceof Element) {
-                    if (n.id_equals(x)) {
+                    if (Object.getOwnPropertyDescriptor(n, 'id')?.value == x) {
                         return n
                     }
                 }
@@ -76,7 +75,7 @@ export class Container extends Element {
         let cur: Node | undefined = _start;
         do {
             if (cur instanceof Element) {
-                if (cur.id_equals(id)) {
+                if (Object.getOwnPropertyDescriptor(cur, 'id')?.value == id) {
                     return cur;
                 }
             }

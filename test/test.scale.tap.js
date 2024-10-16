@@ -59,10 +59,9 @@ export function HeartBeat(parent, items, params) {
         };
     };
 }
-test.test("load_svg the_quick", async (t) => {
-    const anim = new Root();
-    await anim.load_svg("res/the_quick.svg");
-    const { view } = anim;
+test.test("_load_svg the_quick", async (t) => {
+    const root = await Root._load_svg("res/the_quick.svg");
+    const { view } = root;
     view.width.set_value(384);
     view.height.set_value(216);
     let the = view.get_group("The");
@@ -77,7 +76,7 @@ test.test("load_svg the_quick", async (t) => {
     let bb = view.bbox_of(0, dog, the);
     // console.log(bb.dump_rect());
 
-    const tr = anim.at(0);
+    const tr = root.at(0);
     // tr.run(Pass(1))
     // tr.run(ZoomTo(view, [lazy, dog]))
 
@@ -99,12 +98,12 @@ test.test("load_svg the_quick", async (t) => {
     view.color_rendering.set_value("optimizeQuality")
     {
         const trc = tr.clone();
-        t.ok(tr.root === anim);
-        t.ok(trc.root === anim);
+        t.ok(tr.root === root);
+        t.ok(trc.root === root);
         t.not(trc === tr);
     }
 
-    anim.save_json('/tmp/scale.json')
-    anim.save_html('/tmp/scale.html');
+    root.save_json('/tmp/scale.json')
+    root.save_html('/tmp/scale.html');
     t.end();
 });

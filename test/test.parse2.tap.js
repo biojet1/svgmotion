@@ -2,10 +2,9 @@
 import test from "tap";
 import { Root, Rel, ZoomTo, Pass, Easing, AlignTo } from "svgmotion";
 
-test.test("load_svg the_quick", async (t) => {
-    const anim = new Root();
-    await anim.load_svg("res/the_quick.svg");
-    const { view } = anim;
+test.test("_load_svg the_quick", async (t) => {
+    const root = await Root._load_svg("res/the_quick.svg");
+    const { view } = root;
     view.width.set_value(384);
     view.height.set_value(216);
     let the = view.get_group("The");
@@ -27,9 +26,9 @@ test.test("load_svg the_quick", async (t) => {
     {
         let tr = the.transform.add_translate(20, 20);
 
-        anim.at(0).run(Rel(.8).to(tr, [100, 100], { easing: Easing.sigmoid }).at(1).to(tr, [100, 10]));
+        root.at(0).run(Rel(.8).to(tr, [100, 100], { easing: Easing.sigmoid }).at(1).to(tr, [100, 10]));
     }
-    const tr = anim.at(0);
+    const tr = root.at(0);
     tr.run(Pass(1))
     const bbo = view.view_box.bbox();
     tr.run(ZoomTo(view, [lazy]))
@@ -48,7 +47,7 @@ test.test("load_svg the_quick", async (t) => {
     // console.log(r.fill.color.value, r.fill.color.get_rgb_repr(0) + "", r.fill.color.get_value(0));
     // console.dir(r.fill);
     // r.fill.opacity.set_value(.4)
-    anim.save_json('/tmp/the_quick.json')
-    anim.save_html('/tmp/the_quick.html');
+    root.save_json('/tmp/the_quick.json')
+    root.save_html('/tmp/the_quick.html');
     t.end();
 });

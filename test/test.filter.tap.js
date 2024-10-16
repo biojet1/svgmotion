@@ -3,13 +3,13 @@ import test from "tap";
 import { FEGaussianBlur, Element, Root, To, Filter } from "svgmotion";
 
 test.test("add_filter", async (t) => {
-    const anim = new Root();
-    let f = anim.view.defs.add_filter();
+    const root = new Root();
+    let f = root.view.defs.add_filter();
     t.ok(f instanceof Filter);
     t.ok(f instanceof Element);
     const gb = new FEGaussianBlur();
     f.append_child(gb);
-    let d = anim.dump();
+    let d = root.dump();
     t.end();
 });
 

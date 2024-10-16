@@ -6,9 +6,8 @@ import { AMix } from "../dist/utils/sound.js";
 import { FFRun } from "../dist/utils/ffrun.js";
 import { writeFileSync } from 'fs';
 test.test("Say the_quick", async (t) => {
-    const anim = new Root();
-    await anim.load_svg("res/the_quick.svg");
-    const { view } = anim;
+    const root = await Root._load_svg("res/the_quick.svg");
+    const { view } = root;
     view.width.set_value(384);
     view.height.set_value(216);
     let the = view.get_group("The");
@@ -23,8 +22,8 @@ test.test("Say the_quick", async (t) => {
     let bb = view.bbox_of(0, dog, the);
     // console.log(bb.dump_rect());
 
-    const tr = anim.at(0);
-    const voc = anim.voice(new svgmo.GTTS());
+    const tr = root.at(0);
+    const voc = root.voice(new svgmo.GTTS());
     // const voc = new svgmo.GTTS();
     tr.run(svgmo.Bounce(dog));
     tr.run(svgmo.Play(await voc.say(`Hello`)));
@@ -33,8 +32,8 @@ test.test("Say the_quick", async (t) => {
 
     tr.run(svgmo.Bounce(the));
     {
-        const snd1 = await anim.add_file_asset(`/mnt/META/opt/animations/music/Follow_Me.mp3`);
-        const snd2 = await anim.add_file_asset(`/mnt/META/opt/animations/sfx/mixkit-hard-pop-click-2364.wav`);
+        const snd1 = await root.add_file_asset(`/mnt/META/opt/animations/music/Follow_Me.mp3`);
+        const snd2 = await root.add_file_asset(`/mnt/META/opt/animations/sfx/mixkit-hard-pop-click-2364.wav`);
         let s = await snd1.as_sound();
         let t = await snd2.as_sound();
         console.log("duration", s.get_duration(), s.start, s.end);
@@ -70,7 +69,7 @@ test.test("Say the_quick", async (t) => {
             })
         }
 
-        anim.sounds.push(s);
+        root.sounds.push(s);
 
         // {
         //     let [bin, ...args] = ff;
@@ -83,7 +82,7 @@ test.test("Say the_quick", async (t) => {
     }
 
 
-    anim.save_json('/tmp/say.json')
-    anim.save_html('/tmp/say.html');
+    root.save_json('/tmp/say.json')
+    root.save_html('/tmp/say.html');
     t.end();
 });

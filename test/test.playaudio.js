@@ -59,10 +59,9 @@ export function HeartBeat(parent, items, params) {
         };
     };
 }
-test.test("load_svg the_quick", async (t) => {
-    const anim = new Root();
-    await anim.load_svg("res/the_quick.svg");
-    const { view } = anim;
+test.test("_load_svg the_quick", async (t) => {
+    const root = await Root._load_svg("res/the_quick.svg");
+    const { view } = root;
     view.width.set_value(384);
     view.height.set_value(216);
     let the = view.get_group("The");
@@ -76,9 +75,9 @@ test.test("load_svg the_quick", async (t) => {
     let over = view.get_group("over");
     let bb = view.bbox_of(0, dog, the);
 
-    const tr = anim.at(0);
+    const tr = root.at(0);
 
-    const snd2 = await anim.add_file_asset(`/mnt/META/opt/animations/sfx/mixkit-quick-jump-arcade-game-239.wav`).then(v => v.as_sound());
+    const snd2 = await root.add_file_asset(`/mnt/META/opt/animations/sfx/mixkit-quick-jump-arcade-game-239.wav`).then(v => v.as_sound());
 
     tr.run(svgmo.ScaleOut([dog, fox], { easing: Easing.linear, parent: view }))
     tr.run(Play(svgmo.AEval.new("sin(10*2*PI*t)*sin(880*2*PI*t)")));
@@ -95,7 +94,7 @@ test.test("load_svg the_quick", async (t) => {
 
 
 
-    anim.save_json('/tmp/sound.json')
-    anim.save_html('/tmp/sound.html');
+    root.save_json('/tmp/sound.json')
+    root.save_html('/tmp/sound.html');
     t.end();
 });

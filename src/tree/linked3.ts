@@ -196,14 +196,18 @@ export class Parent extends Node {
     }
 
     *children<T extends Node = Node>() {
-        for (let cur = this.first_child(); cur; cur = cur.next_sibling()) {
+        for (let cur = this.first_child(); cur;) {
+            const next = cur.next_sibling();
             yield cur as T;
+            cur = next;
         }
     }
 
     *[Symbol.iterator]() {
-        for (let cur = this.first_child(); cur; cur = cur.next_sibling()) {
+        for (let cur = this.first_child(); cur;) {
+            const next = cur.next_sibling();
             yield cur;
+            cur = next;
         }
     }
 

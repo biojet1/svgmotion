@@ -4,13 +4,12 @@ import { Root } from "svgmotion";
 import { AMix, AEval } from "../dist/utils/sound.js";
 import { FFRun } from "../dist/utils/ffrun.js";
 test.test("Sound 1", async (t) => {
-    const anim = new Root();
-    await anim.load_svg("res/the_quick.svg");
+    const root = await Root._load_svg("res/the_quick.svg");
 
-    const snd1 = await anim.add_file_asset(`/mnt/META/opt/animations/sfx/mixkit-fast-air-sweep-transition-168.wav`).then(v => v.as_sound());
-    const snd2 = await anim.add_file_asset(`/mnt/META/opt/animations/sfx/mixkit-quick-jump-arcade-game-239.wav`).then(v => v.as_sound());
-    const snd3 = await anim.add_file_asset(`/mnt/META/opt/animations/sfx/mixkit-typewriter-single-mechanical-hit-1384.wav`).then(v => v.as_sound());
-    const snd4 = await anim.add_file_asset(`/mnt/META/opt/animations/sfx/mixkit-mechanical-typewriter-hit-1365.wav`).then(v => v.as_sound());
+    const snd1 = await root.add_file_asset(`/mnt/META/opt/animations/sfx/mixkit-fast-air-sweep-transition-168.wav`).then(v => v.as_sound());
+    const snd2 = await root.add_file_asset(`/mnt/META/opt/animations/sfx/mixkit-quick-jump-arcade-game-239.wav`).then(v => v.as_sound());
+    const snd3 = await root.add_file_asset(`/mnt/META/opt/animations/sfx/mixkit-typewriter-single-mechanical-hit-1384.wav`).then(v => v.as_sound());
+    const snd4 = await root.add_file_asset(`/mnt/META/opt/animations/sfx/mixkit-mechanical-typewriter-hit-1365.wav`).then(v => v.as_sound());
 
     // let s = snd1.as_sound();
     // let t = snd2.as_sound();
