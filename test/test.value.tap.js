@@ -59,7 +59,7 @@ test.test("VectorValue", (t) => {
     t.end();
 });
 
-test.test("ViewPort", (t) => {
+test.test("ViewPort", async (t) => {
     let doc = new Root();
     let vp = doc.view;
     // v.push(new Rect());
@@ -82,8 +82,7 @@ test.test("ViewPort", (t) => {
     t.equal(tag, "svg");
     t.equal(nodes[0].tag, "rect");
     t.same(props.view_box.size.v.slice(0, 2), [100, 100]);
-    let head2 = new Root();
-    head2.load(json);
+    let head2 = await Root.load(json);
     t.same(head2.dump(), json);
     // console.warn(JSON.stringify(load(json).dump(), null, 4));
 

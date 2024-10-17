@@ -4,35 +4,8 @@ import { Root } from "../root.js";
 import { Text, TSpan } from "../text.js";
 import { Container } from "../containers.js";
 import "./set_attribute.js";
+
 const NS_SVG = "http://www.w3.org/2000/svg";
-declare module "../root" {
-    interface Root {
-        load_json(src: string): Promise<void>;
-        parse_svg(src: string): Promise<void>;
-    }
-}
-
-declare module "../containers" {
-    interface Container {
-        load_svg(src: string | URL, opt: { xinclude?: boolean; base?: string | URL }): Promise<void>;
-    }
-}
-
-Container.prototype.load_svg = async function (src: string | URL,
-    opt: { xinclude?: boolean; base?: string | URL }) {
-    return sax_load_svg(this, src, opt);
-}
-
-Root.prototype.parse_svg = async function (src: string) {
-    const dom = await sax_parse_svg(src);
-    sax_load_svg_dom(this, dom);
-}
-
-Root.prototype.load_json = async function (src: string) {
-    const fs = await import('fs/promises');
-    const blob = await fs.readFile(src, { encoding: 'utf8' });
-    return this.parse_json(blob);
-}
 
 class SAXElement {
     uri?: string = '';
@@ -209,15 +182,14 @@ function sax_walk(elem: SAXElement, parent: Container, attrs: { [key: string]: s
     }
 }
 
-Root._load_svg = async function (src: string) {
+Root.load_svg = async function (src: string) {
     const fs = await import('fs/promises');
     const blob = await fs.readFile(src, { encoding: 'utf8' });
-    return Root._parse_svg(blob);
+    return Root.parse_svg(blob);
 
 }
 
-
-Root._parse_svg = async function (src: string) {
+Root.parse_svg = async function (src: string) {
     const root = new Root();
     const dom = await sax_parse_svg(src);
     sax_load_svg_dom(root, dom);

@@ -80,36 +80,38 @@ export async function render_root(root: Root, {
     }
 
     try {
-
         const page = await browser.newPage();
         const data = `<!DOCTYPE html><html><head><meta charset="UTF-8">`
             + `<style>*{box-sizing:border-box;margin:0;padding:0}body{background:0 0;overflow:hidden}</style>`
             + `<script>${await fs.readFile(fileURLToPath(import.meta.resolve("../svgmotion.web.js")))}</script>`
-            + `</head><body></body></html>`
-
+            + `</head><body></body>`
+            + `<script>`
+            + `svgmotion.Root.load(${JSON.stringify(root.dump())}).then(root=>{`
+            + `const {svg, stepper} = root.dom_stepper();`
+            + `document.body.appendChild(svg);`
+            + `globalThis.root = root;`
+            + `globalThis.stepper = stepper;`
+            + `});`
+            // + `svg.setAttribute('shape-rendering',"geometricPrecision");`
+            + `</script>`
+            + `</html>`;
         if (uri) {
             await fs.writeFile(fileURLToPath(uri), data);
             await page.goto(uri);
         } else {
             await page.setContent(data);
         }
-
-        await page.evaluate(`const root = svgmotion.from_json(${JSON.stringify(root.dump())});`
-            // + `const svg = root.to_dom(document);`
-            + `const {svg, stepper} = root.dom_stepper();`
-            + `document.body.appendChild(svg);`
-            // + `svg.setAttribute('shape-rendering',"geometricPrecision");`
-        );
-
         if (bgcolor) {
             page.evaluate(`svg.style.backgroundColor = '${bgcolor}'`);
         }
         await page.evaluate(`document.body.style.height = "${height}px"`);
         await page.evaluate(`document.body.style.width = "${width}px"`);
-
-
+        await page.waitForSelector('#root', {
+            visible: true,
+        });
         const div = await page.mainFrame().$('#root')
         if (!div) {
+            console.error(`No #root root.view.id=${root.view.id}`);
             return;
         }
 
@@ -117,6 +119,8 @@ export async function render_root(root: Root, {
         if (!sink) {
             const ff = ffcmd2(fps, [width, height], false, output, { lossless: true, ...video_params });
             if (root.sounds && root.sounds.length > 0) {
+                // TOD: fix assets source id, path
+                // console.warn("RENDER")
                 console.dir(root.sounds, { depth: 4 });
                 const mix = AMix.new(root.sounds, { duration });
                 // console.warn(`AMix ${mix.get_duration()}`);
@@ -132,6 +136,7 @@ export async function render_root(root: Root, {
             sink = ffproc.stdin;
         }
         if (!sink) {
+            console.error(`No sink`);
             return;
         }
 
@@ -139,7 +144,6 @@ export async function render_root(root: Root, {
         const start_frame = 0;
         const end_frame = frames;
         console.warn(`${frameTime(frames, frame_rate)}s ${frames} frames ${frame_rate} fps ${W}x${H} -> ${width}x${height} `);
-
         const sso: ScreenshotOptions = {
             type: 'png',
             omitBackground: bgcolor ? false : true,
@@ -147,29 +151,20 @@ export async function render_root(root: Root, {
         };
         // DEBUG ///////////
         {
-            // await page.evaluate(`root.update_dom(${start_frame}); `);
             await page.evaluate(`stepper.step(${start_frame}); `);
             let html = await page.content();
             // console.warn(html);
             await fs.writeFile('/tmp/svgmotion.html', html);
         }
-        if (fps == frame_rate) {
-            for (let frame = start_frame; frame < end_frame; ++frame) {
-                // await page.evaluate(`root.update_dom(${frame}); `);
-                await page.evaluate(`stepper.step(${frame}); `);
-                const screenshot = await div.screenshot(sso);
-                process.stdout.write(`\r${frame} ${screenshot.byteLength} `);
-                sink.write(screenshot);
-            }
-        } else {
-            const S = round(start_frame * fps / frame_rate);
-            const E = round(end_frame * fps / frame_rate);
+        {
+            const eq = fps == frame_rate;
+            const S = eq ? start_frame : round(start_frame * fps / frame_rate);
+            const E = eq ? end_frame : round(end_frame * fps / frame_rate);
             for (let f = S; f < E; ++f) {
-                let frame = round(f * frame_rate / fps);
-                // await page.evaluate(`root.update_dom(${frame}); `);
+                let frame = eq ? f : round(f * frame_rate / fps);
                 await page.evaluate(`stepper.step(${frame}); `);
                 const screenshot = await div.screenshot(sso);
-                process.stdout.write(`\r${f} ${frame} ${screenshot.byteLength} `);
+                process.stdout.write(`\r${f} ${screenshot.byteLength} `);
                 sink.write(screenshot);
             }
         }

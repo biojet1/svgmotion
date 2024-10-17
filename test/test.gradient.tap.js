@@ -4,7 +4,7 @@ import { Root, Rel, Add } from "svgmotion";
 
 
 test.test("linearGradient", async (t) => {
-  const root = await Root._parse_svg(`<?xml version="1.0" standalone="no"?>
+  const root = await Root.parse_svg(`<?xml version="1.0" standalone="no"?>
 <svg xmlns="http://www.w3.org/2000/svg"
      version="1.1"
      width="300"

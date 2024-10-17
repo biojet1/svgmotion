@@ -4,7 +4,7 @@ import { Root } from "svgmotion";
 import { AMix, AEval } from "../dist/utils/sound.js";
 import { FFRun } from "../dist/utils/ffrun.js";
 test.test("Sound 1", async (t) => {
-    const root = await Root._load_svg("res/the_quick.svg");
+    const root = await Root.load_svg("res/the_quick.svg");
 
     const snd1 = await root.add_file_asset(`/mnt/META/opt/animations/sfx/mixkit-fast-air-sweep-transition-168.wav`).then(v => v.as_sound());
     const snd2 = await root.add_file_asset(`/mnt/META/opt/animations/sfx/mixkit-quick-jump-arcade-game-239.wav`).then(v => v.as_sound());

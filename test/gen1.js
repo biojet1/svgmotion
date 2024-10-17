@@ -1,7 +1,7 @@
 import { Root, Rel, Easing, Seq, To } from "svgmotion";
 export async function animate(lib) {
     const sigm = new Easing(1 / 3, 0, 1 - 1 / 3, 1);
-    const root = await Root._load_svg("test/shapes.svg");
+    const root = await Root.load_svg("test/shapes.svg");
     const maru1 = root.get_circle("maru");
     const maru2 = root.get_circle("maru2");
     const r2 = root.get_rect("r2");

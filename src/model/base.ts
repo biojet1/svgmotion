@@ -86,7 +86,7 @@ export class Element extends Parent {
         return xget(this, "id", Math.round(Math.random() * 1E+5).toString(36));
     }
     set id(id: string) {
-        xget(this, "id", id);
+        xset(this, "id", id);
     }
     /// Properties ////////////
     get transform() { return this._new_field("transform", new Transform()); }

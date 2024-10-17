@@ -8,34 +8,10 @@ declare module "../root" {
 }
 
 class AudioAssetSource extends AudioSource {
-
-    // static override load2(d: object, prev: AudioChain, root: Root) {
-    //     ///
-    // }
-}
-
-class Aloader2 extends ALoader {
-    root: Root;
-    constructor(root: Root) {
-        super();
-        this.root = root;
-    }
-    override load(d: { $: string;[key: string]: any; }, prev: AFilter | ASource): AFilter | ASource {
-        if (d.$ == 'source') {
-            if (d.id) {
-                const a = this.root.assets[d.id];
-                if (a) {
-                    a.as_sound()
-                }
-
-            }
-        }
-        // switch (d.$) {
-        //     case "asset": {
-        //         return AudioAssetSource.load2(d, prev);
-        //     }
-        // }
-        return super.load(d, prev);
+    dump() {
+        const d = super.dump();
+        delete d.path;
+        return d;
     }
 }
 

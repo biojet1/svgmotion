@@ -3,7 +3,7 @@ import test from "tap";
 import { Root, Rel } from "svgmotion";
 
 test.test("_load_svg polygon01", async (t) => {
-    const root = await Root._load_svg("res/polygon01.svg");
+    const root = await Root.load_svg("res/polygon01.svg");
     const tr = root.at(0);
     // console.warn(root.view);
     const pg1 = root.get_polygon(1);
@@ -26,7 +26,7 @@ test.test("_load_svg polygon01", async (t) => {
     t.end();
 });
 test.test("ts-tspan", async (t) => {
-    const root = await Root._parse_svg(`<?xml version="1.0" standalone="no"?>
+    const root = await Root.parse_svg(`<?xml version="1.0" standalone="no"?>
 <svg width="10cm" height="3cm" viewBox="0 0 1000 300"     xmlns="http://www.w3.org/2000/svg" version="1.1">
   <g font-family="Verdana" font-size="64" >
     <text x="100" y="180" fill="blue" >
@@ -45,9 +45,8 @@ test.test("ts-tspan", async (t) => {
     const d1 = root.dump();
     // console.dir(d1, { depth: 100 })
     {
-        const anim2 = new Root();
-        anim2.load(d1);
-        const d2 = anim2.dump();
+        const root2 = await Root.load(d1);
+        const d2 = root2.dump();
         {
             const fs = await import('fs/promises');
             const h = await fs.open('/tmp/parse1.json', 'w');
@@ -62,6 +61,10 @@ test.test("ts-tspan", async (t) => {
         }
         // console.dir(d2, { depth: 100 })
         t.match(d2, d1)
+        root2.view.id = "q"
+        t.same(root2.view.id, "q")
+        const d3 = root2.dump();
+        t.same(d3.view.id, "q");
     }
     const ts = root.get_tspan(0);
     const g = root.get_group(0);

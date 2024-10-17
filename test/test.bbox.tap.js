@@ -16,7 +16,7 @@ function eqBox(t, a, b, epsilon = 0, tag) {
 }
 
 test.test("viewport", async (t) => {
-    const root = await Root._load_svg("res/viewport.svg");
+    const root = await Root.load_svg("res/viewport.svg");
     //
     const R5 = root.get_rect('R5');
     // console.dir(R5.dump(), { depth: 10 });

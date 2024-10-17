@@ -211,7 +211,7 @@ export function updater_dom(root: Root, doc: typeof SVGElement.prototype.ownerDo
     const updates: Array<(frame: number) => void> = [];
     function add_upd(attup: AttUP, elem?: globalThis.SVGElement, text?: globalThis.Text) {
         let { kfv, attr, call, value } = attup;
-        console.warn(attr, value, elem?.constructor.name, text?.constructor.name, kfv)
+        // console.warn(attr, value, elem?.constructor.name, text?.constructor.name, kfv)
         if (kfv) {
             if (elem) {
                 if (!attr || text) {

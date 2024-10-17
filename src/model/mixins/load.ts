@@ -64,30 +64,8 @@ function load_node(obj: PlainNode, parent: Container) {
     throw new Error(`No node factory for "${tag}"`);
 }
 
-declare module "../root" {
-    interface Root {
-        load(src: PlainRoot): void;
-        parse_json(src: string): void;
-    }
-}
-
-export function from_json(src: PlainRoot) {
-    const root = new Root();
-    root.load(src);
-    return root;
-}
-
 Root.load = async function (src: PlainRoot) {
     const root = new Root();
-
-    return root;
-}
-
-Root.parse_json = function (src: string) {
-    return this.load(JSON.parse(src))
-}
-
-Root.prototype.load = function (src: PlainRoot) {
     const { version, view, frame_rate, assets, sounds } = src;
     if (!version) {
         throw new Error("No version {${Object.keys(src)}}");
@@ -99,16 +77,16 @@ Root.prototype.load = function (src: PlainRoot) {
         throw new Error("No frame_rate");
     }
     {
-        this.assets = {};
+        root.assets = {};
         if (assets) {
             for (const [k, v] of Object.entries(assets)) {
                 v.id = k;
-                this.assets[k] = Asset.load(v);
+                root.assets[k] = Asset.load(v);
             }
         }
     }
-    this.version = version;
-    this.sounds = [];
+    root.version = version;
+    root.sounds = [];
     if (sounds) {
         const ldr = new ALoader()
         for (const v of sounds) {
@@ -117,26 +95,35 @@ Root.prototype.load = function (src: PlainRoot) {
                 if (next) {
                     next = ldr.load(u, next);
                 } else {
-
+                    // if (u.$ == "source") {
+                    //     next = await root.assets[u.id].as_sound();
+                    //     continue
+                    // }
                     next = ldr.load(u, next as unknown as ASource);
                 }
             }
             if (next) {
-                this.sounds.push(next);
+                root.sounds.push(next);
             }
         }
     }
     // 
     {
-        const vp = load_node(view, this);
+        const vp = load_node(view, root);
         if (!(vp instanceof ViewPort)) {
             throw new Error("ViewPort expected");
         }
-        this.set_view(vp);
+        root.set_view(vp);
     }
+    return root;
 }
 
-Root.prototype.parse_json = function (src: string) {
+Root.parse_json = function (src: string) {
     return this.load(JSON.parse(src))
 }
+
+
+// Root.prototype.parse_json = function (src: string) {
+//     return this.load(JSON.parse(src))
+// }
 ////////////

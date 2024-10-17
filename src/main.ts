@@ -113,9 +113,8 @@ export async function main() {
                             return fs.readFileSync(inp, { encoding: "utf8" });
                         }
                     })
-                    .then((blob) => {
-                        const root = new lib.Root();
-                        root.parse_json(blob);
+                    .then(async (blob) => {
+                        const root = await lib.Root.parse_json(blob);
                         const { width, height, fps, bgcolor, ffparams } = args;
                         const output = args.output as string;
                         const video_params = ffparams ? parse_loose_json(ffparams) : undefined;

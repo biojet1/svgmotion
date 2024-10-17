@@ -3,7 +3,7 @@ import test from "tap";
 import { Root, Rel, ZoomTo, Pass, Easing, AlignTo } from "svgmotion";
 
 test.test("_load_svg the_quick", async (t) => {
-    const root = await Root._load_svg("res/the_quick.svg");
+    const root = await Root.load_svg("res/the_quick.svg");
     const { view } = root;
     view.width.set_value(384);
     view.height.set_value(216);

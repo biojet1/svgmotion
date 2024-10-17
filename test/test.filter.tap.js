@@ -14,7 +14,7 @@ test.test("add_filter", async (t) => {
 });
 
 test.test("add_fe_gaussian_blur", async (t) => {
-    const root = await Root._load_svg("res/the_quick.svg");
+    const root = await Root.load_svg("res/the_quick.svg");
     const { view } = root;
     view.width.set_value(384);
     view.height.set_value(216);

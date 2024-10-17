@@ -49,6 +49,10 @@ test.test("id", (t) => {
     t.same(Object.getOwnPropertyDescriptor(r, 'id')?.value, undefined);
     r.id = 'ID'
     t.same(Object.getOwnPropertyDescriptor(r, 'id')?.value, 'ID');
+    t.same(r.id, 'ID');
+    r.id = 'ID2'
+    t.same(Object.getOwnPropertyDescriptor(r, 'id')?.value, 'ID2');
+    t.same(r.id, 'ID2');
     r = Rect.new({ x: 45 });
     t.ok(r.id);
     t.same(Object.getOwnPropertyDescriptor(r, 'id')?.value, r.id);

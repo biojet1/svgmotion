@@ -6,7 +6,7 @@ import * as svgm from "svgmotion";
 
 
 test.test("ts-image", async (t) => {
-    const root = await Root._parse_svg(`<?xml version="1.0" standalone="no"?>
+    const root = await Root.parse_svg(`<?xml version="1.0" standalone="no"?>
 <svg width="200" height="200" viewBox="0 0 600 600"     xmlns="http://www.w3.org/2000/svg" version="1.1">
 <svg  id="imvp" x="0" width="200" height="200"  viewBox="100 0 200 200" >
   <image href="file:///mnt/C1/media/Tabby_cat_with_blue_eyes-3336579.jpg"/>

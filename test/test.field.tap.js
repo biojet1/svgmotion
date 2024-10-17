@@ -3,7 +3,7 @@ import test from "tap";
 import { Root, Rel } from "svgmotion";
 
 test.test("field 1", async (t) => {
-  const root = await Root._parse_svg(`<?xml version="1.0" standalone="no"?>
+  const root = await Root.parse_svg(`<?xml version="1.0" standalone="no"?>
 <svg width="10cm" height="3cm" viewBox="0 0 1000 300"     xmlns="http://www.w3.org/2000/svg" version="1.1">
   <g font-family="Verdana" font-size="64" >
     <text x="100" y="180" fill="blue" >

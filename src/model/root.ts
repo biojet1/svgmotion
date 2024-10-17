@@ -118,10 +118,10 @@ export class Root extends Container {
         return this.assets[id] = a;
     }
     //
-    static _load_svg(_src: string): Promise<Root> {
+    static load_svg(_src: string): Promise<Root> {
         throw new Error(`Not implemented`)
     }
-    static _parse_svg(_src: string): Promise<Root> {
+    static parse_svg(_src: string): Promise<Root> {
         throw new Error(`Not implemented`)
     }
     static load: (src: PlainRoot) => Promise<Root>;
