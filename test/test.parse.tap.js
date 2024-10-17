@@ -22,24 +22,7 @@ test.test("_load_svg polygon01", async (t) => {
             .d(1).first(R)
     );
     // console.dir(root.dump(), { depth: 100 });
-
-
     root.save_html("/tmp/ts-polygon01.html");
-    {
-        const { SVGDocument, XMLSerializer } = await import("domspec");
-        const nod = root.to_dom(new SVGDocument());
-        root.update_dom(0);
-        const ser = new XMLSerializer();
-        const xml = ser.serializeToString(nod);
-        // console.warn(ser.serializeToString(nod));
-        {
-            const fs = await import('fs/promises');
-            const h = await fs.open('/tmp/polygon01.svg', 'w');
-            await h.write(xml);
-            await h.close();
-        }
-    }
-
     t.end();
 });
 test.test("ts-tspan", async (t) => {

@@ -69,8 +69,8 @@ export async function render_root(root: Root, {
             height = H;
         }
     }
-    width = Math.floor(width);
-    height = Math.floor(height);
+    width = floor(width);
+    height = floor(height);
     root.view.id = 'root';
     root.view.width.value = width;
     root.view.height.value = height;
@@ -95,7 +95,8 @@ export async function render_root(root: Root, {
         }
 
         await page.evaluate(`const root = svgmotion.from_json(${JSON.stringify(root.dump())});`
-            + `const svg = root.to_dom(document);`
+            // + `const svg = root.to_dom(document);`
+            + `const {svg, stepper} = root.dom_stepper();`
             + `document.body.appendChild(svg);`
             // + `svg.setAttribute('shape-rendering',"geometricPrecision");`
         );
@@ -146,24 +147,27 @@ export async function render_root(root: Root, {
         };
         // DEBUG ///////////
         {
-            await page.evaluate(`root.update_dom(${start_frame}); `);
+            // await page.evaluate(`root.update_dom(${start_frame}); `);
+            await page.evaluate(`stepper.step(${start_frame}); `);
             let html = await page.content();
             // console.warn(html);
             await fs.writeFile('/tmp/svgmotion.html', html);
         }
         if (fps == frame_rate) {
             for (let frame = start_frame; frame < end_frame; ++frame) {
-                await page.evaluate(`root.update_dom(${frame}); `);
+                // await page.evaluate(`root.update_dom(${frame}); `);
+                await page.evaluate(`stepper.step(${frame}); `);
                 const screenshot = await div.screenshot(sso);
                 process.stdout.write(`\r${frame} ${screenshot.byteLength} `);
                 sink.write(screenshot);
             }
         } else {
-            const S = Math.round(start_frame * fps / frame_rate);
-            const E = Math.round(end_frame * fps / frame_rate);
+            const S = round(start_frame * fps / frame_rate);
+            const E = round(end_frame * fps / frame_rate);
             for (let f = S; f < E; ++f) {
-                let frame = Math.round(f * frame_rate / fps);
-                await page.evaluate(`root.update_dom(${frame}); `);
+                let frame = round(f * frame_rate / fps);
+                // await page.evaluate(`root.update_dom(${frame}); `);
+                await page.evaluate(`stepper.step(${frame}); `);
                 const screenshot = await div.screenshot(sso);
                 process.stdout.write(`\r${f} ${frame} ${screenshot.byteLength} `);
                 sink.write(screenshot);
@@ -176,6 +180,7 @@ export async function render_root(root: Root, {
         browser.close();
     }
 }
+
 export function frameTime(N: number, fps: number) {
     if (N === Infinity || N === -Infinity) {
         return 'IN:FI:NIT';
@@ -198,4 +203,5 @@ export function frameTime(N: number, fps: number) {
         } `
     );
 }
-const { /*max, round,*/ floor } = Math;
+
+const { floor, round } = Math;
