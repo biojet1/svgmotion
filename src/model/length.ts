@@ -49,10 +49,10 @@ class CalcLength {
         if (m) {
             const num = parseFloat(m[1]);
             const suf = m.pop();
-            // console.log(`parse_len ${value} ${this.node.id} ${this.node.constructor.name} ${[num, suf]}`)
+            // console.warn(`parse_len ${value} ${this.node.id} ${this.node.constructor.name} ${[num, suf]}`)
             // const n = parse_svg_length(num, suf, this);
             const n = this._parse(num, suf, dir);
-            // console.log(`parse_svg_length OK ${value} ${n} [${this.node.constructor.name}]`);
+            // console.warn(`parse_svg_length OK ${value} ${n} [${this.node.constructor.name}]`);
             return n;
         } else {
             switch (value) {
@@ -68,7 +68,7 @@ class CalcLength {
                     return this._parse(100, '%', dir);
             }
         }
-        console.log(`Unexpected length "${value}" ${this.node.id}`);
+        console.warn(`Unexpected length "${value}" ${this.node.id}`);
         return 0;
         // throw new Error(`Unexpected length "${value}"`);
     }

@@ -282,6 +282,11 @@ export class TextValue extends AnimatableD<string> {
 }
 
 export class UnknownValue extends AnimatableD<string> {
+    override dump(): PlainValue<string> {
+        const d = super.dump();
+        (d as any).$ = '?';
+        return d;
+    }
 
 }
 

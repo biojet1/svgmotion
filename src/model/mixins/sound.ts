@@ -1,9 +1,41 @@
-import { Asset } from "../root.js";
-import { AudioSource } from "../../utils/sound.js";
+import { Asset, Root } from "../root.js";
+import { AFilter, ALoader, ASource, AudioChain, AudioSource } from "../../utils/sound.js";
 
 declare module "../root" {
     interface Asset {
         as_sound(): Promise<AudioSource>;
+    }
+}
+
+class AudioAssetSource extends AudioSource {
+
+    // static override load2(d: object, prev: AudioChain, root: Root) {
+    //     ///
+    // }
+}
+
+class Aloader2 extends ALoader {
+    root: Root;
+    constructor(root: Root) {
+        super();
+        this.root = root;
+    }
+    override load(d: { $: string;[key: string]: any; }, prev: AFilter | ASource): AFilter | ASource {
+        if (d.$ == 'source') {
+            if (d.id) {
+                const a = this.root.assets[d.id];
+                if (a) {
+                    a.as_sound()
+                }
+
+            }
+        }
+        // switch (d.$) {
+        //     case "asset": {
+        //         return AudioAssetSource.load2(d, prev);
+        //     }
+        // }
+        return super.load(d, prev);
     }
 }
 
@@ -12,7 +44,7 @@ Asset.prototype.as_sound = async function () {
     if (!duration) {
         duration = await media_duration(src);
     }
-    return new AudioSource({ id, duration, path: src });
+    return new AudioAssetSource({ id, duration, path: src });
 }
 
 function media_duration(path: string) {
@@ -27,7 +59,7 @@ function media_duration(path: string) {
             path,
         ], { stdio: 'pipe' })
     ).then(async ({ stdout, stderr }) => {
-        // console.log("path", path, stdout);
+        // console.warn("path", path, stdout);
         if (stdout) {
             let data = "";
             for await (const chunk of stdout) {
@@ -35,12 +67,12 @@ function media_duration(path: string) {
             }
             const parsed = parseFloat(data);
             // assert(!Number.isNaN(parsed));
-            // console.log("DUR", parsed);
+            // console.warn("DUR", parsed);
             return parsed;
         }
         if (stderr) {
             for await (const chunk of stderr) {
-                console.log(chunk);
+                console.warn(chunk);
             }
         }
         throw new Error(`cp`);

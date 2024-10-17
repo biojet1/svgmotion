@@ -13,20 +13,20 @@ test.test("Sound 1", async (t) => {
 
     // let s = snd1.as_sound();
     // let t = snd2.as_sound();
-    // console.log("duration", s.get_duration(), s.start, s.end);
+    // console.warn("duration", s.get_duration(), s.start, s.end);
     // s = s.slice(10, 16)
-    // console.log("duration", s.get_duration(), s.start, s.end);
+    // console.warn("duration", s.get_duration(), s.start, s.end);
     // // s = s.start_at(4)
-    // console.log("duration", s.get_duration(), s.start, s.end);
+    // console.warn("duration", s.get_duration(), s.start, s.end);
     // s = s.fade_out(2, 'tri')
-    // console.log("duration", s.get_duration(), s.start, s.end);
+    // console.warn("duration", s.get_duration(), s.start, s.end);
     // // s = s.pad_start(1)
     // console.dir(s, { depth: 100 });
     // // s = s.(2, 'tri')
     // t = t.start_at(3);
     // console.dir([s.dump(), t.dump()], { depth: 100 });
     // console.dir(t, { depth: 100 });
-    console.log(snd4.start_at(5)
+    console.warn(snd4.start_at(5)
         .fade_in(1, "exp")
         .fade_out(0.5, "sin").dump())
     // AudioSource(path="music.mp3", duration=60)

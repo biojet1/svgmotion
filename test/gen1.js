@@ -12,14 +12,14 @@ export async function animate(lib) {
     delete r2.x;
     maru1.r.set_value(20);
     r2.fill.opacity.set_value(1);
-    console.log(
+    console.error(
         "all in this 000",
         "all" in r2.transform,
         Object.hasOwn(r2.transform, "all")
     );
     const g2 = r2.g_wrap();
-    r2.anchor.set_value([-30, -30]);
-    console.log(
+    r2.transform.origin.set_value([-30, -30]);
+    console.error(
         "all in this 111",
         "all" in r2.transform,
         Object.hasOwn(r2.transform, "all")
@@ -73,8 +73,8 @@ export async function animate(lib) {
         // { easing }
         // )
     );
-    // console.log("all in this", "all" in r2.transform, Object.hasOwn(r2.transform, "all"));
-    // console.log("TR", r2.transform, r2.transform.dump());
+    // console.error("all in this", "all" in r2.transform, Object.hasOwn(r2.transform, "all"));
+    // console.error("TR", r2.transform, r2.transform.dump());
     delete e1.cy;
     delete e1.cx;
     const mov = e1.transform.add_translate();
@@ -96,7 +96,7 @@ export async function animate(lib) {
     );
     // mov.repeat_count = 66666666666;
     // mov.repeat(1, true);
-    // console.log(mov.dump());
+    // console.error(mov.dump());
     const EY = e1.ry;
     const EX = e1.rx;
     root.at(0).run(
@@ -137,9 +137,9 @@ export async function animate(lib) {
         );
         // S.repeat(-1, true);
         // S.get_value(1000);
-        // console.log(S.dump());
+        // console.error(S.dump());
         // S.load(S.dump())
-        console.log(S.dump());
+        console.error(S.dump());
     }
     {
         const pos = maru2.transform.add_translate();
@@ -198,11 +198,11 @@ export async function animate(lib) {
             )
         );
 
-        console.log(pos.kfs);
+        console.error(pos.kfs);
     }
 
-    // console.log(r2.transform.dump());
-    // console.log(r2.transform.get_transform_repr());
+    // console.error(r2.transform.dump());
+    // console.error(r2.transform.get_transform_repr());
 
     return root;
 }

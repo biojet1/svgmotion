@@ -1,4 +1,4 @@
-import { PlainValue, TextValue } from "../value.js";
+import { PlainValue, TextValue, UnknownValue } from "../value.js";
 import { Animatable } from "../value.js";
 import { ValueSet } from "../valuesets.js";
 import { Element } from "../base.js";
@@ -6,7 +6,7 @@ import { Root, PlainRoot, PlainNode, Asset } from "../root.js";
 import { Text } from "../text.js";
 import { Container } from "../containers.js";
 import { ViewPort } from "../viewport.js";
-import { AFilter, ASource, AudioChain } from "../../utils/sound.js";
+import { AFilter, ALoader, ASource, AudioChain } from "../../utils/sound.js";
 
 function load_properties(that: Element, props: { [key: string]: PlainValue<any> }) {
     for (let [k, v] of Object.entries(props)) {
@@ -16,14 +16,22 @@ function load_properties(that: Element, props: { [key: string]: PlainValue<any> 
         } else {
             switch (k) {
                 case 'id':
-                    (that as any)[k] = v;
+                    if (typeof v === "string") {
+                        that.id = v;
+                    } else {
+                        throw new Error(``);
+                    }
                     break;
                 default:
                     if (k.startsWith("data-")) {
-                        (that as any)[k] = new TextValue(v as any as string);
-                        return;
+                        const p = ((that as any)[k] = new TextValue());
+                        p.load(v);
+                    } else if ((v as any).$ == '?') {
+                        const p = ((that as any)[k] = new UnknownValue(""));
+                        p.load(v);
+                    } else {
+                        throw new Error(`Unexpected property "${k}" (${v})`);
                     }
-                    throw new Error(`Unexpected property "${k}" (${v})`);
             }
         }
     }
@@ -69,6 +77,16 @@ export function from_json(src: PlainRoot) {
     return root;
 }
 
+Root.load = async function (src: PlainRoot) {
+    const root = new Root();
+
+    return root;
+}
+
+Root.parse_json = function (src: string) {
+    return this.load(JSON.parse(src))
+}
+
 Root.prototype.load = function (src: PlainRoot) {
     const { version, view, frame_rate, assets, sounds } = src;
     if (!version) {
@@ -92,13 +110,15 @@ Root.prototype.load = function (src: PlainRoot) {
     this.version = version;
     this.sounds = [];
     if (sounds) {
+        const ldr = new ALoader()
         for (const v of sounds) {
             let next: ASource | AFilter | undefined = undefined;
             for (const u of v) {
                 if (next) {
-                    next = AudioChain.load(u, next);
+                    next = ldr.load(u, next);
                 } else {
-                    next = AudioChain.load(u, next as unknown as ASource);
+
+                    next = ldr.load(u, next as unknown as ASource);
                 }
             }
             if (next) {

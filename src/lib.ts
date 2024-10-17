@@ -30,8 +30,8 @@ declare module "./model/root" {
 
 Root.prototype.save_html = async function (file: string) {
     const o = this.dump();
-    // console.log("IMP", import.meta);
-    // console.log("IMP", import.meta.resolve("./svgmotion.web.js"));
+    // console.warn("IMP", import.meta);
+    // console.warn("IMP", import.meta.resolve("./svgmotion.web.js"));
     const fs = await import('fs/promises');
     const { fileURLToPath } = await import('url');
     const h = await fs.open(file, 'w');

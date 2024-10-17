@@ -24,13 +24,13 @@ test.test("Keyframe", (t) => {
     // console.info(tr.dump());
     for (const v of x.enum_values()) {
 
-        // console.log(v);
+        // console.warn(v);
     }
 
     x.stroke.dash_array.set_repr("4 5 6");
     t.same(x.stroke.dash_array.dump(), { v: "4 5 6" });
     let v = x.stroke.dash_array.get_value(0);
-    console.log(v);
+    console.warn(v);
 
     t.end();
 

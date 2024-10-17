@@ -24,10 +24,10 @@ function* enum1(all) {
     for (const [kind, v] of Object.entries(all)) {
         const q = enum_prototype_names(v);
         const t = [...q];
-        // console.log("X", kind, t)
+        // console.warn("X", kind, t)
         if (t.includes("Element")) {
             const { tag } = v;
-            // console.log("N", tag, kind, Object.getOwnPropertyDescriptors(v))
+            // console.warn("N", tag, kind, Object.getOwnPropertyDescriptors(v))
             if (tag && /^[a-zA-Z]/.test(tag)) {
                 let name = v.tag;
                 switch (name) {
@@ -59,4 +59,4 @@ if (1) {
 
     });
 }
-// console.log(Object.getOwnPropertyDescriptors(all.Element.prototype))
+// console.warn(Object.getOwnPropertyDescriptors(all.Element.prototype))

@@ -16,7 +16,7 @@ export function HeartBeat(parent, items, params) {
         const times = 3;
         dur = 2 * speed * times;
         // let m0 = Matrix.identity();
-        // console.log(`HeartBeat ${speed} ${times}`);
+        // console.warn(`HeartBeat ${speed} ${times}`);
         function beat(node, start, end) {
             const h = node.transform.prefix_hexad();
             let t = start;
@@ -28,12 +28,12 @@ export function HeartBeat(parent, items, params) {
             // let m1 = Matrix.scale(1.3).multiply(m0);
             h.set_matrix(t, m0, { start });
             for (; s-- > 0;) {
-                // console.log(`set_matrix t=${t} ${start}-${end}`);
+                // console.warn(`set_matrix t=${t} ${start}-${end}`);
                 h.set_matrix(t += speed, m1, { easing: Easing.inoutsine });
                 h.set_matrix(t += speed, m0, { easing: Easing.inoutsine });
             }
             if (t !== end) {
-                console.log(`Beat end ${t} ${end}`);
+                console.warn(`Beat end ${t} ${end}`);
             }
         }
 
@@ -74,7 +74,7 @@ test.test("_load_svg the_quick", async (t) => {
     let the2 = view.get_group("the");
     let over = view.get_group("over");
     let bb = view.bbox_of(0, dog, the);
-    // console.log(bb.dump_rect());
+    // console.warn(bb.dump_rect());
 
     const tr = root.at(0);
     // tr.run(Pass(1))

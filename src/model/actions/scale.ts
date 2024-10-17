@@ -86,7 +86,7 @@ export function ScaleOut(items: Element[] | Element, params: ScaleParams = {}): 
 
             for (const { node, m } of each()) {
                 // let [cx, cy] = ObjectBoxLength.get_anchor(node, start, anchor);
-                // console.log("get_anchor", [cx, cy])
+                // console.warn("get_anchor", [cx, cy])
                 const h = node.transform.prefix_hexad();
                 const u = h.get_matrix(start)
                 if (params.out === false) {

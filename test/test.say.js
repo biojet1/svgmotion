@@ -20,7 +20,7 @@ test.test("Say the_quick", async (t) => {
     let the2 = view.get_group("the");
     let over = view.get_group("over");
     let bb = view.bbox_of(0, dog, the);
-    // console.log(bb.dump_rect());
+    // console.warn(bb.dump_rect());
 
     const tr = root.at(0);
     const voc = root.voice(new svgmo.GTTS());
@@ -36,13 +36,13 @@ test.test("Say the_quick", async (t) => {
         const snd2 = await root.add_file_asset(`/mnt/META/opt/animations/sfx/mixkit-hard-pop-click-2364.wav`);
         let s = await snd1.as_sound();
         let t = await snd2.as_sound();
-        console.log("duration", s.get_duration(), s.start, s.end);
+        console.warn("duration", s.get_duration(), s.start, s.end);
         s = s.slice(10, 16)
-        console.log("duration", s.get_duration(), s.start, s.end);
+        console.warn("duration", s.get_duration(), s.start, s.end);
         // s = s.start_at(4)
-        console.log("duration", s.get_duration(), s.start, s.end);
+        console.warn("duration", s.get_duration(), s.start, s.end);
         s = s.fade_out(2, 'tri')
-        console.log("duration", s.get_duration(), s.start, s.end);
+        console.warn("duration", s.get_duration(), s.start, s.end);
         // s = s.pad_start(1)
         console.dir(s, { depth: 100 });
         // s = s.(2, 'tri')
@@ -73,7 +73,7 @@ test.test("Say the_quick", async (t) => {
 
         // {
         //     let [bin, ...args] = ff;
-        //     console.log(`${bin} `, ...args);
+        //     console.warn(`${bin} `, ...args);
         //     return spawn(bin, args, {
         //         stdio: ['pipe', 'inherit', 'inherit'],
         //     });

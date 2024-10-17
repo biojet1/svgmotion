@@ -13,7 +13,7 @@ test.test("_load_svg the_quick", async (t) => {
     let quick = view.get_group("quick");
     let lazy = view.get_group("lazy");
     let bb = view.bbox_of(0, dog, the);
-    // console.log(bb.dump_rect());
+    // console.warn(bb.dump_rect());
 
     {
         let r = view.add_rect();
@@ -44,7 +44,7 @@ test.test("_load_svg the_quick", async (t) => {
 
 
 
-    // console.log(r.fill.color.value, r.fill.color.get_rgb_repr(0) + "", r.fill.color.get_value(0));
+    // console.warn(r.fill.color.value, r.fill.color.get_rgb_repr(0) + "", r.fill.color.get_value(0));
     // console.dir(r.fill);
     // r.fill.opacity.set_value(.4)
     root.save_json('/tmp/the_quick.json')

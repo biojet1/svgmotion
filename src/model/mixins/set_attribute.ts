@@ -174,12 +174,9 @@ Element.prototype.set_attribute = function (name: string, value: string): Elemen
         /// ETC //////////
         default:
 
-            if (name.startsWith("data-")) {
-                (this as any)[name] = new UnknownValue(value);
-                return this;
-            }
+
             for (const [n, a] of Object.entries(Element._prop_attr)) {
-                // console.log("SET", n, a, name)
+                // console.warn("SET", n, a, name)
                 if (a == name) {
                     const f = (this as any)[n];
                     if (f instanceof Animatable) {
@@ -188,7 +185,13 @@ Element.prototype.set_attribute = function (name: string, value: string): Elemen
                     }
                 }
             }
-
+            // if (name.startsWith("data-")) 
+            {
+                (this as any)[name] = new UnknownValue(value);
+                // (this as any)[`${name}?`] = new UnknownValue(value);
+                console.warn(`Unexpected attribute [${name}]="${value}"`)
+                return this;
+            }
             throw new Error(
                 `Unexpected attribute [${name}]="${value}" tag="${(this.constructor as any).tag}" this="${this.constructor.name}"`
             );
@@ -398,9 +401,9 @@ Image.prototype.set_attribute = function (name: string, value: string) {
         case "preserveAspectRatio":
             this.fit_view.set_repr(value);
             break;
-        // case "crossorigin":
-        //     this.crossorigin.set_repr(value);
-        //     break;
+        case "crossorigin":
+            this.cross_origin.set_repr(value);
+            break;
         default:
             Element.prototype.set_attribute.call(this, name, value);
     }

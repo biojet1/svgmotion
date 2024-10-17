@@ -39,8 +39,6 @@ Container.prototype.dump = function () {
             o.id = id;
         }
     }
-
-
     o.nodes = [...this.children<Element>()].map((v) =>
         v.dump()
     );

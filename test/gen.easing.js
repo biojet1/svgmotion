@@ -35,5 +35,5 @@ static ${k[0].substr(4).toLowerCase()} = new Easing(${/\((.+)\)/.exec(k[1])[1]})
 
 `.trim()]).join('\n')
 
-console.log(x);
+console.warn(x);
 

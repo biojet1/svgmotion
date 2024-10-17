@@ -114,13 +114,16 @@ export async function render_root(root: Root, {
 
         // SINK ////////////////
         if (!sink) {
-            console.dir(root.sounds, { depth: 4 });
             const ff = ffcmd2(fps, [width, height], false, output, { lossless: true, ...video_params });
-            const mix = AMix.new(root.sounds, { duration });
-            // console.log(`AMix ${mix.get_duration()}`);
-            mix.feed_ff(ff);
+            if (root.sounds && root.sounds.length > 0) {
+                console.dir(root.sounds, { depth: 4 });
+                const mix = AMix.new(root.sounds, { duration });
+                // console.warn(`AMix ${mix.get_duration()}`);
+                mix.feed_ff(ff);
+            }
+
             const [bin, ...args] = ff.ff_params();
-            console.log(`${bin} `, ...args);
+            console.warn(`${bin} `, ...args);
             console.dir(ff, { depth: 10 });
             let ffproc = spawn(bin, args, {
                 stdio: ['pipe', 'inherit', 'inherit'],
@@ -134,7 +137,7 @@ export async function render_root(root: Root, {
         // RUN ///////////
         const start_frame = 0;
         const end_frame = frames;
-        console.log(`${frameTime(frames, frame_rate)}s ${frames} frames ${frame_rate} fps ${W}x${H} -> ${width}x${height} `);
+        console.warn(`${frameTime(frames, frame_rate)}s ${frames} frames ${frame_rate} fps ${W}x${H} -> ${width}x${height} `);
 
         const sso: ScreenshotOptions = {
             type: 'png',
@@ -145,7 +148,7 @@ export async function render_root(root: Root, {
         {
             await page.evaluate(`root.update_dom(${start_frame}); `);
             let html = await page.content();
-            // console.log(html);
+            // console.warn(html);
             await fs.writeFile('/tmp/svgmotion.html', html);
         }
         if (fps == frame_rate) {

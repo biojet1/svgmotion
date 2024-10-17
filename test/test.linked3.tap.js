@@ -61,7 +61,7 @@ test.test("Tree Linked3", (t) => {
     // t.same(A.last_child(), undefined);   
     to_string_check(t, A, 'A()');
     A.append_child(B);
-    // console.log(A._end._prev.constructor.name);
+    // console.warn(A._end._prev.constructor.name);
     t.same(A._parent, undefined);
     t.same(A._next, B);
     t.same(A._prev, undefined);

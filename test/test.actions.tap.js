@@ -24,7 +24,7 @@ test.test("Par 2", (t) => {
             To(c, 18),
         ])
     );
-    // console.log(x);
+    // console.warn(x);
 
     t.same(
         cata(c, 0, 15),
@@ -116,7 +116,7 @@ test.test("Seq then Par", (t) => {
     tr.frame_rate = 5;
     tr.hint_dur = 5;
     tr.run(Seq([To([a], 9), To([b], 8), To([c], 7)]));
-    // console.log(tr)
+    // console.warn(tr)
     t.same(a.dump(), {
         k: [
             { t: 0, v: 1 },
@@ -188,7 +188,7 @@ test.test("Seq then Par", (t) => {
 //     {
 //         t.equal(Object.getOwnPropertyDescriptor(r, "opacity"), undefined);
 //         t.equal(r.opacity.value, 1);
-//         // console.log(Object.entries(r));
+//         // console.warn(Object.entries(r));
 //         r.opacity.value = 0.5;
 //         t.equal(r.opacity.value, 0.5);
 //         r.opacity.value = 0.75;
@@ -217,7 +217,7 @@ test.test("Seq then Par", (t) => {
 
 //     {
 //         const q = r.position.kfs;
-//         // console.log(q[3]);
+//         // console.warn(q[3]);
 //         t.same(Array.from(q[3].value), [50, 50]);
 //     }
 
@@ -240,9 +240,9 @@ test.test("Curve", (t) => {
     );
     t.same(Array.from(pos.get_value(0)), [4, 5]);
     t.same(Array.from(pos.get_value(60)), [-200, -100]);
-    // console.log(a);
+    // console.warn(a);
     let d = pos.dump();
-    // console.log(d);
+    // console.warn(d);
     t.same(pos.dump(), d);
     t.end();
 });

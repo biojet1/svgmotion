@@ -15,21 +15,24 @@ export class AudioChain {
     get prev(): AudioChain | undefined {
         return undefined
     }
+    *walk() {
+        for (let cur: AudioChain | undefined = this; cur; cur = cur.prev) {
+            yield cur;
+        }
+    }
+    // dump
     _dump(): any {
         throw new Error(`Not implemented`);
     }
-    graph_name(): string {
-        const { _graph_name } = this;
-        if (_graph_name) {
-            return _graph_name;
+
+    dump(): any {
+        let a: any[] = [];
+        for (let cur: AudioChain | undefined = this; cur; cur = cur.prev) {
+            a.push(cur._dump());
         }
-        throw new Error(`No name`);
+        return a.reverse();
     }
-    static _load(_d: any, _prev: AFilter | ASource) {
-    }
-    feed_ff(_ff: FFRun, _parent?: AudioChain) {
-        throw new Error(`Not implemented in ${this.constructor.name}`);
-    }
+    ///
     slice(from?: number, to?: number) {
         return new Slice(this, { from, to });
     }
@@ -61,19 +64,25 @@ export class AudioChain {
     loop(loop: number) {
         return new Loop(this, { loop });
     }
-    *walk() {
-        for (let cur: AudioChain | undefined = this; cur; cur = cur.prev) {
-            yield cur;
-        }
+    // load
+    static _load(_d: any, _prev: AFilter | ASource) {
     }
-    dump(): any {
-        let a: any[] = [];
-        for (let cur: AudioChain | undefined = this; cur; cur = cur.prev) {
-            a.push(cur._dump());
+    //
+    graph_name(): string {
+        const { _graph_name } = this;
+        if (_graph_name) {
+            return _graph_name;
         }
-        return a.reverse();
+        throw new Error(`No name`);
     }
-    static load(d: { $: string;[key: string]: any; }, prev: AFilter | ASource): AFilter | ASource {
+    feed_ff(_ff: FFRun, _parent?: AudioChain) {
+        throw new Error(`Not implemented in ${this.constructor.name}`);
+    }
+
+}
+
+export class ALoader {
+    load(d: { $: string;[key: string]: any; }, prev: AFilter | ASource): AFilter | ASource {
         switch (d.$) {
             case "adelay": return ADelay._load(d, prev);
             case "aevalsrc": return AEval._load(d, prev);
@@ -92,8 +101,6 @@ export class AudioChain {
     }
 }
 
-export class AFirst {
-}
 export class ASource extends AudioChain {
     protected data: object;
     constructor(
@@ -303,8 +310,6 @@ export class AdjustVolume extends AFilter {
     }
 }
 
-
-
 export class Tremolo extends AFilter {
     static override tag = 'tremolo';
     override  *enum_filter() {
@@ -386,7 +391,7 @@ export class AMix extends ASource {
         if (duration > 0) {
             _end = Math.min(duration, _end);
         }
-        // console.log("RANGE", _start, _end);
+        // console.warn("RANGE", _start, _end);
         inputs = inputs.map(e => {
             const { start, end } = e;
             let pad_sec = _end - end;
@@ -400,7 +405,7 @@ export class AMix extends ASource {
             } else if (pad_sec < 0) {
                 e = e.slice(0, _end);
             }
-            // console.log("inputs", pad_sec, [start, end], [_start, _end]);
+            // console.warn("inputs", pad_sec, [start, end], [_start, _end]);
             return e;
         });
         this._start = _start;

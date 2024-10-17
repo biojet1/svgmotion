@@ -66,7 +66,7 @@ export async function sax_parse_svg(
     const parser = new SAXParser(strict, options);
     let parents: SAXElement[] = [];
     let root = new SAXElement();
-    // console.log("src", `[${src}]`);
+    // console.warn("src", `[${src}]`);
     parser.onerror = function (e: any) {
         console.error(e);
     };
@@ -77,7 +77,7 @@ export async function sax_parse_svg(
         parents.at(-1)?.nodes.push(t);
     };
     parser.onopentag = function (node: any) {
-        // console.log("onopentag", node);
+        // console.warn("onopentag", node);
         const { local, uri, attributes } = node as {
             local: string; uri: string;
             attributes: {
@@ -100,7 +100,7 @@ export async function sax_parse_svg(
         parents.push(elem);
     };
     parser.onclosetag = function (_node: any) {
-        // console.log("onclosetag", node);
+        // console.warn("onclosetag", node);
         if (parents.length < 1) {
             throw new Error(``);
         }

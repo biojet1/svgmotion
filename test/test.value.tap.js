@@ -35,7 +35,7 @@ test.test("ScalarValue", (t) => {
 
 test.test("VectorValue", (t) => {
     let v = new VectorValue([3, 4, 5, 6]);
-    // console.log(v, v.value);
+    // console.warn(v, v.value);
     t.equal(v.value[0], 3);
     t.equal(v.value[1], 4);
     t.equal(v.value[2], 5);
@@ -53,7 +53,7 @@ test.test("VectorValue", (t) => {
     // t.match(VectorValue.load({ v: [3, 4, 5, 6] }), { v: [3, 4, 5, 6] });
     v.key_value(0, new Vector([3, 4]));
     v.key_value(60, new Vector([4, 5]));
-    // console.log(`v=[${new VectorValue().value}]`);
+    // console.warn(`v=[${new VectorValue().value}]`);
     // t.throws(() => new VectorValue());
 
     t.end();
@@ -74,18 +74,18 @@ test.test("ViewPort", (t) => {
     // v[0].fun();
     // r.opacity =
     const json = doc.dump();
-    // console.log(JSON.stringify(json, null, 4));
-    // console.log(vp.constructor["opacity"]);
-    // console.log(vp.constructor["zoom_pan"]);
+    // console.warn(JSON.stringify(json, null, 4));
+    // console.warn(vp.constructor["opacity"]);
+    // console.warn(vp.constructor["zoom_pan"]);
     const { tag, nodes, ...props } = json.view;
-    // console.log(tag, nodes, props);
+    // console.warn(tag, nodes, props);
     t.equal(tag, "svg");
     t.equal(nodes[0].tag, "rect");
     t.same(props.view_box.size.v.slice(0, 2), [100, 100]);
     let head2 = new Root();
     head2.load(json);
     t.same(head2.dump(), json);
-    // console.log(JSON.stringify(load(json).dump(), null, 4));
+    // console.warn(JSON.stringify(load(json).dump(), null, 4));
 
     t.end();
 });
@@ -101,7 +101,7 @@ test.test("TextValue", (t) => {
     t.equal(x.get_value(0), "ONE");
     t.equal(x.get_value(10), "TWO");
     t.equal(x.get_value(20), "3");
-    // console.log(x);
+    // console.warn(x);
     t.equal(x.get_value(-5), "ONE");
     t.equal(x.get_value(5), "ONE");
     t.equal(x.get_value(15), "TWO");
@@ -116,7 +116,7 @@ test.test("Transform", (t) => {
         "translate(4,5) rotate(30) skewX(-7) scale(3, .5) translate(-2 -3) skewY(99) scale(1 , 1) matrix(1 2 3 4 5 6) rotate(2 0 4)"
     );
     t.ok("all" in x);
-    // console.log(x.dump());
+    // console.warn(x.dump());
 
     t.equal(
         x.get_repr(0),
@@ -215,7 +215,7 @@ test.test("Repeat", (t) => {
     t.same(v.get_value(20), 7);
     // t.same(cata(v, 0, 15),[]);
     // ;
-    // console.log(cata(v, 0, 15))
+    // console.warn(cata(v, 0, 15))
     t.end();
 });
 
@@ -243,7 +243,7 @@ test.test("Repeat fraction", (t) => {
     v.check_stepper = (s) => s.repeat(3.3333333333333).clamp();
     let o = 0;
     v.get_value(50);
-    // console.log([...v.enum_values(0, 33)]);
+    // console.warn([...v.enum_values(0, 33)]);
     for (const x of "7 8 9 10 11 12 13 14 15 7 8 9 10 11 12 13 14 15 7 8 9 10 11 12 13 14 15 7 8 9 9 9 9 9".split(
         " "
     )) {
@@ -300,7 +300,7 @@ test.test("Bounce 2.5x", (t) => {
         ` 8 9 10 11 12 13 14 15 14 13 12 11 10 9 8 7 8 9 10 11 12 13 14 15 15 15 15 15`
     ).split(" ")) {
         o++;
-        // console.log(`o:${o} x:${x}`);
+        // console.warn(`o:${o} x:${x}`);
         if (!t.same(v.get_value(o), parseInt(x), `o:${o} x:${x}`)) {
             break;
         }
@@ -323,7 +323,7 @@ test.test("Easing", (t) => {
     v.key_value(30, 5000, { easing: true });
     v.key_value(40, 2000);
     const d = v.dump();
-    // console.log(d)
+    // console.warn(d)
     let u = new ScalarValue(9);
     u.load(d);
 
@@ -359,9 +359,9 @@ test.test("PositionValue", (t) => {
         return Math.round(x * 1000);
     }
 
-    // console.log(a, b);
+    // console.warn(a, b);
 
-    // console.log([...p.enum_values(0, 3)]);
+    // console.warn([...p.enum_values(0, 3)]);
 
     for (const [i, x, y] of [
         [0, 10, 10],

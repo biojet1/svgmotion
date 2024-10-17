@@ -1,4 +1,4 @@
-import { Animatable } from "../value.js";
+import { Animatable, UnknownValue } from "../value.js";
 import { Transform, Fill, ViewBox, Font, Stroke, ValueSet } from "../valuesets.js";
 import { Element, Chars } from "../base.js";
 import { Root } from "../root.js";
@@ -172,12 +172,15 @@ function element_dom(self: Element,
         if (n == 'id') {
             elem.id = v.toString();
         } else if (v instanceof Animatable) {
-            const attr = name_to_attr[n];
+            let attr = name_to_attr[n];
             if (!attr) {
-                if (n.startsWith("data-")) {
-                    continue;
+                if (v instanceof UnknownValue) {
+                    attr = n;
+                    // } else if (n.startsWith("data-")) {
+                    //     continue;
+                } else {
+                    throw new Error(`Unexpected property "${n}"`);
                 }
-                throw new Error(`Unexpected property "${n}"`);
             }
             add_upd(v.attr_field_updater(attr), elem);
         } else if (v instanceof ValueSet) {
@@ -208,7 +211,7 @@ export function updater_dom(root: Root, doc: typeof SVGElement.prototype.ownerDo
     const updates: Array<(frame: number) => void> = [];
     function add_upd(attup: AttUP, elem?: globalThis.SVGElement, text?: globalThis.Text) {
         let { kfv, attr, call, value } = attup;
-        console.log(attr, value, elem?.constructor.name, text?.constructor.name, kfv)
+        console.warn(attr, value, elem?.constructor.name, text?.constructor.name, kfv)
         if (kfv) {
             if (elem) {
                 if (!attr || text) {

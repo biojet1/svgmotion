@@ -65,7 +65,7 @@ Element.prototype.farthest_viewport = function () {
 
 Element.prototype.get_vp_width = function (frame: number): number {
     const ov = this.owner_viewport();
-    // console.log(`get_vp_width this[${this.constructor.name}]  ov<${ov?.constructor.name}>`)
+    // console.warn(`get_vp_width this[${this.constructor.name}]  ov<${ov?.constructor.name}>`)
     if (ov) {
         if (Object.hasOwn(ov, "view_box")) {
             const s = ov.view_box.size.get_value(frame);
@@ -79,7 +79,7 @@ Element.prototype.get_vp_width = function (frame: number): number {
 
 Element.prototype.get_vp_height = function (frame: number): number {
     const ov = this.owner_viewport();
-    // console.log(`get_vp_height this[${this.constructor.name}]  ov<${ov?.constructor.name}>`)
+    // console.warn(`get_vp_height this[${this.constructor.name}]  ov<${ov?.constructor.name}>`)
     if (ov) {
         if (Object.hasOwn(ov, "view_box")) {
             const s = ov.view_box.size.get_value(frame);
@@ -93,7 +93,7 @@ Element.prototype.get_vp_height = function (frame: number): number {
 
 Element.prototype.get_vp_size = function (frame: number, w?: number, h?: number): Vector {
     const ov = this.owner_viewport();
-    // console.log(`get_vp_size this[${this.constructor.name}]  ov<${ov?.constructor.name}>`)
+    // console.warn(`get_vp_size this[${this.constructor.name}]  ov<${ov?.constructor.name}>`)
     if (ov) {
         if (Object.hasOwn(ov, "view_box")) {
             const s = ov.view_box.size.get_value(frame);

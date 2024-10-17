@@ -6,7 +6,7 @@ import { Element } from "./base.js";
 import { BoxLength } from "./length.js";
 
 export function xget<T>(that: any, name: string, value: T): T {
-    // console.log(`_GETX ${name}`);
+    // console.warn(`_GETX ${name}`);
     Object.defineProperty(that, name, {
         value,
         writable: true,
@@ -17,7 +17,7 @@ export function xget<T>(that: any, name: string, value: T): T {
 }
 
 export function xset<T>(that: any, name: string, value: T) {
-    // console.log(`_SETX ${name}`);
+    // console.warn(`_SETX ${name}`);
     Object.defineProperty(that, name, {
         value,
         writable: true,
@@ -758,7 +758,7 @@ export class MHexad extends VectorValue {
     }
     set_matrix(frame: number, m: Matrix, extra?: KeyExtra) {
         const [a, b, c, d, e, f] = m.dump_hexad();
-        // console.log('set_matrix', extra)
+        // console.warn('set_matrix', extra)
         this.key_value(frame, new Vector([a, b, c, d, e, f]), extra)
     }
     override dump() {

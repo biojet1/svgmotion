@@ -39,7 +39,7 @@ export async function main() {
                         },
                     }),
             (args) => {
-                // console.log("gen", args);
+                // console.warn("gen", args);
                 const script = args.script as string;
                 (
                     import(
@@ -47,7 +47,7 @@ export async function main() {
                     ) as Promise<AnimMod>
                 )
                     .then(({ animate }) => {
-                        // console.log("import gen", animate);
+                        // console.warn("import gen", animate);
                         return animate(lib);
                     })
                     .then((doc) => {

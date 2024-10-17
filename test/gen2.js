@@ -3,7 +3,7 @@
 import { Root, Rel } from "svgmotion";
 export async function animate(lib) {
     const root = await Root._load_svg("../../python/flottie/example/res/thank_you_tp.svg");
-    console.log(root);
+    console.warn(root);
     const p = root.view.first_child().first_child().first_child();
     const R = p.transform.rotation;
     root.at(0).run(

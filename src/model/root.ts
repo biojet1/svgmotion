@@ -65,6 +65,7 @@ export class Root extends Container {
     version: string = "0.0.1";
     sounds: AudioChain[] = [];
     assets: { [key: string]: Asset; } = {};
+
     // view
     get view() {
         for (const c of this.children()) {
@@ -123,4 +124,7 @@ export class Root extends Container {
     static _parse_svg(_src: string): Promise<Root> {
         throw new Error(`Not implemented`)
     }
+    static load: (src: PlainRoot) => Promise<Root>;
+    static parse_json: (src: string) => Promise<Root>;
+
 }

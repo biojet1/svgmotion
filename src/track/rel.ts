@@ -65,7 +65,7 @@ export function Rel(t: string | number): Proxy {
         let t_max = -Infinity;
         const map = new Map<IProperty<any>, RelEntry2[]>();
         for (const [time, _] of map2.entries()) {
-            // console.log('time', time, time.endsWith('%'));
+            // console.warn('time', time, time.endsWith('%'));
             if (typeof time == "number") {
                 if (!Number.isFinite(time)) {
                     throw new Error(`Invalid time: ${time}`);
@@ -76,9 +76,9 @@ export function Rel(t: string | number): Proxy {
                 }
             }
         }
-        // console.log("map2", map2);
+        // console.warn("map2", map2);
         if (t_max < 0) {
-            // console.log(map2);
+            // console.warn(map2);
             throw new Error(`Invalid duration: ${t_max}`);
         }
         const frames = track.to_frame(t_max);
@@ -118,7 +118,7 @@ export function Rel(t: string | number): Proxy {
         for (const [, v] of map.entries()) {
             v.sort((a, b) => a.offset - b.offset);
         }
-        // console.log("rel map", map);
+        // console.warn("rel map", map);
         function sup(that: Track) {
             for (const [k, v] of map.entries()) {
                 v.forEach((e, i, a) => e.op.apply(k, e, i, a));
@@ -137,7 +137,7 @@ export function Rel(t: string | number): Proxy {
             }
             sup.start = frame;
             sup.end = frame + frames;
-            // console.log("rel res", map);
+            // console.warn("rel res", map);
             return sup;
         };
     }
@@ -176,7 +176,7 @@ export function Rel(t: string | number): Proxy {
         return this;
     };
     fn.at = function (o: number | string) {
-        // console.log("AT", typeof o, o, arguments)
+        // console.warn("AT", typeof o, o, arguments)
         if (typeof o == "number") {
             return this.t(o);
         } else if (o.endsWith("%")) {
