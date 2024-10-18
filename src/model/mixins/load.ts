@@ -6,7 +6,7 @@ import { Root, PlainRoot, PlainNode, Asset } from "../root.js";
 import { Text } from "../text.js";
 import { Container } from "../containers.js";
 import { ViewPort } from "../viewport.js";
-import { AFilter, ALoader, ASource, AudioChain } from "../../utils/sound.js";
+import { AFilter, ALoader, ASource } from "../../utils/sound.js";
 
 function load_properties(that: Element, props: { [key: string]: PlainValue<any> }) {
     for (let [k, v] of Object.entries(props)) {
@@ -45,7 +45,7 @@ function load_node(obj: PlainNode, parent: Container) {
         if (node instanceof Container) {
             if (nodes) {
                 for (const child of nodes) {
-                    if (child.tag === "$") {
+                    if (child.tag === "chars") {
                         if (node instanceof Text) {
                             node.add_content().content.load(child as any as PlainValue<string>);
                         } else {

@@ -56,7 +56,7 @@ Root.prototype.dom_stepper = function (): { svg: SVGElement, stepper: Stepper } 
     return { svg, stepper }
 }
 
-Root.prototype.animate = function ({ fps = 60, parent }) {
+Root.prototype.animate = function ({ parent }) {
     if (typeof parent === 'string') {
         parent = document.getElementById(parent);
     }

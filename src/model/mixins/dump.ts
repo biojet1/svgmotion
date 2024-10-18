@@ -83,6 +83,6 @@ Root.prototype.dump = function (): PlainRoot {
 
 Chars.prototype.dump = function (): any {
     const d = this.content.dump();
-    (d as any).tag = "$";
+    (d as any).tag = "chars";
     return d;
 }

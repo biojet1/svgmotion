@@ -20,11 +20,6 @@ export interface PlainAsset {
     url?: string;
 }
 
-// export interface PlainSound {
-//     ref: string;
-//     filters?: any[];
-// }
-
 export interface PlainRoot {
     version: string;
     view: PlainNode;

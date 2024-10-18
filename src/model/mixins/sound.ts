@@ -1,5 +1,5 @@
-import { Asset, Root } from "../root.js";
-import { AFilter, ALoader, ASource, AudioChain, AudioSource } from "../../utils/sound.js";
+import { Asset } from "../root.js";
+import { AudioSource } from "../../utils/sound.js";
 
 declare module "../root" {
     interface Asset {
@@ -8,7 +8,7 @@ declare module "../root" {
 }
 
 class AudioAssetSource extends AudioSource {
-    dump() {
+    override dump() {
         const d = super.dump();
         delete d.path;
         return d;
