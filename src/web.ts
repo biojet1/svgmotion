@@ -8,11 +8,9 @@ export * from "./model/mixins/load.js";
 
 export function animate(st: Stepper, fps: number) {
     if (st.start < st.end) {
-
         const mspf = 1000 / fps; // miliseconds per frame
         const frames = st.end - st.start + 1;
         let frame = st.start;
-
         function render(_currentTime: DOMHighResTimeStamp) {
             const t = performance.now();
             {
@@ -62,17 +60,9 @@ Root.prototype.animate = function ({ fps = 60, parent }) {
     if (typeof parent === 'string') {
         parent = document.getElementById(parent);
     }
-    if (0) {
-        // if (parent) {
-        //     let svg = this.to_dom(document);
-        //     parent.appendChild(svg);
-        // }
-        // animate(this, fps);
-    } else {
-        if (parent) {
-            let { svg, stepper } = this.dom_stepper();
-            parent.appendChild(svg);
-            animate(stepper, this.frame_rate);
-        }
+    if (parent) {
+        let { svg, stepper } = this.dom_stepper();
+        parent.appendChild(svg);
+        animate(stepper, this.frame_rate);
     }
 };

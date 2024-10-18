@@ -21,7 +21,7 @@ export type PlainValue<V> = {
     k?: PlainKeyframeV<V>[];
     r?: number;
     b?: boolean;
-    _?: string;
+    $?: string;
 };
 
 export class Animatable<

@@ -461,7 +461,7 @@ export class Transform extends ValueSet {
         this.clear();
         const load = (u: Array<any>) => {
             u.forEach((v) => {
-                switch (v._) {
+                switch (v.$) {
                     case "t":
                         this.add_translate().load(v);
                         break;
@@ -499,7 +499,7 @@ export class Transform extends ValueSet {
                         break;
 
                     default:
-                        throw new Error(`Unexpected transform ${v._}`);
+                        throw new Error(`Unexpected transform ${v.$}`);
                 }
             });
         }
@@ -655,7 +655,7 @@ class MTranslate extends PositionValue {
     }
     override dump() {
         const o = super.dump();
-        o._ = "t";
+        o.$ = "t";
         return o;
     }
 }
@@ -671,7 +671,7 @@ class MScale extends VectorValue {
     }
     override dump() {
         const o = super.dump();
-        o._ = "s";
+        o.$ = "s";
         return o;
     }
 }
@@ -690,7 +690,7 @@ class MRotateAt extends VectorValue {
     }
     override dump() {
         const o = super.dump();
-        o._ = "R";
+        o.$ = "R";
         return o;
     }
 }
@@ -706,7 +706,7 @@ class MRotation extends ScalarValue {
     }
     override dump() {
         const o = super.dump();
-        o._ = "r";
+        o.$ = "r";
         return o;
     }
 }
@@ -722,7 +722,7 @@ class MSkewX extends ScalarValue {
     }
     override dump() {
         const o = super.dump();
-        o._ = "x";
+        o.$ = "x";
         return o;
     }
 }
@@ -738,7 +738,7 @@ class MSkewY extends ScalarValue {
     }
     override dump() {
         const o = super.dump();
-        o._ = "y";
+        o.$ = "y";
         return o;
     }
 }
@@ -763,7 +763,7 @@ export class MHexad extends VectorValue {
     }
     override dump() {
         const o = super.dump();
-        o._ = "h";
+        o.$ = "h";
         return o;
     }
 }

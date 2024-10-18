@@ -147,7 +147,7 @@ test.test("Transform", (t) => {
     {
         x = new Transform();
         x.add_translate(3, 5)
-        t.same(x.dump(), [{ _: 't', v: [3, 5] }]);
+        t.same(x.dump(), [{ $: 't', v: [3, 5] }]);
     }
     {
         x = new Transform();
@@ -159,7 +159,7 @@ test.test("Transform", (t) => {
         x.add_scale(3, 4)
         t.same(x.dump(), {
             box: { v: "stroke-box" }, all: [
-                { _: "s", v: [3, 4] }
+                { $: "s", v: [3, 4] }
             ]
         });
     }
@@ -169,7 +169,7 @@ test.test("Transform", (t) => {
         x.add_rotate(-30, -4, -5)
         t.same(x.dump(), {
             origin: { v: "right top" }, all: [
-                { _: "R", v: [-30, -4, -5] }
+                { $: "R", v: [-30, -4, -5] }
             ]
         });
         x.load([]);
@@ -184,7 +184,7 @@ test.test("Transform", (t) => {
             origin: { v: "left bottom" },
             box: { v: "content-box" },
             all: [
-                { _: "R", v: [-30, -4, -5] }
+                { $: "R", v: [-30, -4, -5] }
             ]
         });
         x.load([]);

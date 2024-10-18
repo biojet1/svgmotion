@@ -195,10 +195,6 @@ export class Animated<V, K extends Keyframe<V> = Keyframe<V>> implements Steppab
     check_stepper<U>(stepper: Stepper<U>) {
         return stepper;
     }
-    // on_stepper<U>(check: (stepper: Stepper<U>) => Stepper<U>) {
-    //     delete this['kfs_stepper'];
-    //     this.check_stepper = check;
-    // }
 }
 
 export type Keyframe<V> = {
