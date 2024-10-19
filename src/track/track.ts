@@ -85,18 +85,16 @@ export class Track implements Steppable {
             }
             steps.push(up);
         }
-        return this.check_stepper(Stepper.create((frame: number) => {
+        return Stepper.create((frame: number) => {
             for (const st of steps) {
                 const { start: s, end: e } = st;
                 if (frame >= s && frame <= e) {
                     st.step(frame);
                 }
             }
-        }, start, end));
+        }, start, end);
     }
-    check_stepper<U>(stepper: Stepper<U>) {
-        return stepper;
-    }
+
 }
 
 function feed(track: Track, cur: Resolver, frame: number, base_frame: number) {

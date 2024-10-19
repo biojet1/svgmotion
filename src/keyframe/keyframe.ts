@@ -1,5 +1,6 @@
 import { Steppable, Stepper } from "../track/stepper.js";
 import { cubic_bezier_y_of_x } from "./bezier.js";
+import { _clamp, Steps } from "./steps.js";
 
 export type KeyExtra = {
     start?: number,
@@ -78,20 +79,6 @@ export class Animated<V, K extends Keyframe<V> = Keyframe<V>> implements Steppab
         return this.lerp_value(t, p.value, k.value);
     }
     // static
-    get kfs_stepper() {
-        const value = this.make_stepper((n: number) => this.get_value(n));
-        Object.defineProperty(this, 'kfs_stepper', {
-            value,
-            writable: true,
-            enumerable: true,
-            configurable: true,
-        });
-        return value;
-    }
-    set kfs_stepper(_v: Stepper<V> | undefined) {
-
-    }
-
     key_value(
         frame: number,
         value: V,
@@ -179,6 +166,7 @@ export class Animated<V, K extends Keyframe<V> = Keyframe<V>> implements Steppab
             yield st.step(start++);
         }
     }
+    // stepper
     stepper(): Stepper {
         return this.make_stepper((n: number) => this.update_value(n));
     }
@@ -188,13 +176,57 @@ export class Animated<V, K extends Keyframe<V> = Keyframe<V>> implements Steppab
         const first = kfs.at(0);
         const last = kfs.at(-1);
         if (first && last) {
-            return this.check_stepper(Stepper.create<U>(step, first.time, last.time)).clamp();
+            if (Object.hasOwn(this, 'steps')) {
+                if (1) {
+                    const [f, s, e] = this.steps.apply(step, first.time, last.time);
+                    return Stepper.create<U>(f, s, e).clamp();
+                } else {
+                    const [v, a, b] = _clamp(first.time, last.time)
+                    const [f, s, e] = this.steps.apply((f: number) => step(v(f)), a, b);
+                    return Stepper.create<U>(f, s, e).clamp();
+                }
+            }
+            return Stepper.create<U>(step, first.time, last.time).clamp();
         }
         throw Error(`Unexpected by '${this.constructor.name}'`);
     }
-    check_stepper<U>(stepper: Stepper<U>) {
-        return stepper;
+    get kfs_stepper() {
+        const value = this.make_stepper((n: number) => this.get_value(n));
+        Object.defineProperty(this, 'kfs_stepper', {
+            value,
+            writable: true,
+            enumerable: true,
+            configurable: true,
+        });
+        return value;
     }
+    set kfs_stepper(v: Stepper<V> | undefined) {
+        Object.defineProperty(this, 'kfs_stepper', {
+            value: v,
+            writable: true,
+            enumerable: true,
+            configurable: true,
+        });
+    }
+    get steps() {
+        const value = new Steps();
+        Object.defineProperty(this, 'steps', {
+            value,
+            writable: true,
+            enumerable: true,
+            configurable: true,
+        });
+        return value;
+    }
+    set steps(v: Steps) {
+        Object.defineProperty(this, 'steps', {
+            value: v,
+            writable: true,
+            enumerable: true,
+            configurable: true,
+        });
+    }
+
 }
 
 export type Keyframe<V> = {

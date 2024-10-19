@@ -2,7 +2,7 @@ import { cubic_bezier_y_of_x } from './bezier.js';
 
 type Easing = [number, number, number, number];
 
-function _repeat(S: number, E: number, count: number = 2): [((f: number) => number), number, number] {
+export function _repeat(S: number, E: number, count: number = 2): [((f: number) => number), number, number] {
     const d = E - S; // duration
     const i = d + 1; // iter duration
     const a = count * i; // active duration
@@ -13,7 +13,7 @@ function _repeat(S: number, E: number, count: number = 2): [((f: number) => numb
     return [w, S, Z];
 }
 
-function _reverse(S: number, E: number): [((f: number) => number), number, number] {
+export function _reverse(S: number, E: number): [((f: number) => number), number, number] {
     const d = E - S; // duration
     const i = d + 1; // iter duration
 
@@ -22,24 +22,22 @@ function _reverse(S: number, E: number): [((f: number) => number), number, numbe
     return [w, S, E];
 }
 
-function _bounce(S: number, E: number, repeatCount: number = 1.0): [((f: number) => number), number, number] {
+export function _bounce(S: number, E: number, repeatCount: number = 1.0): [((f: number) => number), number, number] {
     const d = E - S; // duration
     const i = (d + 1) * 2 - 1; // iter duration
     const p = i - 1;
     const h = p / 2;
     const a = p * repeatCount;
     const Z = S + a;
-
     const w = (frame: number) => S + (h - Math.abs(((((frame - S) % p) + p) % p) - h));
-
     return [w, S, Z];
 }
 
-function _start_at(s: number, e: number, a: number): [((f: number) => number), number, number] {
+export function _start_at(s: number, e: number, a: number): [((f: number) => number), number, number] {
     return [(t: number) => (s + (t - a)), a, a + (e - s)];
 }
 
-function _clamp(s: number, e: number): [((f: number) => number), number, number] {
+export function _clamp(s: number, e: number): [((f: number) => number), number, number] {
     return [
         (n: number) => (n >= e ? e : (n <= s ? s : n)),
         s,
@@ -47,7 +45,7 @@ function _clamp(s: number, e: number): [((f: number) => number), number, number]
     ];
 }
 
-function _ease(s: number, e: number, easing: Easing): [((f: number) => number), number, number] {
+export function _ease(s: number, e: number, easing: Easing): [((f: number) => number), number, number] {
     const [ox, oy, ix, iy] = easing;
     const d = e - s;
 
@@ -59,7 +57,7 @@ function _ease(s: number, e: number, easing: Easing): [((f: number) => number), 
     return [w, s, e];
 }
 
-function _remap(s: number, e: number, a: number, b: number): [((f: number) => number), number, number] {
+export function _remap(s: number, e: number, a: number, b: number): [((f: number) => number), number, number] {
     return [(t: number) => s + (t - a) * (e - s) / (b - a), a, b];
 }
 
@@ -107,7 +105,7 @@ function apply<T>(src: Array<{ $: string;[key: string]: any }>, U: (f: number) =
 }
 
 
-export class Steps extends Array<{ $: string;[key: string]: any }> {
+export class Steps {
     all: Array<{ $: string;[key: string]: any }> = [];
 
     repeat(count: number = 2): this {

@@ -204,7 +204,7 @@ test.test("Repeat", (t) => {
     v.key_value(1, 5);
     v.key_value(7, 13);
     v.key_value(9, 7);
-    v.check_stepper = (s) => s.repeat(2)
+    v.steps.repeat(2);
     t.same(v.get_value(0), 5);
     t.same(v.get_value(9), 7);
     t.same(v.get_value(10), 5);
@@ -214,7 +214,7 @@ test.test("Repeat", (t) => {
     t.same(v.get_value(20), 7);
     // t.same(cata(v, 0, 15),[]);
     // ;
-    // console.warn(cata(v, 0, 15))
+    // console.log(cata(v, 0, 21))
     t.end();
 });
 
@@ -223,7 +223,7 @@ test.test("Repeat Infinite", (t) => {
     v.key_value(1, 7);
     v.key_value(7, 13);
     v.key_value(9, 15);
-    v.check_stepper = (s) => s.repeat(Infinity)
+    v.steps.repeat(Infinity);
     let o = 0;
     for (const x of "7 8 9 10 11 12 13 14 15 7 8 9 10 11 12 13 14 15 7 8 9 10 11 12 13 14 15 7 8 9 10 11 12 13 14 15".split(
         " "
@@ -239,7 +239,7 @@ test.test("Repeat fraction", (t) => {
     v.key_value(1, 7);
     v.key_value(7, 13);
     v.key_value(9, 15);
-    v.check_stepper = (s) => s.repeat(3.3333333333333).clamp();
+    v.steps.repeat(3.3333333333333).clamp();
     let o = 0;
     v.get_value(50);
     // console.warn([...v.enum_values(0, 33)]);
@@ -257,7 +257,7 @@ test.test("Bounce once", (t) => {
     v.key_value(1, 7);
     v.key_value(7, 13);
     v.key_value(9, 15);
-    v.check_stepper = (s) => s.bounce();
+    v.steps.bounce();
     let o = 0;
     for (const x of (
         `7 8 9 10 11 12 13 14 15 14 13 12 11 10 9 8 7` + ` 7 7 7`
@@ -273,7 +273,7 @@ test.test("Bounce twice", (t) => {
     v.key_value(1, 7);
     v.key_value(7, 13);
     v.key_value(9, 15);
-    v.check_stepper = (s) => s.bounce(2);
+    v.steps.bounce(2);
     let o = 0 - 3;
     for (const x of (
         `7 7 7 7 8 9 10 11 12 13 14 15 14 13 12 11 10 9 8 7` +
@@ -292,7 +292,7 @@ test.test("Bounce 2.5x", (t) => {
     v.key_value(1, 7);
     v.key_value(7, 13);
     v.key_value(9, 15);
-    v.check_stepper = (s) => s.bounce(2.5);
+    v.steps.bounce(2.5);
     let o = 0 - 2;
     for (const x of (
         `7 7 7 8 9 10 11 12 13 14 15 14 13 12 11 10 9 8 7` +

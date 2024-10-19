@@ -1,3 +1,5 @@
+import { _bounce, _clamp, _remap, _repeat, _start_at } from "../keyframe/steps.js";
+
 export class Stepper<V = void> {
     start: number;
     end: number;
@@ -10,39 +12,28 @@ export class Stepper<V = void> {
     }
 
     repeat(count: number) {
-        const E = this.end;
-        const S = this.start;
-        const u = this.step;
-        const d = E - S; // duration
-
-        const i = d + 1; // iter duration
-        const a = count * i; // active duration
-        const Z = S + a - 1; // last frame
-
-        return new Stepper((frame: number) => u(S + ((frame - S) % i)), S, Z);
+        const { step: w, start: s, end: e } = this;
+        const [v, a, b] = _repeat(s, e, count)
+        return new Stepper((f: number) => w(v(f)), a, b);
     }
 
     bounce(repeat_count: number = 1) {
-        const E = this.end;
-        const S = this.start;
-        const u = this.step;
-        const d = E - S; // duration
-
-        const i = (d + 1) * 2 - 1; // iter duration
-        const p = i - 1;
-        const h = p / 2;
-        const a = p * repeat_count;
-        const Z = S + a;
-
-        return new Stepper((frame: number) => u(S + (h - Math.abs(((((frame - S) % p) + p) % p) - h))), S, Z);
+        const { step: w, start: s, end: e } = this;
+        const [v, a, b] = _bounce(s, e, repeat_count)
+        return new Stepper((f: number) => w(v(f)), a, b);
     }
 
     clamp() {
-        const E = this.end;
-        const S = this.start;
-        const u = this.step;
-        return new Stepper((frame: number) => u((frame <= S) ? S : ((frame >= E) ? E : frame)), S, E);
+        const { step: w, start: s, end: e } = this;
+        const [v, a, b] = _clamp(s, e)
+        return new Stepper((f: number) => w(v(f)), a, b);
     }
+
+    // slice2(start: number, end: number) {
+    //     const { step: w, start: s, end: e } = this;
+    //     const [v, a, b] = _clamp(s, e)
+    //     return new Stepper((f: number) => w(v(f)), a, b);
+    // }
 
     slice(start: number, end: number) {
         const { start: S, end: E } = this;
@@ -54,21 +45,15 @@ export class Stepper<V = void> {
     }
 
     start_at(start: number) {
-        const u = this.step;
-        const c = this.start;
-        const d = this.end;
-        return new Stepper(((frame: number) => u(c + (frame - start))), start, start + (d - c));
+        const { step: w, start: s, end: e } = this;
+        const [v, a, b] = _start_at(s, e, start)
+        return new Stepper((f: number) => w(v(f)), a, b);
     }
 
-    remap_range(s?: number, e?: number) {
-        const a = this.start;
-        const b = this.end;
-        const c = s ?? this.start;
-        const d = e ?? this.end;
-        const u = this.step;
-        const da = (b - a);
-        const dc = (d - c);
-        return new Stepper(((frame: number) => u(c + (frame - a) * dc / da)), a, b);
+    remap_range(m?: number, n?: number) {
+        const { step: w, start: s, end: e } = this;
+        const [v, a, b] = _remap(s, e, m ?? s, n ?? e)
+        return new Stepper((f: number) => w(v(f)), a, b);
     }
 
     stepper() {
