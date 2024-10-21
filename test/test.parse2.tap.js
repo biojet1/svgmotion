@@ -47,7 +47,7 @@ test.test("_load_svg the_quick", async (t) => {
     // console.warn(r.fill.color.value, r.fill.color.get_rgb_repr(0) + "", r.fill.color.get_value(0));
     // console.dir(r.fill);
     // r.fill.opacity.set_value(.4)
-    root.save_json('/tmp/the_quick.json')
-    root.save_html('/tmp/the_quick.html');
+    root.save_json('/tmp/ts-the_quick.json')
+    root.save_html('/tmp/ts-the_quick.html');
     t.end();
 });

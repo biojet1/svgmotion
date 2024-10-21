@@ -105,6 +105,22 @@ export class Root extends Container {
     set track(v: AnimTrack) {
         xset(this, "track", v);
     }
+    override calc_time_range() {
+        let [s, e] = super.calc_time_range();
+        if (this.sounds) {
+            for (const [k, v] of Object.entries(this.sounds)) {
+                const E = this.track.to_frame(v.end);
+                if (E < Infinity && E > e) {
+                    e = E;
+                }
+                const S = this.track.to_frame(v.start);
+                if (S < s) {
+                    s = S;
+                }
+            }
+        }
+        return [s, e]
+    }
     //
     async add_file_asset(path: string) {
         const id = crypto.randomUUID();

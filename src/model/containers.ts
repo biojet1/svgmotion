@@ -1,27 +1,25 @@
 import { BoundingBox, Matrix } from "../geom/index.js";
-import { Keyframe } from "../keyframe/keyframe.js";
 import { Animatable, TextValue, LengthValue, LengthXValue, LengthYValue } from "./value.js";
 import { ValueSet, ViewBox } from "./valuesets.js";
 import { Element, Chars } from "./base.js";
 import { Node } from "../tree/linked3.js";
 
 export class Container extends Element {
-    // keyframes
-    *enum_keyframes(): Generator<Array<Keyframe<any>>, void, unknown> {
-        for (let v of this.enum_values()) {
-            yield v.kfs;
-        }
-    }
     calc_time_range() {
         let max = 0;
         let min = 0;
-        for (let kfs of this.enum_keyframes()) {
-            for (const { time } of kfs) {
-                if (time > max) {
-                    max = time;
-                }
-                if (time < min) {
-                    min = time;
+        for (let v of this.enum_values()) {
+            const { kfs } = v;
+            if (kfs && kfs.length > 0) {
+                const s = v.kfs_stepper;
+                if (s) {
+                    const { start, end } = s;
+                    if (end < Infinity && end > max) {
+                        max = end;
+                    }
+                    if (start < min) {
+                        min = start;
+                    }
                 }
             }
         }

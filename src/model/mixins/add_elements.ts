@@ -1,6 +1,6 @@
 import { Element } from "../base.js";
 import { Image, Use } from "../elements.js";
-import { TSpan, Text } from "../text.js";
+import { Style, TSpan, Text } from "../text.js";
 import { Container, Group, Symbol, Filter, Marker, Mask, Pattern, ClipPath, Defs } from "../containers.js";
 import { ViewPort } from "../viewport.js";
 import { Ellipse, Circle, Polyline, Polygon, Rect, Path, Line, } from "../shapes.js";
@@ -42,6 +42,7 @@ declare module "../containers" {
         add_polygon(params?: AddOpt): Polygon;
         add_tspan(params?: AddOpt): TSpan;
         add_text(params?: AddOpt): Text;
+        add_style(params?: AddOpt): Style;
         ////
         _add_element(name: string): Element;
     }
@@ -76,6 +77,7 @@ Container.prototype.add_path = function (params?: AddOpt) { const { before, ...e
 Container.prototype.add_polygon = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = Polygon.new(etc); this.insert_before(before, x); return x; }
 Container.prototype.add_tspan = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = TSpan.new(etc); this.insert_before(before, x); return x; }
 Container.prototype.add_text = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = Text.new(etc); this.insert_before(before, x); return x; }
+Container.prototype.add_style = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = Style.new(etc); this.insert_before(before, x); return x; }
 
 Container.prototype._add_element = function (tag: string, params?: AddOpt) {
     switch (tag) {
@@ -107,6 +109,7 @@ Container.prototype._add_element = function (tag: string, params?: AddOpt) {
         case "polygon": return this.add_polygon(params);
         case "tspan": return this.add_tspan(params);
         case "text": return this.add_text(params);
+        case "style": return this.add_style(params);
     }
     throw new Error("Unexpected tag: " + tag);
 }

@@ -1,7 +1,7 @@
 import test from "tap";
-import { Stepper } from "svgmotion";
+import { Stepper, Steps } from "svgmotion";
 
-import { Steps } from "../dist/keyframe/steps.js";
+// import { Steps } from "../dist/keyframe/steps.js";
 
 function echo(n) {
     return n;

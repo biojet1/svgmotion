@@ -93,7 +93,7 @@ export class Element extends Parent {
     get fill() { return this._new_field("fill", new Fill()); }
     get stroke() { return this._new_field("stroke", new Stroke()); }
     get font() { return this._new_field("font", new Font()); }
-    get opacity() { return this._new_field("opacity", new PercentageValue(1)); }
+    get classes() { return this._new_field("classes", new TextValue()); }
     get alignment_baseline() { return this._new_field("alignment_baseline", new TextValue()); }
     get text_anchor() { return this._new_field("text_anchor", new TextValue('start')); }
     get text_decoration() { return this._new_field("text_decoration", new TextValue('none')); }
@@ -120,6 +120,7 @@ export class Element extends Parent {
     get filter() { return this._new_field("filter", new TextValue()); }
     get letter_spacing() { return this._new_field("letter_spacing", new LengthValue(0)); }
     get mask() { return this._new_field("mask", new TextValue('')); }
+    get opacity() { return this._new_field("opacity", new PercentageValue(1)); }
     get pointer_events() { return this._new_field("pointer_events", new TextValue('visiblePainted')); }
     get vector_effect() { return this._new_field("vector_effect", new TextValue('none')); }
 

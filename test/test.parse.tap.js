@@ -2,6 +2,8 @@
 import test from "tap";
 import { Root, Rel } from "svgmotion";
 
+const DIR = '/tmp';
+
 test.test("_load_svg polygon01", async (t) => {
     const root = await Root.load_svg("res/polygon01.svg");
     const tr = root.at(0);
@@ -22,12 +24,14 @@ test.test("_load_svg polygon01", async (t) => {
             .d(1).first(R)
     );
     // console.dir(root.dump(), { depth: 100 });
-    root.save_html("/tmp/ts-polygon01.html");
+    root.save_json(`${DIR}/ts-polygon01.json`);
+    root.save_html(`${DIR}/ts-polygon01.html`);
     t.end();
 });
+
 test.test("ts-tspan", async (t) => {
     const root = await Root.parse_svg(`<?xml version="1.0" standalone="no"?>
-<svg width="10cm" height="3cm" viewBox="0 0 1000 300"     xmlns="http://www.w3.org/2000/svg" version="1.1">
+<svg width="10cm" height="3cm" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" version="1.1">
   <g font-family="Verdana" font-size="64" >
     <text x="100" y="180" fill="blue" >
         But you
@@ -38,7 +42,6 @@ test.test("ts-tspan", async (t) => {
           a peach!
         </tspan>
     </text>
-
   </g>
 </svg>
         `)
@@ -88,8 +91,10 @@ test.test("ts-tspan", async (t) => {
     //     im.y.set_value(5);
     // }
     // console.dir(im.href, { depth: 100 })
-    root.save_json('/tmp/ts-tspan.json')
-    root.save_html('/tmp/ts-tspan.html');
+    root.at(0).run(Rel(0.2).to(ts.fill.color, "yellow").at(0.3).to(ts.fill.color, "pink"));
+    ts.fill.color.steps.bounce().repeat(Infinity);
+    root.save_json(`${DIR}/ts-tspan.json`)
+    root.save_html(`${DIR}/ts-tspan.html`);
     {
         const poly = root.view.add_polygon();
         console.warn('marker_start', poly.marker_start.get_value(0));

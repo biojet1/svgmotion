@@ -3,7 +3,7 @@ import { Animatable } from "../value.js";
 import { ValueSet } from "../valuesets.js";
 import { Element } from "../base.js";
 import { Root, PlainRoot, PlainNode, Asset } from "../root.js";
-import { Text } from "../text.js";
+import { Content, Text } from "../text.js";
 import { Container } from "../containers.js";
 import { ViewPort } from "../viewport.js";
 import { AFilter, ALoader, ASource } from "../../utils/sound.js";
@@ -46,7 +46,7 @@ function load_node(obj: PlainNode, parent: Container) {
             if (nodes) {
                 for (const child of nodes) {
                     if (child.tag === "chars") {
-                        if (node instanceof Text) {
+                        if (node instanceof Content) {
                             node.add_content().content.load(child as any as PlainValue<string>);
                         } else {
                             throw new Error(`"${tag}"`);

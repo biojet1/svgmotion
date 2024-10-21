@@ -1,21 +1,23 @@
 
-import { Stepper } from "./track/stepper.js";
-import { Root } from "./model/root.js";
 export * from "./model/index.js";
-import { updater_dom } from "./model/mixins/dom_stepper.js";
 export * from "./model/mixins/add_elements.js";
 export * from "./model/mixins/load.js";
+import { Stepper } from "./keyframe/stepper.js";
+import { Root } from "./model/root.js";
+import { updater_dom } from "./model/mixins/dom_stepper.js";
 
-export function animate(st: Stepper, fps: number) {
-    if (st.start < st.end) {
+export function animate(st: Stepper, fps: number, start: number = NaN, end: number = NaN) {
+    const s = Number.isNaN(start) ? st.start : start;
+    const e = Number.isNaN(end) ? st.end : end;
+    if (s < e) {
         const mspf = 1000 / fps; // miliseconds per frame
-        const frames = st.end - st.start + 1;
-        let frame = st.start;
+        const frames = e - s + 1;
+        let frame = s;
         function render(_currentTime: DOMHighResTimeStamp) {
             const t = performance.now();
             {
                 if ((frame + 1) == frames) {
-                    console.info(`${frame} t=${t} frames=${frames} ${st.start}-${st.end}`);
+                    console.info(`${frame} t=${t} frames=${frames} ${s}-${e}`);
                 }
                 st.step(frame);
             }
@@ -30,7 +32,7 @@ export function animate(st: Stepper, fps: number) {
         }
         requestAnimationFrame(render);
     } else {
-        st.step(st.start);
+        st.step(s);
     }
 }
 

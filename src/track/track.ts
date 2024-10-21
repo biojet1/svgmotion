@@ -1,6 +1,5 @@
 import { Proxy, Resolver } from "./action.js";
-import { Steppable, Stepper } from "./stepper.js";
-
+import { Steppable, Stepper } from "../keyframe/stepper.js";
 
 export class Track implements Steppable {
     end_frame: number = 0;

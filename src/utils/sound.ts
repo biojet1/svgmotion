@@ -70,7 +70,7 @@ export class AudioChain {
     //
     graph_name(): string {
         const { _graph_name } = this;
-        if (_graph_name) {
+        if (!!_graph_name) {
             return _graph_name;
         }
         throw new Error(`No name`);
@@ -416,6 +416,13 @@ export class AMix extends ASource {
     override feed_ff(ff: FFRun, parent?: AudioChain) {
         const inputs = this.inputs.map(v => {
             v.feed_ff(ff, this);
+            // console.warn("AMIX input", v.constructor.name)
+            if (v instanceof StartAt) {
+                // StartAt does not add filter
+                if (v.prev instanceof ASource) {
+                    return v.prev.graph_name();
+                }
+            }
             return v.graph_name();
         })
         const filters = [{

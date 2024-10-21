@@ -304,9 +304,10 @@ test.test("Bounce 2.5x", (t) => {
             break;
         }
     }
-    // let j = v.dump();
-    // t.same(j.r, 2.5);
-    // t.same(j.b, true);
+
+    let j = v.dump();
+    t.same(j.s, [{ $: "bounce", repeat_count: 2.5 }]);
+
     t.end();
 });
 

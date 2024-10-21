@@ -120,10 +120,10 @@ export async function render_root(root: Root, {
             const ff = ffcmd2(fps, [width, height], false, output, { lossless: true, ...video_params });
             if (root.sounds && root.sounds.length > 0) {
                 // TOD: fix assets source id, path
-                // console.warn("RENDER")
+                console.warn("RENDER")
                 console.dir(root.sounds, { depth: 4 });
                 const mix = AMix.new(root.sounds, { duration });
-                // console.warn(`AMix ${mix.get_duration()}`);
+                console.warn(`AMix ${mix.get_duration()}`);
                 mix.feed_ff(ff);
             }
 

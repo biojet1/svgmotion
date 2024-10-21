@@ -1,6 +1,6 @@
-import { Steppable, Stepper } from "../track/stepper.js";
+import { Stepper, Steppable } from "./stepper.js";
 import { cubic_bezier_y_of_x } from "./bezier.js";
-import { _clamp, Steps } from "./steps.js";
+import { _clamp, Steps } from "./stepper.js";
 
 export type KeyExtra = {
     start?: number,
@@ -177,19 +177,14 @@ export class Animated<V, K extends Keyframe<V> = Keyframe<V>> implements Steppab
         const last = kfs.at(-1);
         if (first && last) {
             if (Object.hasOwn(this, 'steps')) {
-                if (1) {
-                    const [f, s, e] = this.steps.apply(step, first.time, last.time);
-                    return Stepper.create<U>(f, s, e).clamp();
-                } else {
-                    const [v, a, b] = _clamp(first.time, last.time)
-                    const [f, s, e] = this.steps.apply((f: number) => step(v(f)), a, b);
-                    return Stepper.create<U>(f, s, e).clamp();
-                }
+                const [f, s, e] = this.steps.apply(step, first.time, last.time);
+                return Stepper.create<U>(f, s, e).clamp();
             }
             return Stepper.create<U>(step, first.time, last.time).clamp();
         }
         throw Error(`Unexpected by '${this.constructor.name}'`);
     }
+
     get kfs_stepper() {
         const value = this.make_stepper((n: number) => this.get_value(n));
         Object.defineProperty(this, 'kfs_stepper', {

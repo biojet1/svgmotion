@@ -21,6 +21,7 @@ export type PlainValue<V> = {
     k?: PlainKeyframeV<V>[];
     r?: number;
     b?: boolean;
+    s?: Array<{ $: string;[key: string]: any }>;
     $?: string;
 };
 
@@ -66,6 +67,9 @@ export class Animatable<
         if (kfs && kfs.length > 0) {
             o.k = kfs.map((v) => this.dump_keyframe(v, this.dump_key_value(v.value)));
         }
+        if (Object.hasOwn(this, 'steps')) {
+            o.s = this.steps.all;
+        }
         return o;
     }
     // load
@@ -88,7 +92,7 @@ export class Animatable<
         throw Error(`Not implemented by '${this.constructor.name}'`);
     }
     load(x: PlainValue<any>) {
-        const { k, v } = x;
+        const { k, v, s } = x;
         if (k != undefined) {
             this.kfs = k.map((x) => this.load_keyframe(x, this.load_key_value(x.v)));
         } else {
@@ -96,8 +100,9 @@ export class Animatable<
         }
         if (v != undefined) {
             this.value = this.load_value(x.v);
-        } else {
-            // this.value;
+        }
+        if (s && s.length > 0) {
+            this.steps.all = s;
         }
     }
     // repr
@@ -236,6 +241,13 @@ export class PointsValue extends AnimatableD<number[][]> {
     // dump
     override dump_key_value(s: number[][]) {
         return s;
+    }
+    // load
+    override load_key_value(a: any): number[][] {
+        if (Array.isArray(a)) {
+            return a;
+        }
+        throw new Error(`not array of numbers`);
     }
     // keyframe
     override check_value(x: any): number[][] {
