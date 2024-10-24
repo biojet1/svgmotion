@@ -77,16 +77,8 @@ export function ScaleOut(items: Element[] | Element, params: ScaleParams = {}): 
                     }
                 }
             }
-            // function scale(node: Element, t) {
-            //     const p = node.transform_under(start, parent);
-            //     const h = node.transform.prefix_hexad();
-            //     const u = h.get_matrix(start)
-            //     h.set_matrix(end, p.inverse().cat(t).cat(p).cat(u), { start, ...extra })
-            // }
 
             for (const { node, m } of each()) {
-                // let [cx, cy] = ObjectBoxLength.get_anchor(node, start, anchor);
-                // console.warn("get_anchor", [cx, cy])
                 const h = node.transform.prefix_hexad();
                 const u = h.get_matrix(start)
                 if (params.out === false) {

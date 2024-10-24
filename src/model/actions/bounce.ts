@@ -98,7 +98,6 @@ export function Pulsate(items: Element[] | Element, params: BounceParams = {}): 
         const ease2 = params.ease2 ?? Easing.inexpo;
 
         function apply(node: Element, start: number, _end: number) {
-            // const steps: any[] = [];
             let animateTo = show ? 1 : 0;
             let i = 1;
             let t = start;
@@ -110,16 +109,12 @@ export function Pulsate(items: Element[] | Element, params: BounceParams = {}): 
             for (; i < anims; i++) {
                 if (animateTo == 0) {
                     node.opacity.key_value(t += speed, 0, { easing: ease1 });
-                    // steps.push({ dur: speed, ease: ease1, opacity: 0 });
                 } else {
-                    // steps.push({ dur: speed, ease: ease2, opacity: 1 });
                     node.opacity.key_value(t += speed, 1, { easing: ease2 });
                 }
                 animateTo = 1 - animateTo;
             }
-            // steps.push({ dur: speed, ease: ease2, opacity: animateTo });
             node.opacity.key_value(t += speed, animateTo, { easing: ease2 });
-            // yield Tween(nodes, steps).with({ t: 0 });
         }
 
         function supply(_that: Track) {
