@@ -22,7 +22,11 @@ class Player extends Stepper {
         this._mspf = 1000 / fps; // miliseconds per frame
     }
     toggle() {
+        const { stop } = this;
         this.stop = !this.stop;
+        if (stop) {
+            this.render();
+        }
     }
     pace(n: number = 1) {
         const f = this._frame;
@@ -31,27 +35,44 @@ class Player extends Stepper {
         }
         this.stop = true;
     }
+    render(_currentTime: DOMHighResTimeStamp = NaN) {
+        if (this.stop) {
+            return;
+        }
+        const t = performance.now();
+        if ((this._frame + 1) == this._frames) {
+            console.info(`${this._frame} t=${t} frames=${frames} ${this.start}-${this.end}`);
+        }
+        this.step(this._frame = (this._frame + 1) % this._frames);
+        const excess = this._mspf - (performance.now() - t);
+        if (excess > 0) {
+            setTimeout(() => requestAnimationFrame(this.render.bind(this)), excess);
+        } else {
+            requestAnimationFrame(this.render.bind(this));
+        }
+    }
     run() {
         const { start: s, end: e, _mspf: mspf } = this;
         if (s < e) {
-            const self = this;
-            function render(_currentTime: DOMHighResTimeStamp) {
-                const t = performance.now();
-                if (!self.stop) {
-                    if ((self._frame + 1) == self._frames) {
-                        console.info(`${self._frame} t=${t} frames=${frames} ${s}-${e}`);
-                    }
-                    self.step(self._frame = (self._frame + 1) % self._frames);
-                }
-                const excess = mspf - (performance.now() - t);
-                if (excess > 0) {
-                    setTimeout(() => requestAnimationFrame(render), excess);
-                }
-                else {
-                    requestAnimationFrame(render);
-                }
-            }
-            requestAnimationFrame(render);
+            this.render();
+            // const self = this;
+            // function render(_currentTime: DOMHighResTimeStamp) {
+            //     const t = performance.now();
+            //     if (!self.stop) {
+            //         if ((self._frame + 1) == self._frames) {
+            //             console.info(`${self._frame} t=${t} frames=${frames} ${s}-${e}`);
+            //         }
+            //         self.step(self._frame = (self._frame + 1) % self._frames);
+            //     }
+            //     const excess = mspf - (performance.now() - t);
+            //     if (excess > 0) {
+            //         setTimeout(() => requestAnimationFrame(render), excess);
+            //     }
+            //     else {
+            //         requestAnimationFrame(render);
+            //     }
+            // }
+            // requestAnimationFrame(render);
         } else {
             this.step(s);
         }
