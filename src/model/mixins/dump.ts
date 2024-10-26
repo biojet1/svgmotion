@@ -2,10 +2,13 @@ import { Animatable } from "../value.js";
 import { ValueSet } from "../valuesets.js";
 import { Chars, Element } from "../base.js";
 import { Container } from "../containers.js";
-import { Root, PlainRoot, PlainNode } from "../root.js";
+import { Root, PlainRoot, PlainNode, Asset } from "../root.js";
 
 declare module "../root" {
     interface Root {
+        dump(): any;
+    }
+    interface Asset {
         dump(): any;
     }
 }
@@ -14,7 +17,6 @@ declare module "../containers" {
     interface Container {
         dump(): any;
     }
-
 }
 
 declare module "../base" {
@@ -24,6 +26,28 @@ declare module "../base" {
     interface Element {
         dump(): any;
     }
+}
+
+Chars.prototype.dump = function (): any {
+    const d = this.content.dump();
+    (d as any).tag = "chars";
+    return d;
+}
+
+Element.prototype.dump = function (): PlainNode {
+    const o: any = { tag: (<typeof Container>this.constructor).tag };
+    for (let [k, v] of Object.entries(this)) {
+        if (v instanceof ValueSet || v instanceof Animatable) {
+            o[k] = v.dump();
+        }
+    }
+    if (Object.hasOwn(this, 'id')) {
+        const { id } = this;
+        if (id) {
+            o.id = id;
+        }
+    }
+    return o;
 }
 
 Container.prototype.dump = function () {
@@ -45,20 +69,8 @@ Container.prototype.dump = function () {
     return o;
 }
 
-Element.prototype.dump = function (): PlainNode {
-    const o: any = { tag: (<typeof Container>this.constructor).tag };
-    for (let [k, v] of Object.entries(this)) {
-        if (v instanceof ValueSet || v instanceof Animatable) {
-            o[k] = v.dump();
-        }
-    }
-    if (Object.hasOwn(this, 'id')) {
-        const { id } = this;
-        if (id) {
-            o.id = id;
-        }
-    }
-    return o;
+Asset.prototype.dump = function (): any {
+    return Object.fromEntries(Object.entries(this).filter(([k,]) => /^[A-Za-z]+/.test(k) && k != 'id'));
 }
 
 Root.prototype.dump = function (): PlainRoot {
@@ -81,8 +93,4 @@ Root.prototype.dump = function (): PlainRoot {
     };
 }
 
-Chars.prototype.dump = function (): any {
-    const d = this.content.dump();
-    (d as any).tag = "chars";
-    return d;
-}
+

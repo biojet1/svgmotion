@@ -18,7 +18,6 @@ interface Constructor<M> {
     new(...args: any[]): M
 }
 export class Element extends Parent {
-    // id?: string;
     static tag = '?';
     static _prop_attr: { [key: string]: string } = {};
     // tree

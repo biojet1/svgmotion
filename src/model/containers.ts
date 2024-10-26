@@ -40,7 +40,6 @@ export class Container extends Element {
         }
     }
     // tree
-
     find_node<T>(x: number | string = 0, K: { new(...args: any[]): T; }): T | void {
         if (typeof x == "number") {
             for (const n of enum_node_type(this, K)) {

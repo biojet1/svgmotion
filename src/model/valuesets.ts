@@ -261,7 +261,6 @@ export class Font extends ValueSet {
     set size_adjust(v: ScalarValue) {
         this._new_field("size_adjust", v);
     }
-
     //////
 }
 

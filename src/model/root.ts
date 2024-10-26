@@ -35,9 +35,6 @@ export class Asset {
     constructor(id: string) {
         this.id = id;
     }
-    dump() {
-        return Object.fromEntries(Object.entries(this).filter(([k,]) => /^[A-Za-z]+/.test(k) && k != 'id'));
-    }
     static load(x: any) {
         const a = new Asset(``);
         for (const [k, v] of Object.entries(x)) {
@@ -108,7 +105,7 @@ export class Root extends Container {
     override calc_time_range() {
         let [s, e] = super.calc_time_range();
         if (this.sounds) {
-            for (const [k, v] of Object.entries(this.sounds)) {
+            for (const [_k, v] of Object.entries(this.sounds)) {
                 const E = this.track.to_frame(v.end);
                 if (E < Infinity && E > e) {
                     e = E;
@@ -129,13 +126,8 @@ export class Root extends Container {
         return this.assets[id] = a;
     }
     //
-    static load_svg(_src: string): Promise<Root> {
-        throw new Error(`Not implemented`)
-    }
-    static parse_svg(_src: string): Promise<Root> {
-        throw new Error(`Not implemented`)
-    }
+    static load_svg: (_src: string) => Promise<Root>;
+    static parse_svg: (_src: string) => Promise<Root>;
     static load: (src: PlainRoot) => Promise<Root>;
     static parse_json: (src: string) => Promise<Root>;
-
 }

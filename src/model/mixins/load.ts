@@ -3,7 +3,7 @@ import { Animatable } from "../value.js";
 import { ValueSet } from "../valuesets.js";
 import { Element } from "../base.js";
 import { Root, PlainRoot, PlainNode, Asset } from "../root.js";
-import { Content, Text } from "../text.js";
+import { Content } from "../text.js";
 import { Container } from "../containers.js";
 import { ViewPort } from "../viewport.js";
 import { AFilter, ALoader, ASource } from "../../utils/sound.js";
@@ -95,10 +95,6 @@ Root.load = async function (src: PlainRoot) {
                 if (next) {
                     next = ldr.load(u, next);
                 } else {
-                    // if (u.$ == "source") {
-                    //     next = await root.assets[u.id].as_sound();
-                    //     continue
-                    // }
                     next = ldr.load(u, next as unknown as ASource);
                 }
             }
@@ -123,7 +119,4 @@ Root.parse_json = function (src: string) {
 }
 
 
-// Root.prototype.parse_json = function (src: string) {
-//     return this.load(JSON.parse(src))
-// }
 ////////////

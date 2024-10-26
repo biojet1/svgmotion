@@ -7,6 +7,8 @@ export default {
     // .... other webpack, like output, etc.
     optimization: {
         concatenateModules: true,
+        // providedExports: true,
+        usedExports: true,
         minimize: false
     },
     // experiments: {

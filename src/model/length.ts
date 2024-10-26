@@ -145,13 +145,6 @@ class CalcLength {
                 }
                 return amount * font_size;
             }
-            // case "em": {
-            //     const { font_height } = this;
-            //     if (font_height == undefined) {
-            //         throw Error(`No font_height`);
-            //     }
-            //     return amount * font_height;
-            // }
             case undefined:
             case "px":
             case "":

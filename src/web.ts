@@ -1,7 +1,7 @@
 
-export * from "./model/index.js";
-export * from "./model/mixins/add_elements.js";
-export * from "./model/mixins/load.js";
+import "./model/index.js";
+import "./model/mixins/add_elements.js";
+import "./model/mixins/load.js";
 import { Stepper } from "./keyframe/stepper.js";
 import { Root } from "./model/root.js";
 import { updater_dom } from "./model/mixins/dom_stepper.js";
@@ -52,60 +52,12 @@ class Player extends Stepper {
         }
     }
     run() {
-        const { start: s, end: e, _mspf: mspf } = this;
+        const { start: s, end: e } = this;
         if (s < e) {
             this.render();
-            // const self = this;
-            // function render(_currentTime: DOMHighResTimeStamp) {
-            //     const t = performance.now();
-            //     if (!self.stop) {
-            //         if ((self._frame + 1) == self._frames) {
-            //             console.info(`${self._frame} t=${t} frames=${frames} ${s}-${e}`);
-            //         }
-            //         self.step(self._frame = (self._frame + 1) % self._frames);
-            //     }
-            //     const excess = mspf - (performance.now() - t);
-            //     if (excess > 0) {
-            //         setTimeout(() => requestAnimationFrame(render), excess);
-            //     }
-            //     else {
-            //         requestAnimationFrame(render);
-            //     }
-            // }
-            // requestAnimationFrame(render);
         } else {
             this.step(s);
         }
-    }
-}
-
-export function animate(st: Stepper, fps: number, start: number = NaN, end: number = NaN) {
-    const s = Number.isNaN(start) ? st.start : start;
-    const e = Number.isNaN(end) ? st.end : end;
-    if (s < e) {
-        const mspf = 1000 / fps; // miliseconds per frame
-        const frames = e - s + 1;
-        let frame = s;
-        function render(_currentTime: DOMHighResTimeStamp) {
-            const t = performance.now();
-            {
-                if ((frame + 1) == frames) {
-                    console.info(`${frame} t=${t} frames=${frames} ${s}-${e}`);
-                }
-                st.step(frame);
-            }
-            frame = (frame + 1) % frames;
-            const excess = mspf - (performance.now() - t);
-            if (excess > 0) {
-                setTimeout(() => requestAnimationFrame(render), excess);
-            }
-            else {
-                requestAnimationFrame(render);
-            }
-        }
-        requestAnimationFrame(render);
-    } else {
-        st.step(s);
     }
 }
 
