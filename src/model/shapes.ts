@@ -2,22 +2,14 @@ import { PathLC, BoundingBox, Matrix } from "../geom/index.js";
 import { Element } from "./base.js";
 import { PointsValue, TextValue, LengthYValue, LengthXValue, LengthValue } from "./value.js";
 
-abstract class Shape extends Element {
+export class Shape extends Element {
     describe(frame: number): string {
         throw new Error(`Not implemented frame=${frame}`);
     }
     get_path(frame: number): PathLC {
         return PathLC.parse(this.describe(frame));
     }
-    override update_bbox(bbox: BoundingBox, frame: number, m?: Matrix) {
-        let w = this.transform.get_transform(frame);
-        m = m ? m.cat(w) : w;
-        const p = this.get_path(frame);
-        bbox.merge_self((m ? p.transform(m) : p).bbox());
-    }
-    override object_bbox(frame: number) {
-        return this.get_path(frame).bbox();
-    }
+
 }
 
 export class Path extends Shape {

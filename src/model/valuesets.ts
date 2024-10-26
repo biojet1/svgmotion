@@ -74,15 +74,7 @@ export class ValueSet {
             }
         }
     }
-    dump() {
-        let u: any = {};
-        for (let [k, v] of Object.entries(this)) {
-            if (v instanceof Animatable) {
-                u[k] = v.dump();
-            }
-        }
-        return u;
-    }
+
     load(u: PlainValue<any>) {
         for (let [k, v] of Object.entries(u)) {
             const p = (this as any)[k];

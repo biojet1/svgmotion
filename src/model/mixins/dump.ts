@@ -4,6 +4,21 @@ import { Chars, Element } from "../base.js";
 import { Container } from "../containers.js";
 import { Root, PlainRoot, PlainNode, Asset } from "../root.js";
 
+declare module "../valuesets" {
+    interface ValueSet {
+        dump(): any;
+    }
+}
+
+declare module "../base" {
+    interface Chars {
+        dump(): any;
+    }
+    interface Element {
+        dump(): any;
+    }
+}
+
 declare module "../root" {
     interface Root {
         dump(): any;
@@ -19,14 +34,6 @@ declare module "../containers" {
     }
 }
 
-declare module "../base" {
-    interface Chars {
-        dump(): any;
-    }
-    interface Element {
-        dump(): any;
-    }
-}
 
 Chars.prototype.dump = function (): any {
     const d = this.content.dump();
@@ -93,4 +100,12 @@ Root.prototype.dump = function (): PlainRoot {
     };
 }
 
-
+ValueSet.prototype.dump = function () {
+    let u: any = {};
+    for (let [k, v] of Object.entries(this)) {
+        if (v instanceof Animatable) {
+            u[k] = v.dump();
+        }
+    }
+    return u;
+}
