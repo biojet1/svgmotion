@@ -1,11 +1,11 @@
 
 import "./model/index.js";
-import "./model/mixins/add_elements.js";
-import "./model/mixins/load.js";
 import { Stepper } from "./keyframe/stepper.js";
 import { Root } from "./model/root.js";
 import { updater_dom } from "./model/mixins/dom_stepper.js";
-
+import "./model/mixins/add_elements.js";
+import "./model/mixins/load.js";
+export { Root }
 class Player extends Stepper {
     stop: boolean;
     private _mspf: number;
