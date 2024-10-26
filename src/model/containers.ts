@@ -1,4 +1,4 @@
-import { BoundingBox, Matrix } from "../geom/index.js";
+import { BoundingBox } from "../geom/index.js";
 import { Animatable, TextValue, LengthValue, LengthXValue, LengthYValue } from "./value.js";
 import { ValueSet, ViewBox } from "./valuesets.js";
 import { Element, Chars } from "./base.js";
@@ -93,21 +93,7 @@ export class Container extends Element {
         }
         return bb;
     }
-    override update_bbox(bbox: BoundingBox, frame: number, m?: Matrix) {
-        let w = this.transform.get_transform(frame);
-        m = m ? m.cat(w) : w;
-        for (const x of this.children<Element>()) {
-            x.update_bbox(bbox, frame, m);
-        }
-    }
-    override object_bbox(frame: number) {
-        const bb = BoundingBox.not();
-        for (const x of this.children<Element>()) {
-            const m = x.transform_under(frame, this);
-            x.update_bbox(bb, frame, m);
-        }
-        return bb;
-    }
+
 }
 
 function* enum_node_type<T>(that: Container, x: { new(...args: any[]): T }) {

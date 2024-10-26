@@ -316,26 +316,6 @@ export class Transform extends ValueSet {
         return '';
     }
 
-    cat_transform(frame: number, n: Matrix) {
-        if (Object.hasOwn(this, "all")) {
-            const { all } = this;
-            if (Object.hasOwn(this, "origin")) {
-                const [x, y] = this.origin.get_value(frame);
-                n.cat_self(Matrix.translate(x, y));
-                for (const q of all) {
-                    q.cat_transform(frame, n)
-                }
-                n.cat_self(Matrix.translate(-x, -y))
-            } else {
-                all.map((x) => x.cat_transform(frame, n));
-            }
-        }
-    }
-    get_transform(frame: number): Matrix {
-        const m = MatrixMut.identity();
-        this.cat_transform(frame, m);
-        return m;
-    }
     ///
     get all() {
         return xget(this, "all", new Array<MT>());
@@ -424,28 +404,6 @@ export class Transform extends ValueSet {
     }
     get_hexad(x: number = 0) {
         return get1(this.all, x, MHexad);
-    }
-    //
-    override dump() {
-        if (Object.hasOwn(this, "box") || Object.hasOwn(this, "origin")) {
-            const o: any = {}
-            if (Object.hasOwn(this, "box")) {
-                o.box = this.box.dump()
-            }
-            if (Object.hasOwn(this, "origin")) {
-                o.origin = this.origin.dump()
-            }
-            if (Object.hasOwn(this, "all")) {
-                o.all = this.all.map((x) => x.dump());
-            }
-            return o;
-        } else {
-            if (Object.hasOwn(this, "all")) {
-                return this.all.map((x) => x.dump());
-            } else {
-                return [];
-            }
-        }
     }
     // load
     override load(u: PlainValue<any>) {
@@ -546,7 +504,7 @@ export class Transform extends ValueSet {
             return q;
         }
     }
-    //
+    // geom
     ref_box(frame: number) {
         const a = Object.hasOwn(this, "box") ? this.box.get_value(frame) : "";
         switch (a) {
@@ -561,6 +519,27 @@ export class Transform extends ValueSet {
                 return get_element(this).object_bbox(frame);
         }
         throw new Error(``);
+    }
+
+    cat_transform(frame: number, n: Matrix) {
+        if (Object.hasOwn(this, "all")) {
+            const { all } = this;
+            if (Object.hasOwn(this, "origin")) {
+                const [x, y] = this.origin.get_value(frame);
+                n.cat_self(Matrix.translate(x, y));
+                for (const q of all) {
+                    q.cat_transform(frame, n)
+                }
+                n.cat_self(Matrix.translate(-x, -y))
+            } else {
+                all.map((x) => x.cat_transform(frame, n));
+            }
+        }
+    }
+    get_transform(frame: number): Matrix {
+        const m = MatrixMut.identity();
+        this.cat_transform(frame, m);
+        return m;
     }
 }
 

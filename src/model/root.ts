@@ -125,9 +125,10 @@ export class Root extends Container {
         a._parent = this;
         return this.assets[id] = a;
     }
-    //
-    static load_svg: (_src: string) => Promise<Root>;
-    static parse_svg: (_src: string) => Promise<Root>;
+    // load
     static load: (src: PlainRoot) => Promise<Root>;
+    static load_svg: (_src: string) => Promise<Root>;
+    // dump
+    static parse_svg: (_src: string) => Promise<Root>;
     static parse_json: (src: string) => Promise<Root>;
 }

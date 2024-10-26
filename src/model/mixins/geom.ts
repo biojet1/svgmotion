@@ -1,8 +1,29 @@
 import { BoundingBox } from "../../geom/bbox.js";
 import { Matrix } from "../../geom/matrix.js";
+import { PathLC } from "../../geom/path/pathlc.js";
+import { Element } from "../base.js";
+import { Container } from "../containers.js";
 import { Image } from "../elements.js";
 import { Shape } from "../shapes.js";
 import { ViewPort } from "../viewport.js";
+
+Container.prototype.update_bbox = function
+    (bbox: BoundingBox, frame: number, m?: Matrix) {
+    let w = this.transform.get_transform(frame);
+    m = m ? m.cat(w) : w;
+    for (const x of this.children<Element>()) {
+        x.update_bbox(bbox, frame, m);
+    }
+}
+
+Container.prototype.object_bbox = function (frame: number) {
+    const bb = BoundingBox.not();
+    for (const x of this.children<Element>()) {
+        const m = x.transform_under(frame, this);
+        x.update_bbox(bb, frame, m);
+    }
+    return bb;
+}
 
 Image.prototype.object_bbox = function (frame: number): BoundingBox {
     const width = this.width.get_value(frame);
@@ -22,12 +43,12 @@ Image.prototype.update_bbox = function (bbox: BoundingBox, frame: number, m?: Ma
 Shape.prototype.update_bbox = function (bbox: BoundingBox, frame: number, m?: Matrix) {
     let w = this.transform.get_transform(frame);
     m = m ? m.cat(w) : w;
-    const p = this.get_path(frame);
+    const p = PathLC.parse(this.describe(frame));
     bbox.merge_self((m ? p.transform(m) : p).bbox());
 }
 
 Shape.prototype.object_bbox = function (frame: number) {
-    return this.get_path(frame).bbox();
+    return PathLC.parse(this.describe(frame)).bbox();
 }
 
 ViewPort.prototype.update_bbox = function (bbox: BoundingBox, frame: number, m?: Matrix) {

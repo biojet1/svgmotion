@@ -1,5 +1,5 @@
 import { Animatable } from "../value.js";
-import { ValueSet } from "../valuesets.js";
+import { MHexad, Transform, ValueSet } from "../valuesets.js";
 import { Chars, Element } from "../base.js";
 import { Container } from "../containers.js";
 import { Root, PlainRoot, PlainNode, Asset } from "../root.js";
@@ -109,3 +109,31 @@ ValueSet.prototype.dump = function () {
     }
     return u;
 }
+
+Transform.prototype.dump = function () {
+    if (Object.hasOwn(this, "box") || Object.hasOwn(this, "origin")) {
+        const o: any = {}
+        if (Object.hasOwn(this, "box")) {
+            o.box = this.box.dump()
+        }
+        if (Object.hasOwn(this, "origin")) {
+            o.origin = this.origin.dump()
+        }
+        if (Object.hasOwn(this, "all")) {
+            o.all = this.all.map((x) => x.dump());
+        }
+        return o;
+    } else {
+        if (Object.hasOwn(this, "all")) {
+            return this.all.map((x) => x.dump());
+        } else {
+            return [];
+        }
+    }
+}
+
+// MHexad.prototype.dump    = function() {
+//     const o = this.super.dump();
+//     o.$ = "h";
+//     return o;
+// }

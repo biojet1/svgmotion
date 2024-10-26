@@ -1,4 +1,3 @@
-import { BoundingBox, Matrix } from "../geom/index.js";
 import { TextValue, LengthXValue, LengthYValue } from "./value.js";
 import { ViewBox } from "./valuesets.js";
 import { Container, Defs } from "./containers.js";

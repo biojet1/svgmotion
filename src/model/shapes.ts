@@ -1,4 +1,3 @@
-import { PathLC, BoundingBox, Matrix } from "../geom/index.js";
 import { Element } from "./base.js";
 import { PointsValue, TextValue, LengthYValue, LengthXValue, LengthValue } from "./value.js";
 
@@ -6,10 +5,9 @@ export class Shape extends Element {
     describe(frame: number): string {
         throw new Error(`Not implemented frame=${frame}`);
     }
-    get_path(frame: number): PathLC {
-        return PathLC.parse(this.describe(frame));
-    }
-
+    // get_path(frame: number): PathLC {
+    //     return PathLC.parse(this.describe(frame));
+    // }
 }
 
 export class Path extends Shape {
