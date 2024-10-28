@@ -30,7 +30,7 @@ function load_properties(that: Element, props: { [key: string]: PlainValue<any> 
                         const p = ((that as any)[k] = new UnknownValue(""));
                         p.load(v);
                     } else {
-                        throw new Error(`Unexpected property "${k}" (${v})`);
+                        throw new Error(`Unexpected property "${k}" (${that.constructor.name})`);
                     }
             }
         }

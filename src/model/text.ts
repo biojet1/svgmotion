@@ -22,14 +22,13 @@ export class Text extends Content {
     get y() { return this._new_field("y", new LengthYValue(0)); }
     get dx() { return this._new_field("dx", new LengthXValue(0)); }
     get dy() { return this._new_field("dy", new LengthYValue(0)); }
-    ///
-
 }
+
 export class TSpan extends Text {
     static override tag = "tspan";
 }
+
 export class Style extends Content {
     static override tag = "style";
     get type() { return this._new_field("type", new TextValue('text/css')); }
 }
-

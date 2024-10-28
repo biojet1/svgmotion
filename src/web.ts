@@ -8,10 +8,10 @@ import "./model/mixins/load.js";
 export { Root }
 class Player extends Stepper {
     stop: boolean;
-    private _mspf: number;
-    // _step: number;
-    private _frame: number;
-    private _frames: number;
+    _mspf: number;
+    _frame: number;
+    _frames: number;
+    id: string;
     constructor(st: Stepper, fps: number, start: number = NaN, end: number = NaN) {
         const s = Number.isNaN(start) ? st.start : start;
         const e = Number.isNaN(end) ? st.end : end;
@@ -20,6 +20,7 @@ class Player extends Stepper {
         this._frame = s;
         this._frames = e - s + 1;
         this._mspf = 1000 / fps; // miliseconds per frame
+        this.id = Math.round(Math.random() * 1E+5).toString(36);
     }
     toggle() {
         const { stop } = this;
@@ -28,22 +29,23 @@ class Player extends Stepper {
             this.render();
         }
     }
-    pace(n: number = 1) {
-        const f = this._frame;
-        if (n && this.stop) {
-            this.step(this._frame = (n > 0 ? (f + 1) % this._frames : Math.max(f - 1, this.start)));
+    goto(n: number) {
+        const { _frames: d, start: S } = this;
+        this._frame = S + (((n - S) % d) + d) % d;
+        if (this.stop) {
+            this.step(this._frame);
         }
-        this.stop = true;
     }
     render(_currentTime: DOMHighResTimeStamp = NaN) {
         if (this.stop) {
             return;
         }
         const t = performance.now();
-        if ((this._frame + 1) == this._frames) {
-            console.info(`${this._frame} t=${t} frames=${frames} ${this.start}-${this.end}`);
+        const { _frames: d, start: S, _frame: f, end: E } = this;
+        if (f == E) {
+            console.info(`${this.id} t=${t} frames=${d} ${S}-${E}`);
         }
-        this.step(this._frame = (this._frame + 1) % this._frames);
+        this.step(this._frame = S + ((((f + 1) - S) % d) + d) % d);
         const excess = this._mspf - (performance.now() - t);
         if (excess > 0) {
             setTimeout(() => requestAnimationFrame(this.render.bind(this)), excess);
@@ -96,9 +98,13 @@ Root.prototype.animate = function ({ parent }) {
             if (event.key == " ") {
                 p.toggle();
             } else if (event.key == ".") {
-                p.pace(1);
+                p.goto(p._frame + 1);
             } else if (event.key == ",") {
-                p.pace(-1);
+                p.goto(p._frame - 1);
+            } else if (event.key == 'Home') {
+                p.goto(p.start);
+            } else if (event.key == 'End') {
+                p.goto(p.end);
             }
         });
         svg.focus();

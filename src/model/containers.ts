@@ -93,7 +93,6 @@ export class Container extends Element {
         }
         return bb;
     }
-
 }
 
 function* enum_node_type<T>(that: Container, x: { new(...args: any[]): T }) {
@@ -126,10 +125,6 @@ export class Symbol extends Container {
     get ref_x() { return this._new_field("ref_x", new LengthXValue(0)); }
     get ref_y() { return this._new_field("ref_y", new LengthYValue(0)); }
     get view_box() { return this._new_field("view_box", new ViewBox([0, 0], [100, 100])); }
-}
-
-export class Filter extends Container {
-    static override tag = "filter";
 }
 
 export class Marker extends Container {

@@ -7,7 +7,8 @@ import { Circle, Ellipse, Line, Path, Polygon, Polyline, Rect } from "../shapes.
 import { FEDropShadow, FEGaussianBlur, LinearGradient, MeshPatch, MeshRow, RadialGradient } from "../filters.js";
 
 /*% for kind, element in elements.items() %*/
-class /*{ kind }*/ extends Element {
+export class /*{ kind }*/ extends /*% if element.container %*/Container/*% else %*/Element/*% endif %*/ {
+    static override tag = "/*{ element.tag }*/";
     /*% for name, field in element.fields.items() %*/
     get /*{ name }*/() { /*# -#*/
         return this._new_field("/*{ name }*/", new /*{ field.kind }*/(
@@ -17,11 +18,6 @@ class /*{ kind }*/ extends Element {
             /*%- endfor -%*/
         )); /*# -#*/
     }
-    /*#
-    set cx(v: LengthXValue) {
-        this._new_field("cx", v);
-    }
-#*/
     /*% endfor %*/
 }
 /*% endfor %*/

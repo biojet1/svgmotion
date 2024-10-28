@@ -39,8 +39,7 @@ for (const x of anims) {
     await h.write(`let { svg, stepper } = root.dom_stepper();`);
     await h.write(`svg.setAttribute("width", "200");`);
     await h.write(`svg.setAttribute("height", "200");`);
-    await h.write(`document.all.A${x.index}.appendChild(svg);`);
-    await h.write(`svgmotion.animate(stepper, root.frame_rate)`);
+    await h.write(`root.animate({parent:document.all.A${x.index}})`);
     await h.write(`});`);
     await h.write(`</script>`);
 }

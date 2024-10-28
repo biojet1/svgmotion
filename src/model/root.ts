@@ -1,4 +1,4 @@
-import { Track } from "../track/index.js";
+import { Track } from "../track/track.js";
 import { AudioChain } from "../utils/sound.js";
 import { xget, xset } from "./valuesets.js";
 import { Container } from "./containers.js";

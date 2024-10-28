@@ -4,7 +4,7 @@ import { PathLC } from "../../geom/path/pathlc.js";
 import { Element } from "../base.js";
 import { Container } from "../containers.js";
 import { Image } from "../elements.js";
-import { Shape } from "../shapes.js";
+import { Circle, Ellipse, Line, Path, Polygon, Polyline, Rect, Shape } from "../shapes.js";
 import { ViewPort } from "../viewport.js";
 
 Container.prototype.update_bbox = function
@@ -40,16 +40,7 @@ Image.prototype.update_bbox = function (bbox: BoundingBox, frame: number, m?: Ma
     bbox.merge_self(bb.transform(m));
 }
 
-Shape.prototype.update_bbox = function (bbox: BoundingBox, frame: number, m?: Matrix) {
-    let w = this.transform.get_transform(frame);
-    m = m ? m.cat(w) : w;
-    const p = PathLC.parse(this.describe(frame));
-    bbox.merge_self((m ? p.transform(m) : p).bbox());
-}
 
-Shape.prototype.object_bbox = function (frame: number) {
-    return PathLC.parse(this.describe(frame)).bbox();
-}
 
 ViewPort.prototype.update_bbox = function (bbox: BoundingBox, frame: number, m?: Matrix) {
     const width = this.width.get_value(frame);
@@ -147,3 +138,77 @@ ViewPort.prototype.cat_transform = function (frame: number, n: Matrix) {
         }
     }
 }
+
+Path.prototype.describe = function (frame: number) {
+    return this.d.get_value(frame);
+}
+
+Rect.prototype.describe = function (frame: number) {
+    const width = this.width.get_value(frame);
+    const height = this.height.get_value(frame);
+    const left = this.x.get_value(frame);
+    const top = this.y.get_value(frame);
+    const rx = this.rx.get_value(frame);
+    const ry = this.ry.get_value(frame);
+    if (rx && ry) {
+        const right = left + width;
+        const bottom = top + height;
+        const cpts = [left + rx, right - rx, top + ry, bottom - ry];
+        return `M ${cpts[0]},${top}` +
+            `L ${cpts[1]},${top} ` +
+            `A ${rx},${ry} 0 0 1 ${right},${cpts[2]}` +
+            `L ${right},${cpts[3]} ` +
+            `A ${rx},${ry} 0 0 1 ${cpts[1]},${bottom}` +
+            `L ${cpts[0]},${bottom} ` +
+            `A ${rx},${ry} 0 0 1 ${left},${cpts[3]}` +
+            `L ${left},${cpts[2]} ` +
+            `A ${rx},${ry} 0 0 1 ${cpts[0]},${top} z`;
+    }
+    return `M ${left} ${top} h ${width} v ${height} h ${-width} Z`;
+}
+
+Circle.prototype.describe = function (frame: number) {
+    const x = this.cx.get_value(frame);
+    const y = this.cy.get_value(frame);
+    const r = this.r.get_value(frame);
+    if (r === 0) return "M0 0";
+    return `M ${x - r} ${y} A ${r} ${r} 0 0 0 ${x + r} ${y} A ${r} ${r} 0 0 0 ${x - r} ${y}`;
+}
+
+Ellipse.prototype.describe = function (frame: number) {
+    const x = this.cx.get_value(frame);
+    const y = this.cy.get_value(frame);
+    const rx = this.rx.get_value(frame);
+    const ry = this.ry.get_value(frame);
+    return `M ${x - rx} ${y} A ${rx} ${ry} 0 0 0 ${x + rx} ${y} A ${rx} ${ry} 0 0 0 ${x - rx} ${y}`;
+}
+
+Line.prototype.describe = function (frame: number) {
+    const x1 = this.x1.get_value(frame);
+    const x2 = this.x2.get_value(frame);
+    const y1 = this.y1.get_value(frame);
+    const y2 = this.y2.get_value(frame);
+    return `M ${x1} ${y1} L ${x2} ${y2}`;
+}
+
+Polyline.prototype.describe = function (frame: number) {
+    const s = this.points.get_value(frame).map(v => `${v[0]},${v[1]}`).join(' ');
+    return s ? `M ${s}` : "";
+}
+
+Polygon.prototype.describe = function (frame: number) {
+    const s = this.points.get_value(frame).map(v => `${v[0]},${v[1]}`).join(' ');
+    return s ? `M ${s}z` : "";
+}
+
+Shape.prototype.update_bbox = function (bbox: BoundingBox, frame: number, m?: Matrix) {
+    let w = this.transform.get_transform(frame);
+    m = m ? m.cat(w) : w;
+    const p = PathLC.parse(this.describe(frame));
+    bbox.merge_self((m ? p.transform(m) : p).bbox());
+}
+
+Shape.prototype.object_bbox = function (frame: number) {
+    return PathLC.parse(this.describe(frame)).bbox();
+}
+
