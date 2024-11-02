@@ -77,6 +77,12 @@ export class Style extends Content {
 }
 export class FETurbulence extends Element {
     static override tag = "feTurbulence";
+    get x() { return this._new_field("x", new LengthXValue(0)); }
+    get y() { return this._new_field("y", new LengthYValue(0)); }
+    get width() { return this._new_field("width", new LengthXValue(100)); }
+    get height() { return this._new_field("height", new LengthYValue(100)); }
+    get input() { return this._new_field("input", new TextValue('')); }
+    get result() { return this._new_field("result", new TextValue('')); }
     get base_frequency() { return this._new_field("base_frequency", new ScalarPairValue([0, 0])); }
     get num_octaves() { return this._new_field("num_octaves", new ScalarValue(1)); }
     get seed() { return this._new_field("seed", new ScalarValue(0)); }
@@ -85,6 +91,12 @@ export class FETurbulence extends Element {
 }
 export class FETile extends Element {
     static override tag = "feTile";
+    get x() { return this._new_field("x", new LengthXValue(0)); }
+    get y() { return this._new_field("y", new LengthYValue(0)); }
+    get width() { return this._new_field("width", new LengthXValue(100)); }
+    get height() { return this._new_field("height", new LengthYValue(100)); }
+    get input() { return this._new_field("input", new TextValue('')); }
+    get result() { return this._new_field("result", new TextValue('')); }
 }
 export class FESpotLight extends Element {
     static override tag = "feSpotLight";
@@ -105,11 +117,19 @@ export class FEPointLight extends Element {
 }
 export class FEOffset extends Element {
     static override tag = "feOffset";
+    get x() { return this._new_field("x", new LengthXValue(0)); }
+    get y() { return this._new_field("y", new LengthYValue(0)); }
+    get width() { return this._new_field("width", new LengthXValue(100)); }
+    get height() { return this._new_field("height", new LengthYValue(100)); }
+    get input() { return this._new_field("input", new TextValue('')); }
+    get result() { return this._new_field("result", new TextValue('')); }
     get dx() { return this._new_field("dx", new ScalarValue(0)); }
     get dy() { return this._new_field("dy", new ScalarValue(0)); }
 }
 export class FEMorphology extends Element {
     static override tag = "feMorphology";
+    get x() { return this._new_field("x", new LengthXValue(0)); }
+    get y() { return this._new_field("y", new LengthYValue(0)); }
     get width() { return this._new_field("width", new LengthXValue(100)); }
     get height() { return this._new_field("height", new LengthYValue(100)); }
     get input() { return this._new_field("input", new TextValue('')); }
@@ -119,6 +139,8 @@ export class FEMorphology extends Element {
 }
 export class FEMergeNode extends Element {
     static override tag = "feMergeNode";
+    get x() { return this._new_field("x", new LengthXValue(0)); }
+    get y() { return this._new_field("y", new LengthYValue(0)); }
     get width() { return this._new_field("width", new LengthXValue(100)); }
     get height() { return this._new_field("height", new LengthYValue(100)); }
     get input() { return this._new_field("input", new TextValue('')); }
@@ -127,11 +149,19 @@ export class FEMergeNode extends Element {
 export class FEImage extends Element {
     static override tag = "feImage";
     get href() { return this._new_field("href", new TextValue('')); }
+    get x() { return this._new_field("x", new LengthXValue(0)); }
+    get y() { return this._new_field("y", new LengthYValue(0)); }
+    get width() { return this._new_field("width", new LengthXValue(100)); }
+    get height() { return this._new_field("height", new LengthYValue(100)); }
+    get input() { return this._new_field("input", new TextValue('')); }
+    get result() { return this._new_field("result", new TextValue('')); }
     get fit_view() { return this._new_field("fit_view", new TextValue('')); }
     get cross_origin() { return this._new_field("cross_origin", new TextValue('')); }
 }
 export class FEGaussianBlur extends Element {
     static override tag = "feGaussianBlur";
+    get x() { return this._new_field("x", new LengthXValue(0)); }
+    get y() { return this._new_field("y", new LengthYValue(0)); }
     get width() { return this._new_field("width", new LengthXValue(100)); }
     get height() { return this._new_field("height", new LengthYValue(100)); }
     get input() { return this._new_field("input", new TextValue('')); }
@@ -141,6 +171,8 @@ export class FEGaussianBlur extends Element {
 }
 export class FEFuncR extends Element {
     static override tag = "feFuncR";
+    get x() { return this._new_field("x", new LengthXValue(0)); }
+    get y() { return this._new_field("y", new LengthYValue(0)); }
     get width() { return this._new_field("width", new LengthXValue(100)); }
     get height() { return this._new_field("height", new LengthYValue(100)); }
     get input() { return this._new_field("input", new TextValue('')); }
@@ -155,6 +187,8 @@ export class FEFuncR extends Element {
 }
 export class FEFuncG extends Element {
     static override tag = "feFuncG";
+    get x() { return this._new_field("x", new LengthXValue(0)); }
+    get y() { return this._new_field("y", new LengthYValue(0)); }
     get width() { return this._new_field("width", new LengthXValue(100)); }
     get height() { return this._new_field("height", new LengthYValue(100)); }
     get input() { return this._new_field("input", new TextValue('')); }
@@ -169,6 +203,8 @@ export class FEFuncG extends Element {
 }
 export class FEFuncB extends Element {
     static override tag = "feFuncB";
+    get x() { return this._new_field("x", new LengthXValue(0)); }
+    get y() { return this._new_field("y", new LengthYValue(0)); }
     get width() { return this._new_field("width", new LengthXValue(100)); }
     get height() { return this._new_field("height", new LengthYValue(100)); }
     get input() { return this._new_field("input", new TextValue('')); }
@@ -183,6 +219,8 @@ export class FEFuncB extends Element {
 }
 export class FEFuncA extends Element {
     static override tag = "feFuncA";
+    get x() { return this._new_field("x", new LengthXValue(0)); }
+    get y() { return this._new_field("y", new LengthYValue(0)); }
     get width() { return this._new_field("width", new LengthXValue(100)); }
     get height() { return this._new_field("height", new LengthYValue(100)); }
     get input() { return this._new_field("input", new TextValue('')); }
@@ -197,6 +235,8 @@ export class FEFuncA extends Element {
 }
 export class FEFlood extends Element {
     static override tag = "feFlood";
+    get x() { return this._new_field("x", new LengthXValue(0)); }
+    get y() { return this._new_field("y", new LengthYValue(0)); }
     get width() { return this._new_field("width", new LengthXValue(100)); }
     get height() { return this._new_field("height", new LengthYValue(100)); }
     get input() { return this._new_field("input", new TextValue('')); }
@@ -206,6 +246,8 @@ export class FEFlood extends Element {
 }
 export class FEDropShadow extends Element {
     static override tag = "feDropShadow";
+    get x() { return this._new_field("x", new LengthXValue(0)); }
+    get y() { return this._new_field("y", new LengthYValue(0)); }
     get width() { return this._new_field("width", new LengthXValue(100)); }
     get height() { return this._new_field("height", new LengthYValue(100)); }
     get input() { return this._new_field("input", new TextValue('')); }
@@ -221,6 +263,12 @@ export class FEDistantLight extends Element {
 }
 export class FEDisplacementMap extends Element {
     static override tag = "feDisplacementMap";
+    get x() { return this._new_field("x", new LengthXValue(0)); }
+    get y() { return this._new_field("y", new LengthYValue(0)); }
+    get width() { return this._new_field("width", new LengthXValue(100)); }
+    get height() { return this._new_field("height", new LengthYValue(100)); }
+    get input() { return this._new_field("input", new TextValue('')); }
+    get result() { return this._new_field("result", new TextValue('')); }
     get input2() { return this._new_field("input2", new TextValue('')); }
     get scale() { return this._new_field("scale", new ScalarValue(0)); }
     get x_channel_selector() { return this._new_field("x_channel_selector", new TextValue('A')); }
@@ -228,6 +276,12 @@ export class FEDisplacementMap extends Element {
 }
 export class FEConvolveMatrix extends Element {
     static override tag = "feConvolveMatrix";
+    get x() { return this._new_field("x", new LengthXValue(0)); }
+    get y() { return this._new_field("y", new LengthYValue(0)); }
+    get width() { return this._new_field("width", new LengthXValue(100)); }
+    get height() { return this._new_field("height", new LengthYValue(100)); }
+    get input() { return this._new_field("input", new TextValue('')); }
+    get result() { return this._new_field("result", new TextValue('')); }
     get order() { return this._new_field("order", new ScalarPairValue([3, 3])); }
     get kernel_matrix() { return this._new_field("kernel_matrix", new VectorValue([1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0])); }
     get divisor() { return this._new_field("divisor", new ScalarValue(1)); }
@@ -240,6 +294,8 @@ export class FEConvolveMatrix extends Element {
 }
 export class FEComposite extends Element {
     static override tag = "feComposite";
+    get x() { return this._new_field("x", new LengthXValue(0)); }
+    get y() { return this._new_field("y", new LengthYValue(0)); }
     get width() { return this._new_field("width", new LengthXValue(100)); }
     get height() { return this._new_field("height", new LengthYValue(100)); }
     get input() { return this._new_field("input", new TextValue('')); }
@@ -253,16 +309,30 @@ export class FEComposite extends Element {
 }
 export class FEColorMatrix extends Element {
     static override tag = "feColorMatrix";
+    get x() { return this._new_field("x", new LengthXValue(0)); }
+    get y() { return this._new_field("y", new LengthYValue(0)); }
+    get width() { return this._new_field("width", new LengthXValue(100)); }
+    get height() { return this._new_field("height", new LengthYValue(100)); }
+    get input() { return this._new_field("input", new TextValue('')); }
+    get result() { return this._new_field("result", new TextValue('')); }
     get type() { return this._new_field("type", new TextValue('matrix')); }
     get values() { return this._new_field("values", new VectorValue([1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0])); }
 }
 export class FEBlend extends Element {
     static override tag = "feBlend";
+    get x() { return this._new_field("x", new LengthXValue(0)); }
+    get y() { return this._new_field("y", new LengthYValue(0)); }
+    get width() { return this._new_field("width", new LengthXValue(100)); }
+    get height() { return this._new_field("height", new LengthYValue(100)); }
+    get input() { return this._new_field("input", new TextValue('')); }
+    get result() { return this._new_field("result", new TextValue('')); }
     get input2() { return this._new_field("input2", new TextValue('')); }
     get mode() { return this._new_field("mode", new TextValue('normal')); }
 }
 export class FESpecularLighting extends Container {
     static override tag = "feSpecularLighting";
+    get x() { return this._new_field("x", new LengthXValue(0)); }
+    get y() { return this._new_field("y", new LengthYValue(0)); }
     get width() { return this._new_field("width", new LengthXValue(100)); }
     get height() { return this._new_field("height", new LengthYValue(100)); }
     get input() { return this._new_field("input", new TextValue('')); }
@@ -275,15 +345,29 @@ export class FESpecularLighting extends Container {
 }
 export class FEMerge extends Container {
     static override tag = "feMerge";
+    get x() { return this._new_field("x", new LengthXValue(0)); }
+    get y() { return this._new_field("y", new LengthYValue(0)); }
+    get width() { return this._new_field("width", new LengthXValue(100)); }
+    get height() { return this._new_field("height", new LengthYValue(100)); }
+    get input() { return this._new_field("input", new TextValue('')); }
+    get result() { return this._new_field("result", new TextValue('')); }
 }
 export class FEDiffuseLighting extends Container {
     static override tag = "feDiffuseLighting";
+    get x() { return this._new_field("x", new LengthXValue(0)); }
+    get y() { return this._new_field("y", new LengthYValue(0)); }
+    get width() { return this._new_field("width", new LengthXValue(100)); }
+    get height() { return this._new_field("height", new LengthYValue(100)); }
+    get input() { return this._new_field("input", new TextValue('')); }
+    get result() { return this._new_field("result", new TextValue('')); }
     get surface_scale() { return this._new_field("surface_scale", new ScalarValue(1)); }
     get diffuse_constant() { return this._new_field("diffuse_constant", new ScalarValue(1)); }
     get kernel_unit_length() { return this._new_field("kernel_unit_length", new ScalarPairValue([0, 0])); }
 }
 export class FEComponentTransfer extends Container {
     static override tag = "feComponentTransfer";
+    get x() { return this._new_field("x", new LengthXValue(0)); }
+    get y() { return this._new_field("y", new LengthYValue(0)); }
     get width() { return this._new_field("width", new LengthXValue(100)); }
     get height() { return this._new_field("height", new LengthYValue(100)); }
     get input() { return this._new_field("input", new TextValue('')); }
@@ -421,7 +505,3 @@ export class ClipPath extends Container {
     get clip_path_units() { return this._new_field("clip_path_units", new TextValue('userSpaceOnUse')); }
 }
 /* </INSERT> */
-
-function end() {
-
-}

@@ -5,7 +5,6 @@ import { Container } from "../containers.js";
 import { Parent } from "../../tree/linked3.js";
 import { Defs, Group, ViewPort } from "../elements.js";
 
-
 declare module "../base" {
     interface Element {
         owner_viewport(): ViewPort | undefined;
@@ -144,7 +143,6 @@ declare module "../elements" {
         defs(): Defs;
     }
 }
-
 
 ViewPort.prototype.defs = function () {
     for (let cur = this.first_child(); cur; cur = cur.next_sibling()) {
