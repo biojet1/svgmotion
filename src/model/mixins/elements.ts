@@ -1,9 +1,10 @@
 import { Matrix, MatrixMut, Vector } from "../../geom/index.js";
 import { Element } from "../base.js";
 import { Root } from "../root.js";
-import { Container, Group } from "../containers.js";
+import { Container } from "../containers.js";
 import { ViewPort } from "../viewport.js";
 import { Parent } from "../../tree/linked3.js";
+import { Group } from "../elements.js";
 
 
 declare module "../base" {
@@ -138,3 +139,4 @@ Element.prototype.transform_under = function (frame: number, top: Parent): Matri
     }
     throw new Error(`No parent`);
 }
+

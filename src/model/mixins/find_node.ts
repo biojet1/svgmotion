@@ -1,9 +1,9 @@
-import { Container, Symbol, Group, ClipPath, Marker, Mask, Pattern, Defs } from "../containers.js";
+import { Container } from "../containers.js";
 import { ViewPort } from "../viewport.js";
-import { Use, Image } from "../elements.js";
-import { Style, Text, TSpan } from "../text.js";
+import { Use, Image, Symbol, Group, ClipPath, Marker, Mask, Pattern, Defs } from "../elements.js";
+import { TSpan, Text, Style } from "../elements.js";
 import { Circle, Ellipse, Line, Path, Polygon, Polyline, Rect } from "../shapes.js";
-import { Filter, FEComponentTransfer, FEComposite, FEDropShadow, FEFlood, FEFuncA, FEFuncB, FEFuncG, FEFuncR, FEGaussianBlur, FEMerge, FEMergeNode, FEMorphology, FESpecularLighting, LinearGradient, MeshGradient, MeshPatch, MeshRow, RadialGradient, Stop, FEDistantLight, FEPointLight } from "../filters.js";
+import { Filter, FEComponentTransfer, FEComposite, FEDropShadow, FEFlood, FEFuncA, FEFuncB, FEFuncG, FEFuncR, FEGaussianBlur, FEMerge, FEMergeNode, FEMorphology, FESpecularLighting, LinearGradient, MeshGradient, MeshPatch, MeshRow, RadialGradient, Stop, FEDistantLight, FEPointLight } from "../elements.js";
 
 /* <INSERT find_elements.ins.ts > */
 declare module "../containers" {

@@ -208,19 +208,19 @@ export class BoxLength extends CalcLength {
 }
 export class ScalarUnitValue extends ScalarValue {
     unit: string = "";
-    dump(): PlainValue<number> {
+    override dump(): PlainValue<number> {
         const o = super.dump();
         o.u = this.unit;
         return o;
     }
-    load(x: PlainValue<any>): void {
+    override   load(x: PlainValue<any>): void {
         super.load(x);
         this.unit = x.u ?? "";
     }
-    value_repr(value: number): string {
+    override  value_repr(value: number): string {
         return `${super.value_repr(value)}${this.unit}`
     }
-    set_repr(value: string): void {
+    override   set_repr(value: string): void {
         const m = BOTH_MATCH.exec(value);
         if (m) {
             this.value = parseFloat(m[1]);

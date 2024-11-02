@@ -4,7 +4,8 @@ import { PathLC } from "../../geom/path/pathlc.js";
 import { Element } from "../base.js";
 import { Container } from "../containers.js";
 import { Image } from "../elements.js";
-import { Circle, Ellipse, Line, Path, Polygon, Polyline, Rect, Shape } from "../shapes.js";
+import { Circle, Ellipse, Line, Path, Polygon, Polyline, Rect } from "../shapes.js";
+import { Shape } from "../base.js";
 import { ViewPort } from "../viewport.js";
 
 Container.prototype.update_bbox = function

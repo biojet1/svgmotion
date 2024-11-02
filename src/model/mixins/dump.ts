@@ -1,5 +1,5 @@
 import { Animatable } from "../value.js";
-import { MHexad, Transform, ValueSet } from "../valuesets.js";
+import { Transform, ValueSet } from "../valuesets.js";
 import { Chars, Element } from "../base.js";
 import { Container } from "../containers.js";
 import { Root, PlainRoot, PlainNode, Asset } from "../root.js";

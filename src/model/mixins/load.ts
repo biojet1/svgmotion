@@ -3,7 +3,7 @@ import { Animatable } from "../value.js";
 import { ValueSet } from "../valuesets.js";
 import { Element } from "../base.js";
 import { Root, PlainRoot, PlainNode, Asset } from "../root.js";
-import { Content } from "../text.js";
+import { Content } from "../containers.js";
 import { Container } from "../containers.js";
 import { ViewPort } from "../viewport.js";
 import { AFilter, ALoader, ASource } from "../../utils/sound.js";

@@ -1,6 +1,6 @@
 import { BoundingBox } from "../geom/index.js";
-import { Animatable, TextValue, LengthValue, LengthXValue, LengthYValue } from "./value.js";
-import { ValueSet, ViewBox } from "./valuesets.js";
+import { Animatable } from "./value.js";
+import { ValueSet } from "./valuesets.js";
 import { Element, Chars } from "./base.js";
 import { Node } from "../tree/linked3.js";
 
@@ -107,66 +107,16 @@ function* enum_node_type<T>(that: Container, x: { new(...args: any[]): T }) {
     } while (cur !== end && (cur = cur._next));
 }
 
-export class Group extends Container {
-    static override tag = "g";
+export class Content extends Container {
+    add_chars(text: string, before?: Node) {
+        const n = new Chars();
+        n.content.set_value(text);
+        this.insert_before(before, n);
+    }
+    add_content(before?: Node) {
+        const n = new Chars();
+        this.insert_before(before, n);
+        return n;
+    }
 }
 
-export class Defs extends Container {
-    static override tag = "defs";
-}
-
-export class Symbol extends Container {
-    static override tag = "symbol";
-    //
-    get width() { return this._new_field("width", new LengthXValue(100)); }
-    get height() { return this._new_field("height", new LengthYValue(100)); }
-    get x() { return this._new_field("x", new LengthXValue(0)); }
-    get y() { return this._new_field("y", new LengthYValue(0)); }
-    get ref_x() { return this._new_field("ref_x", new LengthXValue(0)); }
-    get ref_y() { return this._new_field("ref_y", new LengthYValue(0)); }
-    get view_box() { return this._new_field("view_box", new ViewBox([0, 0], [100, 100])); }
-}
-
-export class Marker extends Container {
-    static override tag = "marker";
-    ///
-    get ref_x() { return this._new_field("ref_x", new LengthXValue(0)); }
-    get ref_y() { return this._new_field("ref_y", new LengthYValue(0)); }
-    get view_box() { return this._new_field("view_box", new ViewBox([0, 0], [100, 100])); }
-    get marker_units() { return this._new_field("marker_units", new TextValue('strokeWidth')); }
-    get marker_width() { return this._new_field("marker_width", new LengthXValue(3)); }
-    get marker_height() { return this._new_field("marker_height", new LengthYValue(3)); }
-    get orient() { return this._new_field("orient", new LengthValue(0)); }
-    ///
-}
-
-export class Pattern extends Container {
-    static override tag = "pattern";
-    ///
-    get href() { return this._new_field("href", new TextValue('')); }
-    get width() { return this._new_field("width", new LengthXValue(100)); }
-    get height() { return this._new_field("height", new LengthYValue(100)); }
-    get x() { return this._new_field("x", new LengthXValue(0)); }
-    get y() { return this._new_field("y", new LengthYValue(0)); }
-    get view_box() { return this._new_field("view_box", new ViewBox([0, 0], [100, 100])); }
-    get pattern_units() { return this._new_field("pattern_units", new TextValue('objectBoundingBox')); }
-    get pattern_content_units() { return this._new_field("pattern_content_units", new TextValue('userSpaceOnUse')); }
-    get pattern_transform() { return this._new_field("pattern_transform", new TextValue('')); }
-}
-
-export class Mask extends Container {
-    static override tag = "mask";
-    ///
-    get width() { return this._new_field("width", new LengthXValue(100)); }
-    get height() { return this._new_field("height", new LengthYValue(100)); }
-    get x() { return this._new_field("x", new LengthXValue(0)); }
-    get y() { return this._new_field("y", new LengthYValue(0)); }
-    get mask_units() { return this._new_field("mask_units", new TextValue('objectBoundingBox')); }
-    get mask_content_units() { return this._new_field("mask_content_units", new TextValue('userSpaceOnUse')); }
-}
-
-export class ClipPath extends Container {
-    static override tag = "clipPath";
-    ///
-    get clip_path_units() { return this._new_field("clip_path_units", new TextValue('userSpaceOnUse')); }
-}

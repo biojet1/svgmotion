@@ -1,7 +1,8 @@
 
 import { Element } from "../base.js";
 import { Root } from "../root.js";
-import { Text, TSpan } from "../text.js";
+import { TSpan } from "../elements.js";
+import { Text } from "../elements.js";
 import { Container } from "../containers.js";
 import "./set_attribute.js";
 

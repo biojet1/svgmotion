@@ -1,11 +1,9 @@
-
 import { Animatable, ScalarValue, UnknownValue } from "../value.js";
 import { LengthYValue, LengthXValue, LengthValue, FontSizeValue } from "../value.js";
 import { Element } from "../base.js";
-import { Symbol } from "../containers.js";
 import { ViewPort } from "../viewport.js";
 import { ComputeLength } from "../length.js";
-import { Image, Use } from "../elements.js";
+import { Image, Use, Symbol } from "../elements.js";
 
 declare module "../base" {
     interface Element {
@@ -201,7 +199,8 @@ Element.prototype.set_attribute = function (name: string, value: string): Elemen
 }
 
 
-import { TSpan, Text } from "../text.js";
+import { TSpan } from "../elements.js";
+import { Text } from "../elements.js";
 import { Rect, Path, Line, Ellipse, Circle, Polyline, Polygon } from "../shapes.js";
 
 declare module "../viewport" {

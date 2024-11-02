@@ -1,6 +1,7 @@
 import { TextValue, LengthXValue, LengthYValue } from "./value.js";
 import { ViewBox } from "./valuesets.js";
-import { Container, Defs } from "./containers.js";
+import { Container } from "./containers.js";
+import { Defs } from "./elements.js";
 
 export class ViewPort extends Container {
     static override tag = "svg";

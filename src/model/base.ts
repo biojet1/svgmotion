@@ -124,5 +124,10 @@ export class Element extends Parent {
     get vector_effect() { return this._new_field("vector_effect", new TextValue('none')); }
 
 };
+export class Shape extends Element {
+    describe(frame: number): string {
+        throw new Error(`Not implemented frame=${frame}`);
+    }
+}
 
 // TODO: dash array, path
