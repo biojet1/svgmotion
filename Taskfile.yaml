@@ -97,18 +97,8 @@ tasks:
             - python3 -m jinjagen -d /tmp/ins/elements-col.json -D / -i src/model/mixins/add_elements.j2.ts -o /tmp/add_elements.ins.ts
             - python3 -m biojet1.scandir.insert src/model/mixins/ -s /tmp -s /tmp/ins --act
 
-    # fields.j2:
-    #     method: checksum
-    #     sources:
-    #         - src/model/mixins/add_elements.j2.ts
-    #         - /tmp/elements.json
-    #     generates:
-    #         - /tmp/add_elements.ts
-    #     cmds:
-    #         - env -C /mnt/META/wrx/python/flottie python3 -m tests.gen_elements || true
-    #         - python3 -m jinjagen -d /tmp/ins/elements-col.json -D / -i src/model/mixins/fields.j2.ts > /tmp/fields.ts
-
     elements.j2:
         cmds:
-            - env -C /mnt/META/wrx/python/flottie python3 -m tests.gen_elements || true
-            - python3 -m jinjagen -d /tmp/ins/elements-col.json -D / -i src/model/mixins/elements.j2.ts -o /tmp/elements.ts
+            - env -C ../../python/flottie python3 -m tests.gen_elements || true
+            - python3 -m jinjagen -d /tmp/ins/elements-col.json -D / -i src/model/mixins/elements.j2.ts -o /tmp/ins/elements.ts
+            - python3 -m jinjagen -d /tmp/ins/elements-col.json -D / -i src/model/mixins/elements2.j2.ts -o /tmp/ins/elements2.ts

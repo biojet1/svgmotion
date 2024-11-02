@@ -1,6 +1,7 @@
 import { BoundingBox } from "../geom/index.js";
 import { xget } from "./valuesets.js";
 import { Element } from "./base.js";
+import { PlainValue, ScalarValue } from "./value.js";
 
 const BOTH_MATCH = /^\s*(([-+]?[0-9]+(\.[0-9]*)?|[-+]?\.[0-9]+)([eE][-+]?[0-9]+)?)\s*(in|pt|px|mm|cm|m|km|Q|pc|yd|ft||%|em|ex|ch|rem|vw|vh|vmin|vmax|deg|grad|rad|turn|s|ms|Hz|kHz|dpi|dpcm|dppx)\s*$/i;
 
@@ -203,5 +204,29 @@ export class BoxLength extends CalcLength {
             }
             return this.parse_len(v, i > 0 ? "y" : "x");
         });
+    }
+}
+export class ScalarUnitValue extends ScalarValue {
+    unit: string = "";
+    dump(): PlainValue<number> {
+        const o = super.dump();
+        o.u = this.unit;
+        return o;
+    }
+    load(x: PlainValue<any>): void {
+        super.load(x);
+        this.unit = x.u ?? "";
+    }
+    value_repr(value: number): string {
+        return `${super.value_repr(value)}${this.unit}`
+    }
+    set_repr(value: string): void {
+        const m = BOTH_MATCH.exec(value);
+        if (m) {
+            this.value = parseFloat(m[1]);
+            this.unit = m.pop() ?? '';
+        } else {
+            throw new Error(`set_repr`);
+        }
     }
 }

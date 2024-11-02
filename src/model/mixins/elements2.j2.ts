@@ -7,6 +7,7 @@ import { Circle, Ellipse, Line, Path, Polygon, Polyline, Rect } from "../shapes.
 import { FEDropShadow, FEGaussianBlur, LinearGradient, MeshPatch, MeshRow, RadialGradient } from "../filters.js";
 
 /*% for kind, element in elements.items() %*/
+/*%- if element.tag.startswith("fe") -%*/
 export class /*{ kind }*/ extends /*% if element.content -%*/Content
     /*%- elif element.shape -%*/ Shape
     /*%- elif element.container -%*/ Container
@@ -23,5 +24,6 @@ export class /*{ kind }*/ extends /*% if element.content -%*/Content
     }
     /*% endfor %*/
 }
+/*% endif %*/
 /*% endfor %*/
 

@@ -3,9 +3,6 @@ import { Container } from "./containers.js";
 import { ScalarPairValue, LengthYValue, LengthXValue, TextValue, PercentageValue, RGBValue, LengthValue, ScalarValue, VectorValue } from "./value.js";
 import { Transform } from "./valuesets.js";
 
-export class FilterBase extends Element {
-}
-
 export class Stop extends Element {
     static override tag = "stop";
     get offset() { return this._new_field("offset", new PercentageValue(1.0)); }
@@ -59,7 +56,15 @@ export class MeshGradient extends Container {
 
 
 
-
+export class Filter extends Container {
+    static override tag = "filter";
+    get primitive_units() { return this._new_field("primitive_units", new TextValue('userSpaceOnUse')); }
+    get filter_units() { return this._new_field("filter_units", new TextValue('objectBoundingBox')); }
+    get x() { return this._new_field("x", new TextValue('-10%')); }
+    get y() { return this._new_field("y", new TextValue('-10%')); }
+    get width() { return this._new_field("width", new TextValue('120%')); }
+    get height() { return this._new_field("height", new TextValue('120%')); }
+}
 //###########
 export class FEComponentTransfer extends Container {
     static override tag = "feComponentTransfer";
@@ -211,13 +216,4 @@ export class FEDistantLight extends Element {
     static override tag = "feDistantLight";
     get azimuth() { return this._new_field("azimuth", new ScalarValue(0)); }
     get elevation() { return this._new_field("elevation", new ScalarValue(0)); }
-}
-export class Filter extends Container {
-    static override tag = "filter";
-    get primitive_units() { return this._new_field("primitive_units", new TextValue('userSpaceOnUse')); }
-    get filter_units() { return this._new_field("filter_units", new TextValue('objectBoundingBox')); }
-    get x() { return this._new_field("x", new TextValue('-10%')); }
-    get y() { return this._new_field("y", new TextValue('-10%')); }
-    get width() { return this._new_field("width", new TextValue('120%')); }
-    get height() { return this._new_field("height", new TextValue('120%')); }
 }

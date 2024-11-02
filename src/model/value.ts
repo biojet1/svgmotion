@@ -23,6 +23,7 @@ export type PlainValue<V> = {
     b?: boolean;
     s?: Array<{ $: string;[key: string]: any }>;
     $?: string;
+    u?: string;
 };
 
 export class Animatable<
@@ -520,3 +521,5 @@ export class LengthValue extends ScalarValue {
 export class FontSizeValue extends ScalarValue {
 
 }
+
+
