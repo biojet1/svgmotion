@@ -4,7 +4,7 @@ import { FEGaussianBlur, Element, Root, To, Filter } from "svgmotion";
 
 test.test("add_filter", async (t) => {
     const root = new Root();
-    let f = root.view.defs.add_filter();
+    let f = root.view.defs().add_filter();
     t.ok(f instanceof Filter);
     t.ok(f instanceof Element);
     const gb = new FEGaussianBlur();
@@ -27,7 +27,7 @@ test.test("add_fe_gaussian_blur", async (t) => {
 
     const tr = root.at(0);
 
-    let f = view.defs.add_filter();
+    let f = view.defs().add_filter();
     const gb = f.add_fe_gaussian_blur({ std_dev: 2 });
 
     dog.filter.set_value(`url(#${f.id})`);

@@ -3,9 +3,8 @@ import { Animatable } from "../value.js";
 import { ValueSet } from "../valuesets.js";
 import { Element } from "../base.js";
 import { Root, PlainRoot, PlainNode, Asset } from "../root.js";
-import { Content } from "../containers.js";
-import { Container } from "../containers.js";
-import { ViewPort } from "../viewport.js";
+import { Content, Container } from "../containers.js";
+import { ViewPort } from "../elements.js";
 import { AFilter, ALoader, ASource } from "../../utils/sound.js";
 
 function load_properties(that: Element, props: { [key: string]: PlainValue<any> }) {

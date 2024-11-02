@@ -1,12 +1,9 @@
 import { BoundingBox } from "../../geom/bbox.js";
 import { Matrix } from "../../geom/matrix.js";
 import { PathLC } from "../../geom/path/pathlc.js";
-import { Element } from "../base.js";
+import { Element, Shape } from "../base.js";
 import { Container } from "../containers.js";
-import { Image } from "../elements.js";
-import { Circle, Ellipse, Line, Path, Polygon, Polyline, Rect } from "../shapes.js";
-import { Shape } from "../base.js";
-import { ViewPort } from "../viewport.js";
+import { ViewPort, Image, Polygon, Polyline, Line, Ellipse, Circle, Rect, Path } from "../elements.js";
 
 Container.prototype.update_bbox = function
     (bbox: BoundingBox, frame: number, m?: Matrix) {

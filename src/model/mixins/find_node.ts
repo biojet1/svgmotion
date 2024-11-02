@@ -1,8 +1,7 @@
 import { Container } from "../containers.js";
-import { ViewPort } from "../viewport.js";
-import { Use, Image, Symbol, Group, ClipPath, Marker, Mask, Pattern, Defs } from "../elements.js";
+import { ViewPort, Use, Image, Symbol, Group, ClipPath, Marker, Mask, Pattern, Defs } from "../elements.js";
 import { TSpan, Text, Style } from "../elements.js";
-import { Circle, Ellipse, Line, Path, Polygon, Polyline, Rect } from "../shapes.js";
+import { Polygon, Polyline, Line, Ellipse, Circle, Rect, Path } from "../elements.js";
 import { Filter, FEComponentTransfer, FEComposite, FEDropShadow, FEFlood, FEFuncA, FEFuncB, FEFuncG, FEFuncR, FEGaussianBlur, FEMerge, FEMergeNode, FEMorphology, FESpecularLighting, LinearGradient, MeshGradient, MeshPatch, MeshRow, RadialGradient, Stop, FEDistantLight, FEPointLight } from "../elements.js";
 
 /* <INSERT find_elements.ins.ts > */

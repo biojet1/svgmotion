@@ -2,7 +2,7 @@ import { Track } from "../track/track.js";
 import { AudioChain } from "../utils/sound.js";
 import { xget, xset } from "./valuesets.js";
 import { Container } from "./containers.js";
-import { ViewPort } from "./viewport.js";
+import { ViewPort } from "./elements.js";
 
 export class AnimTrack extends Track {
     root!: Root;

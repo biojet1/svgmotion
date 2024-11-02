@@ -2,9 +2,8 @@ import { Matrix, MatrixMut, Vector } from "../../geom/index.js";
 import { Element } from "../base.js";
 import { Root } from "../root.js";
 import { Container } from "../containers.js";
-import { ViewPort } from "../viewport.js";
 import { Parent } from "../../tree/linked3.js";
-import { Group } from "../elements.js";
+import { Defs, Group, ViewPort } from "../elements.js";
 
 
 declare module "../base" {
@@ -140,3 +139,18 @@ Element.prototype.transform_under = function (frame: number, top: Parent): Matri
     throw new Error(`No parent`);
 }
 
+declare module "../elements" {
+    interface ViewPort {
+        defs(): Defs;
+    }
+}
+
+
+ViewPort.prototype.defs = function () {
+    for (let cur = this.first_child(); cur; cur = cur.next_sibling()) {
+        if (cur instanceof Defs) {
+            return cur;
+        }
+    }
+    return this.add_defs();
+}

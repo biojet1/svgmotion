@@ -3,8 +3,7 @@ import { Image, Use } from "../elements.js";
 import { TSpan, Text, Style } from "../elements.js";
 import { Group, Symbol, Marker, Mask, Pattern, ClipPath, Defs } from "../elements.js";
 import { Container, } from "../containers.js";
-import { ViewPort } from "../viewport.js";
-import { Ellipse, Circle, Polyline, Polygon, Rect, Path, Line, } from "../shapes.js";
+import { ViewPort, Polygon, Polyline, Line, Ellipse, Circle, Rect, Path } from "../elements.js";
 import { Filter, FEComponentTransfer, FEComposite, FEDropShadow, FEFlood, FEFuncA, FEFuncB, FEFuncG, FEFuncR, FEGaussianBlur, FEMerge, FEMergeNode, FEMorphology, FESpecularLighting, LinearGradient, MeshGradient, MeshPatch, MeshRow, RadialGradient, Stop, FEPointLight, FEDistantLight, FESpotLight, FETile, FEImage, FEOffset, FEBlend, FEDiffuseLighting, FETurbulence, FEDisplacementMap, FEColorMatrix, FEConvolveMatrix } from "../elements.js";
 
 interface AddOpt {
