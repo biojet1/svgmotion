@@ -1,13 +1,5 @@
-import { Element, Chars } from "../base.js";
-import { Container, Symbol, Group, ClipPath, Marker, Mask, Pattern, Filter } from "../containers.js";
-import { ViewPort } from "../viewport.js";
-import { Use, Image } from "../elements.js";
-import { Text, TSpan } from "../text.js";
-import { Circle, Ellipse, Line, Path, Polygon, Polyline, Rect } from "../shapes.js";
-import { FEDropShadow, FEGaussianBlur, LinearGradient, MeshPatch, MeshRow, RadialGradient } from "../filters.js";
-
 /*% for kind, element in elements.items() %*/
-/*%- if element.tag.startswith("fe") -%*/
+/*%- if element.tag.startswith("fe") or element.tag.startswith("mesh")  or element.tag in ('filter' , 'stop', 'radialGradient', 'linearGradient')  -%*/
 export class /*{ kind }*/ extends /*% if element.content -%*/Content
     /*%- elif element.shape -%*/ Shape
     /*%- elif element.container -%*/ Container

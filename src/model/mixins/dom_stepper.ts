@@ -380,6 +380,27 @@ const name_to_attr : {
  "points": "points",
  "rx": "rx",
  "ry": "ry",
- "d": "d"
+ "d": "d",
+ "points_at_x": "pointsAtX",
+ "points_at_y": "pointsAtY",
+ "points_at_z": "pointsAtZ",
+ "limiting_cone_angle": "limitingConeAngle",
+ "mode": "mode",
+ "diffuse_constant": "diffuseConstant",
+ "base_frequency": "baseFrequency",
+ "num_octaves": "numOctaves",
+ "seed": "seed",
+ "stitch_tiles": "stitchTiles",
+ "scale": "scale",
+ "x_channel_selector": "xChannelSelector",
+ "y_channel_selector": "yChannelSelector",
+ "values": "values",
+ "order": "order",
+ "kernel_matrix": "kernelMatrix",
+ "divisor": "divisor",
+ "bias": "bias",
+ "target_x": "targetX",
+ "target_y": "targetY",
+ "preserve_alpha": "preserveAlpha"
 };
 /* </INSERT> */

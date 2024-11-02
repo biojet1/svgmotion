@@ -101,4 +101,5 @@ tasks:
         cmds:
             - env -C ../../python/flottie python3 -m tests.gen_elements || true
             - python3 -m jinjagen -d /tmp/ins/elements-col.json -D / -i src/model/mixins/elements.j2.ts -o /tmp/ins/elements.ts
-            - python3 -m jinjagen -d /tmp/ins/elements-col.json -D / -i src/model/mixins/elements2.j2.ts -o /tmp/ins/elements2.ts
+            - python3 -m jinjagen -d /tmp/ins/elements-col.json -D / -i src/model/mixins/elements2.j2.ts -o /tmp/ins/elements2.ins.ts
+            - python3 -m biojet1.scandir.insert src/model -s /tmp -s /tmp/ins --act

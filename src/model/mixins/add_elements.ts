@@ -4,7 +4,7 @@ import { Style, TSpan, Text } from "../text.js";
 import { Container, Group, Symbol, Marker, Mask, Pattern, ClipPath, Defs } from "../containers.js";
 import { ViewPort } from "../viewport.js";
 import { Ellipse, Circle, Polyline, Polygon, Rect, Path, Line, } from "../shapes.js";
-import { Filter, FEComponentTransfer, FEComposite, FEDropShadow, FEFlood, FEFuncA, FEFuncB, FEFuncG, FEFuncR, FEGaussianBlur, FEMerge, FEMergeNode, FEMorphology, FESpecularLighting, LinearGradient, MeshGradient, MeshPatch, MeshRow, RadialGradient, Stop, FEPointLight, FEDistantLight } from "../filters.js";
+import { Filter, FEComponentTransfer, FEComposite, FEDropShadow, FEFlood, FEFuncA, FEFuncB, FEFuncG, FEFuncR, FEGaussianBlur, FEMerge, FEMergeNode, FEMorphology, FESpecularLighting, LinearGradient, MeshGradient, MeshPatch, MeshRow, RadialGradient, Stop, FEPointLight, FEDistantLight, FESpotLight, FETile, FEImage, FEOffset, FEBlend, FEDiffuseLighting, FETurbulence, FEDisplacementMap, FEColorMatrix, FEConvolveMatrix } from "../filters.js";
 
 interface AddOpt {
     [key: string]: any;
@@ -56,6 +56,16 @@ declare module "../containers" {
         add_style(params?: AddOpt): Style;
         add_tspan(params?: AddOpt): TSpan;
         add_text(params?: AddOpt): Text;
+        add_fe_spot_light(params?: AddOpt): FESpotLight;
+        add_fe_tile(params?: AddOpt): FETile;
+        add_fe_image(params?: AddOpt): FEImage;
+        add_fe_offset(params?: AddOpt): FEOffset;
+        add_fe_blend(params?: AddOpt): FEBlend;
+        add_fe_diffuse_lighting(params?: AddOpt): FEDiffuseLighting;
+        add_fe_turbulence(params?: AddOpt): FETurbulence;
+        add_fe_displacement_map(params?: AddOpt): FEDisplacementMap;
+        add_fe_color_matrix(params?: AddOpt): FEColorMatrix;
+        add_fe_convolve_matrix(params?: AddOpt): FEConvolveMatrix;
         ////
         _add_element(name: string): Element;
     }
@@ -104,6 +114,16 @@ Container.prototype.add_polygon = function (params?: AddOpt) { const { before, .
 Container.prototype.add_style = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = Style.new(etc); this.insert_before(before, x); return x; }
 Container.prototype.add_tspan = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = TSpan.new(etc); this.insert_before(before, x); return x; }
 Container.prototype.add_text = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = Text.new(etc); this.insert_before(before, x); return x; }
+Container.prototype.add_fe_spot_light = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = FESpotLight.new(etc); this.insert_before(before, x); return x; }
+Container.prototype.add_fe_tile = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = FETile.new(etc); this.insert_before(before, x); return x; }
+Container.prototype.add_fe_image = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = FEImage.new(etc); this.insert_before(before, x); return x; }
+Container.prototype.add_fe_offset = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = FEOffset.new(etc); this.insert_before(before, x); return x; }
+Container.prototype.add_fe_blend = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = FEBlend.new(etc); this.insert_before(before, x); return x; }
+Container.prototype.add_fe_diffuse_lighting = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = FEDiffuseLighting.new(etc); this.insert_before(before, x); return x; }
+Container.prototype.add_fe_turbulence = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = FETurbulence.new(etc); this.insert_before(before, x); return x; }
+Container.prototype.add_fe_displacement_map = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = FEDisplacementMap.new(etc); this.insert_before(before, x); return x; }
+Container.prototype.add_fe_color_matrix = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = FEColorMatrix.new(etc); this.insert_before(before, x); return x; }
+Container.prototype.add_fe_convolve_matrix = function (params?: AddOpt) { const { before, ...etc } = params ?? {}; const x = FEConvolveMatrix.new(etc); this.insert_before(before, x); return x; }
 
 Container.prototype._add_element = function (tag: string, params?: AddOpt) {
     switch (tag) {
@@ -149,6 +169,16 @@ Container.prototype._add_element = function (tag: string, params?: AddOpt) {
         case "style": return this.add_style(params);
         case "tspan": return this.add_tspan(params);
         case "text": return this.add_text(params);
+        case "feSpotLight": return this.add_fe_spot_light(params);
+        case "feTile": return this.add_fe_tile(params);
+        case "feImage": return this.add_fe_image(params);
+        case "feOffset": return this.add_fe_offset(params);
+        case "feBlend": return this.add_fe_blend(params);
+        case "feDiffuseLighting": return this.add_fe_diffuse_lighting(params);
+        case "feTurbulence": return this.add_fe_turbulence(params);
+        case "feDisplacementMap": return this.add_fe_displacement_map(params);
+        case "feColorMatrix": return this.add_fe_color_matrix(params);
+        case "feConvolveMatrix": return this.add_fe_convolve_matrix(params);
     }
     throw new Error("Unexpected tag: " + tag);
 }
