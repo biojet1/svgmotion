@@ -7,40 +7,48 @@ import { Content, Container } from "../containers.js";
 import { ViewPort } from "../elements.js";
 import { AFilter, ALoader, ASource } from "../../utils/sound.js";
 
-function load_properties(that: Element, props: { [key: string]: PlainValue<any> }) {
-    for (let [k, v] of Object.entries(props)) {
-        const p = (that as any)[k];
-        if (p instanceof ValueSet || p instanceof Animatable) {
-            p.load(v);
-        } else {
-            switch (k) {
-                case 'id':
-                    if (typeof v === "string") {
-                        that.id = v;
-                    } else {
-                        throw new Error(``);
-                    }
-                    break;
-                default:
-                    if (k.startsWith("data-")) {
-                        const p = ((that as any)[k] = new TextValue());
-                        p.load(v);
-                    } else if ((v as any).$ == '?') {
-                        const p = ((that as any)[k] = new UnknownValue(""));
-                        p.load(v);
-                    } else {
-                        throw new Error(`Unexpected property "${k}" (${that.constructor.name})`);
-                    }
-            }
-        }
+declare module "../base" {
+    interface Element {
+        _load_field(name: string, value: PlainValue<any>): this;
     }
+}
+
+Element.prototype._load_field = function (k: string, v: PlainValue<any>) {
+    switch (k) {
+        case 'id':
+            if (typeof v === "string") {
+                this.id = v;
+            } else {
+                throw new Error(``);
+            }
+            break;
+        default:
+            const p = (this as any)[k];
+            if (p instanceof ValueSet || p instanceof Animatable) {
+                p.load(v);
+            } else if (k.startsWith("data-")) {
+                const p = ((this as any)[k] = new TextValue());
+                p.load(v);
+            } else if ((v as any).$ == '?') {
+                const p = ((this as any)[k] = new UnknownValue(""));
+                p.load(v);
+            } else {
+                const p = ((this as any)[k] = new UnknownValue(""));
+                p.load(v);
+                // throw new Error(`Unexpected property "${k}" (${that.constructor.name})`);
+            }
+    }
+    return this;
 }
 
 function load_node(obj: PlainNode, parent: Container) {
     const { tag, nodes, ...props } = obj;
     const node = parent._add_element(tag)
     if (node) {
-        load_properties(node, props);
+        for (let [k, v] of Object.entries(props)) {
+            node._load_field(k, v as PlainValue<any>);
+        }
+        // load_properties(node, props);
         if (node instanceof Container) {
             if (nodes) {
                 for (const child of nodes) {

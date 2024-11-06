@@ -6,7 +6,7 @@ import { spawn } from 'child_process';
 import { Browser, BrowserLaunchArgumentOptions, LaunchOptions, ScreenshotOptions, launch } from "puppeteer";
 import { Root } from "../model/root.js";
 import { ffcmd2, VideoOutParams } from "./ffmpeg.js";
-import { AMix } from "../utils/sound.js";
+import { AFilter, AMix } from "../utils/sound.js";
 
 interface RenderParams {
     uri?: string,
@@ -14,6 +14,8 @@ interface RenderParams {
     output: string,
     width?: number,
     height?: number,
+    start_sec?: number,
+    end_sec?: number,
     par?: string,
     quality?: number,
     alpha?: boolean,
@@ -28,7 +30,7 @@ interface RenderParams {
 export async function render_root(root: Root, {
     uri, file: _file, output, width = 0, height, par: _par, quality: _quality,
     puppeteer_options, browser, video_params = {}, sink,
-    bgcolor, fps
+    bgcolor, fps, start_sec, end_sec
 }: RenderParams) {
     if (!browser) {
         if (!puppeteer_options) {
@@ -42,9 +44,21 @@ export async function render_root(root: Root, {
         browser = await launch(puppeteer_options);
     }
 
-    const [start, end] = root.calc_time_range();
-    const frames = end - start;
     const frame_rate = root.frame_rate;
+    let [start, end] = root.calc_time_range();
+    let start_frame = start;
+    let end_frame = end;
+    if (start_sec == undefined) {
+        start_sec = start / frame_rate;
+    } else {
+        start_frame = Math.max(start, round((start_sec ?? 0) * frame_rate));
+    }
+    if (end_sec == undefined) {
+        start_sec = end / frame_rate;
+    } else {
+        end_frame = Math.min(end, round(end_sec * frame_rate));
+    }
+    const frames = end - start;
     const duration = frames / frame_rate;
     const view = root.view;
     const W = view.width.get_value(0);
@@ -122,7 +136,10 @@ export async function render_root(root: Root, {
                 // TOD: fix assets source id, path
                 console.warn("RENDER")
                 console.dir(root.sounds, { depth: 4 });
-                const mix = AMix.new(root.sounds, { duration });
+                let mix: AFilter | AMix = AMix.new(root.sounds, { duration });
+                if (start_frame > start || end_frame < end) {
+                    mix = mix.slice(start_sec, end_sec)
+                }
                 console.warn(`AMix ${mix.get_duration()}`);
                 mix.feed_ff(ff);
             }
@@ -141,8 +158,7 @@ export async function render_root(root: Root, {
         }
 
         // RUN ///////////
-        const start_frame = 0;
-        const end_frame = frames;
+
         console.warn(`${frameTime(frames, frame_rate)}s ${frames} frames ${frame_rate} fps ${W}x${H} -> ${width}x${height} `);
         const sso: ScreenshotOptions = {
             type: 'png',
@@ -160,7 +176,7 @@ export async function render_root(root: Root, {
             const eq = fps == frame_rate;
             const S = eq ? start_frame : round(start_frame * fps / frame_rate);
             const E = eq ? end_frame : round(end_frame * fps / frame_rate);
-            for (let f = S; f < E; ++f) {
+            for (let f = S; f <= E; ++f) {
                 let frame = eq ? f : round(f * frame_rate / fps);
                 await page.evaluate(`stepper.step(${frame}); `);
                 const screenshot = await div.screenshot(sso);

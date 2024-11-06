@@ -39,6 +39,9 @@ export function ffcmd2(
                     codec = "qtrle";
                 } else if (output_file.endsWith(".webm")) {
                     codec = "libvpx-vp9";
+                    if (!pix_fmt) {
+                        pix_fmt = "yuva420p";
+                    }
                 }
             }
 
@@ -57,6 +60,8 @@ export function ffcmd2(
                     size[1] % 2 === 0
                 ) {
                     pix_fmt = "yuv420p";
+                } else if (codec == "libvpx-vp9") {
+                    pix_fmt = "yuva420p";
                 }
             }
             if (suffix) {

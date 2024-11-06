@@ -93,6 +93,14 @@ export async function main() {
                             describe: "video frame rate",
                             type: "number",
                         },
+                        end: {
+                            describe: "end time",
+                            type: "number",
+                        },
+                        start: {
+                            describe: "start time",
+                            type: "number",
+                        },
                         bgcolor: {
                             describe: `set background color`,
                             type: "string",
@@ -115,13 +123,13 @@ export async function main() {
                     })
                     .then(async (blob) => {
                         const root = await lib.Root.parse_json(blob);
-                        const { width, height, fps, bgcolor, ffparams } = args;
+                        const { width, height, fps, bgcolor, ffparams, end, start } = args;
                         const output = args.output as string;
                         const video_params = ffparams ? parse_loose_json(ffparams) : undefined;
                         render_root(root, {
-                            width,
-                            height,
-                            output, fps, bgcolor, video_params
+                            width, height, start_sec: start, end_sec: end,
+                            output, fps, bgcolor, video_params,
+
                         });
                     });
             }
