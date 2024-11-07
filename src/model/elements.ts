@@ -1,4 +1,5 @@
 import { Element, Shape } from "./base.js";
+import { PathValue } from "./bezshape.js";
 import { Container, Content } from "./containers.js";
 import { ScalarPairValue, LengthYValue, LengthXValue, TextValue, PercentageValue, RGBValue, LengthValue, ScalarValue, VectorValue, PointsValue } from "./value.js";
 import { Transform, ViewBox } from "./valuesets.js";
@@ -32,7 +33,7 @@ export class Path extends Shape {
     get marker_start() { return this._new_field("marker_start", new TextValue('none')); }
     get marker_mid() { return this._new_field("marker_mid", new TextValue('none')); }
     get marker_end() { return this._new_field("marker_end", new TextValue('none')); }
-    get d() { return this._new_field("d", new TextValue('')); }
+    get d() { return this._new_field("d", new PathValue('')); }
 }
 export class Line extends Shape {
     static override tag = "line";
